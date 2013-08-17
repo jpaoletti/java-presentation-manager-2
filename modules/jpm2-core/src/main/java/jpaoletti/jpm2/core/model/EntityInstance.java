@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -17,17 +18,20 @@ import jpaoletti.jpm2.core.security.PMSecurityUser;
  */
 public class EntityInstance {
 
+    private Serializable id;
     private List<Operation> operations; //Individual operations
     private List<Field> fields;
     private Map<String, Object> values;
 
-    public EntityInstance(List<Field> fields, List<Operation> operations) throws PMException {
+    public EntityInstance(Serializable id, List<Field> fields, List<Operation> operations) throws PMException {
         this.values = new LinkedHashMap<>();
         this.operations = operations;
         this.fields = fields;
+        this.id = id;
     }
 
-    public EntityInstance(Entity entity, Operation operation, PMSecurityUser user, Object object) throws PMException {
+    public EntityInstance(Serializable id, Entity entity, Operation operation, PMSecurityUser user, Object object) throws PMException {
+        this.id = id;
         values = new HashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
@@ -54,5 +58,13 @@ public class EntityInstance {
 
     public Map<String, Object> getValues() {
         return values;
+    }
+
+    public Serializable getId() {
+        return id;
+    }
+
+    public void setId(Serializable id) {
+        this.id = id;
     }
 }

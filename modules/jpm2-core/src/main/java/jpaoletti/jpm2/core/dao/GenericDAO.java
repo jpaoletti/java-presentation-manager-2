@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  *
  * @author jpaoletti
  */
-public class GenericDAO<T, ID extends Serializable> {
+public abstract class GenericDAO<T, ID extends Serializable> {
 
     @Autowired
     @Qualifier("sessionFactory")
@@ -89,4 +89,6 @@ public class GenericDAO<T, ID extends Serializable> {
             return sessionFactory.openSession();
         }
     }
+
+    public abstract Serializable getId(Object object);
 }
