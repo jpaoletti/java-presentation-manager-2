@@ -1,9 +1,7 @@
 package jpaoletti.jpm2.core.model;
 
-import java.util.ArrayList;
 import java.util.Properties;
 import jpaoletti.jpm2.core.PMCoreObject;
-import jpaoletti.jpm2.util.Validator;
 
 /**
  * An Operation is any action that can be applied to an Entity or to an Entity
@@ -50,7 +48,7 @@ public class Operation extends PMCoreObject {
      */
     private OperationContext context;
     //A list of validators for the operation.
-    private ArrayList<Validator> validators;
+    //private ArrayList<Validator> validators;
     //A properties object to get some extra configurations
     private Properties properties;
     //Permission to do this operation
@@ -187,20 +185,6 @@ public class Operation extends PMCoreObject {
      */
     public void setContext(OperationContext context) {
         this.context = context;
-    }
-
-    /**
-     * @return the validators
-     */
-    public ArrayList<Validator> getValidators() {
-        return validators;
-    }
-
-    /**
-     * @param validators the validators to set
-     */
-    public void setValidators(ArrayList<Validator> validators) {
-        this.validators = validators;
     }
 
     /**
