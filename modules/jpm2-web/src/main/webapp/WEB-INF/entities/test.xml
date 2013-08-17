@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    
+    <!--
+    VER
+    http://static.springsource.org/spring/docs/2.5.6/reference/extensible-xml.html
+    -->
+    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.dao.JPMTestDAO" />
+    
+    <bean id="jpm-entity-test" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="id" value="test" />
+        <property name="clazz" value="jpaoletti.jpm2.core.test.model.JPMTest" />
+        <property name="dao" ref="jpm-dao-test" />
+        <property name="order" value="id string integer bool" />
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="enabled" value="true" />
+                    <property name="scope" value="item" />
+                    <property name="display" value="all" />
+                    <property name="showTitle" value="true" />
+                    <property name="confirm" value="false" />
+                    <property name="perm" value="sysadmin" />
+                    <property name="available" value="true" />
+                    <property name="compact" value="false" />
+                    <property name="popup" value="false" />
+                    <property name="navigable" value="true" />
+                    <!-- <property name="follows" value="otheroper" />-->
+                    <!--<property name="condition">
+                        <bean class="some.OperationCondition">
+                            ...
+                        </bean>
+                    </property>-->
+                    <!--<property name="context">
+                        <bean class="some.OperationContext">
+                            ...
+                        </bean>
+                    </property>-->
+                    <!--<property name="validators">
+                        <list>
+                            ...
+                        </list>
+                    </property>-->
+                    <property name="properties">
+                        <props>
+                            <prop key="operation-column-width">100px</prop>
+                            <prop key="show-row-number">true</prop>
+                        </props>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="show" />
+                    <property name="display" value="edit list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="scope" value="general" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="show list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="delete" />
+                    <property name="confirm" value="false" />
+                    <property name="display" value="edit show list" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="id" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="all"/>
+                                <property name="perm" value="all"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="string" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="integer" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="date" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="bool" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

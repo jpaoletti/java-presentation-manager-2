@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean id="jpm" class="jpaoletti.jpm2.core.PresentationManager" singleton="true">
+        <constructor-arg index="0" value="jpm-config.xml" />
+        <property name="entities">
+            <list>
+                <ref bean="jpm-entity-test" />
+            </list>
+        </property>
+    </bean>
+    <import resource="jpm-default-converters.xml" />
+    <import resource="entities/test.xml" />
+    
+</beans>

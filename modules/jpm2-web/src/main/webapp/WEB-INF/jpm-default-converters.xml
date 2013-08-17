@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean id="default-converter"  class="jpaoletti.jpm2.core.converter.ToStringConverter" />
+    
+    <bean id="jpm-converter-show" class="jpaoletti.jpm2.core.converter.ToStringConverter" />
+    
+    <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.core.converter.ToStringConverter">
+        <property name="properties">
+            <props>
+                <prop key="prefix">U$S</prop>
+                <prop key="suffix"> .-</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="jpm-converter-show-date" class="jpaoletti.jpm2.core.converter.ShowDateTimeConverter">
+        <property name="properties">
+            <props>
+                <prop key="format">dd/MM/yyyy</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.core.converter.ShowDateTimeConverter">
+        <property name="properties">
+            <props>
+                <prop key="format">dd/MM/yyyy HH:mm:ss</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
