@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN" "http://struts.apache.org/dtds/struts-2.0.dtd" [
+    <!ENTITY custom SYSTEM "struts-custom.xml">
+]>
+
+<struts>
+    <constant name="struts.devMode" value="true" />
+    <constant name="struts.serve.static" value="false" />
+ 
+    <package name="default" namespace="/" extends="struts-default">
+        <global-results>
+            <result name="login" type="redirectAction">login</result>
+            <result name="error" >WEB-INF/jsp/jpm-error.jsp</result>
+        </global-results>
+        <action name="index" class="jpaoletti.jpm2.controller.Index" >
+            <result name="success">WEB-INF/jsp/index.jsp</result>
+        </action>
+        <action name="login" class="jpaoletti.jpm2.controller.Login" >
+            <result name="success">WEB-INF/jsp/login.jsp</result>
+        </action>
+        <action name="jpmStatus" class="jpaoletti.jpm2.controller.BaseAction" >
+            <result name="success">WEB-INF/jsp/jpmstatus.jsp</result>
+        </action>
+
+        <action name="list" class="jpaoletti.jpm2.controller.ListAction" >
+            <result name="success">WEB-INF/jsp/jpm-list.jsp</result>
+        </action>
+    </package>
+    
+    &custom;
+</struts>

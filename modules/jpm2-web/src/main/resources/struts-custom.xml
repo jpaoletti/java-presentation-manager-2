@@ -1,0 +1,9 @@
+<!-- Override this file on your project with a custom package -->
+
+<!--
+<package name="mypackage" namespace="/" extends="struts-default">
+    <action name="..." class="..." >
+        <result name="success">WEB-INF/jsp/...</result>
+    </action>
+</package>
+-->
