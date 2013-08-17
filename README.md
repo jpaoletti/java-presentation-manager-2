@@ -3,6 +3,8 @@
 This is the new version of the generic CRUD framework Java Presentation Manager.
 We reduced the unused functionalities and updated frameworks.
 
+THIS IS A WORK IN PROCESS PROJECT.
+
 ## Frameworks and libraries
 
 * Spring 3
