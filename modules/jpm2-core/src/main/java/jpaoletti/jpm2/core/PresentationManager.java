@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import jpaoletti.jpm2.core.converter.ClassConverterList;
+import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.PMSession;
@@ -30,7 +30,7 @@ public class PresentationManager extends Observable {
     private List<Entity> entities;
     private List<Converter> converters;
     //private Map<Object, Monitor> monitors;
-    private ClassConverterList classConverters; //TODO
+    private List<ClassConverter> classConverters;
     private final Map<String, PMSession> sessions = new HashMap<>();
 
     /**
@@ -195,5 +195,22 @@ public class PresentationManager extends Observable {
 
     public void setCustomLoader(CustomLoader customLoader) {
         this.customLoader = customLoader;
+    }
+
+    public List<ClassConverter> getClassConverters() {
+        return classConverters;
+    }
+
+    public void setClassConverters(List<ClassConverter> classConverters) {
+        this.classConverters = classConverters;
+    }
+
+    public Converter getClassConverter(String operation, String className) {
+        for (ClassConverter classConverter : classConverters) {
+            if (classConverter.getOperations().contains(operation) && classConverter.getClassName().equals(className)) {
+                return classConverter.getConverter();
+            }
+        }
+        return null;
     }
 }
