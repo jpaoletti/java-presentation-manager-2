@@ -10,7 +10,6 @@ import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.PMSession;
 import jpaoletti.jpm2.util.JPMUtils;
-import jpaoletti.jpm2.util.Properties;
 
 /**
  *
@@ -25,10 +24,9 @@ public class PresentationManager extends Observable {
     protected String appversion;
     protected String contact;
     protected String defaultConverterClass;
-    protected String cfgFilename;
     protected String cssMode;
-    protected Properties cfg;
     //
+    private CustomLoader customLoader;
     private List<Entity> entities;
     private List<Converter> converters;
     //private Map<Object, Monitor> monitors;
@@ -101,24 +99,9 @@ public class PresentationManager extends Observable {
         sessions.remove(sessionId);
     }
 
-    public List<String> getAll(String name) {
-        return cfg.getAll(name);
-    }
-
-    public boolean allowMultipleLogin() {
-        return "true".equalsIgnoreCase(cfg.getProperty("multi-login", "true"));
-    }
-
     protected void customLoad() throws Exception {
-        final String s = getCfg().getProperty("custom-loader");
-        if (s != null) {
-            try {
-                final CustomLoader customLoader = (CustomLoader) JPMUtils.newInstance(s);
-                logItem("Custom Loader", s, "*");
-                customLoader.execute(this);
-            } catch (ClassNotFoundException e) {
-                logItem("Custom Loader", s, "?");
-            }
+        if (getCustomLoader() != null) {
+            getCustomLoader().execute(this);
         }
     }
 
@@ -151,22 +134,6 @@ public class PresentationManager extends Observable {
     /**
      * GETTERS & SETTERS
      */
-    public String getCfgFilename() {
-        return cfgFilename;
-    }
-
-    public void setCfgFilename(String cfgFilename) {
-        this.cfgFilename = cfgFilename;
-    }
-
-    public Properties getCfg() {
-        return cfg;
-    }
-
-    public void setCfg(Properties cfg) {
-        this.cfg = cfg;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -229,5 +196,13 @@ public class PresentationManager extends Observable {
 
     public void setConverters(List<Converter> converters) {
         this.converters = converters;
+    }
+
+    public CustomLoader getCustomLoader() {
+        return customLoader;
+    }
+
+    public void setCustomLoader(CustomLoader customLoader) {
+        this.customLoader = customLoader;
     }
 }
