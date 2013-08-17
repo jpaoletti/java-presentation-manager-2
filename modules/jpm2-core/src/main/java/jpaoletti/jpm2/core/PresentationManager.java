@@ -33,15 +33,6 @@ public class PresentationManager extends Observable {
     private ClassConverterList classConverters; //TODO
     private final Map<String, PMSession> sessions = new HashMap<>();
 
-    public PresentationManager() throws Exception {
-        initialize();
-    }
-
-    protected final void initialize() throws Exception {
-        notifyObservers();
-        customLoad();
-    }
-
     /**
      * Creates a new session with the given id. If null is used, an automatic
      * session id will be generated

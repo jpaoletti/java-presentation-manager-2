@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
     <bean id="jpm" class="jpaoletti.jpm2.core.PresentationManager" singleton="true">
-        <constructor-arg index="0" value="jpm-config.xml" />
+        <property name="appversion" value="1.0.0" />
         <property name="entities">
             <list>
                 <ref bean="jpm-entity-test" />
