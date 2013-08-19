@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<html lang="en">
+<html>
     <head>
         <%@include file="inc/default-head.jsp" %>
     </head>
@@ -12,15 +12,9 @@
             <div id="content">
                 <div id="content-header">
                     <h1>${pm.subtitle}</h1>
-                    <div class="btn-group">
-                        <a class="btn"><i class="glyphicon glyphicon-file"></i></a>
-                        <a class="btn" title="Manage Users"><i class="glyphicon glyphicon-user"></i></a>
-                        <a class="btn"><i class="glyphicon glyphicon-comment"></i><span class="label label-danger">5</span></a>
-                        <a class="btn"><i class="glyphicon glyphicon-shopping-cart"></i></a>
-                    </div>
                 </div>
                 <div id="breadcrumb">
-                    <a href="#" title="" class="tip-bottom" data-original-title="Go to Home" class="current><i class="glyphicon glyphicon-home"></i> <spring:message code="jpm.index.home" text="Home" /></a>
+                    <a href="#" title="" class="tip-bottom" class="current"><i class="glyphicon glyphicon-home"></i> <spring:message code="jpm.index.home" text="Home" /></a>
                 </div>
                 <div class="container-fluid">
                     <div class="row">
@@ -59,10 +53,6 @@
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <div class="alert alert-info">
-                                Welcome in the <strong>Unicorn Admin Theme</strong>. Don't forget to check all the pages!
-                                <a href="#" data-dismiss="alert" class="close">×</a>
-                            </div>
                             <div class="widget-box">
                                 <div class="widget-title"><span class="icon"><i class="glyphicon glyphicon-signal"></i></span><h5>Site Statistics</h5><div class="buttons"><a href="#" class="btn"><i class="glyphicon glyphicon-refresh"></i> Update stats</a></div></div>
                                 <div class="widget-content">
