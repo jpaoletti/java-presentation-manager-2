@@ -8,7 +8,7 @@
     
     <!--http://static.springsource.org/spring-security/site/docs/3.1.x/reference/springsecurity-single.html</beans:beans>-->
     <!--<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>-->
-    <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.JPMPasswordEncoder"/>
+    <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.BCrypt"/>
     
     <http auto-config='true'>
         <intercept-url pattern="/login" access="IS_AUTHENTICATED_ANONYMOUSLY" />
