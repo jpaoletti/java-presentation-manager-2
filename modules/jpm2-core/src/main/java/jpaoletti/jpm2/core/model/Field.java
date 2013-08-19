@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.security.PMSecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -116,14 +115,14 @@ public class Field extends PMCoreObject {
      * @param operationId The Operation id
      * @return true if field is displayed on the operation
      */
-    public boolean shouldDisplay(String operationId, PMSecurityUser user) {
+    public boolean shouldDisplay(String operationId) {
         if (operationId == null) {
             return false;
         }
         //First we check permissions
         for (FieldConfig config : getConfigs()) {
             if (config.includes(operationId)) {
-                if (config.getPerm() != null && user != null && !user.hasPermission(config.getPerm())) {
+                if (config.getPerm() != null && !userHasRole(config.getPerm())) {
                     return false;
                 }
             }
@@ -226,9 +225,9 @@ public class Field extends PMCoreObject {
         this.defaultConverter = defaultConverter;
     }
 
-    public Converter getConverter(Operation operation, PMSecurityUser user) {
+    public Converter getConverter(Operation operation) {
         for (FieldConfig fieldConfig : getConfigs()) {
-            if (fieldConfig.match(operation, user)) {
+            if (fieldConfig.match(operation)) {
                 return fieldConfig.getConverter();
             }
         }

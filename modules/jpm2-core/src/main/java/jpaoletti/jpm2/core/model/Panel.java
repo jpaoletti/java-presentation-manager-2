@@ -2,7 +2,6 @@ package jpaoletti.jpm2.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import jpaoletti.jpm2.core.security.PMSecurityUser;
 
 /**
  * A grouped set of fields.
@@ -42,13 +41,13 @@ public class Panel {
     /**
      * Fields contained in this panel.
      */
-    public List<Field> getFields(Entity entity, String operationId, PMSecurityUser user) {
+    public List<Field> getFields(Entity entity, String operationId) {
         final String[] fs = getFields().split("[ ]");
-        final List<Field> result = new ArrayList<Field>();
+        final List<Field> result = new ArrayList<>();
         for (String string : fs) {
             final Field field = entity.getFieldById(string);
             if (field != null) {
-                if (operationId == null || field.shouldDisplay(operationId, user)) {
+                if (operationId == null || field.shouldDisplay(operationId)) {
                     result.add(field);
                 }
             }

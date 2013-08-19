@@ -7,7 +7,7 @@
           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
     
     <!--http://static.springsource.org/spring-security/site/docs/3.1.x/reference/springsecurity-single.html</beans:beans>-->
-    <!--<beans:bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>-->
+
     <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.BCrypt"/>
     
     <http auto-config='true'>
@@ -19,16 +19,18 @@
         <session-management>
             <!--<concurrency-control max-sessions="1" />--> <!-- This limits the number of logins the same user may have-->
         </session-management>
+        <remember-me data-source-ref="dataSource"/>
     </http>
-       
+
+    <beans:bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+        <beans:property name="dataSource" ref="dataSource"/>
+        <beans:property name="enableGroups" value="true"/>
+        <beans:property name="enableAuthorities" value="false"/>
+    </beans:bean>
+
     <authentication-manager>
-        <authentication-provider>
+        <authentication-provider user-service-ref="userDetailsService">
             <password-encoder ref="encoder" />
-            <user-service>
-                <!--<user name="admin" password="test" authorities="ROLE_USER" />-->
-                <user name="admin" password="$2a$12$zofXZl6UI.uTuqBSyKwvvOh2Qbx5vjGkgGv8MeH9/6TBPncRK2RHq" authorities="ROLE_ADMIN" />
-            </user-service>
         </authentication-provider>
-    </authentication-manager>   
-           
+    </authentication-manager>
 </beans:beans>

@@ -17,13 +17,11 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class PresentationManager extends Observable {
 
-    private static final String DEFAULT_CONVERTER = "default-converter";
     private static Long sessionIdSeed = 0L;
     protected String title;
     protected String subtitle;
     protected String appversion;
     protected String contact;
-    protected String defaultConverterClass;
     protected String cssMode;
     //
     private CustomLoader customLoader;
@@ -32,6 +30,11 @@ public class PresentationManager extends Observable {
     //private Map<Object, Monitor> monitors;
     private List<ClassConverter> classConverters;
     private final Map<String, PMSession> sessions = new HashMap<>();
+
+    public PresentationManager() {
+        this.title = "JPM2";
+        this.subtitle = "Java Presentation Manager 2";
+    }
 
     /**
      * Creates a new session with the given id. If null is used, an automatic
@@ -96,16 +99,6 @@ public class PresentationManager extends Observable {
         }
     }
 
-    public Converter getDefaultConverter() {
-        try {
-            if (getDefaultConverterClass() != null && !"".equals(getDefaultConverterClass().trim())) {
-                return (Converter) JPMUtils.newInstance(getDefaultConverterClass());
-            }
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
     /**
      * Formatting helper for startup
      *
@@ -155,14 +148,6 @@ public class PresentationManager extends Observable {
 
     public void setContact(String contact) {
         this.contact = contact;
-    }
-
-    public String getDefaultConverterClass() {
-        return defaultConverterClass;
-    }
-
-    public void setDefaultConverterClass(String defaultConverterClass) {
-        this.defaultConverterClass = defaultConverterClass;
     }
 
     public String getCssMode() {

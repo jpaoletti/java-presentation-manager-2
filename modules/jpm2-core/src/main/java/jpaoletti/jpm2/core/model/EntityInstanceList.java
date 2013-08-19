@@ -7,7 +7,6 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
-import jpaoletti.jpm2.core.security.PMSecurityUser;
 
 /**
  *
@@ -23,11 +22,11 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
         this.converters = new HashMap<>();
     }
 
-    public void load(final List objects, Entity entity, Operation operation, PMSecurityUser user) throws PMException {
+    public void load(final List objects, Entity entity, Operation operation) throws PMException {
         fields = new ArrayList<>();
         converters = new HashMap<>();
         for (Field field : entity.getAllFields()) {
-            final Converter converter = field.getConverter(operation, user);
+            final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 fields.add(field);
                 converters.put(field.getId(), converter);

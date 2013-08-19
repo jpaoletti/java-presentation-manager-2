@@ -1,7 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
 import java.util.Date;
-import jpaoletti.jpm2.core.security.PMSecurityUser;
 import jpaoletti.jpm2.util.StringEncrypter;
 
 /**
@@ -11,7 +10,6 @@ import jpaoletti.jpm2.util.StringEncrypter;
 public class PMSession {
 
     private String sessionId;
-    private PMSecurityUser user;
     private Date lastAccess;
     private StringEncrypter stringEncrypter;
     //private NavigationList navigationList;
@@ -19,14 +17,6 @@ public class PMSession {
     public PMSession(String id) {
         this.sessionId = id;
         this.stringEncrypter = new StringEncrypter(id);
-    }
-
-    public PMSecurityUser getUser() {
-        return user;
-    }
-
-    public void setUser(PMSecurityUser user) {
-        this.user = user;
     }
 
     public String getId() {
@@ -59,9 +49,9 @@ public class PMSession {
     }
 
     /*public NavigationList getNavigationList() {
-        if (navigationList == null) {
-            navigationList = new NavigationList();
-        }
-        return navigationList;
-    }*/
+     if (navigationList == null) {
+     navigationList = new NavigationList();
+     }
+     return navigationList;
+     }*/
 }

@@ -18,7 +18,7 @@ public class ListAction extends OperationAction {
         if (prepare.equals(SUCCESS)) {
             list = new EntityInstanceList();
             final List l = getEntity().getDao().list();
-            list.load(l, getEntity(), getOperation(), null);
+            list.load(l, getEntity(), getOperation());
             return SUCCESS;
         } else {
             return prepare;

@@ -3,6 +3,10 @@
 <beans>
     <bean id="jpm" class="jpaoletti.jpm2.core.PresentationManager" singleton="true">
         <property name="appversion" value="1.0.0" />
+        <property name="title" value="JPM2" />
+        <property name="subtitle" value="Java Presentation Manager 2" />
+        <property name="contact" value="jpaoletti@mail.com" />
+        <property name="cssMode" value="less" />
         <property name="entities">
             <list>
                 <ref bean="jpm-entity-test" />
@@ -11,5 +15,4 @@
     </bean>
     <import resource="jpm-default-converters.xml" />
     <import resource="entities/test.xml" />
-    
 </beans>

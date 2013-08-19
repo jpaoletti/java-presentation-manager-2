@@ -2,7 +2,6 @@ package jpaoletti.jpm2.core.model;
 
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.security.PMSecurityUser;
 
 /**
  * A field configuration item for one or more operations. Works also as a
@@ -75,8 +74,7 @@ public class FieldConfig extends PMCoreObject {
         this.converter = converter;
     }
 
-    boolean match(Operation operation, PMSecurityUser user) {
-        return includes(operation.getId())
-                && (getPerm().equalsIgnoreCase(ALL) || (user != null && user.hasPermission(getPerm())));
+    boolean match(Operation operation) {
+        return includes(operation.getId()) && (getPerm().equalsIgnoreCase(ALL) || userHasRole(getPerm()));
     }
 }

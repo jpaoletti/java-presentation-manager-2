@@ -9,7 +9,6 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
-import jpaoletti.jpm2.core.security.PMSecurityUser;
 
 /**
  * Contains fields and fields values. It depends on operation.
@@ -30,13 +29,13 @@ public class EntityInstance {
         this.id = id;
     }
 
-    public EntityInstance(Serializable id, Entity entity, Operation operation, PMSecurityUser user, Object object) throws PMException {
+    public EntityInstance(Serializable id, Entity entity, Operation operation, Object object) throws PMException {
         this.id = id;
         values = new HashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
         for (Field field : entity.getAllFields()) {
-            final Converter converter = field.getConverter(operation, user);
+            final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 try {
                     values.put(field.getId(), converter.visualize(field, object));
