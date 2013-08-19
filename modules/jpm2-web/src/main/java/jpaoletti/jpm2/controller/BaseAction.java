@@ -1,9 +1,13 @@
 package jpaoletti.jpm2.controller;
 
 import com.opensymphony.xwork2.ActionContext;
+import java.util.Collection;
 import jpaoletti.jpm2.core.PresentationManager;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.DefaultActionSupport;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -24,6 +28,15 @@ public class BaseAction extends DefaultActionSupport {
 
     public String getActionName() {
         return (String) getActionContext().get(ActionContext.ACTION_NAME);
+    }
+
+    public UserDetails getUserDetails() {
+        final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return (UserDetails) principal;
+        } else {
+            return null;
+        }
     }
 
     /**
