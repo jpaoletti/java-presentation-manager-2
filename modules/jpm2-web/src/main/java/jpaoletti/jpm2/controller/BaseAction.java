@@ -1,11 +1,9 @@
 package jpaoletti.jpm2.controller;
 
 import com.opensymphony.xwork2.ActionContext;
-import java.util.Collection;
 import jpaoletti.jpm2.core.PresentationManager;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.DefaultActionSupport;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
@@ -60,5 +58,17 @@ public class BaseAction extends DefaultActionSupport {
      */
     public PresentationManager getPm() {
         return (PresentationManager) getBean("jpm");
+    }
+
+    protected String getStringParameter(String string) {
+        final Object value = getActionContext().getParameters().get(string);
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof String) {
+            return (String) value;
+        } else {
+            return ((String[]) value)[0];
+        }
     }
 }
