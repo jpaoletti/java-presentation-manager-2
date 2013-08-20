@@ -114,7 +114,7 @@ public class JPMUtils {
      * @param value The value to set
      *
      */
-    public void set(Object obj, String name, Object value) {
+    public static void set(Object obj, String name, Object value) {
         try {
             PropertyUtils.setNestedProperty(obj, name, value);
         } catch (Exception e) {
