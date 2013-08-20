@@ -10,7 +10,6 @@
     </bean>
     
     <bean id="jpm-entity-test" class="jpaoletti.jpm2.core.model.Entity" >
-        <property name="id" value="test" />
         <property name="clazz" value="jpaoletti.jpm2.core.test.model.JPMTest" />
         <property name="dao" ref="jpm-dao-test" />
         <property name="order" value="id string integer bool" />
@@ -19,7 +18,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
                     <property name="enabled" value="true" />
-                    <property name="scope" value="item" />
+                    <property name="scope" value="general" />
                     <property name="display" value="all" />
                     <property name="showTitle" value="true" />
                     <property name="confirm" value="false" />
@@ -65,7 +64,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="delete" />
-                    <property name="confirm" value="false" />
+                    <property name="confirm" value="true" />
                     <property name="display" value="edit show list" />
                 </bean>
             </list>
@@ -95,6 +94,18 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="bool" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show-bool"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter" ref="jpm-converter-edit-bool"/>
+                            </bean>
+                        </list>
+                    </property>
                 </bean>
             </list>
         </property>

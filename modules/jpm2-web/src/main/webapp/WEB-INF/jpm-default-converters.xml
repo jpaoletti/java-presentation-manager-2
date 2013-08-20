@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="default-converter"  class="jpaoletti.jpm2.core.converter.ToStringConverter" />
-    
-    <bean id="jpm-converter-show" class="jpaoletti.jpm2.core.converter.ToStringConverter" />
-    
-    <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.core.converter.ToStringConverter">
+    <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />
+    <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
+    <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
+
+    <bean id="jpm-converter-edit-bool" class="jpaoletti.jpm2.web.converter.WebEditBoolean" />
+
+    <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
         <property name="properties">
             <props>
                 <prop key="prefix">U$S</prop>
@@ -13,14 +15,14 @@
             </props>
         </property>
     </bean>
-    <bean id="jpm-converter-show-date" class="jpaoletti.jpm2.core.converter.ShowDateTimeConverter">
+    <bean id="jpm-converter-show-date" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
         <property name="properties">
             <props>
                 <prop key="format">dd/MM/yyyy</prop>
             </props>
         </property>
     </bean>
-    <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.core.converter.ShowDateTimeConverter">
+    <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
         <property name="properties">
             <props>
                 <prop key="format">dd/MM/yyyy HH:mm:ss</prop>

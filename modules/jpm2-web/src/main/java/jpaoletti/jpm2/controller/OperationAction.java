@@ -15,6 +15,7 @@ import jpaoletti.jpm2.core.model.OperationScope;
  */
 public class OperationAction extends BaseAction {
 
+    public static final String FINISH = "finish";
     //Parameters
     private String entityId;
     //Results

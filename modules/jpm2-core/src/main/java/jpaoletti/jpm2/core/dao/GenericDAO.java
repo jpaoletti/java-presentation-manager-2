@@ -2,15 +2,18 @@ package jpaoletti.jpm2.core.dao;
 
 import java.io.Serializable;
 import java.util.List;
+import jpaoletti.jpm2.core.idtransformer.IdTransformer;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.jodah.typetools.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -23,6 +26,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     private SessionFactory sessionFactory;
     protected Class<T> persistentClass;
     protected Class<ID> idClass;
+    private IdTransformer transformer;
 
     public GenericDAO() {
         Class<?>[] typeArguments = TypeResolver.resolveRawArguments(GenericDAO.class, getClass());
@@ -31,7 +35,16 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     }
 
     public T get(ID id) {
-        return (T) getSession().get(persistentClass, id);
+        if (id.getClass().equals(idClass)) {
+            return (T) getSession().get(persistentClass, id);
+        } else {
+            return (T) getSession().get(persistentClass, (Serializable) getTransformer().transform(id));
+        }
+    }
+
+    @Transactional(readOnly = false)
+    public void update(final Object object) {
+        getSession().update(object);
     }
 
     /**
@@ -88,6 +101,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         } catch (HibernateException e) {
             return sessionFactory.openSession();
         }
+    }
+
+    public IdTransformer getTransformer() {
+        return transformer;
+    }
+
+    public void setTransformer(IdTransformer transformer) {
+        this.transformer = transformer;
     }
 
     public abstract Serializable getId(Object object);

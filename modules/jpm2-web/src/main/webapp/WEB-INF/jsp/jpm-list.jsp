@@ -13,23 +13,11 @@
         <%@include file="inc/menu.jsp" %>
         <div id="container">
             <div id="content">
-                <div id="content-header">
-                    <h1>${operationName}</h1>
-                    <div class="btn-group">
-                        <s:iterator value="generalOperations" var="o">
-                            <a class="btn" title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />">
-                                <i class="glyphicon jpmicon-${o.id}"></i>
-                            </a>
-                        </s:iterator>
-                    </div>
-                </div>
-                <div id="breadcrumb">
-                    <a href="#" title="" class="tip-bottom current"><i class="glyphicon glyphicon-home"></i> <spring:message code="jpm.index.home" text="Home" /></a>
-                    <a href="#" class="current">${operationName}</a>
-                </div>
+                <%@include file="inc/default-content-header.jsp" %>
+                <%@include file="inc/default-breadcrumb.jsp" %>
                 <div class="container-fluid">
                     <div class="row"><br/>
-                        <table class="table table-bordered table-compact table-striped">
+                        <table class="table table-bordered table-compact">
                             <thead>
                                 <tr>
                                     <th style="width: 5px;"><i class="glyphicon glyphicon-cog"></i></th>
@@ -44,7 +32,10 @@
                                         <td>
                                             <div class="btn-group nowrap">
                                                 <s:iterator value="operations" var="o">
-                                                    <a class="btn btn-mini btn-default" title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />">
+                                                    <a 
+                                                        class="btn btn-mini btn-default" 
+                                                        title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
+                                                        href="${o.id}?entityId=${entity.id}&instanceId=${item.id}">
                                                         <i class="glyphicon jpmicon-${o.id}"></i>
                                                     </a>
                                                 </s:iterator>
