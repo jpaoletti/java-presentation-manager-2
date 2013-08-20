@@ -5,12 +5,12 @@
     <!--
     http://static.springsource.org/spring/docs/2.5.6/reference/extensible-xml.html
     -->
-    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.dao.JPMTestDAO" >
+    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.JPMTestDAO" >
         <property name="transformer" ref="transformer-strToLong" />
     </bean>
     
     <bean id="jpm-entity-test" class="jpaoletti.jpm2.core.model.Entity" >
-        <property name="clazz" value="jpaoletti.jpm2.core.test.model.JPMTest" />
+        <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTest" />
         <property name="dao" ref="jpm-dao-test" />
         <property name="order" value="id string integer bool" />
         <property name="operations" >
@@ -34,9 +34,7 @@
                         </bean>
                     </property>-->
                     <!--<property name="context">
-                        <bean class="some.OperationContext">
-                            ...
-                        </bean>
+                        <bean class="some.OperationContext" />
                     </property>-->
                     <!--<property name="validators">
                         <list>

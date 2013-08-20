@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.core.test.model;
+package jpaoletti.jpm2.core.test;
 
 import java.io.Serializable;
 import java.util.Date;
