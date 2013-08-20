@@ -35,7 +35,7 @@ public class Converter extends PMCoreObject {
      * @throws ConverterException
      *
      */
-    public Object build() throws ConverterException {
+    public Object build(Field field, Object newValue) throws ConverterException {
         throw new IgnoreConvertionException();
     }
 

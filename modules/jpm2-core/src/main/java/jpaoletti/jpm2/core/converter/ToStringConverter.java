@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.core.converter;
 
-import java.util.Date;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
 
