@@ -4,8 +4,10 @@ import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import java.util.List;
 import static jpaoletti.jpm2.controller.BaseAction.getBean;
+import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 
@@ -13,16 +15,21 @@ import jpaoletti.jpm2.core.model.OperationScope;
  *
  * @author jpaoletti
  */
-public class OperationAction extends BaseAction {
+public class OperationAction extends BaseAction implements OperationController {
 
     public static final String FINISH = "finish";
     //Parameters
     private String entityId;
+    private String instanceId;
     //Results
     private Entity entity;
     private Operation operation;
+    private EntityInstance instance;
+    private List<Operation> itemOperations;
     private List<Operation> generalOperations;
     private List<Operation> selectedOperations;
+    //Internal
+    private Object object = null;
 
     /**
      * Loads entity and operation.
@@ -42,23 +49,62 @@ public class OperationAction extends BaseAction {
             getActionErrors().add(UNDEFINED_OPERATION);
             return ERROR;
         }
-        this.generalOperations = entity.getOperationsFor(null, getOperation(), OperationScope.GENERAL);
-        this.selectedOperations = entity.getOperationsFor(null, getOperation(), OperationScope.SELECTED);
+        if (getInstanceId() != null && !getInstanceId().trim().equalsIgnoreCase("")) {
+            setObject(getEntity().getDao().get(getInstanceId()));
+            if (getObject() != null) {
+                setInstance(new EntityInstance(getInstanceId(), getEntity(), getOperation(), getObject()));
+            }
+        }
+        this.itemOperations = getEntity().getOperationsFor(getObject(), getOperation(), OperationScope.ITEM);
+        this.generalOperations = getEntity().getOperationsFor(null, getOperation(), OperationScope.GENERAL);
+        this.selectedOperations = getEntity().getOperationsFor(null, getOperation(), OperationScope.SELECTED);
         return SUCCESS;
     }
 
+    @Override
+    public String execute() throws Exception {
+        final String prepare = prepare();
+        if (prepare.equals(SUCCESS)) {
+            return SUCCESS;
+        } else {
+            return prepare;
+        }
+    }
+
+    public void preConversion() throws PMException {
+        if (getOperation().getContext() != null) {
+            getOperation().getContext().preConversion(this);
+        }
+    }
+
+    public void preExecute() throws PMException {
+        if (getOperation().getContext() != null) {
+            getOperation().getContext().preExecute(this);
+        }
+    }
+
+    public void postExecute() throws PMException {
+        if (getOperation().getContext() != null) {
+            getOperation().getContext().postExecute(this);
+        }
+    }
+
+    @Override
     public List<Operation> getGeneralOperations() {
         return generalOperations;
     }
 
+    @Override
     public List<Operation> getSelectedOperations() {
         return selectedOperations;
     }
 
+    @Override
     public Entity getEntity() {
         return entity;
     }
 
+    @Override
     public String getEntityId() {
         return entityId;
     }
@@ -69,5 +115,39 @@ public class OperationAction extends BaseAction {
 
     public Operation getOperation() {
         return operation;
+    }
+
+    public EntityInstance getInstance() {
+        return instance;
+    }
+
+    public void setInstance(EntityInstance instance) {
+        this.instance = instance;
+    }
+
+    @Override
+    public List<Operation> getItemOperations() {
+        return itemOperations;
+    }
+
+    public void setItemOperations(List<Operation> itemOperations) {
+        this.itemOperations = itemOperations;
+    }
+
+    @Override
+    public Object getObject() {
+        return object;
+    }
+
+    protected void setObject(Object object) {
+        this.object = object;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 }

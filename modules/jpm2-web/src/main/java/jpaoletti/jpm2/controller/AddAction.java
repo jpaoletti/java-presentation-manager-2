@@ -15,7 +15,7 @@ import jpaoletti.jpm2.util.JPMUtils;
  *
  * @author jpaoletti
  */
-public class AddAction extends DefaultCrudAction {
+public class AddAction extends OperationAction {
 
     @Override
     protected String prepare() throws PMException {
@@ -34,14 +34,17 @@ public class AddAction extends DefaultCrudAction {
             for (Map.Entry<String, Object> entry : getInstance().getValues().entrySet()) {
                 final String newValue = getStringParameter("field_" + entry.getKey());
                 final Field field = getEntity().getFieldById(entry.getKey());
+                preConversion();
                 try {
                     final Converter converter = field.getConverter(getOperation());
                     JPMUtils.set(getObject(), field.getProperty(), converter.build(field, newValue));
                 } catch (IgnoreConvertionException e) {
                 }
             }
+            preExecute();
             getEntity().getDao().save(getObject());
             setInstanceId(getEntity().getDao().getId(getObject()).toString());
+            postExecute();
             return FINISH;
         } else {
             return prepare;

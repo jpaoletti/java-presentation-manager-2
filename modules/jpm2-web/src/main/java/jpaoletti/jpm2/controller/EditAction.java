@@ -12,7 +12,7 @@ import jpaoletti.jpm2.util.JPMUtils;
  *
  * @author jpaoletti
  */
-public class EditAction extends DefaultCrudAction {
+public class EditAction extends OperationAction {
 
     public String commit() throws PMException {
         final String prepare = prepare();
