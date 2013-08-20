@@ -76,8 +76,7 @@
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="all"/>
-                                <property name="perm" value="all"/>
+                                <property name="operations" value="list show edit"/>
                                 <property name="converter" ref="jpm-converter-show"/>
                             </bean>
                         </list>
@@ -85,6 +84,18 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="string" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter" ref="jpm-converter-edit-string"/>
+                            </bean>
+                        </list>
+                    </property>
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="integer" />

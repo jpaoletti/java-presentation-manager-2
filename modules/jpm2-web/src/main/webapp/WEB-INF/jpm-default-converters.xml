@@ -6,6 +6,7 @@
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
 
     <bean id="jpm-converter-edit-bool" class="jpaoletti.jpm2.web.converter.WebEditBoolean" />
+    <bean id="jpm-converter-edit-string" class="jpaoletti.jpm2.web.converter.WebEditString" />
 
     <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
         <property name="properties">
