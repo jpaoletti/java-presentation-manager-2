@@ -21,13 +21,16 @@ public class EditAction extends OperationAction {
             for (Map.Entry<String, Object> entry : getInstance().getValues().entrySet()) {
                 final String newValue = getStringParameter("field_" + entry.getKey());
                 final Field field = getEntity().getFieldById(entry.getKey());
+                preConversion();
                 try {
                     final Converter converter = field.getConverter(getOperation());
                     JPMUtils.set(getObject(), field.getProperty(), converter.build(field, newValue));
                 } catch (IgnoreConvertionException e) {
                 }
             }
+            preExecute();
             getEntity().getDao().update(getObject());
+            postExecute();
             return FINISH;
         } else {
             return prepare;
