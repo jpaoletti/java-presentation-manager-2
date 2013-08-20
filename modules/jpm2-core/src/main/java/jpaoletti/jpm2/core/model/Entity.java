@@ -5,6 +5,7 @@ import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.beans.factory.BeanNameAware;
 
 /**
  * An Entity is the visual representation and operation over a class of a data
@@ -13,7 +14,7 @@ import jpaoletti.jpm2.util.JPMUtils;
  * @author jpaoletti
  *
  */
-public class Entity extends PMCoreObject {
+public class Entity extends PMCoreObject implements BeanNameAware {
 
     // Represents the entity id. This must me unique.
     private String id;
@@ -559,5 +560,10 @@ public class Entity extends PMCoreObject {
             }
         }
         return r;
+    }
+
+    @Override
+    public void setBeanName(String string) {
+        this.id = string;
     }
 }
