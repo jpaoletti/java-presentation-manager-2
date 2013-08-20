@@ -233,56 +233,19 @@ public class Field extends PMCoreObject {
         }
         return null;
     }
-    /**
-     * Returns the internationalized field tooltip
-     */
-    /*public String getTooltip() {
-     final String key = "pm.field." + getEntity().getId() + "." + getId() + ".tooltip";
-     if (key == null) {
-     return null;
-     }
-     final String message = getPm().message(key);
-     if (key.equals(message)) {
-     return null;
-     }
-     return message;
-     }*/
-    /**
-     * Find the right converter for this field on the given operation.
-     *
-     * @param operation
-     *
-     * @return a converter
-     */
-    /* public Converter getConverter(String operation) {
-     //First we check "covnerters" list
-     Converter c = getConverters().getConverterForOperation(operation);
-     if (c == null) {
-     // if not found, we check configs
-     for (FieldConfig config : getConfigs()) {
-     if (config.includes(operation)) {
-     //c = getPm().findExternalConverter(config.getEconverter());
-     throw new NotImplementedException();
-     //break;
-     }
-     }
-     }
-     if (c == null) {
-     // If not found, we check class level converters
-     final String _property = getProperty();
-     try {
-     final String[] _properties = _property.split("[.]");
-     Class<?> clazz = Class.forName(getEntity().getClazz());
-     for (int i = 0; i < _properties.length - 1; i++) {
-     clazz = FieldUtils.getField(clazz, _properties[i], true).getType();
-     }
-     final String className = FieldUtils.getField(clazz, _properties[_properties.length - 1], true).getType().getName();
-     //c = getPm().getClassConverters().getConverter(operation, className);
-     throw new NotImplementedException();
-     } catch (Exception ex) {
-     JPMUtils.getLogger().info(String.format("Unable to introspect field '%s' on entity '%s'", _property, getEntity().getId()));
-     }
-     }
-     return c;
-     }*/
+
+//    /**
+//     * Returns the internationalized field tooltip
+//     */
+//    public String getTooltip() {
+//        final String key = getTitle() + ".tooltip";
+//        if (key == null) {
+//            return null;
+//        }
+//        final String message = getPm().message(key);
+//        if (key.equals(message)) {
+//            return null;
+//        }
+//        return message;
+//    }
 }
