@@ -1,34 +1,37 @@
 package jpaoletti.jpm2.core.model;
 
+import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
-
 
 /**
  * This interface allows the programmer to defines some code to execute before
  * or after any operation execution.
- * 
- * @author jpaoletti 
- * 
+ *
+ * @author jpaoletti
+ *
  */
 public interface OperationContext {
 
-    /**This method is executed at the very beginning of the process, before
+    /**
+     * This method is executed at the very beginning of the process, before
      * converterting or replace any data on objects.
-     * @param ctx The context
+     *
      * @throws PMException
      */
-    public void preConversion() throws PMException;
+    public void preConversion(OperationController operationController) throws PMException;
 
-    /**This method is executed before trying to execute the main method of the operation, that is
-     * before opening any transaction. 
-     * @param ctx The context
+    /**
+     * This method is executed before trying to execute the main method of the
+     * operation, that is before opening any transaction.
+     *
      * @throws PMException
      */
-    public void preExecute() throws PMException;
+    public void preExecute(OperationController operationController) throws PMException;
 
-    /**This method is executed after the main method of the operation.
-     * @param ctx The context
+    /**
+     * This method is executed after the main method of the operation.
+     *
      * @throws PMException
      */
-    public void postExecute() throws PMException;
+    public void postExecute(OperationController operationController) throws PMException;
 }
