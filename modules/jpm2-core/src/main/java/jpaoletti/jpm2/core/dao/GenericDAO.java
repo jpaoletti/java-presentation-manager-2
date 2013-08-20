@@ -47,6 +47,11 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         getSession().update(object);
     }
 
+    @Transactional(readOnly = false)
+    public void save(Object object) {
+        getSession().save(object);
+    }
+
     /**
      * Retorna una lista.
      */

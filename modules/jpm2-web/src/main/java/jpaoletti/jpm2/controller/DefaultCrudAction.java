@@ -25,13 +25,13 @@ public class DefaultCrudAction extends OperationAction {
     protected String prepare() throws PMException {
         final String prepare = super.prepare();
         if (SUCCESS.equals(prepare)) {
-            if (getInstanceId() != null) {
-                object = getEntity().getDao().get(getInstanceId());
-                if (object != null) {
-                    setInstance(new EntityInstance(getInstanceId(), getEntity(), getOperation(), object));
+            if (getInstanceId() != null && !getInstanceId().trim().equalsIgnoreCase("")) {
+                setObject(getEntity().getDao().get(getInstanceId()));
+                if (getObject() != null) {
+                    setInstance(new EntityInstance(getInstanceId(), getEntity(), getOperation(), getObject()));
                 }
             }
-            this.itemOperations = getEntity().getOperationsFor(object, getOperation(), OperationScope.ITEM);
+            setItemOperations(getEntity().getOperationsFor(object, getOperation(), OperationScope.ITEM));
         }
         return prepare;
     }
@@ -64,6 +64,10 @@ public class DefaultCrudAction extends OperationAction {
 
     protected Object getObject() {
         return object;
+    }
+
+    protected void setObject(Object object) {
+        this.object = object;
     }
 
     public String getInstanceId() {

@@ -25,6 +25,14 @@
         <action name="list" class="jpaoletti.jpm2.controller.ListAction" >
             <result name="success">WEB-INF/jsp/jpm-list.jsp</result>
         </action>
+        <action name="add" class="jpaoletti.jpm2.controller.AddAction" >
+            <result name="success">WEB-INF/jsp/jpm-edit.jsp</result>
+            <result name="finish" type="redirectAction">
+                <param name="actionName">show</param>
+                <param name="entityId">${entityId}</param>
+                <param name="instanceId">${instanceId}</param>
+            </result>
+        </action>
         <action name="edit" class="jpaoletti.jpm2.controller.EditAction" >
             <result name="success">WEB-INF/jsp/jpm-edit.jsp</result>
             <result name="finish" type="redirectAction">
