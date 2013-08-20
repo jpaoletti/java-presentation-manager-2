@@ -33,7 +33,7 @@
                                             <div class="btn-group nowrap">
                                                 <s:iterator value="operations" var="o">
                                                     <a 
-                                                        class="btn btn-mini btn-default" 
+                                                        class="btn btn-mini btn-default confirm-${o.confirm}" 
                                                         title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
                                                         href="${o.id}?entityId=${entity.id}&instanceId=${item.id}">
                                                         <i class="glyphicon jpmicon-${o.id}"></i>
