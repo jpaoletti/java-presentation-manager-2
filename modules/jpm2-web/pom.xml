@@ -17,8 +17,6 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.1.4.RELEASE</spring.version>
-        <spring-security.version>3.1.4.RELEASE</spring-security.version>
     </properties>
     
     <!-- You may want to copy this profiles in your own project -->
@@ -102,7 +100,12 @@
             <artifactId>thymeleaf-spring3</artifactId>
             <version>2.0.17</version>
         </dependency>
-             
+        <!-- AOP dependency -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2</version>
+        </dependency>
         <!-- Struts 2 -->
         <dependency>
             <groupId>org.apache.struts</groupId>
@@ -227,17 +230,17 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${spring-security.version}</version>
+            <version>${spring.version}</version>
         </dependency> 
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring-security.version}</version>
+            <version>${spring.version}</version>
         </dependency> 
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring-security.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
