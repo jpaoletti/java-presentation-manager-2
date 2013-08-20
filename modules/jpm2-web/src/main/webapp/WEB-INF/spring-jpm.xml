@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+    <bean id="transformer-strToLong" class="jpaoletti.jpm2.core.idtransformer.StrToLong" />
+    <bean id="transformer-strToInt" class="jpaoletti.jpm2.core.idtransformer.StrToInt" />
+
     <bean id="jpm" class="jpaoletti.jpm2.core.PresentationManager" singleton="true">
         <property name="appversion" value="1.0.0" />
         <property name="title" value="JPM2" />

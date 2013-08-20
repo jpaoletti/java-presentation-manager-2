@@ -3,10 +3,11 @@
 <beans>
     
     <!--
-    VER
     http://static.springsource.org/spring/docs/2.5.6/reference/extensible-xml.html
     -->
-    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.dao.JPMTestDAO" />
+    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.dao.JPMTestDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
     
     <bean id="jpm-entity-test" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="id" value="test" />
