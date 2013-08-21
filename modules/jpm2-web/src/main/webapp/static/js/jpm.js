@@ -1,7 +1,23 @@
-
 $(document).ready(function() {
     //Clean empty help-blocks
     $(".help-block:empty").remove();
+    $("body").on("click", ".confirm-true", function(e) {
+        $("#confirmModal").remove();
+        e.preventDefault();
+        var x = $("<div class='modal fade' id='confirmModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>"
+                + "<div class='modal-dialog'><div class='modal-content'><div class='modal-header'>"
+                + "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>"
+                + "<h4 class='modal-title'>Confirm</h4>"
+                + "</div>"
+                + "<div class='modal-body'>Sure?</div>"
+                + "<div class='modal-footer'>"
+                + "<button type='button' class='btn btn-default' data-dismiss='modal' >Cancel</button>"
+                + "<a class='btn btn-primary' href='" + $(this).attr("href") + "' >Ok</button>"
+                + "</div></div></div></div>"
+                );
+        x.appendTo("body");
+        x.modal();
+    });
     //Init Menu
     var ul = $('#sidebar > ul');
     var ul2 = $('#sidebar li.open ul');
