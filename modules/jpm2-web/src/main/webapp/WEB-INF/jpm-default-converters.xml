@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
     <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
@@ -32,4 +36,56 @@
             </props>
         </property>
     </bean>
+
+    <!-- DEFAULT CONFIG LISTS-->
+    <util:list id="default-id-field-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show edit"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+    </util:list>
+
+    <util:list id="default-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-string"/>
+        </bean>
+    </util:list>
+
+    <util:list id="default-int-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-int"/>
+        </bean>
+    </util:list>
+
+    <util:list id="default-date-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show-date"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-date"/>
+        </bean>
+    </util:list>
+
+    <util:list id="default-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show-bool"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-bool"/>
+        </bean>
+    </util:list>
 </beans>
