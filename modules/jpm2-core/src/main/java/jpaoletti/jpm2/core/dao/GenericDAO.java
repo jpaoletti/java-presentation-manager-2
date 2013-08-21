@@ -52,6 +52,11 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         getSession().save(object);
     }
 
+    @Transactional(readOnly = false)
+    public void delete(Object object) {
+        getSession().delete(object);
+    }
+
     /**
      * Retorna una lista.
      */
