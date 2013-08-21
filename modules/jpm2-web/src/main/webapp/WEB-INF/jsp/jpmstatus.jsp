@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="s" uri="/struts-tags" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@include file="inc/default-taglibs.jsp" %>
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
