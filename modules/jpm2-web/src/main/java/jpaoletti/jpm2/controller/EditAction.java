@@ -14,6 +14,10 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class EditAction extends OperationAction {
 
+    public EditAction() {
+        this.requireObject = true;
+    }
+
     public String commit() throws PMException {
         final String prepare = prepare();
         if (prepare.equals(SUCCESS)) {

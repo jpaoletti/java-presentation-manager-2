@@ -17,6 +17,10 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class AddAction extends OperationAction {
 
+    public AddAction() {
+        this.requireObject = false;
+    }
+
     @Override
     protected String prepare() throws PMException {
         final String prepare = super.prepare();

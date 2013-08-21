@@ -3,6 +3,8 @@ package jpaoletti.jpm2.controller;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import java.util.List;
+import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OBJECT;
+import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OPERATION;
 import static jpaoletti.jpm2.controller.BaseAction.getBean;
 import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
@@ -30,6 +32,7 @@ public class OperationAction extends BaseAction implements OperationController {
     private List<Operation> selectedOperations;
     //Internal
     private Object object = null;
+    protected boolean requireObject = false;
 
     /**
      * Loads entity and operation.
@@ -51,11 +54,17 @@ public class OperationAction extends BaseAction implements OperationController {
         }
         if (getInstanceId() != null && !getInstanceId().trim().equalsIgnoreCase("")) {
             setObject(getEntity().getDao().get(getInstanceId()));
-            if (getObject() != null) {
+            if (hasObject()) {
                 setInstance(new EntityInstance(getInstanceId(), getEntity(), getOperation(), getObject()));
             }
         }
-        this.itemOperations = getEntity().getOperationsFor(getObject(), getOperation(), OperationScope.ITEM);
+        if (requireObject && !hasObject()) {
+            getActionErrors().add(UNDEFINED_OBJECT);
+            return ERROR;
+        }
+        if (hasObject()) {
+            this.itemOperations = getEntity().getOperationsFor(getObject(), getOperation(), OperationScope.ITEM);
+        }
         this.generalOperations = getEntity().getOperationsFor(null, getOperation(), OperationScope.GENERAL);
         this.selectedOperations = getEntity().getOperationsFor(null, getOperation(), OperationScope.SELECTED);
         return SUCCESS;
@@ -149,5 +158,9 @@ public class OperationAction extends BaseAction implements OperationController {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public boolean hasObject() {
+        return getObject() != null;
     }
 }

@@ -41,7 +41,7 @@
                 <param name="instanceId">${instanceId}</param>
             </result>
         </action>
-        <action name="show" class="jpaoletti.jpm2.controller.DefaultCrudAction" >
+        <action name="show" class="jpaoletti.jpm2.controller.OperationAction" >
             <result name="success">WEB-INF/jsp/jpm-show.jsp</result>
         </action>
     </package>

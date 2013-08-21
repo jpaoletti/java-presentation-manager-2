@@ -19,6 +19,7 @@ public class BaseAction extends DefaultActionSupport {
     public static final String UNDEFINED_ENTITY_PARAMETER = "Undefined Entity Parameter";
     public static final String UNDEFINED_ENTITY = "Undefined Entity";
     public static final String UNDEFINED_OPERATION = "Undefined Operation";
+    public static final String UNDEFINED_OBJECT = "Undefined Object";
 
     public ActionContext getActionContext() {
         return ActionContext.getContext();
