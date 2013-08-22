@@ -18,12 +18,7 @@ function initConfirm() {
     });
 }
 
-$(document).ready(function() {
-    //Clean empty help-blocks
-    $(".help-block:empty").remove();
-    $(".tooltip-field").tooltip();
-    initConfirm();
-    //Init Menu
+function initWindowsResize() {
     var ul = $('#sidebar > ul');
     var ul2 = $('#sidebar li.open ul');
     // === jPanelMenu === //
@@ -31,7 +26,6 @@ $(document).ready(function() {
         menu: '#sidebar',
         trigger: '#menu-trigger'
     });
-    // === Resize window related === //
     $(window).resize(function() {
         if ($(window).width() > 480 && $(window).width() < 769) {
             ul2.css({'display': 'none'});
@@ -86,9 +80,9 @@ $(document).ready(function() {
     if ($(window).width() > 480 && $(window).width() < 769) {
         ul2.css({'display': 'none'});
     }
+}
 
-    // === Sidebar navigation === //
-
+function initMenu() {
     $('li.submenu > a').click(function(e) {
         e.preventDefault();
         var submenu = $(this).siblings('ul');
@@ -120,6 +114,18 @@ $(document).ready(function() {
             li.addClass('open');
         }
     });
+}
+
+$(document).ready(function() {
+    //Clean empty help-blocks
+    $(".help-block:empty").remove();
+    $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
+    $(".row-fluid:not(:has(div))").remove();
+    initConfirm();
+    //Init Menu
+    initWindowsResize();
+    // === Sidebar navigation === //
+    initMenu();
 
     // === Tooltips === //
     $('.tip').tooltip();
@@ -127,24 +133,4 @@ $(document).ready(function() {
     $('.tip-right').tooltip({placement: 'right'});
     $('.tip-top').tooltip({placement: 'top'});
     $('.tip-bottom').tooltip({placement: 'bottom'});
-
-    // === Style switcher === //
-    $('#style-switcher i').click(function() {
-        if ($(this).hasClass('open')) {
-            $(this).parent().animate({right: '-=220'});
-            $(this).removeClass('open');
-        } else {
-            $(this).parent().animate({right: '+=220'});
-            $(this).addClass('open');
-        }
-        $(this).toggleClass('glyphicon-arrow-left');
-        $(this).toggleClass('glyphicon-arrow-right');
-    });
-
-    $('#style-switcher a').click(function() {
-        var style = $(this).attr('href').replace('#', '');
-        $('.skin-color').attr('href', 'css/unicorn.' + style + '.css');
-        $(this).siblings('a').css({'border-color': 'transparent'});
-        $(this).css({'border-color': '#aaaaaa'});
-    });
 });
