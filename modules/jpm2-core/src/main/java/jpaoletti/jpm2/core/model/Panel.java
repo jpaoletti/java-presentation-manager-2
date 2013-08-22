@@ -1,6 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,6 +13,7 @@ public class Panel {
     private String icon;
     private String title;
     private String fields;
+    private Integer blocks;
 
     public String getTitle() {
         return title;
@@ -41,17 +42,15 @@ public class Panel {
     /**
      * Fields contained in this panel.
      */
-    public List<Field> getFields(Entity entity, String operationId) {
-        final String[] fs = getFields().split("[ ]");
-        final List<Field> result = new ArrayList<>();
-        for (String string : fs) {
-            final Field field = entity.getFieldById(string);
-            if (field != null) {
-                if (operationId == null || field.shouldDisplay(operationId)) {
-                    result.add(field);
-                }
-            }
-        }
-        return result;
+    public List<String> getFieldList() {
+        return Arrays.asList(getFields().split("[ ]"));
+    }
+
+    public Integer getBlocks() {
+        return blocks;
+    }
+
+    public void setBlocks(Integer blocks) {
+        this.blocks = blocks;
     }
 }

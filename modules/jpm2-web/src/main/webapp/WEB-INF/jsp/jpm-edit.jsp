@@ -13,7 +13,6 @@
             <div id="content">
                 <%@include file="inc/default-content-header.jsp" %>
                 <%@include file="inc/default-breadcrumb.jsp" %>
-
                 <div class="container-fluid">
                     <div class="row"><br/>
                         <div class="col-12">
@@ -25,23 +24,9 @@
                                     <form class="form-horizontal" role="form" method="POST" action="${operation.id}!commit">
                                         <input name="entityId" value="${entity.id}" type="hidden" />
                                         <input name="instanceId" value="${instance.id}" type="hidden" />
-                                        <c:if test="${empty entity.panels}">
-                                            <s:iterator value="instance.values" var="value">
-                                                <div id="control-group-${key}" class="form-group">
-                                                    <label class="col-lg-2 control-label" for="f_${key}">
-                                                        <jpm:field-title entity="${entity}" fieldId="${key}" />
-                                                    </label>
-                                                    <div class="col-lg-10">
-                                                        ${value}
-                                                    </div>
-                                                </div>
-                                            </s:iterator>
-                                        </c:if>
-                                        <c:if test="${not empty ctx.entity.panels}">
-                                            TO-DO
-                                        </c:if>
+                                        <%@include file="inc/default-form-content.jsp" %>
                                         <div class="form-group">
-                                            <div class="col-lg-offset-2 col-lg-10">
+                                            <div class="col-lg-12">
                                                 <button type="submit" class="btn btn-primary"><spring:message code="jpm.form.submit" text="Submit" /></button>
                                             </div>
                                         </div>

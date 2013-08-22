@@ -93,5 +93,33 @@
                 </bean>
             </list>
         </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="glyphicon-bell" />
+                                <property name="title" value="jpm.jpm-entity-test.panel1" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="id string" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="glyphicon-briefcase" />
+                                <property name="title" value="jpm.jpm-entity-test.panel2" />
+                                <property name="blocks" value="8" />
+                                <property name="fields" value="integer date bool" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
     </bean>
 </beans>

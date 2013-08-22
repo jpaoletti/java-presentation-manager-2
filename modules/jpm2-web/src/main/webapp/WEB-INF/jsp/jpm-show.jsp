@@ -22,22 +22,8 @@
                                 </div>
                                 <div class="widget-content">
                                     <form class="form-horizontal" role="form" action="#">
-                                        <c:if test="${empty entity.panels}">
-                                            <s:iterator value="instance.values" var="value">
-                                                <div id="control-group-${field.id}" class="form-group">
-                                                    <label class="col-lg-2 control-label" for="f_${key}">
-                                                        <jpm:field-title entity="${entity}" fieldId="${key}" />
-                                                    </label>
-                                                    <div class="col-lg-10">
-                                                        ${value}
-                                                        <p class="help-block"><spring:message code="jpm.field.${entity.id}.${field.id}.help" text="" /></p>
-                                                    </div>
-                                                </div>
-                                            </s:iterator>
-                                        </c:if>
-                                        <c:if test="${not empty ctx.entity.panels}">
-                                            TODO
-                                        </c:if>
+                                        <%@include file="inc/default-form-content.jsp" %>
+                                        &nbsp;
                                     </form>
                                 </div>
                             </div>
