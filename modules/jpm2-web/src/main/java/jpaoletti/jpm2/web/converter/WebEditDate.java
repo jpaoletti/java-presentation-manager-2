@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Field;
 import org.joda.time.DateTime;
 
@@ -35,7 +36,7 @@ public class WebEditDate extends WebToString {
             try {
                 return sdf.parse(newValue.toString());
             } catch (ParseException ex) {
-                throw new ConverterException("jpm.converter.error.invalid.date.format");
+                throw new ConverterException(MessageFactory.error("jpm.converter.error.invalid.date.format", newValue.toString()));
             }
         }
     }

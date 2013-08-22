@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core;
 
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.message.MessageFactory;
 
 /**
  * A generic expection for Presentation Manager engine.
@@ -9,11 +10,14 @@ import jpaoletti.jpm2.core.message.Message;
  */
 public class PMException extends Exception {
 
-    private String key;
     private Message msg;
-    private static final long serialVersionUID = -1685585143991954053L;
 
     public PMException(Message msg) {
+        this.msg = msg;
+    }
+
+    public PMException(Message msg, Throwable nested) {
+        super(nested);
         this.msg = msg;
     }
 
@@ -22,7 +26,7 @@ public class PMException extends Exception {
      * @param key
      */
     public PMException(String key) {
-        setKey(key);
+        this.msg = MessageFactory.error(key);
     }
 
     /**
@@ -46,21 +50,8 @@ public class PMException extends Exception {
      * @param nested
      */
     public PMException(String s, Throwable nested) {
-        super(s, nested);
-    }
-
-    /**
-     * @param key the key to set
-     */
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    /**
-     * @return the key
-     */
-    public String getKey() {
-        return key;
+        this(nested);
+        this.msg = MessageFactory.error(s);
     }
 
     public Message getMsg() {
@@ -73,12 +64,6 @@ public class PMException extends Exception {
 
     @Override
     public String getMessage() {
-        /*if (getMsg() != null) {
-         return PresentationManager.getMessage(getMsg().getKey(), getMsg().getArgs());
-         } else if (getKey() != null) {
-         return PresentationManager.getMessage(getKey());
-         } else {*/
-        return super.getMessage();
-        //}
+        return getMsg().getKey();
     }
 }

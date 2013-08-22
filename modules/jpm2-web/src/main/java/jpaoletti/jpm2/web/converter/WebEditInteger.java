@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.web.converter;
 
 import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Field;
 
 /**
@@ -21,7 +22,11 @@ public class WebEditInteger extends WebToString {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {
-            return Integer.parseInt((String) newValue);
+            try {
+                return Integer.parseInt((String) newValue);
+            } catch (NumberFormatException e) {
+                throw new ConverterException(MessageFactory.error("jpm.converter.error.invalid.int.format", newValue.toString()));
+            }
         }
     }
 }
