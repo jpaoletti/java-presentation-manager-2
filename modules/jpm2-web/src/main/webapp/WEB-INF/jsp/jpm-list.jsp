@@ -20,7 +20,7 @@
                                 <tr>
                                     <th style="width: 5px;"><i class="glyphicon glyphicon-cog"></i></th>
                                         <s:iterator value="list.fields" var="field">
-                                        <th><spring:message code="jpm.field.${entity.id}.${field.id}" text="${field.id}" /></th>
+                                        <th><jpm:field-title entity="${entity}" fieldId="${field.id}" /></th>
                                         </s:iterator>
                                 </tr>
                             </thead>

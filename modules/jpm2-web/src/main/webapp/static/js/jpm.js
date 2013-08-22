@@ -21,6 +21,7 @@ function initConfirm() {
 $(document).ready(function() {
     //Clean empty help-blocks
     $(".help-block:empty").remove();
+    $(".tooltip-field").tooltip();
     initConfirm();
     //Init Menu
     var ul = $('#sidebar > ul');

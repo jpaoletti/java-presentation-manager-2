@@ -25,7 +25,9 @@
                                         <c:if test="${empty entity.panels}">
                                             <s:iterator value="instance.values" var="value">
                                                 <div id="control-group-${field.id}" class="form-group">
-                                                    <label class="col-lg-2 control-label" for="f_${key}"><spring:message code="jpm.field.${entity.id}.${key}" text="${key}" /></label>
+                                                    <label class="col-lg-2 control-label" for="f_${key}">
+                                                        <jpm:field-title entity="${entity}" fieldId="${key}" />
+                                                    </label>
                                                     <div class="col-lg-10">
                                                         ${value}
                                                         <p class="help-block"><spring:message code="jpm.field.${entity.id}.${field.id}.help" text="" /></p>
