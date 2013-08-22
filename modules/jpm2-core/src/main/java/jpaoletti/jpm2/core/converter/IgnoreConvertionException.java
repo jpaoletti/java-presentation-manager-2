@@ -20,6 +20,6 @@ public class IgnoreConvertionException extends ConverterException {
      *
      */
     public IgnoreConvertionException() {
-        super();
+        super("");
     }
 }
