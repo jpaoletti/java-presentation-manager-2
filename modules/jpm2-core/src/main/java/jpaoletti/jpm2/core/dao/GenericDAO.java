@@ -7,9 +7,9 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.jodah.typetools.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,6 +58,16 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     }
 
     /**
+     * Retorna una lista.
+     */
+    public Long count(Criterion... restrictions) {
+        final Criteria c = getBaseCriteria(restrictions);
+        c.setProjection(Projections.rowCount());
+        return (Long) c.uniqueResult();
+    }
+
+    /**
+     * /**
      * Retorna una lista.
      */
     public List<T> list(Criterion... restrictions) {
