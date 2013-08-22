@@ -8,6 +8,7 @@ import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OPERATION;
 import static jpaoletti.jpm2.controller.BaseAction.getBean;
 import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
@@ -162,5 +163,9 @@ public class OperationAction extends BaseAction implements OperationController {
 
     public boolean hasObject() {
         return getObject() != null;
+    }
+
+    protected GenericDAO getDao() {
+        return getEntity().getDao();
     }
 }

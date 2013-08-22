@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * This is a list with an index displacement. That means that any index received or
- * sent in functions has a displacement. For example if displacement is 10 then
- * get(10) will return 0 item, get(11) will return 1 item and so on.
+ * This is a list with an index displacement. That means that any index received
+ * or sent in functions has a displacement. For example if displacement is 10
+ * then get(10) will return 0 item, get(11) will return 1 item and so on.
  *
  * @param <T>
  */
@@ -21,7 +21,8 @@ public class DisplacedList<T> extends ArrayList<T> {
     }
 
     /**
-     *  Inherited from ArrayList
+     * Inherited from ArrayList
+     *
      * @param index
      * @param element
      */
@@ -36,6 +37,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @param o
      * @return
      */
@@ -49,6 +51,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @param index
      * @param element
      * @return
@@ -63,6 +66,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @param index
      * @return
      */
@@ -76,6 +80,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @param o
      * @return
      */
@@ -89,6 +94,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @param index
      * @return
      */
@@ -110,15 +116,17 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @return
      */
     @Override
     public Iterator<T> iterator() {
-        return new DisplacedIterator<T>(this);
+        return new DisplacedIterator<>(this);
     }
 
     /**
      * Constructor with an initial displacement
+     *
      * @param displacement
      */
     public DisplacedList(Integer displacement) {
@@ -128,6 +136,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Inherited from ArrayList
+     *
      * @param c
      */
     public DisplacedList(Collection<? extends T> c) {
@@ -146,7 +155,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * getter for displacement
-     * 
+     *
      * @return
      */
     public Integer getDisplacement() {
@@ -155,7 +164,7 @@ public class DisplacedList<T> extends ArrayList<T> {
 
     /**
      * Setter for displacement
-     * 
+     *
      * @param displacement
      */
     public void setDisplacement(Integer displacement) {

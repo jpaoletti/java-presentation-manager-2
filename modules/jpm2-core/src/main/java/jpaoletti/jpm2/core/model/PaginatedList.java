@@ -2,7 +2,6 @@ package jpaoletti.jpm2.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import jpaoletti.jpm2.util.DisplacedList;
 
 /**
  * This list represents a list with a paged representation.
@@ -12,54 +11,22 @@ import jpaoletti.jpm2.util.DisplacedList;
 public class PaginatedList {
 
     public static final int DEFAULT_PAGE_SIZE = 10;
-    private Entity entity;
-    private DisplacedList<Object> contents;
+    private EntityInstanceList contents;
     private Integer page;
     private Integer pages;
+    private Integer pageSize;
     private Long total;
-    private Integer rowsPerPage;
     private ListSort sort;
     private ListFilter listFilter; //Permanent list filter
-    private List<Operation> operations;
-    private List<Operation> rowOperations;
-    private boolean searchable;
     private boolean paginable;
-    private boolean showRowNumber;
-    private String operationColWidth;
     private boolean hasSelectedScope;
-    private boolean compactedOperations;
-
-    /**
-     * Returns a list with the existing pages index
-     *
-     * @return
-     */
-    public List<Integer> getPageRange() {
-        List<Integer> r = new ArrayList<Integer>();
-        for (int i = 1; i <= getPages(); i++) {
-            r.add(i);
-        }
-        return r;
-    }
-
-    /**
-     * String representation of the list
-     *
-     * @return
-     */
-    @Override
-    public String toString() {
-        return "PMList [entity=" + entity + ", page " + page + " of "
-                + pages + ", total=" + total + ", rowsPerPage=" + rowsPerPage
-                + ((sort != null) ? ", order=" + sort.getFieldId() + ", direction=" + sort.getDirection() : "") + "]";
-    }
 
     /**
      * Default constructor
      */
     public PaginatedList() {
         this.page = 1;
-        rowsPerPage = 10; //Default
+        pageSize = 10; //Default
     }
 
     /**
@@ -68,10 +35,10 @@ public class PaginatedList {
      * @param contents
      * @param total
      */
-    public PaginatedList(DisplacedList<Object> contents, Long total) {
+    public PaginatedList(EntityInstanceList contents, Long total) {
         super();
         this.contents = contents;
-        rowsPerPage = 10; //Default
+        pageSize = DEFAULT_PAGE_SIZE; //Default
         this.page = 1;
         if (total != null) {
             setTotal(total);
@@ -79,15 +46,30 @@ public class PaginatedList {
     }
 
     /**
+     * Returns a list with the existing pages index
      *
-     * @param rowsPerPage
+     * @return
      */
-    public void setRowsPerPage(Integer rowsPerPage) {
-        if (rowsPerPage != this.rowsPerPage) {
-            this.page = 1;
+    public List<Integer> getPageRange() {
+        List<Integer> r = new ArrayList<>();
+        for (int i = 1; i <= getPages(); i++) {
+            r.add(i);
         }
-        this.rowsPerPage = rowsPerPage;
-        setTotal(total);
+        return r;
+    }
+
+    /**
+     *
+     * @param pageSize
+     */
+    public void setPageSize(Integer pageSize) {
+        if (pageSize != null) {
+            if (pageSize != getPageSize()) {
+                this.page = 1;
+            }
+            this.pageSize = pageSize;
+            setTotal(total);
+        }
     }
 
     public ListSort getSort() {
@@ -101,14 +83,7 @@ public class PaginatedList {
         this.sort = sort;
     }
 
-    /**
-     *
-     * @return
-     */
-    public DisplacedList<Object> getContents() {
-        if (contents == null) {
-            contents = new DisplacedList<Object>();
-        }
+    public EntityInstanceList getContents() {
         return contents;
     }
 
@@ -116,9 +91,9 @@ public class PaginatedList {
      *
      * @param contents
      */
-    public void setContents(DisplacedList<Object> contents) {
+    public void setContents(EntityInstanceList contents) {
         this.contents = contents;
-        getContents().setDisplacement((int) ((getPage() - 1) * getRowsPerPage()));
+        getContents().setDisplacement((int) ((getPage() - 1) * getPageSize()));
     }
 
     /**
@@ -137,8 +112,9 @@ public class PaginatedList {
      * @param page
      */
     public void setPage(Integer page) {
-        //Out of range page sets to last one
-        if (getTotal() != null && page > getPages()) {
+        if (page == null) {
+            this.page = 1;
+        } else if (getTotal() != null && page > getPages()) { //Out of range page sets to last one
             this.page = getPages();
         } else {
             this.page = page;
@@ -179,52 +155,16 @@ public class PaginatedList {
     public final void setTotal(Long total) {
         this.total = total;
         if (total != null) {
-            if (total % rowsPerPage == 0) {
-                this.pages = (int) (total / rowsPerPage);
+            if (total % pageSize == 0) {
+                this.pages = (int) (total / pageSize);
             } else {
-                this.pages = (int) (total / rowsPerPage) + 1;
+                this.pages = (int) (total / pageSize) + 1;
             }
         }
     }
 
-    /**
-     *
-     * @return
-     */
-    public Integer getRowsPerPage() {
-        return rowsPerPage;
-    }
-
-    /**
-     *
-     * @param entity
-     */
-    public void setEntity(Entity entity) {
-        this.entity = entity;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public List<Operation> getOperations() {
-        return operations;
-    }
-
-    public void setOperations(List<Operation> operations) {
-        this.operations = operations;
-    }
-
-    public List<Operation> getRowOperations() {
-        return rowOperations;
-    }
-
-    public void setRowOperations(List<Operation> rowOperations) {
-        this.rowOperations = rowOperations;
+    public Integer getPageSize() {
+        return pageSize == null ? DEFAULT_PAGE_SIZE : pageSize;
     }
 
     /**
@@ -233,30 +173,7 @@ public class PaginatedList {
      * @return
      */
     public Integer from() {
-        return (this.getPage() != null) ? (((getPage() - 1) * getRowsPerPage())) : 0;
-    }
-
-    /**
-     * Return the page size of the list (or de Row Per Page value)
-     *
-     * @return
-     */
-    public Integer rpp() {
-        return (getRowsPerPage() != null) ? getRowsPerPage() : DEFAULT_PAGE_SIZE;
-    }
-
-    /**
-     * @param searchable the searchable to set
-     */
-    public void setSearchable(boolean searchable) {
-        this.searchable = searchable;
-    }
-
-    /**
-     * @return the searchable
-     */
-    public boolean isSearchable() {
-        return searchable;
+        return (this.getPage() != null) ? (((getPage() - 1) * getPageSize())) : 0;
     }
 
     /**
@@ -271,34 +188,6 @@ public class PaginatedList {
      */
     public boolean isPaginable() {
         return paginable;
-    }
-
-    /**
-     * @param showRowNumber the showRowNumber to set
-     */
-    public void setShowRowNumber(boolean showRowNumber) {
-        this.showRowNumber = showRowNumber;
-    }
-
-    /**
-     * @return the showRowNumber
-     */
-    public boolean isShowRowNumber() {
-        return showRowNumber;
-    }
-
-    /**
-     * @param operationColWidth the operationColWidth to set
-     */
-    public void setOperationColWidth(String operationColWidth) {
-        this.operationColWidth = operationColWidth;
-    }
-
-    /**
-     * @return the operationColWidth
-     */
-    public String getOperationColWidth() {
-        return operationColWidth;
     }
 
     /**
@@ -329,17 +218,6 @@ public class PaginatedList {
 
     public void setListFilter(ListFilter listFilter) {
         this.listFilter = listFilter;
-    }
-
-    /**
-     * @return true if list operations are compacted
-     */
-    public boolean isCompactedOperations() {
-        return compactedOperations;
-    }
-
-    public void setCompactedOperations(boolean compactedOperations) {
-        this.compactedOperations = compactedOperations;
     }
 
     /**

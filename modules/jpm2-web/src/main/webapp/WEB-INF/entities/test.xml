@@ -44,6 +44,7 @@
                     <property name="properties">
                         <props>
                             <prop key="show-row-number">true</prop>
+                            <prop key="paginable">true</prop>
                         </props>
                     </property>
                 </bean>
