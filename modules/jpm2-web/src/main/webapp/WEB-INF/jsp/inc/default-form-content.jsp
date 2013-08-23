@@ -25,12 +25,15 @@
                         <div class="panel-body">
                             <s:iterator value="fieldList" var="field">
                                 <c:if test="${not empty instance.values[field]}">
-                                    <div id="control-group-${field}" class="form-group">
+                                    <div id="control-group-${field}" class="form-group ${not empty fieldMessages[field] ? 'has-error':''}">
                                         <label class="col-lg-2 control-label" for="f_${field}">
                                             <jpm:field-title entity="${entity}" fieldId="${field}" />
                                         </label>
                                         <div class="col-lg-10">
                                             ${instance.values[field]}
+                                            <c:if test="${not empty fieldMessages[field]}">
+                                                <p class="help-block"><spring:message code="${fieldMessages[field].key}" text="${fieldMessages[field].key}" arguments="${fieldMessages[field].arguments}" argumentSeparator=";" /></p>
+                                            </c:if>
                                         </div>
                                     </div>
                                 </c:if>

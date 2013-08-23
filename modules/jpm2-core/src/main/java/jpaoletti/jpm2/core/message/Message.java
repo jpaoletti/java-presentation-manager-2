@@ -99,4 +99,12 @@ public class Message {
     public void setType(MessageType type) {
         this.type = type;
     }
+
+    public String getArguments() {
+        final StringBuilder sb = new StringBuilder();
+        for (String string : getArgs()) {
+            sb.append(string).append(";");
+        }
+        return sb.toString().substring(0, sb.toString().length() - 1);
+    }
 }

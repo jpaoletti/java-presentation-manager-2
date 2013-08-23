@@ -2,8 +2,10 @@ package jpaoletti.jpm2.controller;
 
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import java.util.Map;
+import static jpaoletti.jpm2.controller.OperationAction.COMMIT_ERROR;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -30,7 +32,12 @@ public class EditAction extends OperationAction {
                     final Converter converter = field.getConverter(getOperation());
                     JPMUtils.set(getObject(), field.getProperty(), converter.build(field, newValue));
                 } catch (IgnoreConvertionException e) {
+                } catch (ConverterException e) {
+                    getFieldMessages().put(field.getId(), e.getMsg());
                 }
+            }
+            if (!getFieldMessages().isEmpty()) {
+                return COMMIT_ERROR;
             }
             preExecute();
             getEntity().getDao().update(getObject());

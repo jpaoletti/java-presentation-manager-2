@@ -4,6 +4,7 @@ import com.opensymphony.xwork2.ActionContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.apache.struts2.dispatcher.DefaultActionSupport;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import org.apache.struts2.interceptor.SessionAware;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
@@ -69,8 +71,15 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
         final WebApplicationContext context =
                 WebApplicationContextUtils.getRequiredWebApplicationContext(
                 ServletActionContext.getServletContext());
-
         return context.getBean(name);
+    }
+
+    public static String getMessage(String code, String... args) {
+        final Locale locale = LocaleContextHolder.getLocale();
+        final WebApplicationContext context =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(
+                ServletActionContext.getServletContext());
+        return context.getMessage(code, args, locale);
     }
 
     /**

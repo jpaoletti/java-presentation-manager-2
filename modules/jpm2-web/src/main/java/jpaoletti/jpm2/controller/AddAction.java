@@ -5,6 +5,7 @@ import java.util.Map;
 import static jpaoletti.jpm2.controller.OperationAction.FINISH;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -43,7 +44,12 @@ public class AddAction extends OperationAction {
                     final Converter converter = field.getConverter(getOperation());
                     JPMUtils.set(getObject(), field.getProperty(), converter.build(field, newValue));
                 } catch (IgnoreConvertionException e) {
+                } catch (ConverterException e) {
+                    getFieldMessages().put(field.getId(), e.getMsg());
                 }
+            }
+            if (!getFieldMessages().isEmpty()) {
+                return COMMIT_ERROR;
             }
             preExecute();
             getEntity().getDao().save(getObject());
