@@ -35,8 +35,7 @@
                                                 <p class="help-block">
                                                     <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
                                                     <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
-                                                        * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />
-                                                        ${st.last ? '<br/>':''}
+                                                        * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
                                                     </c:forEach>
                                                 </p>
                                             </c:if>
