@@ -1,6 +1,8 @@
 package jpaoletti.jpm2.core.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
@@ -234,18 +236,20 @@ public class Field extends PMCoreObject {
         return null;
     }
 
-//    /**
-//     * Returns the internationalized field tooltip
-//     */
-//    public String getTooltip() {
-//        final String key = getTitle() + ".tooltip";
-//        if (key == null) {
-//            return null;
-//        }
-//        final String message = getPm().message(key);
-//        if (key.equals(message)) {
-//            return null;
-//        }
-//        return message;
-//    }
+    public List<FieldValidator> getValidators(Operation operation) {
+        for (FieldConfig fieldConfig : getConfigs()) {
+            if (fieldConfig.match(operation)) {
+                if (fieldConfig.getValidators() == null || fieldConfig.getValidators().isEmpty()) {
+                    if (fieldConfig.getValidator() == null) {
+                        return Collections.EMPTY_LIST;
+                    } else {
+                        return Arrays.asList(fieldConfig.getValidator());
+                    }
+                } else {
+                    return fieldConfig.getValidators();
+                }
+            }
+        }
+        return null;
+    }
 }

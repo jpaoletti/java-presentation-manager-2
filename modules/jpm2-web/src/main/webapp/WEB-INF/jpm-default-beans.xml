@@ -5,6 +5,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
+    <!-- ID TRANSFORMERS -->
+    <bean id="transformer-strToLong" class="jpaoletti.jpm2.core.idtransformer.StrToLong" />
+    <bean id="transformer-strToInt" class="jpaoletti.jpm2.core.idtransformer.StrToInt" />
+
+    <!-- VALIDATORS -->
+    <bean id="jpm-validator-notNull" class="jpaoletti.jpm2.core.validator.NotNull" />
+
+    <!-- CONVERTERS -->
     <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />

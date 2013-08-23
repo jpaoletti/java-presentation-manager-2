@@ -32,7 +32,13 @@
                                         <div class="col-lg-10">
                                             ${instance.values[field]}
                                             <c:if test="${not empty fieldMessages[field]}">
-                                                <p class="help-block"><spring:message code="${fieldMessages[field].key}" text="${fieldMessages[field].key}" arguments="${fieldMessages[field].arguments}" argumentSeparator=";" /></p>
+                                                <p class="help-block">
+                                                    <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
+                                                    <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
+                                                        * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />
+                                                        ${st.last ? '<br/>':''}
+                                                    </c:forEach>
+                                                </p>
                                             </c:if>
                                         </div>
                                     </div>

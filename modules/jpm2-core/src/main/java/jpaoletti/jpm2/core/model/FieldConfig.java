@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
 
@@ -15,8 +16,9 @@ public class FieldConfig extends PMCoreObject {
     private String operations;
     private String perm;
     private Converter converter;
+    private FieldValidator validator;
+    private List<FieldValidator> validators;
 
-    //TODO private List<FieldValidator> validators;
     public FieldConfig() {
     }
 
@@ -76,5 +78,21 @@ public class FieldConfig extends PMCoreObject {
 
     boolean match(Operation operation) {
         return includes(operation.getId()) && (getPerm().equalsIgnoreCase(ALL) || userHasRole(getPerm()));
+    }
+
+    public FieldValidator getValidator() {
+        return validator;
+    }
+
+    public void setValidator(FieldValidator validator) {
+        this.validator = validator;
+    }
+
+    public List<FieldValidator> getValidators() {
+        return validators;
+    }
+
+    public void setValidators(List<FieldValidator> validators) {
+        this.validators = validators;
     }
 }

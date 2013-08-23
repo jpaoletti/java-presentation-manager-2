@@ -3,17 +3,25 @@ package jpaoletti.jpm2.controller;
 import static com.opensymphony.xwork2.Action.ERROR;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import java.util.List;
+import java.util.Map;
 import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OBJECT;
 import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OPERATION;
 import static jpaoletti.jpm2.controller.BaseAction.getBean;
 import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.dao.GenericDAO;
+import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.FieldValidator;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
+import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  *
@@ -81,6 +89,29 @@ public class OperationAction extends BaseAction implements OperationController {
             return SUCCESS;
         } else {
             return prepare;
+        }
+    }
+
+    protected void processFields() throws PMException {
+        for (Map.Entry<String, Object> entry : getInstance().getValues().entrySet()) {
+            final String newValue = getStringParameter("field_" + entry.getKey());
+            final Field field = getEntity().getFieldById(entry.getKey());
+            preConversion();
+            try {
+                final Converter converter = field.getConverter(getOperation());
+                final Object convertedValue = converter.build(field, newValue);
+                final List<FieldValidator> validators = field.getValidators(getOperation());
+                for (FieldValidator fieldValidator : validators) {
+                    final Message msg = fieldValidator.validate(getObject(), convertedValue);
+                    if (msg != null) {
+                        addFieldMsg(field, msg);
+                    }
+                }
+                JPMUtils.set(getObject(), field.getProperty(), convertedValue);
+            } catch (IgnoreConvertionException e) {
+            } catch (ConverterException e) {
+                addFieldMsg(field, e.getMsg());
+            }
         }
     }
 

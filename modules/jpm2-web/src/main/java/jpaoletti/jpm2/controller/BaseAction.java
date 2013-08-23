@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.model.Field;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.DefaultActionSupport;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -37,7 +38,7 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
     //Messages
     private List<Message> globalMessages = new ArrayList<>();
     private List<Message> entityMessages = new ArrayList<>();
-    private Map<String, Message> fieldMessages = new HashMap<>(); //field
+    private Map<String, List<Message>> fieldMessages = new HashMap<>(); //field
     //Struts and Http stuff
     private Map<String, Object> session;
     private HttpServletResponse servletResponse;
@@ -59,6 +60,13 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
         } else {
             return null;
         }
+    }
+
+    protected void addFieldMsg(final Field field, Message message) {
+        if (!getFieldMessages().containsKey(field.getId())) {
+            getFieldMessages().put(field.getId(), new ArrayList<Message>());
+        }
+        getFieldMessages().get(field.getId()).add(message);
     }
 
     /**
@@ -111,7 +119,7 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
         return entityMessages;
     }
 
-    public Map<String, Message> getFieldMessages() {
+    public Map<String, List<Message>> getFieldMessages() {
         return fieldMessages;
     }
 
