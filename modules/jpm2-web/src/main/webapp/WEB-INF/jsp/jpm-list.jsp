@@ -23,10 +23,9 @@
                                             <input type="hidden" name="entityId" value="${entityId}" />
                                             <input type="hidden" name="page" value="${paginatedList.page}" />
                                             <div class="form-group">
-                                                <label class="sr-only">Email address</label>
                                                 <input class="form-control" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" />
                                             </div>
-                                            <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-arrow-right"></span></button>
+                                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></button>
                                         </form>
                                     </div>
                                 </div>

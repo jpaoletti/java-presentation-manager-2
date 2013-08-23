@@ -13,6 +13,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
+import jpaoletti.jpm2.core.model.SessionEntityData;
 
 /**
  *
@@ -20,6 +21,7 @@ import jpaoletti.jpm2.core.model.OperationScope;
  */
 public class OperationAction extends BaseAction implements OperationController {
 
+    public static final String COMMIT_ERROR = "commit_error";
     public static final String FINISH = "finish";
     //Parameters
     private String entityId;
@@ -48,6 +50,7 @@ public class OperationAction extends BaseAction implements OperationController {
             getActionErrors().add(UNDEFINED_ENTITY);
             return ERROR;
         }
+
         operation = getEntity().getOperation(getActionName());
         if (operation == null) {
             getActionErrors().add(UNDEFINED_OPERATION);
@@ -167,5 +170,14 @@ public class OperationAction extends BaseAction implements OperationController {
 
     protected GenericDAO getDao() {
         return getEntity().getDao();
+    }
+
+    protected SessionEntityData getSessionEntityData() {
+        final Object sed = getHttpSession().getAttribute(getEntityId());
+        if (sed == null) {
+            final SessionEntityData sessionEntityData = new SessionEntityData(getEntityId());
+            getHttpSession().setAttribute(getEntityId(), sessionEntityData);
+        }
+        return (SessionEntityData) getHttpSession().getAttribute(getEntityId());
     }
 }

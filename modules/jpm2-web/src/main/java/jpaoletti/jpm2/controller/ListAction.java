@@ -10,6 +10,7 @@ import jpaoletti.jpm2.core.model.PaginatedList;
  */
 public class ListAction extends OperationAction {
     //Parameters
+
     private Integer page;
     private Integer pageSize;
     //Result
@@ -29,6 +30,9 @@ public class ListAction extends OperationAction {
                 getPaginatedList().setTotal(getDao().count());
                 getList().load(getDao().list(getPaginatedList().from(), getPaginatedList().getPageSize()), getEntity(), getOperation());
                 getPaginatedList().setContents(getList());
+
+                getSessionEntityData().setPage(getPaginatedList().getPage());
+                getSessionEntityData().setPageSize(getPaginatedList().getPageSize());
             } else {
                 getList().load(getDao().list(), getEntity(), getOperation());
             }
@@ -47,7 +51,11 @@ public class ListAction extends OperationAction {
     }
 
     public Integer getPage() {
-        return page;
+        if (page == null) {
+            return getSessionEntityData().getPage();
+        } else {
+            return page;
+        }
     }
 
     public void setPage(Integer page) {
@@ -55,7 +63,11 @@ public class ListAction extends OperationAction {
     }
 
     public Integer getPageSize() {
-        return pageSize;
+        if (pageSize == null) {
+            return getSessionEntityData().getPageSize();
+        } else {
+            return pageSize;
+        }
     }
 
     public void setPageSize(Integer pageSize) {

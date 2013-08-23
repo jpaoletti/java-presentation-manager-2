@@ -1,9 +1,21 @@
 package jpaoletti.jpm2.controller;
 
 import com.opensymphony.xwork2.ActionContext;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.message.Message;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.DefaultActionSupport;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
+import org.apache.struts2.interceptor.SessionAware;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
@@ -14,12 +26,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author jpaoletti
  */
-public class BaseAction extends DefaultActionSupport {
+public class BaseAction extends DefaultActionSupport implements SessionAware, ServletResponseAware, ServletRequestAware {
 
     public static final String UNDEFINED_ENTITY_PARAMETER = "Undefined Entity Parameter";
     public static final String UNDEFINED_ENTITY = "Undefined Entity";
     public static final String UNDEFINED_OPERATION = "Undefined Operation";
     public static final String UNDEFINED_OBJECT = "Undefined Object";
+    //Messages
+    private List<Message> globalMessages = new ArrayList<>();
+    private List<Message> entityMessages = new ArrayList<>();
+    private Map<String, Message> fieldMessages = new HashMap<>(); //field
+    //Struts and Http stuff
+    private Map<String, Object> session;
+    private HttpServletResponse servletResponse;
+    private HttpServletRequest servletRequest;
+    private HttpSession httpSession;
 
     public ActionContext getActionContext() {
         return ActionContext.getContext();
@@ -71,5 +92,73 @@ public class BaseAction extends DefaultActionSupport {
         } else {
             return ((String[]) value)[0];
         }
+    }
+
+    public List<Message> getGlobalMessages() {
+        return globalMessages;
+    }
+
+    public List<Message> getEntityMessages() {
+        return entityMessages;
+    }
+
+    public Map<String, Message> getFieldMessages() {
+        return fieldMessages;
+    }
+
+    @Override
+    public void setSession(Map<String, Object> map) {
+        this.session = map;
+    }
+
+    public Map<String, Object> getSession() {
+        return session;
+    }
+
+    @Override
+    public void setServletResponse(HttpServletResponse hsr) {
+        this.servletResponse = hsr;
+    }
+
+    @Override
+    public void setServletRequest(HttpServletRequest hsr) {
+        this.servletRequest = hsr;
+        this.httpSession = hsr.getSession(true);
+    }
+
+    public HttpServletResponse getServletResponse() {
+        return servletResponse;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public Cookie getCookieValue(String cookieName) {
+        Cookie cookies[] = servletRequest.getCookies();
+        Cookie myCookie = null;
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                if (cookies[i].getName().equals(cookieName)) {
+                    myCookie = cookies[i];
+                    break;
+                }
+            }
+        }
+        return myCookie;
+    }
+
+    public void setCookieValue(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(60 * 60 * 24 * 365); // Make the cookie last a year  
+        servletResponse.addCookie(cookie);
+    }
+
+    public HttpSession getHttpSession() {
+        return httpSession;
+    }
+
+    public void setHttpSession(HttpSession httpSession) {
+        this.httpSession = httpSession;
     }
 }
