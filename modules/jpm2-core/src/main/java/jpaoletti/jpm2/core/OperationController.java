@@ -21,4 +21,6 @@ public interface OperationController {
     public List<Operation> getGeneralOperations();
 
     public List<Operation> getSelectedOperations();
+
+    public List<String> getParameter(String param);
 }

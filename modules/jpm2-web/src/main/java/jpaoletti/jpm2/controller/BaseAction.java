@@ -2,6 +2,7 @@ package jpaoletti.jpm2.controller;
 
 import com.opensymphony.xwork2.ActionContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -99,15 +100,24 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
         return (PresentationManager) getBean("jpm");
     }
 
-    protected String getStringParameter(String string) {
-        final Object value = getActionContext().getParameters().get(string);
+    public List<String> getParameter(String param) {
+        final Object value = getActionContext().getParameters().get(param);
         if (value == null) {
             return null;
         }
-        if (value instanceof String) {
-            return (String) value;
+        if (value instanceof String[]) {
+            return Arrays.asList((String[]) value);
         } else {
-            return ((String[]) value)[0];
+            return Arrays.asList((String) value);
+        }
+    }
+
+    protected String getStringParameter(String string) {
+        final List<String> list = getParameter(string);
+        if (list == null || list.isEmpty()) {
+            return null;
+        } else {
+            return list.get(0);
         }
     }
 
