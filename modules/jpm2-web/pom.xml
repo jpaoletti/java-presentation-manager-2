@@ -90,7 +90,7 @@
     </profiles>
 
     <dependencies>
-        <dependency>
+        <!--<dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
             <version>2.0.17</version>
@@ -99,7 +99,7 @@
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring3</artifactId>
             <version>2.0.17</version>
-        </dependency>
+        </dependency>-->
         <!-- AOP dependency -->
         <dependency>
             <groupId>cglib</groupId>
