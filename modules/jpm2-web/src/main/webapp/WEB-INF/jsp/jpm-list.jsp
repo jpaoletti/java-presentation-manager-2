@@ -80,7 +80,15 @@
                                                 </div>
                                             </td>
                                             <s:iterator value="values" var="v">
-                                                <td data-field="${v.key}">${v.value}</td>
+                                                <td data-field="${v.key}">
+                                                    <c:set var="convertedValue" value="${v.value}"/>
+                                                    <c:if test="${fn:startsWith(convertedValue, '@page:')}">
+                                                        <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
+                                                    </c:if>
+                                                    <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
+                                                        ${convertedValue}
+                                                    </c:if>
+                                                </td>
                                             </s:iterator>
                                         </tr>
                                     </s:iterator>
