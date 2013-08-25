@@ -9,9 +9,11 @@ public class SessionEntityData {
     private String entityId;
     private Integer page;
     private Integer pageSize;
+    private SearchCriteria searchCriteria;
 
     public SessionEntityData(String entityId) {
         this.entityId = entityId;
+        this.searchCriteria = new SearchCriteria();
     }
 
     public String getEntityId() {
@@ -36,5 +38,9 @@ public class SessionEntityData {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public SearchCriteria getSearchCriteria() {
+        return searchCriteria;
     }
 }

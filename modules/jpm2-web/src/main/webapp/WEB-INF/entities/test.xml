@@ -78,10 +78,12 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="string" />
+                    <property name="searcher" ref="jpm-seracher-string" />
                     <property name="configs" ref="default-string-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="integer" />
+                    <property name="searcher" ref="jpm-seracher-int"/>
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">

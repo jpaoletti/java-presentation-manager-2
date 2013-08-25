@@ -6,21 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.search.Searcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * A Field represents a property of the represented entity.
- *
- * <h2>Simple entity configuration file</h2>
- * <pre>
- * {@code
- * <field id="id" display="all | some_operations" align="right | left | center"
- * width="xxxx" />
- * ....
- * </field> }
- * <
- * /pre>
  *
  * @author jpaoletti
  *
@@ -39,9 +30,9 @@ public class Field extends PMCoreObject {
     private String property;
     private String width;
     private String display;
-//    private ArrayList<Validator> validators;
     private String defaultValue;
-    private String align; //left right center
+    private String align; //left right center, TODO
+    private Searcher searcher;
     private List<FieldConfig> configs;
 
     /**
@@ -251,5 +242,13 @@ public class Field extends PMCoreObject {
             }
         }
         return null;
+    }
+
+    public Searcher getSearcher() {
+        return searcher;
+    }
+
+    public void setSearcher(Searcher searcher) {
+        this.searcher = searcher;
     }
 }

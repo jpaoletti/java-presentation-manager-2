@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OBJECT;
 import static jpaoletti.jpm2.controller.BaseAction.UNDEFINED_OPERATION;
-import static jpaoletti.jpm2.controller.BaseAction.getBean;
 import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
@@ -14,28 +13,24 @@ import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.message.Message;
-import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.FieldValidator;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
-import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  *
  * @author jpaoletti
  */
-public class OperationAction extends BaseAction implements OperationController {
+public class OperationAction extends EntityAction implements OperationController {
 
     public static final String COMMIT_ERROR = "commit_error";
     public static final String FINISH = "finish";
     //Parameters
-    private String entityId;
     private String instanceId;
     //Results
-    private Entity entity;
     private Operation operation;
     private EntityInstance instance;
     private List<Operation> itemOperations;
@@ -49,16 +44,10 @@ public class OperationAction extends BaseAction implements OperationController {
      * Loads entity and operation.
      */
     protected String prepare() throws PMException {
-        if (getEntityId() == null || getEntityId().trim().equals("")) {
-            getActionErrors().add(UNDEFINED_ENTITY_PARAMETER);
-            return ERROR;
+        final String loadEntity = loadEntity();
+        if (!loadEntity.equals(SUCCESS)) {
+            return loadEntity;
         }
-        entity = (Entity) getBean(getEntityId());
-        if (entity == null) {
-            getActionErrors().add(UNDEFINED_ENTITY);
-            return ERROR;
-        }
-
         operation = getEntity().getOperation(getActionName());
         if (operation == null) {
             getActionErrors().add(UNDEFINED_OPERATION);
@@ -143,20 +132,6 @@ public class OperationAction extends BaseAction implements OperationController {
         return selectedOperations;
     }
 
-    @Override
-    public Entity getEntity() {
-        return entity;
-    }
-
-    @Override
-    public String getEntityId() {
-        return entityId;
-    }
-
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
-    }
-
     public Operation getOperation() {
         return operation;
     }
@@ -201,14 +176,5 @@ public class OperationAction extends BaseAction implements OperationController {
 
     protected GenericDAO getDao() {
         return getEntity().getDao();
-    }
-
-    protected SessionEntityData getSessionEntityData() {
-        final Object sed = getHttpSession().getAttribute(getEntityId());
-        if (sed == null) {
-            final SessionEntityData sessionEntityData = new SessionEntityData(getEntityId());
-            getHttpSession().setAttribute(getEntityId(), sessionEntityData);
-        }
-        return (SessionEntityData) getHttpSession().getAttribute(getEntityId());
     }
 }

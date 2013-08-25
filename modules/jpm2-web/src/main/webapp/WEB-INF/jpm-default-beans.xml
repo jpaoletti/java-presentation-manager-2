@@ -12,6 +12,11 @@
     <!-- VALIDATORS -->
     <bean id="jpm-validator-notNull" class="jpaoletti.jpm2.core.validator.NotNull" />
 
+    <!-- SEARCHERS -->
+    <bean id="jpm-seracher-int" class="jpaoletti.jpm2.core.search.IntegerSearcher" />
+    <bean id="jpm-seracher-long" class="jpaoletti.jpm2.core.search.LongSearcher" />
+    <bean id="jpm-seracher-string" class="jpaoletti.jpm2.core.search.StringSearcher" />
+
     <!-- CONVERTERS -->
     <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />

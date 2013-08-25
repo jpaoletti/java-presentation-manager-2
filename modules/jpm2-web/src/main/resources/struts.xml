@@ -52,6 +52,18 @@
                 <param name="entityId">${entityId}</param>
             </result>
         </action>
+        <action name="addSearch" class="jpaoletti.jpm2.controller.AddSearch">
+            <result name="success" type="redirectAction">
+                <param name="actionName">list</param>
+                <param name="entityId">${entityId}</param>
+            </result>
+        </action>
+        <action name="removeSearch" class="jpaoletti.jpm2.controller.RemoveSearch">
+            <result name="success" type="redirectAction">
+                <param name="actionName">list</param>
+                <param name="entityId">${entityId}</param>
+            </result>
+        </action>
     </package>
     
     &custom;

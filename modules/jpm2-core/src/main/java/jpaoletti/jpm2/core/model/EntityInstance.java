@@ -17,7 +17,7 @@ import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
  */
 public class EntityInstance {
 
-    private Serializable id;
+    private Serializable id; //Current intstance Id
     private List<Operation> operations; //Individual operations
     private List<Field> fields;
     private Map<String, Object> values;
