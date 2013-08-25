@@ -40,7 +40,7 @@
             <%@include  file="inc/footer.jsp" %>
             <%@include  file="inc/default-javascript.jsp" %>
             <script type="text/javascript">
-                $(function() {
+                jpmLoad(function() {
                     $(".help-block:empty").remove();
                     $(".to-string").each(function() {
                         var v = $(this).html();

@@ -38,7 +38,7 @@
         </div>
         <%@include  file="inc/default-javascript.jsp" %>
         <script type="text/javascript">
-        $(document).ready(function() {
+        jpmLoad(function() {
             if ($.browser.msie === true && $.browser.version.slice(0, 3) < 10) {
                 $('input[placeholder]').each(function() {
                     var input = $(this);

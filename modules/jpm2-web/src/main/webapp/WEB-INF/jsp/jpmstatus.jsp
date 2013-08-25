@@ -87,9 +87,9 @@
         <%@include  file="inc/footer.jsp" %>
         <%@include  file="inc/default-javascript.jsp" %>
         <script type="text/javascript">
-            $(function() {
+            jpmLoad(function() {
                 $("#menu-status").addClass("active");
-            })
+            });
         </script>
     </body>
 </html>

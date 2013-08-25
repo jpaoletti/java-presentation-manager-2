@@ -1,3 +1,25 @@
+var PM_onLoadFunctions = new Array();
+
+String.prototype.trim = function() {
+    return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
+};
+
+/**
+ * Register a function to excecute on page load.
+ * @param func The function
+ */
+function jpmLoad(func) {
+    PM_onLoadFunctions.push(func);
+}
+
+var delay = (function() {
+    var timer = 0;
+    return function(callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
+
 function initConfirm() {
     $("body").on("click", ".confirm-true", function(e) {
         $("#confirmModal").remove();
@@ -117,20 +139,35 @@ function initMenu() {
 }
 
 $(document).ready(function() {
-    //Clean empty help-blocks
-    $(".help-block:empty").remove();
-    $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
-    $(".row-fluid:not(:has(div))").remove();
-    initConfirm();
-    //Init Menu
-    initWindowsResize();
-    // === Sidebar navigation === //
-    initMenu();
+    try {
+        //Clean empty help-blocks
+        $(".help-block:empty").remove();
+        $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
+        $(".row-fluid:not(:has(div))").remove();
+        $("input[type='file']").closest("form").attr("enctype", "multipart/form-data");
+        initConfirm();
+        //Init Menu
+        initWindowsResize();
+        // === Sidebar navigation === //
+        initMenu();
 
-    // === Tooltips === //
-    $('.tip').tooltip();
-    $('.tip-left').tooltip({placement: 'left'});
-    $('.tip-right').tooltip({placement: 'right'});
-    $('.tip-top').tooltip({placement: 'top'});
-    $('.tip-bottom').tooltip({placement: 'bottom'});
+        // === Tooltips === //
+        $('.tip').tooltip();
+        $('.tip-left').tooltip({placement: 'left'});
+        $('.tip-right').tooltip({placement: 'right'});
+        $('.tip-top').tooltip({placement: 'top'});
+        $('.tip-bottom').tooltip({placement: 'bottom'});
+
+        $.each(PM_onLoadFunctions, function() {
+            try {
+                this();
+            } catch (e) {
+                alert("Error: " + e);
+            }
+        });
+    } finally {
+        $("#loading-div").hide();
+        $("#content").show();
+        $("#footer").removeClass("hide");
+    }
 });

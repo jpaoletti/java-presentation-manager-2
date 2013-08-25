@@ -142,7 +142,7 @@
                     $("#searchModal .modal-body").find("input").focus();
                 });
             }
-            $(function() {
+            jpmLoad(function() {
                 //<s:iterator var="f" value="list.fields"><c:if test="${not empty f.align}">
                 $("td[data-field='${f.id}']").css("text-align", "${f.align}");
                 //</c:if><c:if test="${not empty f.width}">

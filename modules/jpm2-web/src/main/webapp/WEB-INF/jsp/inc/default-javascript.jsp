@@ -1,3 +1,8 @@
+<div id="loading-div">
+    <div class="mainLoading">
+        <img src="static/img/main_loading.gif"  alt="..." />
+    </div>
+</div>
 <c:if test="${pm.cssMode !='css'}">
     <script type="text/javascript" src="static/js/less-1.4.1.min.js?v=${pm.appversion}"></script>
 </c:if>

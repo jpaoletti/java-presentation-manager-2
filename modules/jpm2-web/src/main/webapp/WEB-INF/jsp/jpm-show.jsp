@@ -35,7 +35,7 @@
         <%@include  file="inc/footer.jsp" %>
         <%@include  file="inc/default-javascript.jsp" %>
         <script type="text/javascript">
-            $(function() {
+            jpmLoad(function() {
                 $(".to-string").each(function() {
                     var v = $(this).html();
                     $(this).html("<input disabled class='form-control' type='text' value='" + v + "' />");
