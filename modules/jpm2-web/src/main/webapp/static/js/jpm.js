@@ -1,16 +1,6 @@
-var PM_onLoadFunctions = new Array();
-
 String.prototype.trim = function() {
     return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
 };
-
-/**
- * Register a function to excecute on page load.
- * @param func The function
- */
-function jpmLoad(func) {
-    PM_onLoadFunctions.push(func);
-}
 
 var delay = (function() {
     var timer = 0;

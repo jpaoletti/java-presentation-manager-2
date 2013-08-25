@@ -10,3 +10,5 @@
     <c:if test="${pm.cssMode !='css'}">
         <link href="static/less/all.less?v=${pm.appversion}" rel="stylesheet" type="text/less"  />
     </c:if>
+    <script type="text/javascript" src="static/js/jquery-2.0.3.min.js?v=${pm.appversion}" ></script>
+    <script type="text/javascript" src="static/js/jpm-head.js?v=${pm.appversion}" ></script>
