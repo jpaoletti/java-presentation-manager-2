@@ -116,6 +116,27 @@
                     <property name="align" value="center" />
                     <property name="configs" ref="default-bool-config" />
                 </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="test" />
+                    <property name="width" value="55px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditObject">
+                                        <property name="entity" ref="jpm-entity-test" />
+                                        <property name="textField" value="string" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
         <property name="panels">
@@ -127,7 +148,7 @@
                                 <property name="icon" value="glyphicon-bell" />
                                 <property name="title" value="jpm.jpm-entity-test.panel1" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="id string" />
+                                <property name="fields" value="id string test" />
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="glyphicon-briefcase" />

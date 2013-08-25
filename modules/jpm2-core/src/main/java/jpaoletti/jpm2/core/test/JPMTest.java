@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import org.hibernate.annotations.Type;
@@ -36,6 +38,9 @@ public class JPMTest implements Serializable {
     @Column(name = "bool_field")
     @Type(type = "yes_no")
     private Boolean bool;
+    @ManyToOne()
+    @JoinColumn(name = "test")
+    private JPMTest test;
 
     public JPMTest(Long id, String string, Integer integer, Date date, Boolean bool) {
         this.id = id;
@@ -86,5 +91,18 @@ public class JPMTest implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public JPMTest getTest() {
+        return test;
+    }
+
+    public void setTest(JPMTest test) {
+        this.test = test;
+    }
+
+    @Override
+    public String toString() {
+        return getString();
     }
 }

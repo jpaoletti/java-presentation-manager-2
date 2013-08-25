@@ -65,6 +65,15 @@
             </result>
         </action>
     </package>
-    
+
+    <package name="jpm-json"  extends="json-default">
+        <action name="objectConverterGetData" class="jpaoletti.jpm2.controller.ajax.ObjectConverterGetData">
+            <result name="success" type="json">
+                <param name="noCache">true</param>
+                <param name="root">result</param>
+            </result>
+        </action>
+    </package>
+
     &custom;
 </struts>

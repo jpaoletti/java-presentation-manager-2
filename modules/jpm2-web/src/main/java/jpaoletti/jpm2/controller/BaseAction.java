@@ -83,8 +83,8 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
         return context.getBean(name);
     }
 
-    public static String getMessage(String code, String... args) {
-        final Locale locale = LocaleContextHolder.getLocale();
+    public String getMessage(String code, String... args) {
+        final Locale locale = getLocale();
         final WebApplicationContext context =
                 WebApplicationContextUtils.getRequiredWebApplicationContext(
                 ServletActionContext.getServletContext());
@@ -187,5 +187,10 @@ public class BaseAction extends DefaultActionSupport implements SessionAware, Se
 
     public void setHttpSession(HttpSession httpSession) {
         this.httpSession = httpSession;
+    }
+
+    @Override
+    public Locale getLocale() {
+        return LocaleContextHolder.getLocale();
     }
 }
