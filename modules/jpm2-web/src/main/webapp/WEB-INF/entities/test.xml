@@ -129,12 +129,6 @@
                                 <property name="blocks" value="4" />
                                 <property name="fields" value="id string" />
                             </bean>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.PanelRow">
-                    <property name="panels">
-                        <list>
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="glyphicon-briefcase" />
                                 <property name="title" value="jpm.jpm-entity-test.panel2" />

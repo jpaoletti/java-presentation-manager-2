@@ -12,7 +12,7 @@
 </c:if>
 <c:if test="${not empty entity.panels}">
     <s:iterator value="entity.panels" var="row">
-        <div class="row-fluid">
+        <div class="row jpm-content-panels">
             <s:iterator value="panels" var="panel">
                 <div class="col-lg-${panel.blocks}">
                     <div class="panel panel-default">
