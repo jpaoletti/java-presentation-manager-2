@@ -60,7 +60,7 @@
                                     <tr>
                                         <th style="width: 5px;"><i class="glyphicon glyphicon-cog"></i></th>
                                             <s:iterator value="list.fields" var="field">
-                                            <th><jpm:field-title entity="${entity}" fieldId="${field.id}" /></th>
+                                            <th data-field="${field.id}"><jpm:field-title entity="${entity}" fieldId="${field.id}" /></th>
                                             </s:iterator>
                                     </tr>
                                 </thead>
@@ -80,7 +80,7 @@
                                                 </div>
                                             </td>
                                             <s:iterator value="values" var="v">
-                                                <td>${v.value}</td>
+                                                <td data-field="${v.key}">${v.value}</td>
                                             </s:iterator>
                                         </tr>
                                     </s:iterator>
@@ -142,6 +142,13 @@
                     $("#searchModal .modal-body").find("input").focus();
                 });
             }
+            $(function() {
+                //<s:iterator var="f" value="list.fields"><c:if test="${not empty f.align}">
+                $("td[data-field='${f.id}']").css("text-align", "${f.align}");
+                //</c:if><c:if test="${not empty f.width}">
+                $("[data-field='${f.id}']").css("width", "${f.width}");
+                //</c:if></s:iterator>
+            });
         </script>
     </body>
 </html>

@@ -75,6 +75,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="id" />
                     <property name="configs" ref="default-id-field-config" />
+                    <property name="width" value="55px" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="string" />
@@ -83,7 +84,9 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="integer" />
+                    <property name="align" value="right" />
                     <property name="searcher" ref="jpm-seracher-int"/>
+                    <property name="width" value="55px" />
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -104,10 +107,13 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="date" />
+                    <property name="width" value="100px" />
                     <property name="configs" ref="default-date-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="bool" />
+                    <property name="width" value="55px" />
+                    <property name="align" value="center" />
                     <property name="configs" ref="default-bool-config" />
                 </bean>
             </list>
@@ -132,7 +138,7 @@
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="glyphicon-briefcase" />
                                 <property name="title" value="jpm.jpm-entity-test.panel2" />
-                                <property name="blocks" value="8" />
+                                <property name="blocks" value="4" />
                                 <property name="fields" value="integer date bool" />
                             </bean>
                         </list>

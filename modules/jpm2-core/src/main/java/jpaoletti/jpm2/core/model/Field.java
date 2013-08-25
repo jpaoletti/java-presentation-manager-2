@@ -40,7 +40,6 @@ public class Field extends PMCoreObject {
      */
     public Field() {
         super();
-        align = "left";
         defaultValue = "";
     }
 
