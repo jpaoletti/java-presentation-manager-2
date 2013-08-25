@@ -13,12 +13,12 @@ THIS IS A WORK IN PROCESS PROJECT.
 * Boostrap 3
 * jQuery 2
 * Less
+* <a href='http://ivaynberg.github.io/select2/index.html' >Select2</a>
 
 ## Functionalities
 
 * Localization (spring, view side)
 * Data access (DAO, core side)
 * Session management (spring ?)
-* Security (spring security 3)
-* Authorization (spring)
+* Security & Authorization (spring security 3)
 
