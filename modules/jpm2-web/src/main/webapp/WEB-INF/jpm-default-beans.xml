@@ -6,6 +6,7 @@
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
     <!-- ID TRANSFORMERS -->
+    <bean id="transformer-str" class="jpaoletti.jpm2.core.idtransformer.Str" />
     <bean id="transformer-strToLong" class="jpaoletti.jpm2.core.idtransformer.StrToLong" />
     <bean id="transformer-strToInt" class="jpaoletti.jpm2.core.idtransformer.StrToInt" />
 
@@ -16,6 +17,7 @@
     <bean id="jpm-seracher-int" class="jpaoletti.jpm2.core.search.IntegerSearcher" />
     <bean id="jpm-seracher-long" class="jpaoletti.jpm2.core.search.LongSearcher" />
     <bean id="jpm-seracher-string" class="jpaoletti.jpm2.core.search.StringSearcher" />
+    <bean id="jpm-searcher-bool" class="jpaoletti.jpm2.core.search.BoolSearcher" />
 
     <!-- CONVERTERS -->
     <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />

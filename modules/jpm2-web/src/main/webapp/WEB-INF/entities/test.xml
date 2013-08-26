@@ -112,6 +112,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="bool" />
+                    <property name="searcher" ref="jpm-searcher-bool" />
                     <property name="width" value="55px" />
                     <property name="align" value="center" />
                     <property name="configs" ref="default-bool-config" />
