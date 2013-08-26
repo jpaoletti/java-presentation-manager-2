@@ -1,12 +1,10 @@
 package jpaoletti.jpm2.core.model;
 
-import jpaoletti.jpm2.core.message.Message;
-
 /**
  *
  * @author jpaoletti
  */
-public interface FieldValidator {
+public interface OperationValidator {
 
-    public Message validate(Object object, Object convertedValue);
+    public void validate(Object object) throws ValidationException;
 }

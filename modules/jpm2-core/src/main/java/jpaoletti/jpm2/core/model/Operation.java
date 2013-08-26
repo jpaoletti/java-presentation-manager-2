@@ -43,12 +43,8 @@ public class Operation extends PMCoreObject {
     private boolean showTitle;
     //Indicate if a confirmation is needed before proceed.
     private boolean confirm;
-    /**
-     * @see OperationContext
-     */
     private OperationContext context;
-    //A list of validators for the operation.
-    //private ArrayList<Validator> validators;
+    private OperationValidator validator;
     //A properties object to get some extra configurations
     private Properties properties;
     //Permission to do this operation
@@ -307,5 +303,13 @@ public class Operation extends PMCoreObject {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public OperationValidator getValidator() {
+        return validator;
+    }
+
+    public void setValidator(OperationValidator validator) {
+        this.validator = validator;
     }
 }

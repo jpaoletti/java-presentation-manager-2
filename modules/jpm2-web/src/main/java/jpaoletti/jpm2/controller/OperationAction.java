@@ -18,6 +18,7 @@ import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.FieldValidator;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
+import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 
 /**
@@ -102,6 +103,9 @@ public class OperationAction extends EntityAction implements OperationController
                 addFieldMsg(field, e.getMsg());
             }
         }
+        if (!getFieldMessages().isEmpty()) {
+            throw new ValidationException(null);
+        }
     }
 
     public void preConversion() throws PMException {
@@ -111,6 +115,9 @@ public class OperationAction extends EntityAction implements OperationController
     }
 
     public void preExecute() throws PMException {
+        if (getOperation().getValidator() != null) {
+            getOperation().getValidator().validate(getObject());
+        }
         if (getOperation().getContext() != null) {
             getOperation().getContext().preExecute(this);
         }

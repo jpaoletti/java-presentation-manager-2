@@ -5,6 +5,7 @@ import static jpaoletti.jpm2.controller.OperationAction.FINISH;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.OperationScope;
+import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 
 /**
@@ -31,11 +32,15 @@ public class AddAction extends OperationAction {
     public String commit() throws PMException {
         final String prepare = prepare();
         if (prepare.equals(SUCCESS)) {
-            processFields();
-            if (!getFieldMessages().isEmpty()) {
+            try {
+                processFields();
+                preExecute();
+            } catch (ValidationException e) {
+                if (e.getMsg() != null) {
+                    getEntityMessages().add(e.getMsg());
+                }
                 return COMMIT_ERROR;
             }
-            preExecute();
             getEntity().getDao().save(getObject());
             setInstanceId(getEntity().getDao().getId(getObject()).toString());
             postExecute();

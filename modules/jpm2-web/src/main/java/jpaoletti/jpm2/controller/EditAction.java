@@ -3,6 +3,7 @@ package jpaoletti.jpm2.controller;
 import static com.opensymphony.xwork2.Action.SUCCESS;
 import static jpaoletti.jpm2.controller.OperationAction.COMMIT_ERROR;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.model.ValidationException;
 
 /**
  *
@@ -17,11 +18,15 @@ public class EditAction extends OperationAction {
     public String commit() throws PMException {
         final String prepare = prepare();
         if (prepare.equals(SUCCESS)) {
-            processFields();
-            if (!getFieldMessages().isEmpty()) {
+            try {
+                processFields();
+                preExecute();
+            } catch (ValidationException e) {
+                if (e.getMsg() != null) {
+                    getEntityMessages().add(e.getMsg());
+                }
                 return COMMIT_ERROR;
             }
-            preExecute();
             getEntity().getDao().update(getObject());
             postExecute();
             return FINISH;
