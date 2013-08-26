@@ -34,7 +34,7 @@ public class WebEditObject extends Converter {
 
     @Override
     public Object build(Field field, Object newValue) throws ConverterException {
-        if (newValue == null) {
+        if (newValue == null || "".equals(newValue)) {
             return null;
         } else {
             return getEntity().getDao().get((String) newValue);
