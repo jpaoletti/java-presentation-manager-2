@@ -1,5 +1,3 @@
-
-
 <input name="field_${field}" id="field_${field}" value="${param.value}" />
 <script type="text/javascript" src="static/js/select2.min.js"></script>
 <script type="text/javascript" src="static/js/locale/select2_locale_${locale.language}.js"></script>
