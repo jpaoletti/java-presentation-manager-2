@@ -18,7 +18,14 @@
             </props>
         </property>
  
-        <property name="annotatedClasses" value="jpaoletti.jpm2.core.test.JPMTest"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>jpaoletti.jpm2.core.test.JPMTest</value>
+                <value>jpaoletti.jpm2.core.security.Authority</value>
+                <value>jpaoletti.jpm2.core.security.User</value>
+                <value>jpaoletti.jpm2.core.security.Group</value>
+            </list>
+        </property>
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
