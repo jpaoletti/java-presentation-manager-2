@@ -2,7 +2,6 @@ package jpaoletti.jpm2.core.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ public class EntityInstance {
 
     public EntityInstance(Serializable id, Entity entity, Operation operation, Object object) throws PMException {
         this.id = id;
-        values = new HashMap<>();
+        values = new LinkedHashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
         for (Field field : entity.getAllFields()) {
