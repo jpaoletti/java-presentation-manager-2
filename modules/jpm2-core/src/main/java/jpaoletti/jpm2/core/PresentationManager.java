@@ -198,4 +198,13 @@ public class PresentationManager extends Observable {
         }
         return null;
     }
+
+    public Entity getEntity(String entityId) {
+        for (Entity entity : getEntities()) {
+            if (entity.getId().equalsIgnoreCase(entityId)) {
+                return entity;
+            }
+        }
+        return null;
+    }
 }
