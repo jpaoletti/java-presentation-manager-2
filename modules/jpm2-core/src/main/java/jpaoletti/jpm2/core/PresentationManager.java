@@ -4,18 +4,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.PMSession;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author jpaoletti
  */
-public class PresentationManager extends Observable {
+public class PresentationManager{
 
     private static Long sessionIdSeed = 0L;
     protected String title;
@@ -23,10 +23,9 @@ public class PresentationManager extends Observable {
     protected String appversion;
     protected String contact;
     protected String cssMode;
-    //
     private CustomLoader customLoader;
-    private List<Entity> entities;
-    private List<Converter> converters;
+    @Autowired
+    private Map<String, Entity> entities;
     //private Map<Object, Monitor> monitors;
     private List<ClassConverter> classConverters;
     private final Map<String, PMSession> sessions = new HashMap<>();
@@ -111,10 +110,6 @@ public class PresentationManager extends Observable {
         JPMUtils.getLogger().info(String.format("(%s) %-25s %s", symbol, s1, (s2 != null) ? s2 : ""));
     }
 
-    private void error(Object error) {
-        JPMUtils.getLogger().error(error);
-    }
-
     /**
      * GETTERS & SETTERS
      */
@@ -158,20 +153,12 @@ public class PresentationManager extends Observable {
         this.cssMode = cssMode;
     }
 
-    public List<Entity> getEntities() {
+    public Map<String, Entity> getEntities() {
         return entities;
     }
 
-    public void setEntities(List<Entity> entities) {
+    public void setEntities(Map<String, Entity> entities) {
         this.entities = entities;
-    }
-
-    public List<Converter> getConverters() {
-        return converters;
-    }
-
-    public void setConverters(List<Converter> converters) {
-        this.converters = converters;
     }
 
     public CustomLoader getCustomLoader() {
@@ -200,11 +187,6 @@ public class PresentationManager extends Observable {
     }
 
     public Entity getEntity(String entityId) {
-        for (Entity entity : getEntities()) {
-            if (entity.getId().equalsIgnoreCase(entityId)) {
-                return entity;
-            }
-        }
-        return null;
+        return getEntities().get(entityId);
     }
 }
