@@ -7,6 +7,8 @@ import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.search.Searcher;
+import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -249,5 +251,27 @@ public class Field extends PMCoreObject {
 
     public void setSearcher(Searcher searcher) {
         this.searcher = searcher;
+    }
+
+    /**
+     * Finds the current field class.
+     *
+     * @param baseClass
+     * @return
+     */
+    public Class getClass(String baseClass) {
+        try {
+            final String _property = getProperty();
+            final String[] _properties = _property.split("[.]");
+            Class<?> clazz = Class.forName(baseClass);
+            for (int i = 0; i < _properties.length - 1; i++) {
+                clazz = FieldUtils.getField(clazz, _properties[i], true).getType();
+            }
+            final String className = FieldUtils.getField(clazz, _properties[_properties.length - 1], true).getType().getName();
+            return Class.forName(className);
+        } catch (ClassNotFoundException ex) {
+            JPMUtils.getLogger().error(ex);
+        }
+        return null;
     }
 }

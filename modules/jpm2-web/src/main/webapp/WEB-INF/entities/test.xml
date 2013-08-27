@@ -138,6 +138,27 @@
                         </list>
                     </property>
                 </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="tests" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditCollection">
+                                        <property name="entity" ref="jpm-entity-test" />
+                                        <property name="baseEntity" ref="jpm-entity-test" />
+                                        <property name="textField" value="string" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
         <property name="panels">
@@ -156,6 +177,12 @@
                                 <property name="title" value="jpm.jpm-entity-test.panel2" />
                                 <property name="blocks" value="4" />
                                 <property name="fields" value="integer date bool" />
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="glyphicon-cog" />
+                                <property name="title" value="Another Test" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="tests" />
                             </bean>
                         </list>
                     </property>
