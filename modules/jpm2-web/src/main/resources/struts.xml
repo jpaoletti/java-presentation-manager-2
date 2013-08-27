@@ -52,6 +52,9 @@
                 <param name="entityId">${entityId}</param>
             </result>
         </action>
+        <action name="resetPassword" class="jpaoletti.jpm2.controller.ResetPassword" >
+            <result name="success">WEB-INF/jsp/jpm-resetPassword.jsp</result>
+        </action>
         <action name="addSearch" class="jpaoletti.jpm2.controller.AddSearch">
             <result name="success" type="redirectAction">
                 <param name="actionName">list</param>
