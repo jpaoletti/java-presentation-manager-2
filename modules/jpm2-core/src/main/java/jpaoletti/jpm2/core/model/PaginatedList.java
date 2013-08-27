@@ -241,4 +241,8 @@ public class PaginatedList {
             return null;
         }
     }
+
+    public List<Field> getFields() {
+        return getContents().getFields();
+    }
 }
