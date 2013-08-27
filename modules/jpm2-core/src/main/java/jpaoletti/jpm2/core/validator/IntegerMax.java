@@ -16,7 +16,7 @@ public class IntegerMax implements FieldValidator {
     @Override
     public Message validate(Object object, Object convertedValue) {
         final Integer value = (Integer) convertedValue;
-        if (value <= getMax()) {
+        if (value == null || value <= getMax()) {
             return null;
         } else {
             return MessageFactory.error(getMessage(), String.valueOf(convertedValue), String.valueOf(getMax()));

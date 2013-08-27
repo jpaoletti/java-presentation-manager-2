@@ -7,6 +7,7 @@
             $('<link href="static/css/select2.css" rel="stylesheet">').appendTo("head");
         }
         $("#field_${field}").select2({
+            multiple: true,
             placeholder: "...",
             minimumInputLength: ${param.minSearch},
             ajax: {

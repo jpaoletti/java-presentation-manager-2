@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.test;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import org.hibernate.annotations.Type;
@@ -41,6 +43,8 @@ public class JPMTest implements Serializable {
     @ManyToOne()
     @JoinColumn(name = "test")
     private JPMTest test;
+    @OneToMany(mappedBy = "test")
+    private List<JPMTest> tests;
 
     public JPMTest(Long id, String string, Integer integer, Date date, Boolean bool) {
         this.id = id;
@@ -101,8 +105,16 @@ public class JPMTest implements Serializable {
         this.test = test;
     }
 
+    public List<JPMTest> getTests() {
+        return tests;
+    }
+
+    public void setTests(List<JPMTest> tests) {
+        this.tests = tests;
+    }
+
     @Override
     public String toString() {
-        return getString();
+        return "[" + getId() + "] " + getString();
     }
 }
