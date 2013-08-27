@@ -25,6 +25,17 @@
                                         <input name="entityId" value="${entity.id}" type="hidden" />
                                         <input name="instanceId" value="${instance.id}" type="hidden" />
                                         <%@include file="inc/default-form-content.jsp" %>
+                                        <c:if test="${not empty entityMessages}">
+                                            <div class="row">
+                                                <div class="col-lg-offset-2 col-lg-10">
+                                                    <div class="alert alert-danger">
+                                                        <c:forEach items="${entityMessages}" var="m">
+                                                            * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
+                                                        </c:forEach>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:if>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <button type="submit" class="btn btn-primary"><spring:message code="jpm.form.submit" text="Submit" /></button>

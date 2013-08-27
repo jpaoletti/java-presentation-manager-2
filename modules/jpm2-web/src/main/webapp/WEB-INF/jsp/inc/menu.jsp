@@ -10,5 +10,14 @@
                 <li><a href="list?entityId=jpm-entity-test"><spring:message code="jpm.entity.title.test" text="Test Entity" /></a></li>
             </ul>
         </li>
+        <security:authorize ifAnyGranted="ROLE_USERADMIN">
+        <li class="submenu">
+            <a href="#"><i class="glyphicon glyphicon-user"></i> <span><spring:message code="jpm.menu.security" text="Security" /></span></a>
+            <ul>
+                <li><a href="list?entityId=jpm-entity-user"><spring:message code="jpm.entity.title.jpm-entity-user" text="Users" /></a></li>
+                <li><a href="list?entityId=jpm-entity-group"><spring:message code="jpm.entity.title.jpm-entity-group" text="Groups" /></a></li>
+            </ul>
+        </li>
+        </security:authorize>
     </ul>
 </div>

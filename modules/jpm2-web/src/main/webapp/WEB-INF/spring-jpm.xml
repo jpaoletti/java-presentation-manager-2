@@ -10,9 +10,13 @@
         <property name="entities">
             <list>
                 <ref bean="jpm-entity-test" />
+                <ref bean="jpm-entity-auth" />
+                <ref bean="jpm-entity-user" />
+                <ref bean="jpm-entity-group" />
             </list>
         </property>
     </bean>
     <import resource="jpm-default-beans.xml" />
     <import resource="entities/test.xml" />
+    <import resource="entities/jpm-security-entities.xml" />
 </beans>

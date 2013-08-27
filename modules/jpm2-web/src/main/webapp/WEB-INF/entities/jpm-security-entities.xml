@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean id="jpm-dao-auth" class="jpaoletti.jpm2.core.dao.AuthorityDAO" >
+        <property name="transformer" ref="transformer-str" />
+    </bean>
+    <bean id="jpm-dao-user" class="jpaoletti.jpm2.core.dao.UserDAO" >
+        <property name="transformer" ref="transformer-str" />
+    </bean>
+    <bean id="jpm-dao-group" class="jpaoletti.jpm2.core.dao.GroupDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
+
+    <bean id="jpm-entity-auth" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.security.Authority" />
+        <property name="dao" ref="jpm-dao-auth" />
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="authority" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jpm-entity-user" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.security.User" />
+        <property name="dao" ref="jpm-dao-user" />
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="scope" value="general" />
+                    <property name="perm" value="sysadmin" />
+                    <property name="navigable" value="true" />
+                    <property name="properties">
+                        <props>
+                            <prop key="paginable">true</prop>
+                        </props>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="show" />
+                    <property name="display" value="edit list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="scope" value="general" />
+                    <property name="validator" >
+                        <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" >
+                            <property name="dao" ref="jpm-dao-user" />
+                        </bean>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="show list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="resetPassword" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="show list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="delete" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="edit show list" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="username" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show edit"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add"/>
+                                <property name="converter" ref="jpm-converter-edit-string"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="password" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.Password" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="enabled" />
+                    <property name="searcher" ref="jpm-searcher-bool" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show-bool"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="edit"/>
+                                <property name="converter" ref="jpm-converter-edit-bool"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="groups" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jpm-entity-group" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.security.Group" />
+        <property name="dao" ref="jpm-dao-group" />
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="scope" value="general" />
+                    <property name="perm" value="sysadmin" />
+                    <property name="navigable" value="true" />
+                    <property name="properties">
+                        <props>
+                            <prop key="paginable">true</prop>
+                        </props>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="show" />
+                    <property name="display" value="edit list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="scope" value="general" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="show list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="delete" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="edit show list" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="id" />
+                    <property name="configs" ref="default-id-field-config" />
+                    <property name="width" value="55px" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="name" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="authorities" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <!--                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditObject">
+                                        <property name="entity" ref="jpm-entity-auth" />
+                                        <property name="textField" value="authority" />
+                                    </bean>
+                                </property>
+                            </bean>-->
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

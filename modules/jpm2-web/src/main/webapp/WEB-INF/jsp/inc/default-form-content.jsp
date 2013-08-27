@@ -7,7 +7,22 @@
                 <jpm:field-title entity="${entity}" fieldId="${key}" />
             </label>
             <div class="col-lg-10">
-                ${value}
+                <c:set var="field" value="${key}" scope="request" />
+                <c:set var="convertedValue" value="${value}"/>
+                <c:if test="${fn:startsWith(convertedValue, '@page:')}">
+                    <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
+                </c:if>
+                <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
+                    ${convertedValue}
+                </c:if>
+                <c:if test="${not empty fieldMessages[field]}">
+                    <p class="help-block">
+                        <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
+                        <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
+                            * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
+                        </c:forEach>
+                    </p>
+                </c:if>
             </div>
         </div>
     </s:iterator>
@@ -41,10 +56,10 @@
                                             </c:if>
                                             <c:if test="${not empty fieldMessages[field]}">
                                                 <p class="help-block">
-                                                <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
-                                                <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
-                                                    * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
-                                                </c:forEach>
+                                                    <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
+                                                    <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
+                                                        * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
+                                                    </c:forEach>
                                                 </p>
                                             </c:if>
                                         </div>
