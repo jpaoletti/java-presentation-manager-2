@@ -8,6 +8,7 @@ import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import org.springframework.beans.TypeMismatchException;
@@ -57,6 +58,10 @@ public class BaseController implements OperationController {
         if (getContext().getOperation().getContext() != null) {
             getContext().getOperation().getContext().postExecute(this);
         }
+    }
+
+    protected EntityInstance newEntityInstance(String instanceId, Entity entity) throws PMException {
+        return new EntityInstance(instanceId, entity, getContext().getOperation(), getContext().getObject());
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -111,7 +116,7 @@ public class BaseController implements OperationController {
 
     @Override
     public Object getObject() {
-       return getContext().getObject();
+        return getContext().getObject();
     }
 
     @Override

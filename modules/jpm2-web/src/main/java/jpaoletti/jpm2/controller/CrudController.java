@@ -28,6 +28,16 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class CrudController extends BaseController {
 
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET)
+    public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
+        getContext().setEntity(entity);
+        getContext().setOperation(entity.getOperation("show"));
+        getContext().setObject(getEntity().getDao().get(instanceId));
+        final ModelAndView mav = newMav();
+        mav.addObject("instance", newEntityInstance(instanceId, entity));
+        return mav;
+    }
+
     /**
      * GET method prepares form.
      *
@@ -60,7 +70,7 @@ public class CrudController extends BaseController {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("add"));
         getContext().setObject(JPMUtils.newInstance(entity.getClazz()));
-        final EntityInstance instance = new EntityInstance(null, entity, getContext().getOperation(), getContext().getObject());
+        final EntityInstance instance = newEntityInstance(null, entity);
         try {
             processFields(instance);
             preExecute();
