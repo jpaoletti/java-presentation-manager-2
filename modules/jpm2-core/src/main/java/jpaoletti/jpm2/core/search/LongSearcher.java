@@ -9,7 +9,7 @@ import java.util.Map;
 public class LongSearcher extends IntegerSearcher {
 
     @Override
-    protected Object getValue(Map<String, Object> parameters) throws NumberFormatException {
-        return Long.parseLong(((String[]) parameters.get("value"))[0]);
+    protected Object getValue(Map<String, String[]> parameters) throws NumberFormatException {
+        return Long.parseLong(parameters.get("value")[0]);
     }
 }

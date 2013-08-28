@@ -1,5 +1,5 @@
 <div id="header">
-    <h1><a href="./index">${pm.title}</a></h1>	
+    <h1><a href="/index">${jpm.title}</a></h1>	
     <a id="menu-trigger" href="#"><i class="glyphicon glyphicon-align-justify"></i></a>	
 </div>
 <div id="user-nav">

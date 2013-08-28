@@ -3,12 +3,12 @@
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
-        <link href="static/css/login.css?v=${pm.appversion}" rel="stylesheet" type="text/css" />
+        <link href="<c:url value='static/css/login.css?v=${jpm.appversion}' />" rel="stylesheet" type="text/css" />
     </head>
     <body  onload='document.loginform.j_username.focus();'>
         <div id="container" class="container">
             <div id="logo">
-                <img src="static/img/login.png" alt="Login" />
+                <img src="<c:url value='/static/img/login.png'/>" alt="Login" />
             </div>
             <div id="loginbox">            
                 <form id="loginform" action="j_spring_security_check" method="POST">

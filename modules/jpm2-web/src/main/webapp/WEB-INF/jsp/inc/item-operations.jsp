@@ -1,8 +1,8 @@
 <div class="btn-group">
-    <s:iterator value="itemOperations" var="o">
+    <c:forEach items="${itemOperations}" var="o">
         <a class="btn btn-sm btn-default confirm-${o.confirm}" 
-           href="${o.id}?entityId=${entity.id}&instanceId=${instance.id}">
+           href="<c:url value='/jpm/${entity.id}/${instance.id}/${o.id}' />">
             <i class="glyphicon jpmicon-${o.id}"></i> <spring:message code="${o.title}" text="${o.title}" arguments=" " />
         </a>
-    </s:iterator>
+    </c:forEach>
 </div>

@@ -21,7 +21,7 @@
                                     <%@include file="inc/item-operations.jsp" %>
                                 </div>
                                 <div class="widget-content">
-                                    <form class="form-horizontal" role="form" method="POST" action="${operation.id}!commit">
+                                    <form class="form-horizontal" role="form" method="POST">
                                         <input name="entityId" value="${entity.id}" type="hidden" />
                                         <input name="instanceId" value="${instance.id}" type="hidden" />
                                         <%@include file="inc/default-form-content.jsp" %>

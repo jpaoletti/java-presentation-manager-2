@@ -18,8 +18,8 @@ public class StringSearcher implements Searcher {
     }
 
     @Override
-    public Criterion build(Field field, Map<String, Object> parameters) {
-        final String value = ((String[]) parameters.get("value"))[0];
+    public Criterion build(Field field, Map<String, String[]> parameters) {
+        final String value = parameters.get("value")[0];
         final String operator = ((String[]) parameters.get("operator"))[0];
         switch (operator) {
             case "li":

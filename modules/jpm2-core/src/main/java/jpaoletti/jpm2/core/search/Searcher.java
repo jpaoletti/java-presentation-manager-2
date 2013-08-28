@@ -12,5 +12,5 @@ public interface Searcher {
 
     public String visualization();
 
-    public Criterion build(Field field, Map<String, Object> parameters);
+    public Criterion build(Field field, Map<String, String[]> parameters);
 }

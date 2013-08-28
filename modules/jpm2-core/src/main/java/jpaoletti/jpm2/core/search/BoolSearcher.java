@@ -17,13 +17,12 @@ public class BoolSearcher implements Searcher {
     }
 
     @Override
-    public Criterion build(Field field, Map<String, Object> parameters) {
-        final String value = ((String[]) parameters.get("value"))[0];
+    public Criterion build(Field field, Map<String, String[]> parameters) {
+        final String value = parameters.get("value")[0];
         if (value != null) {
             return Restrictions.eq(field.getProperty(), value.equalsIgnoreCase("TRUE"));
         } else {
             return null;
         }
-
     }
 }

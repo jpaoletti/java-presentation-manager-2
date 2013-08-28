@@ -3,8 +3,8 @@
         <p class="text-muted credit">
             <span>
                 <spring:message code="jpm.copyright" text="??" arguments="jpaoletti,2013" argumentSeparator="," /> 
-                - v${pm.appversion}
-                - <a href="mailto:${pm.contact}" ><spring:message code='jpm.contact' text='Contact' /> </a>
+                - v${jpm.appversion}
+                - <a href="mailto:${jpm.contact}" ><spring:message code='jpm.contact' text='Contact' /> </a>
             </span></p>
     </div>
 </footer>

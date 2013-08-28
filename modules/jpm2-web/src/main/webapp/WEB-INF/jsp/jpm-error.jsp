@@ -10,7 +10,7 @@
         <div id="container">
             <div id="content">
                 <div id="content-header">
-                    <h1>${pm.subtitle}</h1>
+                    <h1>${jpm.subtitle}</h1>
                 </div>
                 <div id="breadcrumb">
                     <a href="#" title="" class="tip-bottom" class="current"><i class="glyphicon glyphicon-home"></i> <spring:message code="jpm.index.home" text="Home" /></a>

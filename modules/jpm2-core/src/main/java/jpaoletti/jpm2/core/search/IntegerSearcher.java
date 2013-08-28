@@ -17,9 +17,9 @@ public class IntegerSearcher implements Searcher {
     }
 
     @Override
-    public Criterion build(Field field, Map<String, Object> parameters) {
+    public Criterion build(Field field, Map<String, String[]> parameters) {
         final Object value = getValue(parameters);
-        final String operator = ((String[]) parameters.get("operator"))[0];
+        final String operator = parameters.get("operator")[0];
         switch (operator) {
             case "ne":
                 return Restrictions.ne(field.getProperty(), value);
@@ -36,7 +36,7 @@ public class IntegerSearcher implements Searcher {
         }
     }
 
-    protected Object getValue(Map<String, Object> parameters) throws NumberFormatException {
-        return Integer.parseInt(((String[]) parameters.get("value"))[0]);
+    protected Object getValue(Map<String, String[]> parameters) throws NumberFormatException {
+        return Integer.parseInt(parameters.get("value")[0]);
     }
 }

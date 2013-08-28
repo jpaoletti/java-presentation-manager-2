@@ -1,7 +1,6 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:if test="${empty entity.panels}">
-    <s:iterator value="instance.values" var="value">
+    <c:forEach items="${instance.values}" var="value">
         <div id="control-group-${key}" class="form-group">
             <label class="col-lg-2 control-label" for="f_${key}">
                 <jpm:field-title entity="${entity}" fieldId="${key}" />
@@ -25,12 +24,12 @@
                 </c:if>
             </div>
         </div>
-    </s:iterator>
+    </c:forEach>
 </c:if>
 <c:if test="${not empty entity.panels}">
-    <s:iterator value="entity.panels" var="row">
+    <c:forEach items="${entity.panels}" var="row">
         <div class="row jpm-content-panels">
-            <s:iterator value="panels" var="panel">
+            <c:forEach items="${row.panels}" var="panel">
                 <div class="col-lg-${panel.blocks}">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -40,7 +39,7 @@
                             </h3>
                         </div>
                         <div class="panel-body">
-                            <s:iterator value="fieldList" var="field">
+                            <c:forEach items="${panel.fieldList}" var="field">
                                 <c:if test="${not empty instance.values[field]}">
                                     <div id="control-group-${field}" class="form-group ${not empty fieldMessages[field] ? 'has-error':''}">
                                         <label class="col-lg-2 control-label" for="f_${field}">
@@ -65,11 +64,11 @@
                                         </div>
                                     </div>
                                 </c:if>
-                            </s:iterator>
+                            </c:forEach>
                         </div>
                     </div>
                 </div>
-            </s:iterator>
+            </c:forEach>
         </div>
-    </s:iterator>
+    </c:forEach>
 </c:if>

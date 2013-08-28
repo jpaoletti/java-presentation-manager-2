@@ -90,22 +90,6 @@
     </profiles>
 
     <dependencies>
-        <!--<dependency>
-            <groupId>org.thymeleaf</groupId>
-            <artifactId>thymeleaf</artifactId>
-            <version>2.0.17</version>
-        </dependency>
-        <dependency>
-            <groupId>org.thymeleaf</groupId>
-            <artifactId>thymeleaf-spring3</artifactId>
-            <version>2.0.17</version>
-        </dependency>-->
-        <!-- AOP dependency -->
-        <dependency>
-            <groupId>org.apache.struts</groupId>
-            <artifactId>struts2-json-plugin</artifactId>
-            <version>2.3.15.1</version>
-        </dependency>
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
@@ -122,7 +106,7 @@
             <artifactId>struts2-spring-plugin</artifactId>
             <version>2.3.15.1</version>
         </dependency>
-        
+
         <!-- MySQL database driver -->
         <dependency>
             <groupId>mysql</groupId>
