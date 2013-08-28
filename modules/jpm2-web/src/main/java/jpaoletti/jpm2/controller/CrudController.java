@@ -8,17 +8,20 @@ import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
-import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.FieldValidator;
-import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.ObjectConverterData;
+import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -28,14 +31,24 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class CrudController extends BaseController {
 
+    @RequestMapping(value = "/jpm/{entity}/{id}", method = RequestMethod.GET, headers = "Accept=application/json")
+    @ResponseBody
+    public ObjectConverterData.ObjectConverterDataItem listObject(
+            @PathVariable Entity entity, @PathVariable String id, @RequestParam String textField,
+            @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
+        final Field field = getEntity().getFieldById(textField);
+        final Object object = getEntity().getDao().get(id);
+        return new ObjectConverterDataItem(getEntity().getDao().getId(object).toString(),
+                JPMUtils.get(object, field.getProperty()).toString());
+    }
+
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET)
     public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("show"));
         getContext().setObject(getEntity().getDao().get(instanceId));
-        final ModelAndView mav = newMav();
-        mav.addObject("instance", newEntityInstance(instanceId, entity));
-        return mav;
+        getContext().setEntityInstance(newEntityInstance(instanceId, entity));
+        return newMav();
     }
 
     /**
@@ -46,15 +59,13 @@ public class CrudController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/add", method = RequestMethod.GET)
-    public ModelAndView add(@PathVariable Entity entity) throws PMException {
+    public ModelAndView addPrepare(@PathVariable Entity entity) throws PMException {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("add"));
         getContext().setObject(JPMUtils.newInstance(entity.getClazz()));
+        getContext().setEntityInstance(newEntityInstance(null, entity));
         final ModelAndView mav = newMav();
         mav.setViewName("jpm-edit");
-        final Operation operation = getContext().getOperation();
-        final EntityInstance instance = new EntityInstance(null, entity, operation, getContext().getObject());
-        mav.addObject("instance", instance);
         return mav;
     }
 
@@ -70,9 +81,9 @@ public class CrudController extends BaseController {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("add"));
         getContext().setObject(JPMUtils.newInstance(entity.getClazz()));
-        final EntityInstance instance = newEntityInstance(null, entity);
+        getContext().setEntityInstance(newEntityInstance(null, entity));
         try {
-            processFields(instance);
+            processFields();
             preExecute();
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
@@ -85,19 +96,47 @@ public class CrudController extends BaseController {
         return "redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show";
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit")
-    public ModelAndView edit(@PathVariable Entity entity, @PathVariable String operationId, @PathVariable String instanceId) throws PMException {
-        return null;
+    /**
+     * GET method prepares form.
+     *
+     * @param entity
+     * @return model and view
+     * @throws PMException
+     */
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit", method = RequestMethod.GET)
+    public ModelAndView editPrepare(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
+        getContext().setEntity(entity);
+        getContext().setOperation(entity.getOperation("edit"));
+        getContext().setObject(getEntity().getDao().get(instanceId));
+        getContext().setEntityInstance(newEntityInstance(instanceId, entity));
+        return newMav();
     }
 
-    protected void processFields(EntityInstance instance) throws PMException {
-        for (Map.Entry<String, Object> entry : instance.getValues().entrySet()) {
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit", method = RequestMethod.POST)
+    @Transactional(readOnly = false)
+    public String editCommit(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
+        editPrepare(entity, instanceId);
+        try {
+            processFields();
+            preExecute();
+        } catch (ValidationException e) {
+            if (e.getMsg() != null) {
+                //getEntityMessages().add(e.getMsg());
+            }
+        }
+        getEntity().getDao().update(getObject());
+        postExecute();
+        return "redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show";
+    }
+
+    protected void processFields() throws PMException {
+        preConversion();
+        for (Map.Entry<String, Object> entry : getContext().getEntityInstance().getValues().entrySet()) {
             final String newValue = getRequest().getParameter("field_" + entry.getKey());
             final Field field = getContext().getEntity().getFieldById(entry.getKey());
-            preConversion();
             try {
                 final Converter converter = field.getConverter(getContext().getOperation());
-                final Object convertedValue = converter.build(field, newValue);
+                final Object convertedValue = converter.build(field, getContext().getObject(), newValue);
                 final List<FieldValidator> validators = field.getValidators(getContext().getOperation());
                 for (FieldValidator fieldValidator : validators) {
                     final Message msg = fieldValidator.validate(getObject(), convertedValue);
@@ -120,9 +159,17 @@ public class CrudController extends BaseController {
         final ModelAndView mav = new ModelAndView("jpm-" + getContext().getOperation().getId());
         mav.addObject("entity", getContext().getEntity());
         mav.addObject("operation", getContext().getOperation());
-        mav.addObject("object", getContext().getObject());
+        if (getContext().getObject() != null) {
+            mav.addObject("object", getContext().getObject());
+        }
         mav.addObject("generalOperations", getContext().getEntity().getOperationsFor(null, getContext().getOperation(), OperationScope.GENERAL));
         mav.addObject("selectedOperations", getContext().getEntity().getOperationsFor(null, getContext().getOperation(), OperationScope.SELECTED));
+        if (getContext().getObject() != null) {
+            mav.addObject("itemOperations", getContext().getEntity().getOperationsFor(getContext().getObject(), getContext().getOperation(), OperationScope.ITEM));
+        }
+        if (getContext().getEntityInstance() != null) {
+            mav.addObject("instance", getContext().getEntityInstance());
+        }
         return mav;
     }
 }

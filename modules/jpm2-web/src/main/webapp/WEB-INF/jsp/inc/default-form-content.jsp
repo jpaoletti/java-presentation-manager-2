@@ -1,13 +1,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:if test="${empty entity.panels}">
     <c:forEach items="${instance.values}" var="value">
-        <div id="control-group-${key}" class="form-group">
-            <label class="col-lg-2 control-label" for="f_${key}">
-                <jpm:field-title entity="${entity}" fieldId="${key}" />
+        <div id="control-group-${value.key}" class="form-group">
+            <label class="col-lg-2 control-label" for="f_${value.key}">
+                <jpm:field-title entity="${entity}" fieldId="${value.key}" />
             </label>
             <div class="col-lg-10">
-                <c:set var="field" value="${key}" scope="request" />
-                <c:set var="convertedValue" value="${value}"/>
+                <c:set var="field" value="${value.key}" scope="request" />
+                <c:set var="convertedValue" value="${value.value}"/>
                 <c:if test="${fn:startsWith(convertedValue, '@page:')}">
                     <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
                 </c:if>
@@ -47,6 +47,7 @@
                                         </label>
                                         <div class="col-lg-10">
                                             <c:set var="convertedValue" value="${instance.values[field]}"/>
+                                            <c:set var="field" value="${field}" scope="request" />
                                             <c:if test="${fn:startsWith(convertedValue, '@page:')}">
                                                 <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
                                             </c:if>

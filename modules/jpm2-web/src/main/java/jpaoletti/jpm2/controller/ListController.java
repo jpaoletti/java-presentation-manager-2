@@ -1,6 +1,8 @@
 package jpaoletti.jpm2.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.PMException;
@@ -10,12 +12,18 @@ import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.PaginatedList;
+import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.ObjectConverterData;
+import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -25,8 +33,30 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ListController extends BaseController {
 
+    @RequestMapping(value = "/jpm/{entity}", method = RequestMethod.GET, headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
+    @ResponseBody
+    public ObjectConverterData listObject(
+            @PathVariable Entity entity, @RequestParam String textField,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
+        final Field field = entity.getFieldById(textField);
+        final Integer ps = (pageSize == null) ? 20 : pageSize;
+        final ObjectConverterData r = new ObjectConverterData();
+        final List list = entity.getDao().list((page - 1) * ps, ps, Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+        r.setMore(list.size() == ps);
+        r.setResults(new ArrayList<ObjectConverterDataItem>());
+        for (Object object : list) {
+            r.getResults().add(new ObjectConverterDataItem(
+                    entity.getDao().getId(object).toString(),
+                    JPMUtils.get(object, field.getProperty()).toString()));
+        }
+        return r;
+    }
+
     @RequestMapping(value = "/jpm/{entity}", method = RequestMethod.GET)
-    public ModelAndView list(@PathVariable Entity entity, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
+    public ModelAndView list(@PathVariable Entity entity,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-list");
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("list"));
