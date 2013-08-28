@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core;
 
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 
 /**
@@ -30,4 +31,8 @@ public interface JPMContext {
     public Object getObject();
 
     public void setObject(Object object);
+
+    public EntityInstance getEntityInstance();
+
+    public void setEntityInstance(EntityInstance instance);
 }

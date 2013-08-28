@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core;
 
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -17,6 +18,7 @@ public class JPMContextImpl implements JPMContext {
     private Entity entity;
     private Operation operation;
     private Object object;
+    private EntityInstance entityInstance;
 
     public JPMContextImpl() {
     }
@@ -49,5 +51,15 @@ public class JPMContextImpl implements JPMContext {
     @Override
     public void setObject(Object object) {
         this.object = object;
+    }
+
+    @Override
+    public EntityInstance getEntityInstance() {
+        return entityInstance;
+    }
+
+    @Override
+    public void setEntityInstance(EntityInstance entityInstance) {
+        this.entityInstance = entityInstance;
     }
 }
