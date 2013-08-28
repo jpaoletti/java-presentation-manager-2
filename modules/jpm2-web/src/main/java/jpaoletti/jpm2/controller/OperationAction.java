@@ -89,7 +89,7 @@ public class OperationAction extends EntityAction implements OperationController
             preConversion();
             try {
                 final Converter converter = field.getConverter(getOperation());
-                final Object convertedValue = converter.build(field, newValue);
+                final Object convertedValue = converter.build(field, getObject(), newValue);
                 final List<FieldValidator> validators = field.getValidators(getOperation());
                 for (FieldValidator fieldValidator : validators) {
                     final Message msg = fieldValidator.validate(getObject(), convertedValue);

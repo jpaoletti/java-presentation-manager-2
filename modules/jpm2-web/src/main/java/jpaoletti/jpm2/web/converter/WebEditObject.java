@@ -24,7 +24,7 @@ public class WebEditObject extends Converter {
     @Override
     public Object visualize(Field field, Object object) throws ConverterException {
         final Object value = (object == null) ? null : getValue(object, field);
-        final String res = "@page:object-converter.jsp?" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
+        final String res = "@page:object-converter.jsp?entityId=" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
         if (value == null) {
             return res;
         } else {
@@ -33,7 +33,7 @@ public class WebEditObject extends Converter {
     }
 
     @Override
-    public Object build(Field field, Object newValue) throws ConverterException {
+    public Object build(Field field, Object object, Object newValue) throws ConverterException {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {

@@ -17,7 +17,7 @@ public class Password extends Converter {
     }
 
     @Override
-    public Object build(Field field, Object newValue) throws ConverterException {
+    public Object build(Field field, Object object, Object newValue) throws ConverterException {
         return BCrypt.hashpw((String) newValue, BCrypt.gensalt());
     }
 }

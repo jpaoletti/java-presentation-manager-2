@@ -2,7 +2,6 @@ package jpaoletti.jpm2.web.converter;
 
 import java.util.Collection;
 import jpaoletti.jpm2.core.converter.ConverterException;
-import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -22,7 +21,7 @@ public class WebEditCollection extends WebEditObject {
     @Override
     public Object visualize(Field field, Object object) throws ConverterException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
-        final String res = "@page:collection-converter.jsp?" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
+        final String res = "@page:collection-converter.jsp?entityId=" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
             return res;
         } else {
@@ -35,13 +34,13 @@ public class WebEditCollection extends WebEditObject {
     }
 
     @Override
-    public Object build(Field field, Object newValue) throws ConverterException {
+    public Object build(Field field, Object object, Object newValue) throws ConverterException {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {
-            final Class clazz = field.getClass(getBaseEntity().getClazz());
             try {
-                final Collection c = (Collection) clazz.newInstance();
+                final Collection<Object> c = (Collection<Object>) getValue(object, field);
+                c.clear();
                 final String[] split = ((String) newValue).split("[,]");
                 for (String s : split) {
                     c.add(getEntity().getDao().get(s));
@@ -49,7 +48,7 @@ public class WebEditCollection extends WebEditObject {
                 return c;
             } catch (Exception ex) {
                 JPMUtils.getLogger().error(ex);
-                throw new ConverterException(MessageFactory.error("cannot.create.collection", clazz.getName()));
+                return null;
             }
         }
     }

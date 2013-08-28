@@ -16,7 +16,7 @@ public class WebEditBoolean extends WebToString {
     }
 
     @Override
-    public Object build(Field field, Object newValue) throws ConverterException {
+    public Object build(Field field, Object object, Object newValue) throws ConverterException {
         return newValue != null && !"".equalsIgnoreCase(((String) newValue).trim());
     }
 }
