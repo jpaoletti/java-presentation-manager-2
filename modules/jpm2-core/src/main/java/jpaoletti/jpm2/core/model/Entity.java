@@ -411,7 +411,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return The operation
      */
     public Operation getOperation(String id) {
-        for (Iterator<Operation> it = operations.iterator(); it.hasNext();) {
+        for (Iterator<Operation> it = getOperations().iterator(); it.hasNext();) {
             Operation oper = it.next();
             if (oper.getId().compareTo(id) == 0) {
                 return oper;
