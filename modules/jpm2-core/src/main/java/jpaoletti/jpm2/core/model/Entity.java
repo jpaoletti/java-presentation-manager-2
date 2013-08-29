@@ -16,30 +16,28 @@ import org.springframework.beans.factory.BeanNameAware;
  */
 public class Entity extends PMCoreObject implements BeanNameAware {
 
-    // Represents the entity id. This must me unique.
-    private String id;
-    //The full name of the class represented by the entity.
-    private String clazz;
-    private String idField;
+    private String id; // Represents the entity id. This must me unique.
+    private String clazz;//The full name of the class represented by the entity.
     private GenericDAO dao;
     private String order;
     private Entity parent;
     private Boolean auditable;
     private EntityOwner owner;
     private Highlights highlights;
-    private Boolean noCount;
-    private boolean paginable;
+    private boolean count; //Enable the use of "count" on lists
+    private boolean paginable; //Enable pagination on lists
+    private String auth; //Needed authority to access any operation on this entity
     private List<Field> fields;
     private List<Entity> weaks;
     private List<PanelRow> panels;
     private List<Operation> operations;
-    //
     private Map<String, Field> fieldsbyid;
 
     public Entity() {
         super();
         fieldsbyid = null;
         paginable = true;
+        count = true;
     }
 
     /**
@@ -66,59 +64,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return r;
     }
 
-    /**
-     * Returns a list of this entity instances with null from and count and with
-     * the given filter
-     *
-     * @param ctx The context
-     * @param filter The filter
-     * @return The list
-     * @throws PMException
-     */
-    /*  public List<?> getList(PMContext ctx, EntityFilter filter) throws PMException {
-     return getList(ctx, filter, null, null, null);
-     }*/
-    /**
-     * Return a list of this entity instances with null from and count and the
-     * filter took from the entity container of the context
-     *
-     * @param ctx The context
-     * @return The list
-     * @throws PMException
-     */
-    /*    public List<?> getList(PMContext ctx) throws PMException {
-     final EntityFilter filter = (ctx != null && this.equals(ctx.getEntity())) ? ctx.getEntityContainer().getFilter() : null;
-     return getList(ctx, filter, null, null, null);
-     }
-     */
-    /**
-     * Returns a list taken from data access with the given parameters.
-     *
-     * @param ctx The context
-     * @param filter A filter
-     * @param from The index of the first element
-     * @param count The maximun number of items retrieved
-     * @return The list
-     * @throws PMException
-     */
-    /* public List<?> getList(PMContext ctx, EntityFilter filter, ListSort sort, Integer from, Integer count) throws PMException {
-     return getDataAccess().list(ctx, filter, null, sort, from, count);
-     }
-     */
-    /**
-     * Returns a list taken from data access with the given parameters.
-     *
-     * @param ctx The context
-     * @param filter A list filter
-     * @param from The index of the first element
-     * @param count The maximun number of items retrieved
-     * @return The list
-     * @throws PMException
-     */
-    /* public List<?> getList(PMContext ctx, ListFilter filter, ListSort sort, Integer from, Integer count) throws PMException {
-     return getDataAccess().list(ctx, null, filter, sort, from, count);
-     }
-     */
     /**
      * Getter for a field by its id
      *
@@ -374,21 +319,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return true;
     }
 
-    /**
-     * @param noCount the noCount to set
-     */
-    public void setNoCount(Boolean noCount) {
-        this.noCount = noCount;
+    public boolean isCount() {
+        return count;
     }
 
-    /**
-     * @return the noCount
-     */
-    public Boolean getNoCount() {
-        if (noCount == null) {
-            return false;
-        }
-        return noCount;
+    public void setCount(boolean count) {
+        this.count = count;
     }
 
     /**
@@ -432,27 +368,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      */
     public String getTitle() {
         return String.format("jpm.entity.title.%s", getId());
-    }
-
-    public String getIdField() {
-        if (idField != null) {
-            return idField;
-        } else if (getParent() != null) {
-            return getParent().getIdField();
-        } else {
-            return null;
-        }
-    }
-
-    public void setIdField(String idField) {
-        this.idField = idField;
-    }
-
-    /**
-     * @return true if the entity has idField
-     */
-    public boolean isIdentified() {
-        return getIdField() != null;
     }
 
     /**
@@ -575,5 +490,14 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setPaginable(boolean paginable) {
         this.paginable = paginable;
+    }
+
+    @Override
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 }

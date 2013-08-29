@@ -14,7 +14,7 @@ public class FieldConfig extends PMCoreObject {
 
     public static final String ALL = "all";
     private String operations;
-    private String perm;
+    private String auth;
     private Converter converter;
     private FieldValidator validator;
     private List<FieldValidator> validators;
@@ -22,9 +22,9 @@ public class FieldConfig extends PMCoreObject {
     public FieldConfig() {
     }
 
-    public FieldConfig(String operations, String perm, Converter converter) {
+    public FieldConfig(String operations, String auth, Converter converter) {
         this.operations = operations;
-        this.perm = perm;
+        this.auth = auth;
         this.converter = converter;
     }
 
@@ -56,16 +56,17 @@ public class FieldConfig extends PMCoreObject {
         this.operations = operations;
     }
 
-    public String getPerm() {
-        if (perm == null) {
+    @Override
+    public String getAuth() {
+        if (auth == null) {
             return ALL;
         } else {
-            return perm.trim();
+            return auth.trim();
         }
     }
 
-    public void setPerm(String perm) {
-        this.perm = perm;
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 
     public Converter getConverter() {
@@ -77,7 +78,7 @@ public class FieldConfig extends PMCoreObject {
     }
 
     boolean match(Operation operation) {
-        return includes(operation.getId()) && (getPerm().equalsIgnoreCase(ALL) || userHasRole(getPerm()));
+        return includes(operation.getId()) && (getAuth().equalsIgnoreCase(ALL) || userHasRole(getAuth()));
     }
 
     public FieldValidator getValidator() {

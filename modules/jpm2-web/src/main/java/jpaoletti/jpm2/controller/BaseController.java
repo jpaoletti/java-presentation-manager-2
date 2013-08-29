@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
+import jpaoletti.jpm2.core.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
@@ -131,6 +132,11 @@ public class BaseController {
         System.out.println("Invalid value is: " + ex.getValue());
         System.out.println("Required type is: " + ex.getRequiredType().getSimpleName());
         return null;
+    }
+
+    @ExceptionHandler(NotAuthorizedException.class)
+    public String handleNotAuthorizedException(NotAuthorizedException ex, HttpServletRequest req, HttpServletResponse resp) {
+        return "not-authotized";
     }
 
     public HttpSession getSession() {

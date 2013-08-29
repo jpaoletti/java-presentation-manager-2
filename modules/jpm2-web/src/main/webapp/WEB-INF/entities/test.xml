@@ -22,7 +22,6 @@
                     <property name="display" value="all" />
                     <property name="showTitle" value="true" />
                     <property name="confirm" value="false" />
-                    <property name="perm" value="sysadmin" />
                     <property name="available" value="true" />
                     <property name="compact" value="false" />
                     <property name="popup" value="false" />

@@ -14,6 +14,7 @@
     <bean id="jpm-entity-auth" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.Authority" />
         <property name="dao" ref="jpm-dao-auth" />
+        <property name="auth" value="ROLE_USERADMIN" />
         <property name="fields" >
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Field">
@@ -28,12 +29,12 @@
     <bean id="jpm-entity-user" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.User" />
         <property name="dao" ref="jpm-dao-user" />
+        <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
                     <property name="scope" value="general" />
-                    <property name="perm" value="sysadmin" />
                     <property name="navigable" value="true" />
                     <property name="properties">
                         <props>
@@ -144,12 +145,12 @@
     <bean id="jpm-entity-group" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.Group" />
         <property name="dao" ref="jpm-dao-group" />
+        <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
                     <property name="scope" value="general" />
-                    <property name="perm" value="sysadmin" />
                     <property name="navigable" value="true" />
                     <property name="properties">
                         <props>

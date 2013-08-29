@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core;
 
 import jpaoletti.jpm2.core.model.PMCoreConstants;
+import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -24,7 +25,7 @@ public abstract class PMCoreObject implements PMCoreConstants {
      */
     public void debug(String s) {
         if (getDebug()) {
-            System.out.println(s);
+            JPMUtils.getLogger().debug(debug);
         }
     }
 
@@ -63,5 +64,18 @@ public abstract class PMCoreObject implements PMCoreConstants {
             }
         }
         return false;
+    }
+
+    public void checkAuthorization() throws NotAuthorizedException {
+        if (getAuth() != null && !userHasRole(getAuth())) {
+            throw new NotAuthorizedException();
+        }
+    }
+
+    /**
+     * Override me
+     */
+    public String getAuth() {
+        return null;
     }
 }

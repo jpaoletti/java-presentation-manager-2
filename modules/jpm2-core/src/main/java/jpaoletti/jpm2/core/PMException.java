@@ -64,6 +64,6 @@ public class PMException extends Exception {
 
     @Override
     public String getMessage() {
-        return getMsg().getKey();
+        return (getMsg() != null) ? getMsg().getKey() : "";
     }
 }

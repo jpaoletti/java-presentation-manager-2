@@ -47,8 +47,6 @@ public class Operation extends PMCoreObject {
     private OperationValidator validator;
     //A properties object to get some extra configurations
     private Properties properties;
-    //Permission to do this operation
-    private String perm;
     // Another operation ID that follows this one on success
     private String follows;
     //Conditional to show on others
@@ -60,6 +58,7 @@ public class Operation extends PMCoreObject {
     private boolean popup; //Default: false
     private Integer auditLevel;//Overrides default audit level for operation
     private boolean navigable; //Default: true, if navigable, impacts on NavigationList
+    private String auth; //Needed authority to access any operation on this entity
 
     public Operation() {
         this.enabled = true;
@@ -226,12 +225,13 @@ public class Operation extends PMCoreObject {
         this.confirm = confirm;
     }
 
-    public String getPerm() {
-        return perm;
+    @Override
+    public String getAuth() {
+        return auth;
     }
 
-    public void setPerm(String perm) {
-        this.perm = perm;
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 
     /**

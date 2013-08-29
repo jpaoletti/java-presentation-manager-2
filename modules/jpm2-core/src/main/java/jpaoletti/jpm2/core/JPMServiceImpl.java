@@ -23,6 +23,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     @Transactional(readOnly = true)
     public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize) throws PMException {
+        entity.checkAuthorization();
+        operation.checkAuthorization();
         final PaginatedList pl = new PaginatedList();
         final Criterion search = sessionEntityData.getSearchCriteria().getCriterion();
         if (entity.isPaginable()) {
@@ -58,14 +60,14 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final Object object = entity.getDao().get(instanceId); //current object
         try {
             processFields(entity, operation, object, entityInstance, parameters);
-            //preExecute();
+            preExecute(operation, object);
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
                 //getEntityMessages().add(e.getMsg());
             }
         }
         entity.getDao().update(object);
-        //postExecute();
+        postExecute(operation);
         return object;
     }
 

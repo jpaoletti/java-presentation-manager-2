@@ -116,7 +116,7 @@ public class Field extends PMCoreObject {
         //First we check permissions
         for (FieldConfig config : getConfigs()) {
             if (config.includes(operationId)) {
-                if (config.getPerm() != null && !userHasRole(config.getPerm())) {
+                if (config.getAuth() != null && !userHasRole(config.getAuth())) {
                     return false;
                 }
             }
