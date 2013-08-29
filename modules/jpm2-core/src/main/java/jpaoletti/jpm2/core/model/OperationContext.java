@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.core.model;
 
-import jpaoletti.jpm2.core.OperationController;
 import jpaoletti.jpm2.core.PMException;
 
 /**
@@ -18,7 +17,7 @@ public interface OperationContext {
      *
      * @throws PMException
      */
-    public void preConversion(OperationController operationController) throws PMException;
+    public void preConversion() throws PMException;
 
     /**
      * This method is executed before trying to execute the main method of the
@@ -26,12 +25,12 @@ public interface OperationContext {
      *
      * @throws PMException
      */
-    public void preExecute(OperationController operationController) throws PMException;
+    public void preExecute() throws PMException;
 
     /**
      * This method is executed after the main method of the operation.
      *
      * @throws PMException
      */
-    public void postExecute(OperationController operationController) throws PMException;
+    public void postExecute() throws PMException;
 }

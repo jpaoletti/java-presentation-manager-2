@@ -25,7 +25,7 @@
                                                 <spring:message code="jpm.list.search" text="Search" /> <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu" role="menu">
-                                                <c:forEach items="${fieldSearchs}" var="fs">
+                                                <c:forEach items="${paginatedList.fieldSearchs}" var="fs">
                                                     <li role="presentation">
                                                         <a role="menuitem" tabindex="-1" href="javascript:openSearchModal('${fs.key.id}');"><spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" /></a>
                                                     </li>
@@ -40,7 +40,7 @@
                                             </c:forEach>
                                         </div>
                                     </div>
-                                    <c:if test="${paginable}">
+                                    <c:if test="${entity.paginable}">
                                         <div class="col-lg-3">
                                             <form action="" class="form-inline pull-right" role="form">
                                                 <input type="hidden" name="entityId" value="${entityId}" />
@@ -129,7 +129,7 @@
             </form>
         </div>
         <div class="hide" id='fieldSearchForms'>
-            <c:forEach items="${fieldSearchs}" var="fs">
+            <c:forEach items="${paginatedList.fieldSearchs}" var="fs">
                 <div id='fieldSearchForm_${fs.key.id}'>
                     <c:if test="${fn:startsWith(fs.value, '@page:')}">
                         <jsp:include page="searcher/${fn:replace(fs.value, '@page:', '')}" flush="true" />

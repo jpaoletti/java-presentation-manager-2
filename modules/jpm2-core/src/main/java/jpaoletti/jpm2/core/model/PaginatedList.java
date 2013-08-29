@@ -1,7 +1,9 @@
 package jpaoletti.jpm2.core.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This list represents a list with a paged representation.
@@ -12,6 +14,7 @@ public class PaginatedList {
 
     public static final int DEFAULT_PAGE_SIZE = 10;
     private EntityInstanceList contents;
+    private Map<Field, String> fieldSearchs;
     private Integer page;
     private Integer pages;
     private Integer pageSize;
@@ -26,7 +29,9 @@ public class PaginatedList {
      */
     public PaginatedList() {
         this.page = 1;
-        pageSize = 10; //Default
+        this.pageSize = 10;
+        this.contents = new EntityInstanceList();
+        this.fieldSearchs = new LinkedHashMap<>();
     }
 
     /**
@@ -93,7 +98,6 @@ public class PaginatedList {
      */
     public void setContents(EntityInstanceList contents) {
         this.contents = contents;
-        getContents().setDisplacement((int) ((getPage() - 1) * getPageSize()));
     }
 
     /**
@@ -244,5 +248,13 @@ public class PaginatedList {
 
     public List<Field> getFields() {
         return getContents().getFields();
+    }
+
+    public Map<Field, String> getFieldSearchs() {
+        return fieldSearchs;
+    }
+
+    public void setFieldSearchs(Map<Field, String> fieldSearchs) {
+        this.fieldSearchs = fieldSearchs;
     }
 }

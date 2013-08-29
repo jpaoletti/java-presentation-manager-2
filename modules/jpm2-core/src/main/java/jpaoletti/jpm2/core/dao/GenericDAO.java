@@ -13,7 +13,6 @@ import org.hibernate.criterion.Projections;
 import org.jodah.typetools.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -42,17 +41,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
 
-    @Transactional(readOnly = false)
     public void update(final Object object) {
         getSession().update(object);
     }
 
-    @Transactional(readOnly = false)
     public void save(Object object) {
         getSession().save(object);
     }
 
-    @Transactional(readOnly = false)
     public void delete(Object object) {
         getSession().delete(object);
     }
