@@ -3,7 +3,7 @@ package jpaoletti.jpm2.controller;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import jpaoletti.jpm2.core.JPMService;
+import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;

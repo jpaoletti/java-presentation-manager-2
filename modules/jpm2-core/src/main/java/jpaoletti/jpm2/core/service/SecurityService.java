@@ -1,8 +1,9 @@
-package jpaoletti.jpm2.core.security;
+package jpaoletti.jpm2.core.service;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.security.User;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

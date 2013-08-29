@@ -1,10 +1,11 @@
-package jpaoletti.jpm2.core.security;
+package jpaoletti.jpm2.core.service;
 
 import java.util.UUID;
-import jpaoletti.jpm2.core.JPMServiceBase;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.security.BCrypt;
+import jpaoletti.jpm2.core.security.User;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +24,7 @@ public final class SecurityServiceImpl extends JPMServiceBase implements Securit
         preExecute(operation, user);
         entity.getDao().update(user);
         postExecute(operation);
+        getJpm().audit();
         return user;
     }
 }

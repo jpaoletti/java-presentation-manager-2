@@ -1,8 +1,11 @@
-package jpaoletti.jpm2.core;
+package jpaoletti.jpm2.core.service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import jpaoletti.jpm2.core.JPMContext;
+import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
@@ -24,6 +27,8 @@ public class JPMServiceBase {
 
     @Autowired
     private JPMContext context;
+    @Autowired
+    private PresentationManager jpm;
 
     protected void processFields(Entity entity, Operation operation, Object object, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         preConversion(operation);
@@ -86,5 +91,13 @@ public class JPMServiceBase {
 
     public void setContext(JPMContext context) {
         this.context = context;
+    }
+
+    public PresentationManager getJpm() {
+        return jpm;
+    }
+
+    public void setJpm(PresentationManager jpm) {
+        this.jpm = jpm;
     }
 }

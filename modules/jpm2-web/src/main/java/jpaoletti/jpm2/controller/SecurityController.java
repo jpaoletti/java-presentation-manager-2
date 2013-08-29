@@ -3,7 +3,7 @@ package jpaoletti.jpm2.controller;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.security.SecurityService;
+import jpaoletti.jpm2.core.service.SecurityService;
 import jpaoletti.jpm2.core.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

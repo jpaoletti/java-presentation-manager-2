@@ -1,6 +1,7 @@
-package jpaoletti.jpm2.core;
+package jpaoletti.jpm2.core.service;
 
 import java.util.Map;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -10,7 +11,6 @@ import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.criterion.Criterion;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     @Override
-    @Transactional(readOnly = true)
     public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize) throws PMException {
         entity.checkAuthorization();
         operation.checkAuthorization();
@@ -50,36 +49,49 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                 pl.getFieldSearchs().put(field, field.getSearcher().visualization());
             }
         }
+        getJpm().audit();
         return pl;
     }
 
-    @Transactional(readOnly = false)
     @Override
     public Object update(Entity entity, Operation operation, String instanceId, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = entity.getDao().get(instanceId); //current object
+        getContext().setObject(object);
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao().update(object);
         postExecute(operation);
+        getJpm().audit();
         return object;
     }
 
     @Override
     public void delete(Entity entity, Operation operation, String instanceId) throws PMException {
         final Object object = entity.getDao().get(instanceId); //current object
+        getContext().setObject(object);
         preExecute(operation, object);
         entity.getDao().delete(object);
         postExecute(operation);
+        getJpm().audit();
     }
 
     @Override
-    @Transactional
+    public Object get(Entity entity, Operation operation, String instanceId) throws PMException {
+        preExecute(operation, null);
+        final Object object = entity.getDao().get(instanceId); //current object
+        postExecute(operation);
+        return object;
+    }
+
+    @Override
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = JPMUtils.newInstance(entity.getClazz());
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao().save(object);
         postExecute(operation);
+        getContext().setObject(object);
+        getJpm().audit();
         return entity.getDao().getId(object).toString();
     }
 }
