@@ -1,5 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<script type="text/javascript" src="<c:url value='/static/js/pwdwidget.js'/>"></script>
+<script type="text/javascript" src="${cp}static/js/pwdwidget.js"></script>
 <div id="d_${field}" class="control-group">
     <div class='pwdwidgetdiv' id='thepwddiv${field}'></div>
 </div>

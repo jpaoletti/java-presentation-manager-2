@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.security;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -33,6 +34,7 @@ public class User implements Serializable {
 
     public User() {
         this.enabled = true;
+        this.groups = new ArrayList<>();
     }
 
     public String getUsername() {

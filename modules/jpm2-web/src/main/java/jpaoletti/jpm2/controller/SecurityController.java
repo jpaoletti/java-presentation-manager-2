@@ -5,6 +5,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.SecurityService;
 import jpaoletti.jpm2.core.security.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +20,10 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class SecurityController extends BaseController {
 
+    @Autowired
     private SecurityService securityService;
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/resetPassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/resetPassword")
     public ModelAndView resetPassword(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         final Operation operation = entity.getOperation("resetPassword");
         getContext().setEntity(entity);

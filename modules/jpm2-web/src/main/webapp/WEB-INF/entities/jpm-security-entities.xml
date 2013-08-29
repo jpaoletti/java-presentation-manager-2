@@ -44,7 +44,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="show" />
-                    <property name="display" value="edit list" />
+                    <property name="display" value="edit list resetPassword" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
@@ -57,7 +57,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="edit" />
-                    <property name="display" value="show list" />
+                    <property name="display" value="show list resetPassword" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="resetPassword" />

@@ -25,11 +25,11 @@
                                         <div class="row jpm-content-panels">
                                             <div class="col-sm-4">
                                                 <div id="control-group-${key}" class="form-group">
-                                                    <label class="col-lg-2 control-label" for="f_${key}">
+                                                    <label class="col-lg-4 control-label" for="f_${key}">
                                                         <spring:message code="jpm.security.generatedpassword" text="Generated Passowrd"/>
                                                     </label>
-                                                    <div class="col-lg-10">
-                                                        ${value}
+                                                    <div class="col-lg-8">
+                                                        <input type="text" class="form-control" value="${object.newPassword}" disabled/>
                                                     </div>
                                                 </div>
                                             </div>

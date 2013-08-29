@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.security;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,6 +32,10 @@ public class Group implements Serializable {
             @JoinColumn(name = "group_id"), inverseJoinColumns =
             @JoinColumn(name = "authority"))
     private List<Authority> authorities;
+
+    public Group() {
+        this.authorities = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
