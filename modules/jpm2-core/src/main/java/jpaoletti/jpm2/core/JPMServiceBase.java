@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.converter.Converter;
@@ -11,13 +12,18 @@ import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.FieldValidator;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author jpaoletti
  */
 public class JPMServiceBase {
+
+    @Autowired
+    private JPMContext context;
 
     protected void processFields(Entity entity, Operation operation, Object object, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         preConversion(operation);
@@ -32,18 +38,18 @@ public class JPMServiceBase {
                 for (FieldValidator fieldValidator : validators) {
                     final Message msg = fieldValidator.validate(object, convertedValue);
                     if (msg != null) {
-                        //addFieldMsg(field, msg);
+                        getContext().addFieldMsg(field, msg);
                     }
                 }
                 JPMUtils.set(object, field.getProperty(), convertedValue);
             } catch (IgnoreConvertionException e) {
             } catch (ConverterException e) {
-                //addFieldMsg(field, e.getMsg());
+                getContext().addFieldMsg(field, e.getMsg());
             }
         }
-//        if (!getFieldMessages().isEmpty()) {
-//            throw new ValidationException(null);
-//        }
+        if (!getContext().getFieldMessages().isEmpty()) {
+            throw new ValidationException(null);
+        }
     }
 
     public void preConversion(Operation operation) throws PMException {
@@ -65,5 +71,20 @@ public class JPMServiceBase {
         if (operation.getContext() != null) {
             operation.getContext().postExecute();
         }
+    }
+
+    protected void addFieldMsg(Map<String, List<Message>> messages, Field field, Message msg) {
+        if (!messages.containsKey(field.getId())) {
+            messages.put(field.getId(), new ArrayList<Message>());
+        }
+        messages.get(field.getId()).add(msg);
+    }
+
+    public JPMContext getContext() {
+        return context;
+    }
+
+    public void setContext(JPMContext context) {
+        this.context = context;
     }
 }

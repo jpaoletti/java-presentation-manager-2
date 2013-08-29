@@ -1,10 +1,8 @@
 package jpaoletti.jpm2.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -14,7 +12,6 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
-import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import org.apache.struts2.ServletActionContext;
@@ -44,7 +41,6 @@ public class BaseController {
     //Messages TO-DO
     private List<Message> globalMessages = new ArrayList<>();
     private List<Message> entityMessages = new ArrayList<>();
-    private Map<String, List<Message>> fieldMessages = new HashMap<>(); //field
 
     protected ModelAndView newMav() throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-" + getContext().getOperation().getId());
@@ -71,13 +67,6 @@ public class BaseController {
         } else {
             return null;
         }
-    }
-
-    protected void addFieldMsg(final Field field, Message message) {
-        if (!getFieldMessages().containsKey(field.getId())) {
-            getFieldMessages().put(field.getId(), new ArrayList<Message>());
-        }
-        getFieldMessages().get(field.getId()).add(message);
     }
 
     /**
@@ -135,7 +124,7 @@ public class BaseController {
     }
 
     @ExceptionHandler(NotAuthorizedException.class)
-    public String handleNotAuthorizedException(NotAuthorizedException ex, HttpServletRequest req, HttpServletResponse resp) {
+    public String handleNotAuthorizedException() {
         return "not-authotized";
     }
 
@@ -177,13 +166,5 @@ public class BaseController {
 
     public void setEntityMessages(List<Message> entityMessages) {
         this.entityMessages = entityMessages;
-    }
-
-    public Map<String, List<Message>> getFieldMessages() {
-        return fieldMessages;
-    }
-
-    public void setFieldMessages(Map<String, List<Message>> fieldMessages) {
-        this.fieldMessages = fieldMessages;
     }
 }

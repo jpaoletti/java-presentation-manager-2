@@ -1,7 +1,13 @@
 package jpaoletti.jpm2.core;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -19,8 +25,10 @@ public class JPMContextImpl implements JPMContext {
     private Operation operation;
     private Object object;
     private EntityInstance entityInstance;
+    private Map<String, List<Message>> fieldMessages; //field
 
     public JPMContextImpl() {
+        this.fieldMessages = new HashMap<>();
     }
 
     @Override
@@ -61,5 +69,22 @@ public class JPMContextImpl implements JPMContext {
     @Override
     public void setEntityInstance(EntityInstance entityInstance) {
         this.entityInstance = entityInstance;
+    }
+
+    @Override
+    public void addFieldMsg(final Field field, Message message) {
+        if (!getFieldMessages().containsKey(field.getId())) {
+            getFieldMessages().put(field.getId(), new ArrayList<Message>());
+        }
+        getFieldMessages().get(field.getId()).add(message);
+    }
+
+    @Override
+    public Map<String, List<Message>> getFieldMessages() {
+        return fieldMessages;
+    }
+
+    public void setFieldMessages(Map<String, List<Message>> fieldMessages) {
+        this.fieldMessages = fieldMessages;
     }
 }

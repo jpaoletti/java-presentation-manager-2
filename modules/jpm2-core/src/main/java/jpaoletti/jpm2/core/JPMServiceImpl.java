@@ -7,7 +7,6 @@ import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
-import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.criterion.Criterion;
 import org.springframework.stereotype.Service;
@@ -58,14 +57,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     public Object update(Entity entity, Operation operation, String instanceId, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = entity.getDao().get(instanceId); //current object
-        try {
-            processFields(entity, operation, object, entityInstance, parameters);
-            preExecute(operation, object);
-        } catch (ValidationException e) {
-            if (e.getMsg() != null) {
-                //getEntityMessages().add(e.getMsg());
-            }
-        }
+        processFields(entity, operation, object, entityInstance, parameters);
+        preExecute(operation, object);
         entity.getDao().update(object);
         postExecute(operation);
         return object;
@@ -83,15 +76,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Transactional
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = JPMUtils.newInstance(entity.getClazz());
-        try {
-            processFields(entity, operation, object, entityInstance, parameters);
-            preExecute(operation, object);
-        } catch (ValidationException e) {
-            if (e.getMsg() != null) {
-                //getEntityMessages().add(e.getMsg());
-            }
-        }
-        entity.getDao().update(object);
+        processFields(entity, operation, object, entityInstance, parameters);
+        preExecute(operation, object);
+        entity.getDao().save(object);
         postExecute(operation);
         return entity.getDao().getId(object).toString();
     }

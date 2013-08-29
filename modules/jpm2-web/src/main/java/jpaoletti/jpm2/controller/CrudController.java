@@ -73,12 +73,18 @@ public final class CrudController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/add", method = RequestMethod.POST)
-    public String addCommit(@PathVariable Entity entity) throws PMException {
+    public ModelAndView addCommit(@PathVariable Entity entity) throws PMException {
         final Operation operation = entity.getOperation("add");
-        final String instanceId = getService().save(entity, operation,
-                new EntityInstance(null, entity, operation, null),
-                getRequest().getParameterMap());
-        return "redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show";
+        try {
+            final String instanceId = getService().save(entity, operation,
+                    new EntityInstance(null, entity, operation, null),
+                    getRequest().getParameterMap());
+            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
+        } catch (PMException e) {
+            final ModelAndView mav = addPrepare(entity);
+            mav.addObject("fieldMessages", getContext().getFieldMessages());
+            return mav;
+        }
     }
 
     /**
@@ -98,16 +104,22 @@ public final class CrudController extends BaseController {
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit", method = RequestMethod.POST)
-    public String editCommit(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
+    public ModelAndView editCommit(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("edit"));
-        getService().update(
-                getContext().getEntity(),
-                getContext().getOperation(),
-                instanceId,
-                newEntityInstance(instanceId, entity),
-                getRequest().getParameterMap());
-        return "redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show";
+        try {
+            getService().update(
+                    getContext().getEntity(),
+                    getContext().getOperation(),
+                    instanceId,
+                    newEntityInstance(instanceId, entity),
+                    getRequest().getParameterMap());
+            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
+        } catch (PMException e) {
+            final ModelAndView mav = addPrepare(entity);
+            mav.addObject("fieldMessages", getContext().getFieldMessages());
+            return mav;
+        }
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/delete", method = RequestMethod.GET)

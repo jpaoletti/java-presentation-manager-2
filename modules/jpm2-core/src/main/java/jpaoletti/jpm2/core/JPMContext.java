@@ -1,7 +1,11 @@
 package jpaoletti.jpm2.core;
 
+import java.util.List;
+import java.util.Map;
+import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 
 /**
@@ -35,4 +39,8 @@ public interface JPMContext {
     public EntityInstance getEntityInstance();
 
     public void setEntityInstance(EntityInstance instance);
+
+    public void addFieldMsg(final Field field, Message message);
+
+    public Map<String, List<Message>> getFieldMessages();
 }
