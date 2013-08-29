@@ -113,12 +113,17 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="test" />
-                    <property name="width" value="100px" />
+                    <property name="width" value="150px" />
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="list show"/>
-                                <property name="converter" ref="jpm-converter-show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowObject">
+                                        <property name="entity" ref="jpm-entity-test" />
+                                        <property name="fields" value="id,string,integer,date,bool" />
+                                    </bean>
+                                </property>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="add edit"/>

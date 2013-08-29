@@ -82,6 +82,7 @@
                                             <c:forEach items="${item.values}" var="v">
                                                 <td data-field="${v.key}">
                                                     <c:set var="convertedValue" value="${v.value}"/>
+                                                    <c:set var="field" value="${v.key}" scope="request" />
                                                     <c:if test="${fn:startsWith(convertedValue, '@page:')}">
                                                         <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
                                                     </c:if>

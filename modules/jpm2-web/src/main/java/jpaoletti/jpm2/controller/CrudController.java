@@ -1,7 +1,11 @@
 package jpaoletti.jpm2.controller;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -37,6 +41,27 @@ public final class CrudController extends BaseController {
         final Field field = entity.getFieldById(textField);
         final Object object = getService().get(entity, instanceId);
         return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
+    }
+
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET, headers = "Accept=application/json")
+    @ResponseBody
+    public Map<String, Object> showJSON(@PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
+        getContext().setOperation(entity.getOperation("show"));
+        final Object object = getService().get(entity, getContext().getOperation(), instanceId);
+        getContext().setObject(object);
+        final Map<String, Object> values = new LinkedHashMap<>();
+        final String[] fs = fields.split("[,]");
+        for (String fid : fs) {
+            final Field field = entity.getFieldById(fid);
+            final Converter converter = field.getConverter(getContext().getOperation());
+            if (converter != null) {
+                try {
+                    values.put(field.getId(), converter.visualize(field, object));
+                } catch (IgnoreConvertionException ex) {
+                }
+            }
+        }
+        return values;
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET)
