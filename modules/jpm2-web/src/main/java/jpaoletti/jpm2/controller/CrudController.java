@@ -35,7 +35,7 @@ public final class CrudController extends BaseController {
             @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam String textField,
             @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
         final Field field = entity.getFieldById(textField);
-        final Object object = getService().get(entity, entity.getOperation("show"), instanceId);
+        final Object object = getService().get(entity, instanceId);
         return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
     }
 

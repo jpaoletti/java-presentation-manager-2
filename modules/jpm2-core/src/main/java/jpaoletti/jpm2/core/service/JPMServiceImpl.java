@@ -84,6 +84,11 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     @Override
+    public Object get(Entity entity, String instanceId) throws PMException {
+        return entity.getDao().get(instanceId);
+    }
+
+    @Override
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = JPMUtils.newInstance(entity.getClazz());
         processFields(entity, operation, object, entityInstance, parameters);

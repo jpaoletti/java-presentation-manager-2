@@ -24,7 +24,17 @@ public interface JPMService {
     @Transactional
     public void delete(Entity entity, Operation operation, String instanceId) throws PMException;
 
+    /**
+     * Retrieve an object of this entity, caring about the operation being
+     * executed.
+     */
     public Object get(Entity entity, Operation operation, String instanceId) throws PMException;
+
+    /**
+     * Retrieve an object of this entity, without caring about the operation
+     * being executed.
+     */
+    public Object get(Entity entity, String instanceId) throws PMException;
 
     @Transactional
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
