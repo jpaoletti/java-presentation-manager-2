@@ -1,4 +1,4 @@
-<c:if test="${paginable}">
+<c:if test="${entity.paginable}">
     <ul class="pagination pagination-sm">
         <li ${(paginatedList.page > 1)?'':"class='disabled'"}><a href="<c:url value='/jpm/${entity.id}?page=${paginatedList.page-1}' />">&laquo; </a></li>
         <c:if test="${paginatedList.total != null}">

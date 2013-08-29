@@ -28,6 +28,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private EntityOwner owner;
     private Highlights highlights;
     private Boolean noCount;
+    private boolean paginable;
     private List<Field> fields;
     private List<Entity> weaks;
     private List<PanelRow> panels;
@@ -38,6 +39,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     public Entity() {
         super();
         fieldsbyid = null;
+        paginable = true;
     }
 
     /**
@@ -565,5 +567,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     @Override
     public void setBeanName(String string) {
         this.id = string;
+    }
+
+    public boolean isPaginable() {
+        return paginable;
+    }
+
+    public void setPaginable(boolean paginable) {
+        this.paginable = paginable;
     }
 }
