@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Security User. Just for CRUD operations.
@@ -27,6 +28,8 @@ public class User implements Serializable {
             @JoinColumn(name = "username"), inverseJoinColumns =
             @JoinColumn(name = "group_id"))
     private List<Group> groups;
+    @Transient
+    private String newPassword;
 
     public User() {
         this.enabled = true;
@@ -67,5 +70,13 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return getUsername();
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

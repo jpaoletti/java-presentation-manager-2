@@ -17,7 +17,7 @@
         <property name="fields" >
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Field">
-                    <property name="id" value="authority" />
+                    <property name="id" value="id" />
                     <property name="searcher" ref="jpm-searcher-string" />
                     <property name="configs" ref="default-string-config" />
                 </bean>
@@ -119,7 +119,23 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="groups" />
-                    <property name="configs" ref="default-string-config" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditCollection">
+                                        <property name="entity" ref="jpm-entity-group" />
+                                        <property name="textField" value="name" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
                 </bean>
             </list>
         </property>
@@ -177,18 +193,18 @@
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="list show"/>
+                                <property name="operations" value="show"/>
                                 <property name="converter" ref="jpm-converter-show"/>
                             </bean>
-                            <!--                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="add edit"/>
                                 <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.WebEditObject">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditCollection">
                                         <property name="entity" ref="jpm-entity-auth" />
-                                        <property name="textField" value="authority" />
+                                        <property name="textField" value="id" />
                                     </bean>
                                 </property>
-                            </bean>-->
+                            </bean>
                         </list>
                     </property>
                 </bean>

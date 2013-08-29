@@ -2,14 +2,14 @@ package jpaoletti.jpm2.core.security;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 /**
@@ -26,11 +26,11 @@ public class Group implements Serializable {
     private Long id;
     @Column(name = "group_name")
     private String name;
-    @ElementCollection
-    @CollectionTable(name = "group_authorities", joinColumns =
-            @JoinColumn(name = "group_id"))
-    @Column(name = "authority")
-    private List<String> authorities;
+    @ManyToMany
+    @JoinTable(name = "group_authorities", joinColumns =
+            @JoinColumn(name = "group_id"), inverseJoinColumns =
+            @JoinColumn(name = "authority"))
+    private List<Authority> authorities;
 
     public Long getId() {
         return id;
@@ -48,11 +48,11 @@ public class Group implements Serializable {
         this.name = name;
     }
 
-    public List<String> getAuthorities() {
+    public List<Authority> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(List<String> authorities) {
+    public void setAuthorities(List<Authority> authorities) {
         this.authorities = authorities;
     }
 
