@@ -20,9 +20,7 @@
         </c:if>
         <c:if test="${not entity.countable}">
             <form action="" class="form-inline pull-right" role="form">
-                <div class="form-group">
-                    <input class="form-control page-size input-sm" type="number" min="1" ${(paginatedList.more)?'':("max='".concat(paginatedList.page).concat("'"))} value="${paginatedList.page}" name="page" style="width:60px;" />
-                </div>
+                <input class="form-control page-size input-sm" type="number" min="1" ${(paginatedList.more)?'':("max='".concat(paginatedList.page).concat("'"))} value="${paginatedList.page}" name="page" style="width:60px;" />
                 <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-arrow-right"></span></button>
             </form>
         </c:if>
