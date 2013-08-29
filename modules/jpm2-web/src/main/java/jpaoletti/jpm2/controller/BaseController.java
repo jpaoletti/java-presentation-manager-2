@@ -15,7 +15,6 @@ import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
-import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -23,8 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -73,27 +70,6 @@ public class BaseController {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Retrieves a bean from Spring context.
-     *
-     * @param name Bean name
-     * @return bean
-     */
-    public static Object getBean(String name) {
-        final WebApplicationContext context =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(
-                ServletActionContext.getServletContext());
-        return context.getBean(name);
-    }
-
-    public String getMessage(String code, String... args) {
-        final Locale locale = getLocale();
-        final WebApplicationContext ctx =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(
-                ServletActionContext.getServletContext());
-        return ctx.getMessage(code, args, locale);
     }
 
     public Locale getLocale() {
