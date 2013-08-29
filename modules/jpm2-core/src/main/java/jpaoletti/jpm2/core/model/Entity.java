@@ -24,7 +24,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private boolean auditable;
     private EntityOwner owner;
     private Highlights highlights;
-    private boolean count; //Enable the use of "count" on lists
+    private boolean countable; //Enable the use of "count" on lists
     private boolean paginable; //Enable pagination on lists
     private String auth; //Needed authority to access any operation on this entity
     private List<Field> fields;
@@ -37,7 +37,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         super();
         fieldsbyid = null;
         paginable = true;
-        count = true;
+        countable = true;
         auditable = true;
     }
 
@@ -317,12 +317,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return true;
     }
 
-    public boolean isCount() {
-        return count;
+    public boolean isCountable() {
+        return countable;
     }
 
-    public void setCount(boolean count) {
-        this.count = count;
+    public void setCountable(boolean countable) {
+        this.countable = countable;
     }
 
     /**

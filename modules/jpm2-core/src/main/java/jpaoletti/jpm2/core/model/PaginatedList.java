@@ -257,4 +257,8 @@ public class PaginatedList {
     public void setFieldSearchs(Map<Field, String> fieldSearchs) {
         this.fieldSearchs = fieldSearchs;
     }
+
+    public boolean isMore() {
+        return (total == null && getContents().size() == getPageSize()) || (total != null && getPage() < getPages());
+    }
 }

@@ -30,10 +30,14 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             pl.setPage(page != null ? page : sessionEntityData.getPage());
             if (search == null) {
                 pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize()), entity, operation);
-                pl.setTotal(entity.getDao().count());
+                if (entity.isCountable()) {
+                    pl.setTotal(entity.getDao().count());
+                }
             } else {
                 pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize(), search), entity, operation);
-                pl.setTotal(entity.getDao().count(search));
+                if (entity.isCountable()) {
+                    pl.setTotal(entity.getDao().count(search));
+                }
             }
             sessionEntityData.setPage(pl.getPage());
             sessionEntityData.setPageSize(pl.getPageSize());

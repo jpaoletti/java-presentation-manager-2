@@ -13,6 +13,7 @@
         <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTest" />
         <property name="dao" ref="jpm-dao-test" />
         <property name="order" value="id string integer bool" />
+        <property name="countable" value="false" />
         <property name="operations" >
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
