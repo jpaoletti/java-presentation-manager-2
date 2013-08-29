@@ -29,6 +29,8 @@
     <bean id="jpm-converter-edit-int" class="jpaoletti.jpm2.web.converter.WebEditInteger" />
     <bean id="jpm-converter-edit-date" class="jpaoletti.jpm2.web.converter.WebEditDate" />
 
+    <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
+
     <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
         <property name="properties">
             <props>

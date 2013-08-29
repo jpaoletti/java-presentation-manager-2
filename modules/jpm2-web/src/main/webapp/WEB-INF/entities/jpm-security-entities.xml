@@ -24,6 +24,18 @@
                 </bean>
             </list>
         </property>
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="scope" value="general" />
+                    <property name="navigable" value="true" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="show" />
+                </bean>
+            </list>
+        </property>
     </bean>
 
     <bean id="jpm-entity-user" class="jpaoletti.jpm2.core.model.Entity" >
@@ -36,11 +48,6 @@
                     <property name="id" value="list" />
                     <property name="scope" value="general" />
                     <property name="navigable" value="true" />
-                    <property name="properties">
-                        <props>
-                            <prop key="paginable">true</prop>
-                        </props>
-                    </property>
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="show" />
@@ -124,7 +131,7 @@
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
-                                <property name="converter" ref="jpm-converter-show"/>
+                                <property name="converter" ref="jpm-converter-show-collection"/>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="add edit"/>
@@ -152,11 +159,6 @@
                     <property name="id" value="list" />
                     <property name="scope" value="general" />
                     <property name="navigable" value="true" />
-                    <property name="properties">
-                        <props>
-                            <prop key="paginable">true</prop>
-                        </props>
-                    </property>
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="show" />
@@ -195,7 +197,7 @@
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
-                                <property name="converter" ref="jpm-converter-show"/>
+                                <property name="converter" ref="jpm-converter-show-collection"/>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="add edit"/>
