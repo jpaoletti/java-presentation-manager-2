@@ -1,15 +1,13 @@
 package jpaoletti.jpm2.core.idtransformer;
 
-import java.io.Serializable;
-
 /**
  *
  * @author jpaoletti
  */
-public class StrToInt implements IdTransformer {
+public class StrToInt implements IdTransformer<Integer> {
 
     @Override
-    public Serializable transform(Serializable input) {
-        return Integer.parseInt((String) input);
+    public Integer transform(String input) {
+        return Integer.parseInt(input);
     }
 }

@@ -1,14 +1,12 @@
 package jpaoletti.jpm2.core.idtransformer;
 
-import java.io.Serializable;
-
 /**
- * Receives a generic representation of the id (normally a String) and we need
- * to transform it to its final serializable form.
+ * Receives a generic representation of the id in a String form and translate it
+ * to a final id form.
  *
  * @author jpaoletti
  */
-public interface IdTransformer {
+public interface IdTransformer<T> {
 
-    public Serializable transform(Serializable input);
+    public T transform(String input);
 }

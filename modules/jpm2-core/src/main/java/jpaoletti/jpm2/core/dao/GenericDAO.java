@@ -18,14 +18,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
  *
  * @author jpaoletti
  */
-public abstract class GenericDAO<T, ID extends Serializable> {
+public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
     protected Class<T> persistentClass;
     protected Class<ID> idClass;
-    private IdTransformer transformer;
+    private IdTransformer<ID> transformer;
 
     public GenericDAO() {
         Class<?>[] typeArguments = TypeResolver.resolveRawArguments(GenericDAO.class, getClass());
@@ -33,7 +33,8 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         this.idClass = (Class<ID>) typeArguments[1];
     }
 
-    public T get(ID id) {
+    @Override
+    public T get(String id) {
         if (id.getClass().equals(idClass)) {
             return (T) getSession().get(persistentClass, id);
         } else {
@@ -41,14 +42,17 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
 
+    @Override
     public void update(final Object object) {
         getSession().update(object);
     }
 
+    @Override
     public void save(Object object) {
         getSession().save(object);
     }
 
+    @Override
     public void delete(Object object) {
         getSession().delete(object);
     }
@@ -56,6 +60,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     /**
      * Retorna una lista.
      */
+    @Override
     public Long count(Criterion... restrictions) {
         final Criteria c = getBaseCriteria(restrictions);
         c.setProjection(Projections.rowCount());
@@ -93,6 +98,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     /**
      * Retorna una lista con un solo ordenamiento.
      */
+    @Override
     public List<T> list(Integer from, Integer max, Order order, Criterion... restrictions) {
         final Criteria c = getBaseCriteria(restrictions);
         c.addOrder(order);
@@ -126,6 +132,4 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     public void setTransformer(IdTransformer transformer) {
         this.transformer = transformer;
     }
-
-    public abstract Serializable getId(Object object);
 }

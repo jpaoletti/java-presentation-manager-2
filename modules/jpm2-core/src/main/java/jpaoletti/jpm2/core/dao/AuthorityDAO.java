@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.core.dao;
 
-import java.io.Serializable;
 import jpaoletti.jpm2.core.security.Authority;
 
 /**
@@ -10,7 +9,7 @@ import jpaoletti.jpm2.core.security.Authority;
 public class AuthorityDAO extends GenericDAO<Authority, String> {
 
     @Override
-    public Serializable getId(Object object) {
+    public String getId(Object object) {
         return ((Authority) object).getId();
     }
 }

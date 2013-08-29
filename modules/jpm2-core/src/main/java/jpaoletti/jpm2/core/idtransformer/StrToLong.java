@@ -1,15 +1,13 @@
 package jpaoletti.jpm2.core.idtransformer;
 
-import java.io.Serializable;
-
 /**
  *
  * @author jpaoletti
  */
-public class StrToLong implements IdTransformer {
+public class StrToLong implements IdTransformer<Long> {
 
     @Override
-    public Serializable transform(Serializable input) {
-        return Long.parseLong((String) input);
+    public Long transform(String input) {
+        return Long.parseLong(input);
     }
 }
