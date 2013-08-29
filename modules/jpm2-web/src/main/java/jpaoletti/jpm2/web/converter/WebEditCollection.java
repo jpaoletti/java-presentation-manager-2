@@ -2,7 +2,6 @@ package jpaoletti.jpm2.web.converter;
 
 import java.util.Collection;
 import jpaoletti.jpm2.core.converter.ConverterException;
-import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
 
@@ -11,8 +10,6 @@ import jpaoletti.jpm2.util.JPMUtils;
  * @author jpaoletti
  */
 public class WebEditCollection extends WebEditObject {
-
-    private Entity baseEntity;
 
     public WebEditCollection() {
         super();
@@ -27,9 +24,9 @@ public class WebEditCollection extends WebEditObject {
         } else {
             final StringBuilder sb = new StringBuilder();
             for (Object o : value) {
-                sb.append(getEntity().getDao().getId(o)).append("|");
+                sb.append(getEntity().getDao().getId(o)).append(",");
             }
-            return res + "&value=" + sb.toString();
+            return res + "&value=" + sb.toString().substring(0, sb.toString().length() - 1);
         }
     }
 
@@ -51,13 +48,5 @@ public class WebEditCollection extends WebEditObject {
                 return null;
             }
         }
-    }
-
-    public Entity getBaseEntity() {
-        return baseEntity;
-    }
-
-    public void setBaseEntity(Entity baseEntity) {
-        this.baseEntity = baseEntity;
     }
 }

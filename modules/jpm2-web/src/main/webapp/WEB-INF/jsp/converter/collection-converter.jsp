@@ -1,4 +1,4 @@
-<input name="field_${field}" id="field_${field}" value="${param.value}" />
+<input name="field_${field}" id="field_${field}" value="${param.value}" type="hidden"/>
 <script type="text/javascript" src="${cp}static/js/select2.min.js"></script>
 <script type="text/javascript" src="${cp}static/js/locale/select2_locale_${locale.language}.js"></script>
 <script type="text/javascript">
@@ -28,13 +28,22 @@
             initSelection: function(element, callback) {
                 var id = $(element).val();
                 if (id !== "") {
-                    $.ajax("${cp}jpm/${param.entityId}/"+id, {
-                        data: {
-                            textField: "${param.textField}"
-                        },
-                        dataType: "json"
-                    }).done(function(data) {
-                        callback(data);
+                    var ids = id.split(",");
+                    var result = new Array();
+                    var f = function(item) {
+                        $.ajax("${cp}jpm/${param.entityId}/" + item + "?textField=${param.textField}", {
+                            dataType: "json",
+                            async: false,
+                            success: function(data) {
+                                result.push(data);
+                            }})
+                    };
+                    var def = [];
+                    $.each(ids, function(i, item) {
+                        def.push(f(item))
+                    });
+                    $.when.apply($, def).done(function() {
+                        callback(result);
                     });
                 }
             },
