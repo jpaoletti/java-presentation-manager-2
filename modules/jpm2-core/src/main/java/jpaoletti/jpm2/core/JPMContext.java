@@ -43,4 +43,6 @@ public interface JPMContext {
     public void addFieldMsg(final Field field, Message message);
 
     public Map<String, List<Message>> getFieldMessages();
+
+    public List<Message> getEntityMessages();
 }

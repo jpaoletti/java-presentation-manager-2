@@ -26,9 +26,11 @@ public class JPMContextImpl implements JPMContext {
     private Object object;
     private EntityInstance entityInstance;
     private Map<String, List<Message>> fieldMessages; //field
+    private List<Message> entityMessages;
 
     public JPMContextImpl() {
         this.fieldMessages = new HashMap<>();
+        this.entityMessages = new ArrayList<>();
     }
 
     @Override
@@ -86,5 +88,14 @@ public class JPMContextImpl implements JPMContext {
 
     public void setFieldMessages(Map<String, List<Message>> fieldMessages) {
         this.fieldMessages = fieldMessages;
+    }
+
+    @Override
+    public List<Message> getEntityMessages() {
+        return entityMessages;
+    }
+
+    public void setEntityMessages(List<Message> entityMessages) {
+        this.entityMessages = entityMessages;
     }
 }

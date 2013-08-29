@@ -12,6 +12,7 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import org.apache.struts2.ServletActionContext;
@@ -40,22 +41,27 @@ public class BaseController {
     private JPMContext context;
     //Messages TO-DO
     private List<Message> globalMessages = new ArrayList<>();
-    private List<Message> entityMessages = new ArrayList<>();
 
     protected ModelAndView newMav() throws PMException {
-        final ModelAndView mav = new ModelAndView("jpm-" + getContext().getOperation().getId());
-        mav.addObject("entity", getContext().getEntity());
-        mav.addObject("operation", getContext().getOperation());
+        final Entity entity = getContext().getEntity();
+        final Operation operation = getContext().getOperation();
+        final ModelAndView mav = new ModelAndView("jpm-" + operation.getId());
+        mav.addObject("entity", entity);
+        mav.addObject("operation", operation);
+        mav.addObject("generalOperations", entity.getOperationsFor(null, operation, OperationScope.GENERAL));
+        mav.addObject("selectedOperations", entity.getOperationsFor(null, operation, OperationScope.SELECTED));
         if (getContext().getObject() != null) {
             mav.addObject("object", getContext().getObject());
-        }
-        mav.addObject("generalOperations", getContext().getEntity().getOperationsFor(null, getContext().getOperation(), OperationScope.GENERAL));
-        mav.addObject("selectedOperations", getContext().getEntity().getOperationsFor(null, getContext().getOperation(), OperationScope.SELECTED));
-        if (getContext().getObject() != null) {
-            mav.addObject("itemOperations", getContext().getEntity().getOperationsFor(getContext().getObject(), getContext().getOperation(), OperationScope.ITEM));
+            mav.addObject("itemOperations", entity.getOperationsFor(getContext().getObject(), operation, OperationScope.ITEM));
         }
         if (getContext().getEntityInstance() != null) {
             mav.addObject("instance", getContext().getEntityInstance());
+        }
+        if (!getContext().getEntityMessages().isEmpty()) {
+            mav.addObject("entityMessages", getContext().getEntityMessages());
+        }
+        if (!getContext().getFieldMessages().isEmpty()) {
+            mav.addObject("fieldMessages", getContext().getFieldMessages());
         }
         return mav;
     }
@@ -158,13 +164,5 @@ public class BaseController {
 
     public void setGlobalMessages(List<Message> globalMessages) {
         this.globalMessages = globalMessages;
-    }
-
-    public List<Message> getEntityMessages() {
-        return entityMessages;
-    }
-
-    public void setEntityMessages(List<Message> entityMessages) {
-        this.entityMessages = entityMessages;
     }
 }

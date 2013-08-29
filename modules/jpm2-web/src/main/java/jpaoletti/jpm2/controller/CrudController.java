@@ -6,6 +6,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
@@ -80,10 +81,11 @@ public final class CrudController extends BaseController {
                     new EntityInstance(null, entity, operation, null),
                     getRequest().getParameterMap());
             return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
-        } catch (PMException e) {
-            final ModelAndView mav = addPrepare(entity);
-            mav.addObject("fieldMessages", getContext().getFieldMessages());
-            return mav;
+        } catch (ValidationException e) {
+            if (e.getMsg() != null) {
+                getContext().getEntityMessages().add(e.getMsg());
+            }
+            return addPrepare(entity);
         }
     }
 
@@ -115,10 +117,11 @@ public final class CrudController extends BaseController {
                     newEntityInstance(instanceId, entity),
                     getRequest().getParameterMap());
             return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
-        } catch (PMException e) {
-            final ModelAndView mav = addPrepare(entity);
-            mav.addObject("fieldMessages", getContext().getFieldMessages());
-            return mav;
+        } catch (ValidationException e) {
+            if (e.getMsg() != null) {
+                getContext().getEntityMessages().add(e.getMsg());
+            }
+            return editPrepare(entity, instanceId);
         }
     }
 
