@@ -7,13 +7,12 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
-import jpaoletti.jpm2.util.DisplacedList;
 
 /**
  *
  * @author jpaoletti
  */
-public class EntityInstanceList extends DisplacedList<EntityInstance> {
+public class EntityInstanceList extends ArrayList<EntityInstance> {
 
     private List<Field> fields;
     private Map<String, Converter> converters;
