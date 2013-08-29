@@ -8,6 +8,7 @@ import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.PMSession;
+import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,14 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author jpaoletti
  */
-public class PresentationManager{
+public class PresentationManager {
 
     private static Long sessionIdSeed = 0L;
-    protected String title;
-    protected String subtitle;
-    protected String appversion;
-    protected String contact;
-    protected String cssMode;
+    private String title;
+    private String subtitle;
+    private String appversion;
+    private String contact;
+    private String cssMode;
+    private AuditService auditService;
     private CustomLoader customLoader;
     @Autowired
     private Map<String, Entity> entities;
@@ -188,5 +190,25 @@ public class PresentationManager{
 
     public Entity getEntity(String entityId) {
         return getEntities().get(entityId);
+    }
+
+    public AuditService getAuditService() {
+        return auditService;
+    }
+
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+
+    public void audit() {
+        if (getAuditService() != null) {
+            getAuditService().register();
+        }
+    }
+
+    public void audit(String s) {
+        if (getAuditService() != null) {
+            getAuditService().register(s);
+        }
     }
 }

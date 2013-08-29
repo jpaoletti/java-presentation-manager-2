@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -36,6 +37,8 @@ public class BaseController {
     private HttpServletRequest request;
     @Autowired
     private JPMContext context;
+    @Autowired
+    private PresentationManager jpm;
     //Messages TO-DO
     private List<Message> globalMessages = new ArrayList<>();
 
@@ -140,5 +143,13 @@ public class BaseController {
 
     public void setGlobalMessages(List<Message> globalMessages) {
         this.globalMessages = globalMessages;
+    }
+
+    public PresentationManager getJpm() {
+        return jpm;
+    }
+
+    public void setJpm(PresentationManager jpm) {
+        this.jpm = jpm;
     }
 }

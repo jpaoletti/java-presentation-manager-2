@@ -7,6 +7,9 @@
         <property name="subtitle" value="Java Presentation Manager 2" />
         <property name="contact" value="jpaoletti@mail.com" />
         <property name="cssMode" value="less" />
+        <property name="auditService">
+            <bean class="jpaoletti.jpm2.core.service.AuditServiceDatabase" />
+        </property>
     </bean>
     <import resource="jpm-default-beans.xml" />
     <import resource="entities/test.xml" />

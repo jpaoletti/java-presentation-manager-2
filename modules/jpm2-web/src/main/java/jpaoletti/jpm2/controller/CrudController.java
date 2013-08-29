@@ -35,7 +35,7 @@ public final class CrudController extends BaseController {
             @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam String textField,
             @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
         final Field field = entity.getFieldById(textField);
-        final Object object = entity.getDao().get(instanceId);
+        final Object object = getService().get(entity, entity.getOperation("show"), instanceId);
         return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
     }
 
@@ -43,7 +43,7 @@ public final class CrudController extends BaseController {
     public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("show"));
-        getContext().setObject(entity.getDao().get(instanceId));
+        getContext().setObject(getService().get(entity, getContext().getOperation(), instanceId));
         getContext().setEntityInstance(newEntityInstance(instanceId, entity));
         return newMav();
     }
@@ -100,7 +100,7 @@ public final class CrudController extends BaseController {
     public ModelAndView editPrepare(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("edit"));
-        getContext().setObject(entity.getDao().get(instanceId));
+        getContext().setObject(getService().get(entity, getContext().getOperation(), instanceId));
         getContext().setEntityInstance(newEntityInstance(instanceId, entity));
         return newMav();
     }

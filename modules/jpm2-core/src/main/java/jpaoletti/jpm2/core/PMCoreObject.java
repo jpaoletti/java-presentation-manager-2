@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * This is the superclass of all the core objects of Presentation Manager and it
@@ -47,23 +48,24 @@ public abstract class PMCoreObject implements PMCoreConstants {
     }
 
     public boolean userHasRole(String role) {
-        // get security context from thread local
-        final SecurityContext context = SecurityContextHolder.getContext();
-        if (context == null) {
-            return false;
-        }
-
-        final Authentication authentication = context.getAuthentication();
+        final Authentication authentication = getAuthentication();
         if (authentication == null) {
             return false;
         }
-
         for (final GrantedAuthority auth : authentication.getAuthorities()) {
             if (role.equals(auth.getAuthority())) {
                 return true;
             }
         }
         return false;
+    }
+
+    public Authentication getAuthentication() {
+        final SecurityContext context = SecurityContextHolder.getContext();
+        if (context == null) {
+            return null;
+        }
+        return context.getAuthentication();
     }
 
     public void checkAuthorization() throws NotAuthorizedException {
@@ -77,5 +79,9 @@ public abstract class PMCoreObject implements PMCoreConstants {
      */
     public String getAuth() {
         return null;
+    }
+
+    protected UserDetails getUserDetails() {
+        return (UserDetails) getAuthentication().getPrincipal();
     }
 }

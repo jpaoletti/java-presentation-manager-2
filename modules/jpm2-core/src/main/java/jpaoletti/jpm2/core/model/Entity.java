@@ -21,7 +21,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private GenericDAO dao;
     private String order;
     private Entity parent;
-    private Boolean auditable;
+    private boolean auditable;
     private EntityOwner owner;
     private Highlights highlights;
     private boolean count; //Enable the use of "count" on lists
@@ -38,6 +38,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         fieldsbyid = null;
         paginable = true;
         count = true;
+        auditable = true;
     }
 
     /**
@@ -182,9 +183,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return the auditable
      */
     public boolean isAuditable() {
-        if (auditable == null) {
-            return false;
-        }
         return auditable;
     }
 
@@ -395,14 +393,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setParent(Entity parent) {
         this.parent = parent;
-    }
-
-    public Boolean getAuditable() {
-        return auditable;
-    }
-
-    public void setAuditable(Boolean auditable) {
-        this.auditable = auditable;
     }
 
     public GenericDAO getDao() {

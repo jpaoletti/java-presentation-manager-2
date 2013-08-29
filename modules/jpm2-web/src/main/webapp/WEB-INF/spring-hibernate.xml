@@ -20,6 +20,7 @@
  
         <property name="annotatedClasses">
             <list>
+                <value>jpaoletti.jpm2.core.model.AuditRecord</value>
                 <value>jpaoletti.jpm2.core.test.JPMTest</value>
                 <value>jpaoletti.jpm2.core.security.Authority</value>
                 <value>jpaoletti.jpm2.core.security.User</value>

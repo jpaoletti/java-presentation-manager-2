@@ -56,8 +56,8 @@ public class Operation extends PMCoreObject {
     private boolean compact; //Default: false
     //Display operation in a "popup" visualization instead of redirecting it
     private boolean popup; //Default: false
-    private Integer auditLevel;//Overrides default audit level for operation
     private boolean navigable; //Default: true, if navigable, impacts on NavigationList
+    private boolean auditable; //Default: true, if navigable, impacts on NavigationList
     private String auth; //Needed authority to access any operation on this entity
 
     public Operation() {
@@ -68,6 +68,7 @@ public class Operation extends PMCoreObject {
         this.available = true;
         this.confirm = false;
         this.navigable = true;
+        this.auditable = true;
     }
 
     public OperationCondition getCondition() {
@@ -253,12 +254,12 @@ public class Operation extends PMCoreObject {
         this.popup = popup;
     }
 
-    public Integer getAuditLevel() {
-        return auditLevel;
+    public boolean isAuditable() {
+        return auditable;
     }
 
-    public void setAuditLevel(Integer auditLevel) {
-        this.auditLevel = auditLevel;
+    public void setAuditable(boolean auditable) {
+        this.auditable = auditable;
     }
 
     public boolean isShowTitle() {
