@@ -5,7 +5,7 @@
         <%@include file="inc/default-head.jsp" %>
     </head>
     <body>
-        <spring:message var="entityName" code="${entity.title}" text="${entity.title}" />
+        <c:set var="entityName" value="${entity.title}" />
         <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" />
         <%@include file="inc/header.jsp" %>
         <%@include file="inc/menu.jsp" %>

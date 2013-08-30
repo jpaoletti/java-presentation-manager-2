@@ -365,7 +365,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * Returns the entity title key.
      */
     public String getTitle() {
-        return String.format("jpm.entity.title.%s", getId());
+        return getMessage(String.format("jpm.entity.title.%s", getId()));
     }
 
     /**

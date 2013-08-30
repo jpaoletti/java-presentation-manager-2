@@ -274,4 +274,8 @@ public class Field extends PMCoreObject {
         }
         return null;
     }
+
+    public String getTitle(final Entity entity) {
+        return getMessage("jpm.field." + entity.getId() + "." + getId());
+    }
 }

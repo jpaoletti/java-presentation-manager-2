@@ -6,7 +6,7 @@
         <%@include file="inc/default-head.jsp" %>
     </head>
     <body>
-        <spring:message var="entityName" code="${entity.title}" text="${entity.title}" />
+        <c:set var="entityName" value="${entity.title}" />
         <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" text="Operation" />
         <%@include file="inc/header.jsp" %>
         <%@include file="inc/menu.jsp" %>
@@ -100,7 +100,9 @@
                                     <%@include file="inc/default-paginator.jsp" %>
                                 </div>
                                 <div class="col-lg-1">
+                                    <c:if test="${entity.countable}">
                                     <input class="form-control pull-right input-sm" disabled type="text" value="<spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" />" />
+                                    </c:if>
                                 </div>
                             </div>
                         </div>

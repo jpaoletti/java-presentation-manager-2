@@ -2,6 +2,10 @@ package jpaoletti.jpm2.core;
 
 import jpaoletti.jpm2.core.model.PMCoreConstants;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public abstract class PMCoreObject implements PMCoreConstants {
 
+    @Autowired
+    private MessageSource messageSource;
     private Boolean debug;
 
     /**
@@ -83,5 +89,21 @@ public abstract class PMCoreObject implements PMCoreConstants {
 
     protected UserDetails getUserDetails() {
         return (UserDetails) getAuthentication().getPrincipal();
+    }
+
+    public MessageSource getMessageSource() {
+        return messageSource;
+    }
+
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    public String getMessage(String key, Object... params) {
+        try {
+            return getMessageSource().getMessage(key, params, LocaleContextHolder.getLocale());
+        } catch (NoSuchMessageException e) {
+            return key;
+        }
     }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -15,6 +16,7 @@ import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +58,7 @@ public final class CrudController extends BaseController {
             final Converter converter = field.getConverter(getContext().getOperation());
             if (converter != null) {
                 try {
-                    values.put(field.getId(), converter.visualize(field, object));
+                    values.put(field.getTitle(entity), converter.visualize(field, object));
                 } catch (IgnoreConvertionException ex) {
                 }
             }

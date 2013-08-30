@@ -18,6 +18,7 @@ import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,6 +40,8 @@ public class BaseController {
     private JPMContext context;
     @Autowired
     private PresentationManager jpm;
+    @Autowired
+    private MessageSource messageSource;
     //Messages TO-DO
     private List<Message> globalMessages = new ArrayList<>();
 
@@ -151,5 +154,13 @@ public class BaseController {
 
     public void setJpm(PresentationManager jpm) {
         this.jpm = jpm;
+    }
+
+    public MessageSource getMessageSource() {
+        return messageSource;
+    }
+
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 }
