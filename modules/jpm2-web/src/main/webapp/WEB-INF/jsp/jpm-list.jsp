@@ -101,7 +101,7 @@
                                 </div>
                                 <div class="col-lg-1">
                                     <c:if test="${entity.countable}">
-                                    <input class="form-control pull-right input-sm" disabled type="text" value="<spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" />" />
+                                        <span class="label label-default"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
                                     </c:if>
                                 </div>
                             </div>
