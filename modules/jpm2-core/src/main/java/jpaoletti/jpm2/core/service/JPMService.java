@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface JPMService {
 
+    public PaginatedList getWeakList(Entity entity, String instanceId, Entity weak) throws PMException;
+
     @Transactional
     public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize) throws PMException;
 
@@ -38,4 +40,7 @@ public interface JPMService {
 
     @Transactional
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
+
+    @Transactional
+    public String save(Entity owner, String ownerId, Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
 }

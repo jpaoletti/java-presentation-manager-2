@@ -8,6 +8,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
+import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  * Contains fields and fields values. It depends on operation.
@@ -17,10 +18,15 @@ import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 public class EntityInstance {
 
     private Serializable id; //Current intstance Id
+    private Entity owner;
+    private String ownerId;
     private List<Operation> operations; //Individual operations
     private List<Field> fields;
     private Map<String, Object> values;
 
+    /**
+     * Used for lists.
+     */
     public EntityInstance(Serializable id, List<Field> fields, List<Operation> operations) throws PMException {
         this.values = new LinkedHashMap<>();
         this.operations = operations;
@@ -28,6 +34,9 @@ public class EntityInstance {
         this.id = id;
     }
 
+    /**
+     * Used for single instance operations.
+     */
     public EntityInstance(Serializable id, Entity entity, Operation operation, Object object) throws PMException {
         this.id = id;
         values = new LinkedHashMap<>();
@@ -44,6 +53,13 @@ public class EntityInstance {
             }
         }
         operations = entity.getOperationsFor(object, operation, OperationScope.ITEM);
+        if (entity.isWeak() && object != null) {
+            this.owner = entity.getOwner().getOwner();
+            final Object ownerobject = JPMUtils.get(object, entity.getOwner().getLocalProperty());
+            if (ownerobject != null) {
+                this.ownerId = getOwner().getDao().getId(ownerobject).toString();
+            }
+        }
     }
 
     public List<Operation> getOperations() {
@@ -64,5 +80,21 @@ public class EntityInstance {
 
     public void setId(Serializable id) {
         this.id = id;
+    }
+
+    public final Entity getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Entity owner) {
+        this.owner = owner;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 }

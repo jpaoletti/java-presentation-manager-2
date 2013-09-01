@@ -59,6 +59,10 @@ public class BaseController {
         }
         if (getContext().getEntityInstance() != null) {
             mav.addObject("instance", getContext().getEntityInstance());
+            if (entity.isWeak()) {
+                mav.addObject("owner", getContext().getEntityInstance().getOwner());
+                mav.addObject("ownerId", getContext().getEntityInstance().getOwnerId());
+            }
         }
         if (!getContext().getEntityMessages().isEmpty()) {
             mav.addObject("entityMessages", getContext().getEntityMessages());
@@ -114,6 +118,17 @@ public class BaseController {
     @ExceptionHandler(NotAuthorizedException.class)
     public String handleNotAuthorizedException() {
         return "not-authotized";
+    }
+
+    /**
+     * Redirect to list depending on weaks entities.
+     */
+    protected String toList(final EntityInstance instance, Entity entity) {
+        if (instance.getOwner() != null) {
+            return String.format("redirect:/jpm/%s/%s/%s", instance.getOwner().getId(), instance.getOwnerId(), entity.getId());
+        } else {
+            return String.format("redirect:/jpm/%s", entity.getId());
+        }
     }
 
     public HttpSession getSession() {

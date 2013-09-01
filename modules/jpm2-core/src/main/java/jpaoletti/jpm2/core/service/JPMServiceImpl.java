@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.service;
 
+import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
@@ -10,6 +11,7 @@ import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +20,23 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class JPMServiceImpl extends JPMServiceBase implements JPMService {
+
+    /**
+     *
+     * @param entity Weak entity
+     * @param owner Instance of the owner entity.
+     * @param ownerField
+     * @return
+     */
+    @Override
+    public PaginatedList getWeakList(Entity entity, String instanceId, Entity weak) throws PMException {
+        final Object owner = entity.getDao().get(instanceId);
+        final List list = weak.getDao().list(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+        final PaginatedList pl = new PaginatedList();
+        pl.setTotal((long) list.size());
+        pl.getContents().load(list, weak, weak.getOperation("list"));
+        return pl;
+    }
 
     @Override
     public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize) throws PMException {
@@ -95,6 +114,20 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = JPMUtils.newInstance(entity.getClazz());
+        processFields(entity, operation, object, entityInstance, parameters);
+        preExecute(operation, object);
+        entity.getDao().save(object);
+        postExecute(operation);
+        getContext().setObject(object);
+        getJpm().audit();
+        return entity.getDao().getId(object).toString();
+    }
+
+    @Override
+    public String save(Entity owner, String ownerId, Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
+        final Object ownerObject = owner.getDao().get(ownerId);
+        final Object object = JPMUtils.newInstance(entity.getClazz());
+        JPMUtils.set(object, entity.getOwner().getLocalProperty(), ownerObject);
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao().save(object);
