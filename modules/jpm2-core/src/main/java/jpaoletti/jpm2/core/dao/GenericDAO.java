@@ -23,7 +23,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
-    protected Class<T> persistentClass;
+    private Class<T> persistentClass;
     protected Class<ID> idClass;
     private IdTransformer<ID> transformer;
 
@@ -36,9 +36,9 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     @Override
     public T get(String id) {
         if (id.getClass().equals(idClass)) {
-            return (T) getSession().get(persistentClass, id);
+            return (T) getSession().get(getPersistentClass(), id);
         } else {
-            return (T) getSession().get(persistentClass, (Serializable) getTransformer().transform(id));
+            return (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
         }
     }
 
@@ -108,7 +108,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     }
 
     protected Criteria getBaseCriteria(Criterion[] restrictions) {
-        final Criteria c = getSession().createCriteria(persistentClass);
+        final Criteria c = getSession().createCriteria(getPersistentClass());
         if (restrictions != null) {
             for (Criterion criterion : restrictions) {
                 c.add(criterion);
@@ -131,5 +131,19 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
 
     public void setTransformer(IdTransformer transformer) {
         this.transformer = transformer;
+    }
+
+    /**
+     * @return the persistentClass
+     */
+    public Class<T> getPersistentClass() {
+        return persistentClass;
+    }
+
+    /**
+     * @param persistentClass the persistentClass to set
+     */
+    public void setPersistentClass(Class<T> persistentClass) {
+        this.persistentClass = persistentClass;
     }
 }
