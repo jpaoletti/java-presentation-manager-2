@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>
-            WEB-INF/applicationContext.xml, 
-            WEB-INF/spring-locale.xml, 
-            WEB-INF/spring-security.xml,
-            WEB-INF/spring-datasource.xml,
-            WEB-INF/spring-hibernate.xml,
-            WEB-INF/spring-jpm.xml
-        </param-value>
-    </context-param>
-    
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">   
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>

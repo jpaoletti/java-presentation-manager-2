@@ -23,23 +23,10 @@
     <!-- **************************************************************** -->
     <mvc:annotation-driven />
     <context:component-scan base-package="jpaoletti.jpm2" />
-
-    <!-- **************************************************************** -->
-    <!--  THYMELEAF-SPECIFIC ARTIFACTS                                    -->
-    <!--  TemplateResolver <- TemplateEngine <- ViewResolver              -->
-    <!-- **************************************************************** -->
-<!--    <bean id="templateResolver" class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
-        <property name="prefix" value="/WEB-INF/templates/" />
-        <property name="suffix" value=".html" />
-        <property name="templateMode" value="HTML5" />
-    </bean>
     
-    <bean id="templateEngine"
-        class="org.thymeleaf.spring3.SpringTemplateEngine">
-        <property name="templateResolver" ref="templateResolver" />
-    </bean>
-   
-    <bean class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
-        <property name="templateEngine" ref="templateEngine" />
-    </bean>-->
+    <import resource="spring-locale.xml" />
+    <import resource="spring-datasource.xml" />
+    <import resource="spring-security.xml" />
+    <import resource="spring-hibernate.xml" />
+    <import resource="spring-jpm.xml" />
 </beans>
