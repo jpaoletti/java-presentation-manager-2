@@ -1,10 +1,12 @@
 package jpaoletti.jpm2.core.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author jpaoletti
  */
-public class SessionEntityData {
+public class SessionEntityData implements Serializable {
 
     private String entityId;
     private Integer page;

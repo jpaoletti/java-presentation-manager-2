@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core;
 
+import java.io.Serializable;
 import jpaoletti.jpm2.core.model.PMCoreConstants;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author jpaoletti
  *
  */
-public abstract class PMCoreObject implements PMCoreConstants {
+public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     @Autowired
     private MessageSource messageSource;

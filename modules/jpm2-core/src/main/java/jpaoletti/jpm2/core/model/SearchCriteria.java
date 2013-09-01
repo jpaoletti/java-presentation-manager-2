@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.criterion.Criterion;
@@ -10,7 +11,7 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author jpaoletti
  */
-public class SearchCriteria {
+public class SearchCriteria implements Serializable{
 
     private Criterion criterion; //Global criteria search, Something like Restrictions.and(... , ...)
     private List<SearchCriteriaField> definitions; //Individual criterias
