@@ -262,22 +262,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     /**
-     * Looks for the weak entity corresponding to the given field in this string
-     * entity
-     *
-     * @param field
-     * @return the weak entity
-     */
-    public Entity getWeak(Field field) {
-        for (Entity entity : getWeaks()) {
-            if (entity.getOwner().getEntityProperty().equals(field.getProperty())) {
-                return entity;
-            }
-        }
-        return null;
-    }
-
-    /**
      *
      * @return the hashcode
      */
