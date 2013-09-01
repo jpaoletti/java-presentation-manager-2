@@ -44,4 +44,6 @@
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+
+    <import resource="jpm-servlet-custom.xml" />
 </beans>
