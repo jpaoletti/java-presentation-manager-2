@@ -23,20 +23,18 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
     }
 
     public void load(final List objects, Entity entity, Operation operation) throws PMException {
-        fields = new ArrayList<>();
-        converters = new HashMap<>();
         for (Field field : entity.getAllFields()) {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
-                fields.add(field);
-                converters.put(field.getId(), converter);
+                getFields().add(field);
+                getConverters().put(field.getId(), converter);
             }
         }
         for (Object object : objects) {
-            final EntityInstance instance = new EntityInstance(entity.getDao().getId(object), fields, entity.getOperationsFor(object, operation, OperationScope.ITEM));
+            final EntityInstance instance = new EntityInstance(entity.getDao().getId(object), getFields(), entity.getOperationsFor(object, operation, OperationScope.ITEM));
             for (Field field : getFields()) {
                 try {
-                    instance.getValues().put(field.getId(), converters.get(field.getId()).visualize(field, object));
+                    instance.getValues().put(field.getId(), getConverters().get(field.getId()).visualize(field, object));
                 } catch (IgnoreConvertionException ex) {
                 }
             }
