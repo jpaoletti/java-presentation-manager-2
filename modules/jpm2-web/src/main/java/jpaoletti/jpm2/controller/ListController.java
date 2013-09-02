@@ -39,9 +39,11 @@ public class ListController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}.json", method = RequestMethod.GET, headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
     @ResponseBody
     public ObjectConverterData listObject(
-            @PathVariable Entity entity, @RequestParam String textField,
+            @PathVariable Entity entity,
+            @RequestParam String textField,
             @RequestParam(required = false) String query,
-            @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) throws PMException {
         final Field field = entity.getFieldById(textField);
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
@@ -110,31 +112,65 @@ public class ListController extends BaseController {
     }
 
     @RequestMapping(value = "/jpm/{entity}/addSearch")
-    public String addSearch(@PathVariable Entity entity, @RequestParam String fieldId, HttpServletRequest request) throws PMException {
-        try {
-            final Field field = entity.getFieldById(fieldId);
-            if (field.getSearcher() != null) {
-                final Criterion build = field.getSearcher().build(field, request.getParameterMap());
-                getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
-            }
-        } catch (Exception e) {
+    public String addSearch(
+            @PathVariable Entity entity,
+            @RequestParam String fieldId,
+            HttpServletRequest request) throws PMException {
+        final Field field = entity.getFieldById(fieldId);
+        if (field.getSearcher() != null) {
+            final Criterion build = field.getSearcher().build(field, request.getParameterMap());
+            getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
         return "redirect:/jpm/" + entity.getId() + "/";
     }
 
-    @RequestMapping(value = "/jpm/{entity}/removeSearch")
-    public String removeSearch(@PathVariable Entity entity, @RequestParam Integer i) throws PMException {
-        try {
-            getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        } catch (Exception e) {
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
+    public String addWeakSearch(
+            @PathVariable Entity owner,
+            @PathVariable String ownerId,
+            @PathVariable Entity entity,
+            @RequestParam String fieldId,
+            HttpServletRequest request) throws PMException {
+        final Field field = entity.getFieldById(fieldId);
+        if (field.getSearcher() != null) {
+            final Criterion build = field.getSearcher().build(field, request.getParameterMap());
+            getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
+        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
+    }
+
+    @RequestMapping(value = "/jpm/{entity}/removeSearch")
+    public String removeSearch(
+            @PathVariable Entity entity,
+            @RequestParam Integer i) throws PMException {
+        getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
         return "redirect:/jpm/" + entity.getId() + "/";
+    }
+
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeSearch")
+    public String removeWeakSearch(
+            @PathVariable Entity owner,
+            @PathVariable String ownerId,
+            @PathVariable Entity entity,
+            @RequestParam Integer i) throws PMException {
+        getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
+        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
     }
 
     @RequestMapping(value = "/jpm/{entity}/sort")
     public String sort(@PathVariable Entity entity, @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
         return "redirect:/jpm/" + entity.getId() + "/";
+    }
+
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/sort")
+    public String sortWeak(
+            @PathVariable Entity owner,
+            @PathVariable String ownerId,
+            @PathVariable Entity entity,
+            @RequestParam String fieldId) throws PMException {
+        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
+        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
     }
 
     protected Criterion getSearch(Entity entity) {

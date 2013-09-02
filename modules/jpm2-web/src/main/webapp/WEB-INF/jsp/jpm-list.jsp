@@ -34,9 +34,16 @@
                                         </div>
                                         <div class="btn-group">
                                             <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
-                                                <a type="button" href="<c:url value='/jpm/${entity.id}/removeSearch?i=${st.index}' />" class="btn btn-default removeSearchBtn">
-                                                    ${d} <span class="glyphicon glyphicon-remove"></span>
-                                                </a>
+                                                <c:if test="${empty owner}">
+                                                    <a type="button" href="<c:url value='/jpm/${entity.id}/removeSearch?i=${st.index}' />" class="btn btn-default removeSearchBtn">
+                                                        ${d} <span class="glyphicon glyphicon-remove"></span>
+                                                    </a>
+                                                </c:if>
+                                                <c:if test="${not empty owner}">
+                                                    <a type="button" href="<c:url value='/jpm/${owner.id}/${ownerId}/${entity.id}/removeSearch?i=${st.index}' />" class="btn btn-default removeSearchBtn">
+                                                        ${d} <span class="glyphicon glyphicon-remove"></span>
+                                                    </a>
+                                                </c:if>
                                             </c:forEach>
                                         </div>
                                     </div>
@@ -62,7 +69,9 @@
                                             <a href="javascript:;" id="help-btn" data-toggle="popover" data-html="true"><i class="glyphicon glyphicon-cog"></i></a>
                                         </th>
                                         <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
-                                            <th data-field="${field.id}" data-entity="${entity.id}" data-cp="${cp}" data-index='${st.index+1}' class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
+                                            <th data-field="${field.id}" data-entity="${entity.id}" data-index='${st.index+1}'
+                                                data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
+                                                class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                                 <c:if test="${field.sortable}">
                                                     <span class="glyphicon ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt'):'glyphicon-sort'} pull-right"></span>
                                                 </c:if>
@@ -118,7 +127,13 @@
             </div>
         </div>
         <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-            <form method="POST" id='addSearchForm' action="<c:url value='/jpm/${entity.id}/addSearch' />">
+            <c:if test="${empty owner}">
+                <c:set var="addSearchUrl" value="${cp}jpm/${entity.id}/addSearch"/>
+            </c:if>
+            <c:if test="${not empty owner}">
+                <c:set var="addSearchUrl" value="${cp}jpm/${owner.id}/${ownerId}/${entity.id}/addSearch"/>
+            </c:if>
+            <form method="POST" id='addSearchForm' action="${addSearchUrl}">
                 <input type="hidden" name="entityId" value="${entityId}"/>
                 <input type="hidden" name="fieldId" value=""/>
                 <div class="modal-dialog modal-sm">
@@ -172,13 +187,13 @@
                 $("[data-field='${f.id}']").css("width", "${f.width}");
                 //</c:if></c:forEach>
                 $(document).on("keypress", function(e) {
-                    if (e.which === <spring:message code="jpm.list.shortcut.search" text="102" />) { //search 'f'
+                    if (e.which === parseInt("<spring:message code='jpm.list.shortcut.search' text='102' />")) { //search 'f'
                         $("#search-dropdown").dropdown('toggle').focus();
                     } else
-                    if (e.which === <spring:message code="jpm.list.shortcut.help" text="104" />) { //sort 'h'
+                    if (e.which === parseInt("<spring:message code='jpm.list.shortcut.help' text='104' />")) { //sort 'h'
                         $('#help-btn').popover('toggle');
                     } else
-                    if (e.which === <spring:message code="jpm.list.shortcut.sort" text="115" />) { //sort 's'
+                    if (e.which === parseInt("<spring:message code='jpm.list.shortcut.sort' text='115' />")) { //sort 's'
                         $(".sortable").each(function(i, v) {
                             var sortable = $(this);
                             var idx = sortable.attr("data-index") + ". ";

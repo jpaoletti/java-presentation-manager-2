@@ -140,7 +140,7 @@ $(window).load(function() {
         $(".row-fluid:not(:has(div))").remove();
         $("input[type='file']").closest("form").attr("enctype", "multipart/form-data");
         $(".sortable").click(function(){
-            window.location = $(this).attr("data-cp")+"jpm/"+$(this).attr("data-entity")+"/sort?fieldId="+$(this).attr("data-field");
+            window.location = $(this).attr("data-cp")+$(this).attr("data-entity")+"/sort?fieldId="+$(this).attr("data-field");
         });
         initConfirm();
         //Init Menu
