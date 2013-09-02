@@ -115,10 +115,10 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = JPMUtils.newInstance(entity.getClazz());
         processFields(entity, operation, object, entityInstance, parameters);
+        getContext().setObject(object);
         preExecute(operation, object);
         entity.getDao().save(object);
         postExecute(operation);
-        getContext().setObject(object);
         getJpm().audit();
         return entity.getDao().getId(object).toString();
     }
