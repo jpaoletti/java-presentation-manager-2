@@ -58,7 +58,7 @@
                             <table class="table table-bordered table-compact">
                                 <thead>
                                     <tr>
-                                        <th style="width: 5px;"><i class="glyphicon glyphicon-cog"></i></th>
+                                        <th><i class="glyphicon glyphicon-cog"></i></th>
                                             <c:forEach items="${paginatedList.fields}" var="field">
                                             <th data-field="${field.id}" data-entity="${entity.id}" data-cp="${cp}" class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                                 <c:if test="${field.sortable}">
@@ -72,7 +72,7 @@
                                 <tbody>
                                     <c:forEach items="${paginatedList.contents}" var="item">
                                         <tr data-id="${item.id}">
-                                            <th>
+                                            <th class="operation-list" style="width: ${fn:length(item.operations) * 30 + 20}px">
                                     <div class="btn-group nowrap">
                                         <c:forEach items="${item.operations}" var="o">
                                             <a
