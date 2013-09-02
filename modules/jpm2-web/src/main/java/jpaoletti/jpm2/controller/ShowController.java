@@ -7,10 +7,7 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
-import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
-import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
@@ -28,7 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author jpaoletti
  */
 @Controller
-public final class CrudController extends BaseController {
+public final class ShowController extends BaseController {
 
     @Autowired
     private JPMService service;
@@ -71,76 +68,6 @@ public final class CrudController extends BaseController {
         getContext().setObject(getService().get(entity, getContext().getOperation(), instanceId));
         getContext().setEntityInstance(newEntityInstance(instanceId, entity));
         return newMav();
-    }
-
-    /**
-     * GET method prepares form.
-     *
-     * @param entity
-     * @return model and view
-     * @throws PMException
-     */
-    @RequestMapping(value = {"/jpm/{entity}/add", "/jpm/{owner}/{ownerId}/{entity}/add"}, method = RequestMethod.GET)
-    public ModelAndView addPrepare(@PathVariable Entity entity, @PathVariable String ownerId) throws PMException {
-        getContext().setEntity(entity);
-        getContext().setOperation(entity.getOperation("add"));
-        getContext().setObject(JPMUtils.newInstance(entity.getClazz()));
-        getContext().setEntityInstance(newEntityInstance(null, entity));
-        final ModelAndView mav = newMav();
-        mav.setViewName("jpm-edit");
-        if (entity.isWeak()) {
-            mav.addObject("ownerId", ownerId);
-        }
-        return mav;
-    }
-
-    /**
-     * POST method finalizes the operation
-     *
-     * @param entity
-     * @return redirect to show
-     * @throws PMException
-     */
-    @RequestMapping(value = "/jpm/{entity}/add", method = RequestMethod.POST)
-    public ModelAndView addCommit(@PathVariable Entity entity) throws PMException {
-        final Operation operation = entity.getOperation("add");
-        try {
-            final String instanceId = getService().save(entity, operation,
-                    new EntityInstance(null, entity, operation, null),
-                    getRequest().getParameterMap());
-            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
-        } catch (ValidationException e) {
-            if (e.getMsg() != null) {
-                getContext().getEntityMessages().add(e.getMsg());
-            }
-            return addPrepare(entity, null);
-        }
-    }
-
-    /**
-     * POST method finalizes the operation
-     *
-     * @param entity
-     * @return redirect to show
-     * @throws PMException
-     */
-    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/add", method = RequestMethod.POST)
-    public ModelAndView addWeakCommit(
-            @PathVariable Entity owner,
-            @PathVariable String ownerId,
-            @PathVariable Entity entity) throws PMException {
-        final Operation operation = entity.getOperation("add");
-        try {
-            final String instanceId = getService().save(owner, ownerId, entity, operation,
-                    new EntityInstance(null, entity, operation, null),
-                    getRequest().getParameterMap());
-            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
-        } catch (ValidationException e) {
-            if (e.getMsg() != null) {
-                getContext().getEntityMessages().add(e.getMsg());
-            }
-            return addPrepare(entity, ownerId);
-        }
     }
 
     public JPMService getService() {
