@@ -1,6 +1,6 @@
 <c:if test="${entity.paginable}">
     <ul class="pagination pagination-sm">
-        <li ${(paginatedList.page > 1)?'':"class='disabled'"}><a href="<c:url value='/jpm/${entity.id}?page=${paginatedList.page-1}' />">&laquo; </a></li>
+        <li ${(paginatedList.page > 1)?'':"class='disabled'"}><a href="?page=${paginatedList.page-1}">&laquo; </a></li>
         <c:if test="${entity.countable}">
             <c:if test="${paginatedList.pages > 20}">
                 <jpm:pagination-link paginatedList='${paginatedList}' i="${1}" />
@@ -25,7 +25,7 @@
             </form>
         </c:if>
         <li ${paginatedList.more?'':"class='disabled'"}>
-            <a href="<c:url value='/jpm/${entity.id}?page=${paginatedList.page+1}' />">&raquo;</a>
+            <a href="?page=${paginatedList.page+1}">&raquo;</a>
         </li>
     </ul>
 </c:if>
