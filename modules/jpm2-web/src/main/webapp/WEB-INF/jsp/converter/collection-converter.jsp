@@ -11,7 +11,7 @@
             placeholder: "...",
             minimumInputLength: ${param.minSearch},
             ajax: {
-                url: "${cp}jpm/${param.entityId}",
+                url: "${cp}jpm/${param.entityId}.json",
                 dataType: 'json',
                 data: function(term, page) {
                     return {
@@ -31,7 +31,7 @@
                     var ids = id.split(",");
                     var result = new Array();
                     var f = function(item) {
-                        $.ajax("${cp}jpm/${param.entityId}/" + item + "?textField=${param.textField}", {
+                        $.ajax("${cp}jpm/${param.entityId}/" + item + ".json?textField=${param.textField}", {
                             dataType: "json",
                             async: false,
                             success: function(data) {

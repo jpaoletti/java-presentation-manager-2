@@ -10,7 +10,7 @@
             placeholder: "...",
             minimumInputLength: ${param.minSearch},
             ajax: {
-                url: "${cp}jpm/${param.entityId}",
+                url: "${cp}jpm/${param.entityId}.json",
                 dataType: 'json',
                 data: function(term, page) {
                     return {
@@ -27,7 +27,7 @@
             initSelection: function(element, callback) {
                 var id = $(element).val();
                 if (id !== "") {
-                    $.ajax("${cp}jpm/${param.entityId}/"+id, {
+                    $.ajax("${cp}jpm/${param.entityId}/" + id + ".json", {
                         data: {
                             textField: "${param.textField}"
                         },

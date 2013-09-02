@@ -33,7 +33,7 @@ public final class CrudController extends BaseController {
     @Autowired
     private JPMService service;
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
             @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam String textField,
@@ -43,7 +43,7 @@ public final class CrudController extends BaseController {
         return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public Map<String, Object> showJSON(@PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
         getContext().setOperation(entity.getOperation("show"));

@@ -37,7 +37,7 @@ public class ListController extends BaseController {
     @Autowired
     private JPMService service;
 
-    @RequestMapping(value = "/jpm/{entity}", method = RequestMethod.GET, headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
+    @RequestMapping(value = "/jpm/{entity}.json", method = RequestMethod.GET, headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
     @ResponseBody
     public ObjectConverterData listObject(
             @PathVariable Entity entity, @RequestParam String textField,

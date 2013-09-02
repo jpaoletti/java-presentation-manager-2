@@ -5,7 +5,7 @@
             var fname = "#field_${field}_${param.instanceId}_${param.objectId}";
             var x = $(fname);
             x.on("click", function() {
-                $.getJSON("${cp}jpm/${param.entityId}/${param.instanceId}/show?fields=${param.fields}", function(data) {
+                $.getJSON("${cp}jpm/${param.entityId}/${param.instanceId}/show.json?fields=${param.fields}", function(data) {
                     var content = "<table class='table table-compact table-bordered'><tbody>";
                     $.each(data, function(i, v) {
                         content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
