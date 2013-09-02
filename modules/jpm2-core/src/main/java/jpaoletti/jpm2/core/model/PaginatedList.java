@@ -19,7 +19,6 @@ public class PaginatedList {
     private Integer pages;
     private Integer pageSize;
     private Long total;
-    private ListSort sort;
     private ListFilter listFilter; //Permanent list filter
     private boolean paginable;
     private boolean hasSelectedScope;
@@ -75,17 +74,6 @@ public class PaginatedList {
             this.pageSize = pageSize;
             setTotal(total);
         }
-    }
-
-    public ListSort getSort() {
-        if (sort == null) {
-            sort = new ListSort(null, ListSort.SortDirection.ASC);
-        }
-        return sort;
-    }
-
-    public void setSort(ListSort sort) {
-        this.sort = sort;
     }
 
     public EntityInstanceList getContents() {
