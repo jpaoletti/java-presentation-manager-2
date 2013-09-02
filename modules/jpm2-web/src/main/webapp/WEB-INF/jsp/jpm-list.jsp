@@ -21,13 +21,13 @@
                                 <div class="row">
                                     <div class="col-lg-9">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                            <button id="search-dropdown" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
                                                 <spring:message code="jpm.list.search" text="Search" /> <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu" role="menu">
-                                                <c:forEach items="${paginatedList.fieldSearchs}" var="fs">
+                                                <c:forEach items="${paginatedList.fieldSearchs}" var="fs" varStatus="st">
                                                     <li role="presentation">
-                                                        <a role="menuitem" tabindex="-1" href="javascript:openSearchModal('${fs.key.id}');"><spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" /></a>
+                                                        <a id="search-link-${st.index+1}" role="menuitem" tabindex="-1" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}');">${st.index+1}. <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" /></a>
                                                     </li>
                                                 </c:forEach>
                                             </ul>
@@ -58,9 +58,11 @@
                             <table class="table table-bordered table-compact">
                                 <thead>
                                     <tr>
-                                        <th><i class="glyphicon glyphicon-cog"></i></th>
-                                            <c:forEach items="${paginatedList.fields}" var="field">
-                                            <th data-field="${field.id}" data-entity="${entity.id}" data-cp="${cp}" class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
+                                        <th id='operation-column-header'>
+                                            <a href="javascript:;" id="help-btn" data-toggle="popover" data-html="true"><i class="glyphicon glyphicon-cog"></i></a>
+                                        </th>
+                                        <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
+                                            <th data-field="${field.id}" data-entity="${entity.id}" data-cp="${cp}" data-index='${st.index+1}' class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                                 <c:if test="${field.sortable}">
                                                     <span class="glyphicon ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt'):'glyphicon-sort'} pull-right"></span>
                                                 </c:if>
@@ -158,12 +160,48 @@
                     $("#searchModal .modal-body").find("input").focus();
                 });
             }
+            var sorting = false;
             jpmLoad(function() {
+                $("#help-btn").popover({
+                    title: "<spring:message code='jpm.list.shortcut.help.title' text='Help' />",
+                    content: "<spring:message code='jpm.list.shortcut.help.content' text='<ul><li>Press \'f\' to search</li><li>Press \'s\' to sort</li><li>Press \'h\' for help</li></ul>' />"
+                });
                 //<c:forEach items="${paginatedList.fields}" var="f"><c:if test="${not empty f.align}">
                 $("td[data-field='${f.id}']").css("text-align", "${f.align}");
                 //</c:if><c:if test="${not empty f.width}">
                 $("[data-field='${f.id}']").css("width", "${f.width}");
                 //</c:if></c:forEach>
+                $(document).on("keypress", function(e) {
+                    if (e.which === <spring:message code="jpm.list.shortcut.search" text="102" />) { //search 'f'
+                        $("#search-dropdown").dropdown('toggle').focus();
+                    } else
+                    if (e.which === <spring:message code="jpm.list.shortcut.help" text="104" />) { //sort 'h'
+                        $('#help-btn').popover('toggle');
+                    } else
+                    if (e.which === <spring:message code="jpm.list.shortcut.sort" text="115" />) { //sort 's'
+                        $(".sortable").each(function(i, v) {
+                            var sortable = $(this);
+                            var idx = sortable.attr("data-index") + ". ";
+                            if (sortable.html().substring(0, idx.length) !== idx) {
+                                sortable.prepend(idx);
+                                setTimeout(function() {
+                                    sortable.html(sortable.html().substring(idx.length));
+                                    sorting = false;
+                                }, 3000);
+                            }
+                        });
+                        sorting = true;
+                    } else if (sorting && e.which > 48 && e.which <= 57) {
+                        if (e.which > 48 && e.which <= 57) { // 1 - 9
+                            $(".sortable[data-index='" + (e.which - 48) + "']").trigger("click");
+                        }
+                    }
+                });
+                $("#search-dropdown").on("keypress", function(e) {
+                    if (e.which > 48 && e.which <= 57) { // 1 - 9
+                        openSearchModal($("#search-link-" + (e.which - 48)).attr("data-field"));
+                    }
+                });
             });
         </script>
     </body>
