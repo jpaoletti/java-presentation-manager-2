@@ -1,8 +1,3 @@
-<div id="loading-div">
-    <div class="mainLoading">
-        <img src="${cp}static/img/main_loading.gif"  alt="..." />
-    </div>
-</div>
 <c:if test="${jpm.cssMode !='css'}">
     <script type="text/javascript" src="${cp}static/js/less-1.4.1.min.js?v=${jpm.appversion}"></script>
 </c:if>

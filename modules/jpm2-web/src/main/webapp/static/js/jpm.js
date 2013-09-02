@@ -128,7 +128,11 @@ function initMenu() {
     });
 }
 
-$(document).ready(function() {
+$(window).unload(function() {
+    $("#loading-div").fadeIn();
+});
+
+$(window).load(function() {
     try {
         //Clean empty help-blocks
         $(".help-block:empty").remove();
@@ -156,8 +160,6 @@ $(document).ready(function() {
             }
         });
     } finally {
-        $("#loading-div").hide();
-        $("#content").show();
-        $("#footer").removeClass("hide");
+        $("#loading-div").fadeOut();
     }
 });

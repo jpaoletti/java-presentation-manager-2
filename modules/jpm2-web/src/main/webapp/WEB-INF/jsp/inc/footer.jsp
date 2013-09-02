@@ -1,5 +1,5 @@
 <footer class="row">
-    <div id="footer" class="hide">
+    <div id="footer">
         <p class="text-muted credit">
             <span>
                 <spring:message code="jpm.copyright" text="??" arguments="jpaoletti,2013" argumentSeparator="," /> 
