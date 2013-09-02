@@ -1,7 +1,6 @@
 package jpaoletti.jpm2.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.NotAuthorizedException;
@@ -129,6 +128,12 @@ public class ListController extends BaseController {
             getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
         } catch (Exception e) {
         }
+        return "redirect:/jpm/" + entity.getId() + "/";
+    }
+
+    @RequestMapping(value = "/jpm/{entity}/sort")
+    public String sort(@PathVariable Entity entity, @RequestParam String fieldId) throws PMException {
+        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
         return "redirect:/jpm/" + entity.getId() + "/";
     }
 

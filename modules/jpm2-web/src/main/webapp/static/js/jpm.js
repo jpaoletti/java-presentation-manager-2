@@ -139,6 +139,9 @@ $(window).load(function() {
         $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
         $("input[type='file']").closest("form").attr("enctype", "multipart/form-data");
+        $(".sortable").click(function(){
+            window.location = $(this).attr("data-cp")+"jpm/"+$(this).attr("data-entity")+"/sort?fieldId="+$(this).attr("data-field");
+        });
         initConfirm();
         //Init Menu
         initWindowsResize();

@@ -47,22 +47,19 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (entity.isPaginable()) {
             pl.setPageSize(pageSize != null ? pageSize : sessionEntityData.getPageSize());
             pl.setPage(page != null ? page : sessionEntityData.getPage());
-            if (search == null) {
-                pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize()), entity, operation);
-                if (entity.isCountable()) {
-                    pl.setTotal(entity.getDao().count());
-                }
+            if (sessionEntityData.getSort().isSorted()) {
+                pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize(), sessionEntityData.getSort().getOrder(), search), entity, operation);
             } else {
                 pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize(), search), entity, operation);
-                if (entity.isCountable()) {
-                    pl.setTotal(entity.getDao().count(search));
-                }
+            }
+            if (entity.isCountable()) {
+                pl.setTotal(entity.getDao().count(search));
             }
             sessionEntityData.setPage(pl.getPage());
             sessionEntityData.setPageSize(pl.getPageSize());
         } else {
-            if (search == null) {
-                pl.getContents().load(entity.getDao().list(), entity, operation);
+            if (sessionEntityData.getSort().isSorted()) {
+                pl.getContents().load(entity.getDao().list(sessionEntityData.getSort().getOrder(), search), entity, operation);
             } else {
                 pl.getContents().load(entity.getDao().list(search), entity, operation);
             }

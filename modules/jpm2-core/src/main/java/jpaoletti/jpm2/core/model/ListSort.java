@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.core.model;
 
+import org.hibernate.criterion.Order;
+
 /**
  * Entity list order
  *
@@ -7,12 +9,42 @@ package jpaoletti.jpm2.core.model;
  */
 public class ListSort {
 
-    private String fieldId;
+    private Field field;
     private SortDirection direction;
 
-    public ListSort(String fieldId, SortDirection direction) {
-        this.fieldId = fieldId;
+    public ListSort() {
+        this.direction = SortDirection.ASC;
+    }
+
+    public ListSort(Field field, SortDirection direction) {
+        this.field = field;
         this.direction = direction;
+    }
+
+    public Order getOrder() {
+        if (isSorted()) {
+            if (isAsc()) {
+                return Order.asc(getField().getProperty());
+            } else {
+                return Order.desc(getField().getProperty());
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public void set(Field f) {
+        //Same field, toggle asc/desc
+        if (f.equals(getField())) {
+            if (isAsc()) {
+                setDirection(SortDirection.DESC);
+            } else {
+                setDirection(SortDirection.ASC);
+            }
+        } else {
+            setField(f);
+            setDirection(SortDirection.ASC);
+        }
     }
 
     public boolean isDesc() {
@@ -24,7 +56,7 @@ public class ListSort {
     }
 
     public boolean isSorted() {
-        return getFieldId() != null;
+        return getField() != null;
     }
 
     public SortDirection getDirection() {
@@ -35,12 +67,12 @@ public class ListSort {
         this.direction = direction;
     }
 
-    public String getFieldId() {
-        return fieldId;
+    public Field getField() {
+        return field;
     }
 
-    public void setFieldId(String fieldId) {
-        this.fieldId = fieldId;
+    public void setField(Field field) {
+        this.field = field;
     }
 
     public static enum SortDirection {

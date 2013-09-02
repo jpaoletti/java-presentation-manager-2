@@ -12,10 +12,12 @@ public class SessionEntityData implements Serializable {
     private Integer page;
     private Integer pageSize;
     private SearchCriteria searchCriteria;
+    private ListSort sort;
 
     public SessionEntityData(String entityId) {
         this.entityId = entityId;
         this.searchCriteria = new SearchCriteria();
+        this.sort = new ListSort();
     }
 
     public String getEntityId() {
@@ -44,5 +46,13 @@ public class SessionEntityData implements Serializable {
 
     public SearchCriteria getSearchCriteria() {
         return searchCriteria;
+    }
+
+    public ListSort getSort() {
+        return sort;
+    }
+
+    public void setSort(ListSort sort) {
+        this.sort = sort;
     }
 }

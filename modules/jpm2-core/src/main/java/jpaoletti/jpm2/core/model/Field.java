@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.search.Searcher;
@@ -35,6 +36,7 @@ public class Field extends PMCoreObject {
     private String defaultValue;
     private String align; //left right center, TODO
     private Searcher searcher;
+    private boolean sortable;
     private List<FieldConfig> configs;
 
     /**
@@ -43,6 +45,7 @@ public class Field extends PMCoreObject {
     public Field() {
         super();
         defaultValue = "";
+        this.sortable = true;
     }
 
     /**
@@ -277,5 +280,35 @@ public class Field extends PMCoreObject {
 
     public String getTitle(final Entity entity) {
         return getMessage("jpm.field." + entity.getId() + "." + getId());
+    }
+
+    public boolean isSortable() {
+        return sortable;
+    }
+
+    public void setSortable(boolean sortable) {
+        this.sortable = sortable;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + Objects.hashCode(this.getId());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Field other = (Field) obj;
+        if (!Objects.equals(this.getId(), other.getId())) {
+            return false;
+        }
+        return true;
     }
 }

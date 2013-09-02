@@ -2247,3 +2247,16 @@ ul.show-collection-converter{
     -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+.table th.sortable{ cursor: pointer !important; }
+
+@sortedColor1: #DDD;
+@sortedColor2: #CCC;
+.table th.sorted{
+    background-color: darken(#e6e6e6, 15%);
+	background-image: -webkit-gradient(linear, 0 0%, 0 100%, from(@sortedColor1), to(@sortedColor2));
+	background-image: -webkit-linear-gradient(top, @sortedColor1 0%, @sortedColor2 100%);
+    background-image: -moz-linear-gradient(top, @sortedColor1 0%, @sortedColor2 100%);
+    background-image: -ms-linear-gradient(top, @sortedColor1 0%, @sortedColor2 100%);
+    background-image: -o-linear-gradient(top, @sortedColor1 0%, @sortedColor2 100%);
+    background-image: -linear-gradient(top, @sortedColor1 0%, @sortedColor2 100%);
+}

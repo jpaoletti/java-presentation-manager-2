@@ -21,7 +21,7 @@
                                 <div class="row">
                                     <div class="col-lg-9">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
                                                 <spring:message code="jpm.list.search" text="Search" /> <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu" role="menu">
@@ -47,9 +47,9 @@
                                                 <input type="hidden" name="page" value="${paginatedList.page}" />
                                                 <div class="form-group">
                                                     <label><spring:message code="jpm.list.pagesize" text="Page Size" /></label>
-                                                    <input class="form-control page-size" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" style="width:60px;" />
+                                                    <input class="form-control page-size input-sm" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" style="width:60px;" />
                                                 </div>
-                                                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></button>
+                                                <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-arrow-right"></span></button>
                                             </form>
                                         </div>
                                     </c:if>
@@ -60,39 +60,44 @@
                                     <tr>
                                         <th style="width: 5px;"><i class="glyphicon glyphicon-cog"></i></th>
                                             <c:forEach items="${paginatedList.fields}" var="field">
-                                            <th data-field="${field.id}"><jpm:field-title entity="${entity}" fieldId="${field.id}" /></th>
-                                            </c:forEach>
+                                            <th data-field="${field.id}" data-entity="${entity.id}" data-cp="${cp}" class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
+                                                <c:if test="${field.sortable}">
+                                                    <span class="glyphicon ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt'):'glyphicon-sort'} pull-right"></span>
+                                                </c:if>
+                                                <jpm:field-title entity="${entity}" fieldId="${field.id}" />
+                                            </th>
+                                        </c:forEach>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach items="${paginatedList.contents}" var="item">
                                         <tr data-id="${item.id}">
-                                            <td>
-                                                <div class="btn-group nowrap">
-                                                    <c:forEach items="${item.operations}" var="o">
-                                                        <a 
-                                                            class="btn btn-mini btn-default confirm-${o.confirm}" 
-                                                            title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                                            href="<c:url value='/jpm/${entity.id}/${item.id}/${o.id}' />">
-                                                            <i class="glyphicon jpmicon-${o.id}"></i>
-                                                        </a>
-                                                    </c:forEach>
-                                                </div>
-                                            </td>
-                                            <c:forEach items="${item.values}" var="v">
-                                                <td data-field="${v.key}">
-                                                    <c:set var="convertedValue" value="${v.value}"/>
-                                                    <c:set var="field" value="${v.key}" scope="request" />
-                                                    <c:if test="${fn:startsWith(convertedValue, '@page:')}">
-                                                        <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
-                                                    </c:if>
-                                                    <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
-                                                        ${convertedValue}
-                                                    </c:if>
-                                                </td>
-                                            </c:forEach>
-                                        </tr>
+                                            <th>
+                                    <div class="btn-group nowrap">
+                                        <c:forEach items="${item.operations}" var="o">
+                                            <a
+                                                class="btn btn-mini btn-default confirm-${o.confirm}" 
+                                                title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
+                                                href="<c:url value='/jpm/${entity.id}/${item.id}/${o.id}' />">
+                                                <i class="glyphicon jpmicon-${o.id}"></i>
+                                            </a>
+                                        </c:forEach>
+                                    </div>
+                                    </th>
+                                    <c:forEach items="${item.values}" var="v">
+                                        <td data-field="${v.key}">
+                                            <c:set var="convertedValue" value="${v.value}"/>
+                                            <c:set var="field" value="${v.key}" scope="request" />
+                                            <c:if test="${fn:startsWith(convertedValue, '@page:')}">
+                                                <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
+                                            </c:if>
+                                            <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
+                                                ${convertedValue}
+                                            </c:if>
+                                        </td>
                                     </c:forEach>
+                                    </tr>
+                                </c:forEach>
                                 </tbody>
                             </table>
                             <div class="panel-footer row list-pagination">
