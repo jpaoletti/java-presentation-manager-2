@@ -111,7 +111,9 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         final Criteria c = getSession().createCriteria(getPersistentClass());
         if (restrictions != null) {
             for (Criterion criterion : restrictions) {
-                c.add(criterion);
+                if (criterion != null) {
+                    c.add(criterion);
+                }
             }
         }
         return c;
