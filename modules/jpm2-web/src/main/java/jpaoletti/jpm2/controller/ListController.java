@@ -8,6 +8,7 @@ import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.PaginatedList;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -34,6 +36,8 @@ import org.springframework.web.servlet.ModelAndView;
 public class ListController extends BaseController {
 
     @Autowired
+    private WebApplicationContext ctx;
+    @Autowired
     private JPMService service;
 
     @RequestMapping(value = "/jpm/{entity}.json", method = RequestMethod.GET, headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
@@ -41,13 +45,24 @@ public class ListController extends BaseController {
     public ObjectConverterData listObject(
             @PathVariable Entity entity,
             @RequestParam String textField,
+            @RequestParam(required = false) String ownerId,
+            @RequestParam(required = false) String filter,
             @RequestParam(required = false) String query,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
         final Field field = entity.getFieldById(textField);
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
-        final List list = entity.getDao().list((page - 1) * ps, ps, Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+        final List<Criterion> restrictions = new ArrayList<>();
+        if (filter != null) {
+            final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
+            final Criterion c = lfilter.getListFilter(entity, getSessionEntityData(entity), ownerId);
+            if (c != null) {
+                restrictions.add(c);
+            }
+        }
+        restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+        final List list = entity.getDao().list((page - 1) * ps, ps, restrictions.toArray(new Criterion[restrictions.size()]));
         r.setMore(list.size() == ps);
         r.setResults(new ArrayList<ObjectConverterDataItem>());
         for (Object object : list) {
@@ -66,7 +81,7 @@ public class ListController extends BaseController {
         if (entity.isWeak()) {
             throw new NotAuthorizedException();
         }
-        ModelAndView mav = generalList(entity, page, pageSize);
+        ModelAndView mav = generalList(entity, page, pageSize, null);
         return mav;
     }
 
@@ -80,7 +95,7 @@ public class ListController extends BaseController {
         if (!entity.isWeak()) {
             throw new NotAuthorizedException();
         }
-        final ModelAndView mav = generalList(entity, page, pageSize);
+        final ModelAndView mav = generalList(entity, page, pageSize, ownerId);
         mav.addObject("owner", owner);
         mav.addObject("ownerId", ownerId);
         return mav;
@@ -185,12 +200,12 @@ public class ListController extends BaseController {
         this.service = service;
     }
 
-    protected ModelAndView generalList(Entity entity, Integer page, Integer pageSize) throws PMException {
+    protected ModelAndView generalList(Entity entity, Integer page, Integer pageSize, String ownerId) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-list");
         getContext().setEntity(entity);
         getContext().setOperation(entity.getOperation("list"));
         final Operation operation = getContext().getOperation();
-        final PaginatedList paginatedList = getService().getPaginatedList(entity, operation, getSessionEntityData(entity), page, pageSize);
+        final PaginatedList paginatedList = getService().getPaginatedList(entity, operation, getSessionEntityData(entity), page, pageSize, ownerId);
         mav.addObject("entity", entity);
         mav.addObject("operation", operation);
         mav.addObject("paginatedList", paginatedList);
@@ -198,5 +213,13 @@ public class ListController extends BaseController {
         mav.addObject("selectedOperations", entity.getOperationsFor(null, operation, OperationScope.SELECTED));
         mav.addObject("sessionEntityData", getSessionEntityData(entity));
         return mav;
+    }
+
+    public WebApplicationContext getCtx() {
+        return ctx;
+    }
+
+    public void setCtx(WebApplicationContext ctx) {
+        this.ctx = ctx;
     }
 }

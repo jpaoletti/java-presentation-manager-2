@@ -1,19 +1,22 @@
 package jpaoletti.jpm2.core.model;
 
+import org.hibernate.criterion.Criterion;
+
 /**
- * An interface that filters the data shown by an entity. Each data access has
- * his own creation of this interface.
+ * An interface that filters the data shown by an entity.
  *
  * @author jpaoletti
- * */
+ *
+ */
 public interface ListFilter {
 
     /**
-     * Returns an specific implementation of a filter given by and understood by
-     * each data access.
-     * 
-     * @param ctx The context
+     * Returns a unique id for the filter;
+     */
+    public String getId();
+
+    /**
      * @return the filter object
      */
-    public Object getListFilter();
+    public Criterion getListFilter(Entity entity, SessionEntityData sessionData, String ownerId);
 }

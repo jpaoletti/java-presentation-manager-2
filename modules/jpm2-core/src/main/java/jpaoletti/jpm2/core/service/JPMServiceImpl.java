@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.service;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -33,37 +34,47 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final Object owner = entity.getDao().get(instanceId);
         final List list = weak.getDao().list(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
         final PaginatedList pl = new PaginatedList();
+        getContext().setEntity(entity);
+        getContext().setObject(owner);
         pl.setTotal((long) list.size());
         pl.getContents().load(list, weak, weak.getOperation("list"));
         return pl;
     }
 
     @Override
-    public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize) throws PMException {
+    public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, String ownerId) throws PMException {
         entity.checkAuthorization();
         operation.checkAuthorization();
         final PaginatedList pl = new PaginatedList();
         final Criterion search = sessionEntityData.getSearchCriteria().getCriterion();
+        Criterion ownerC = null;
+        if (ownerId != null) {
+            final Object owner = entity.getOwner().getOwner().getDao().get(ownerId);
+            ownerC = Restrictions.eq(entity.getOwner().getLocalProperty(), owner);
+        }
+        final GenericDAO dao = entity.getDao();
+        List list;
         if (entity.isPaginable()) {
             pl.setPageSize(pageSize != null ? pageSize : sessionEntityData.getPageSize());
             pl.setPage(page != null ? page : sessionEntityData.getPage());
             if (sessionEntityData.getSort().isSorted()) {
-                pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize(), sessionEntityData.getSort().getOrder(), search), entity, operation);
+                list = dao.list(pl.from(), pl.getPageSize(), sessionEntityData.getSort().getOrder(), search, ownerC);
             } else {
-                pl.getContents().load(entity.getDao().list(pl.from(), pl.getPageSize(), search), entity, operation);
+                list = dao.list(pl.from(), pl.getPageSize(), search, ownerC);
             }
             if (entity.isCountable()) {
-                pl.setTotal(entity.getDao().count(search));
+                pl.setTotal(dao.count(search));
             }
             sessionEntityData.setPage(pl.getPage());
             sessionEntityData.setPageSize(pl.getPageSize());
         } else {
             if (sessionEntityData.getSort().isSorted()) {
-                pl.getContents().load(entity.getDao().list(sessionEntityData.getSort().getOrder(), search), entity, operation);
+                list = dao.list(sessionEntityData.getSort().getOrder(), search, ownerC);
             } else {
-                pl.getContents().load(entity.getDao().list(search), entity, operation);
+                list = dao.list(search, ownerC);
             }
         }
+        pl.getContents().load(list, entity, operation);
         for (Field field : entity.getAllFields()) {
             if (field.getSearcher() != null) {
                 pl.getFieldSearchs().put(field, field.getSearcher().visualization());

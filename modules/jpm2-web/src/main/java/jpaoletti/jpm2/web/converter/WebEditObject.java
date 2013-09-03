@@ -4,6 +4,7 @@ import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.ConverterException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.ListFilter;
 
 /**
  *
@@ -12,6 +13,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebEditObject extends Converter {
 
     private Entity entity;
+    private ListFilter filter;
     private String textField;
     private Integer pageSize;
     private Integer minSearch;
@@ -24,12 +26,18 @@ public class WebEditObject extends Converter {
     @Override
     public Object visualize(Field field, Object object) throws ConverterException {
         final Object value = (object == null) ? null : getValue(object, field);
-        final String res = "@page:object-converter.jsp?entityId=" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
-        if (value == null) {
-            return res;
-        } else {
-            return res + "&value=" + getEntity().getDao().getId(value);
+        final StringBuilder sb = new StringBuilder("@page:object-converter.jsp");
+        sb.append("?entityId=").append(getEntity().getId());
+        sb.append("&textField=").append(getTextField());
+        sb.append("&pageSize=").append(getPageSize());
+        sb.append("&minSearch=").append(getMinSearch());
+        if (value != null) {
+            sb.append("&value=").append(getEntity().getDao().getId(value));
         }
+        if (getFilter() != null) {
+            sb.append("&filter=").append(getFilter().getId());
+        }
+        return sb.toString();
     }
 
     @Override
@@ -71,5 +79,13 @@ public class WebEditObject extends Converter {
 
     public void setMinSearch(Integer minSearch) {
         this.minSearch = minSearch;
+    }
+
+    public ListFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(ListFilter filter) {
+        this.filter = filter;
     }
 }
