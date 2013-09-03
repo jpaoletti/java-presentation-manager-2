@@ -8,24 +8,24 @@ import java.io.Serializable;
  */
 public class SessionEntityData implements Serializable {
 
-    private String entityId;
+    private Entity entity;
     private Integer page;
     private Integer pageSize;
     private SearchCriteria searchCriteria;
     private ListSort sort;
 
-    public SessionEntityData(String entityId) {
-        this.entityId = entityId;
+    public SessionEntityData(Entity entity) {
+        this.entity = entity;
         this.searchCriteria = new SearchCriteria();
         this.sort = new ListSort();
     }
 
-    public String getEntityId() {
-        return entityId;
+    public Entity getEntity() {
+        return entity;
     }
 
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
+    public void setEntity(Entity entity) {
+        this.entity = entity;
     }
 
     public Integer getPage() {

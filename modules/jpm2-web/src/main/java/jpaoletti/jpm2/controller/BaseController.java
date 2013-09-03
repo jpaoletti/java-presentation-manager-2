@@ -89,7 +89,7 @@ public class BaseController {
     public SessionEntityData getSessionEntityData(Entity entity) {
         final Object sed = getSession().getAttribute(entity.getId());
         if (sed == null) {
-            final SessionEntityData sessionEntityData = new SessionEntityData(entity.getId());
+            final SessionEntityData sessionEntityData = new SessionEntityData(entity);
             getSession().setAttribute(entity.getId(), sessionEntityData);
         }
         return (SessionEntityData) getSession().getAttribute(entity.getId());
