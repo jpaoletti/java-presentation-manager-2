@@ -8,7 +8,7 @@
         <c:set var="entityName" value="${entity.title}" />
         <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" />
         <%@include file="inc/header.jsp" %>
-        <%@include file="inc/menu.jsp" %>
+        <jsp:include page="inc/menu/${currentHome}-menu.jsp" />
         <div id="container">
             <div id="content">
                 <%@include file="inc/default-content-header.jsp" %>

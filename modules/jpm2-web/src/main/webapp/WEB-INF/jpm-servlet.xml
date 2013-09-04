@@ -22,9 +22,6 @@
     <context:component-scan base-package="jpaoletti.jpm2.controller"/>
     <mvc:annotation-driven  conversion-service="conversionService" />
     <mvc:resources mapping="/static/**" location="/static/" />
-    <mvc:view-controller path="" view-name="index"/>
-    <mvc:view-controller path="/" view-name="index"/>
-    <mvc:view-controller path="/index" view-name="index"/>
 
     <bean name="handlerMapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
     <bean name="handlerAdapter" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>

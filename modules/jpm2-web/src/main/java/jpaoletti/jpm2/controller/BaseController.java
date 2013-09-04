@@ -32,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class BaseController {
 
+    public static final String CURRENT_HOME = "currentHome";
     @Autowired
     public HttpSession session;
     @Autowired
@@ -118,6 +119,10 @@ public class BaseController {
     @ExceptionHandler(NotAuthorizedException.class)
     public String handleNotAuthorizedException() {
         return "not-authotized";
+    }
+
+    public void setCurrentHome(String newHome) {
+        getSession().setAttribute(CURRENT_HOME, newHome);
     }
 
     /**

@@ -6,7 +6,7 @@
     </head>
     <body>
         <%@include file="inc/header.jsp" %>
-        <%@include file="inc/menu.jsp" %>
+        <jsp:include page="inc/menu/${currentHome}-menu.jsp" />
         <div id="container">
             <div id="content">
                 <div id="content-header"></div>
