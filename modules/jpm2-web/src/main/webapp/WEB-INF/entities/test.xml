@@ -100,6 +100,24 @@
                     </property>
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="decimal" />
+                    <property name="align" value="right" />
+                    <property name="searcher" ref="jpm-seracher-int"/>
+                    <property name="width" value="55px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter" ref="jpm-converter-edit-decimal"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="date" />
                     <property name="width" value="100px" />
                     <property name="configs" ref="default-date-config" />
@@ -160,7 +178,7 @@
                                 <property name="icon" value="glyphicon-cog" />
                                 <property name="title" value="Another Test" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="tests" />
+                                <property name="fields" value="decimal" />
                             </bean>
                         </list>
                     </property>

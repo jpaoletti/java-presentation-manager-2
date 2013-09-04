@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.test;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,6 +39,8 @@ public class JPMTest implements Serializable {
     @Column(name = "bool_field")
     @Type(type = "yes_no")
     private Boolean bool;
+    @Column(name = "decimal_field")
+    private BigDecimal decimal;
     @ManyToOne()
     @JoinColumn(name = "test")
     private JPMTest test;
@@ -104,5 +107,13 @@ public class JPMTest implements Serializable {
     @Override
     public String toString() {
         return "[" + getId() + "] " + getString();
+    }
+
+    public BigDecimal getDecimal() {
+        return decimal;
+    }
+
+    public void setDecimal(BigDecimal decimal) {
+        this.decimal = decimal;
     }
 }
