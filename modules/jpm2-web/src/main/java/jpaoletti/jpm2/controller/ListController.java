@@ -54,7 +54,7 @@ public class ListController extends BaseController {
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
         final List<Criterion> restrictions = new ArrayList<>();
-        if (filter != null) {
+        if (filter != null && !"".equals(filter)) {
             final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
             final Criterion c = lfilter.getListFilter(entity, getSessionEntityData(entity), ownerId);
             if (c != null) {
