@@ -12,3 +12,8 @@
     messages["jpm.modal.confirm.text"] = "<spring:message code='jpm.modal.confirm.text' text='Are you sure you want to continue?' />";
 </script>
 <script type="text/javascript" src="${cp}static/js/jpm.js?v=${jpm.appversion}"></script>
+<script type="text/javascript">
+    jpmLoad(function() {
+        $("#menu-${entity.id}").addClass("active");
+    });
+</script>
