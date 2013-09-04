@@ -11,14 +11,7 @@
         jpmLoad(function() {
             $("#control-group-${field}").find(".col-lg-2").remove();
             $("#control-group-${field}").find(".col-lg-10").removeClass("col-lg-10").addClass("col-lg-12");
-            $.ajax({
-                url: "${cp}jpm/${entity.id}/${instance.id}/${param.weakId}/weaklist",
-                dataType: "text",
-                context: document.body,
-                success: function(data) {
-                    $("#weak${field}-list").html(data).find("table").removeClass().addClass("table table-bordered table-condensed table-striped");
-                }
-            });
+            $("#weak${field}-list").load("${cp}jpm/${entity.id}/${instance.id}/${param.weakId}/weaklist");
         });
     </script>
 </c:if>

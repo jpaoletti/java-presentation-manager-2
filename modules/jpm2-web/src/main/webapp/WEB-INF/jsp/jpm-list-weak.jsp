@@ -1,6 +1,6 @@
 <%@include file="inc/default-taglibs.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<table>
+<table class="table table-bordered table-condensed table-striped">
     <thead>
         <tr>
             <c:forEach items="${paginatedList.fields}" var="field">
