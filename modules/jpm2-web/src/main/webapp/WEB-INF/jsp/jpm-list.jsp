@@ -62,10 +62,13 @@
                                     </c:if>
                                 </div>
                             </div>
-                            <table class="table table-bordered table-compact">
+                            <table class="table table-bordered table-compact jpm-list-table">
                                 <thead>
                                     <tr>
                                         <th id='operation-column-header'>
+                                            <c:if test="${not empty selectedOperations}">
+                                                <input type="checkbox" class="pull-left" id="select_unselect_all" />
+                                            </c:if>
                                             <a href="javascript:;" id="help-btn" data-toggle="popover" data-html="true"><i class="glyphicon glyphicon-cog"></i></a>
                                         </th>
                                         <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
@@ -85,6 +88,9 @@
                                         <tr data-id="${item.id}">
                                             <th class="operation-list" style="width: ${fn:length(item.operations) * 30 + 20}px">
                                     <div class="btn-group nowrap">
+                                        <c:if test="${not empty selectedOperations}">
+                                            <input type="checkbox" class="pull-left selectable" data-id="${item.id}" />
+                                        </c:if>
                                         <c:forEach items="${item.operations}" var="o">
                                             <a
                                                 class="btn btn-mini btn-default confirm-${o.confirm}" 
@@ -110,6 +116,22 @@
                                     </tr>
                                 </c:forEach>
                                 </tbody>
+                                <c:if test="${not empty selectedOperations}">
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="100">
+                                                <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="pull-left" />
+                                                <c:forEach var="o" items="${selectedOperations}">
+                                                    <button class="btn btn-mini btn-default selected-operation" type="button" 
+                                                            data-entity="${entity.id}" data-operation="${o.id}" data-confirm="${o.confirm}">
+                                                        <i class="glyphicon jpmicon-${o.id}"></i>
+                                                        <spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />
+                                                    </button>
+                                                </c:forEach>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </c:if>
                             </table>
                             <div class="panel-footer row list-pagination">
                                 <div class="col-lg-11">
@@ -177,6 +199,23 @@
             }
             var sorting = false;
             jpmLoad(function() {
+                $("#select_unselect_all").on("click", function() {
+                    if ($(this).is(":checked")) {
+                        $(".selectable").prop("checked", true);
+                    } else {
+                        $(".selectable").prop("checked", false);
+                    }
+                });
+                $(".selected-operation").on("click", function() {
+                    var instanceIds = $.map($('.selectable:checked'), function(n, i) {
+                        return $(n).attr("data-id");
+                    }).join(',');
+                    var btn = $(this);
+                    //We simulate a link
+                    var a = $("<a href='${cp}jpm/" + btn.attr("data-entity") + "/" + instanceIds + "/" + btn.attr("data-operation") + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
+                    $("body").append(a);
+                    a.trigger("click");
+                });
                 $("#help-btn").popover({
                     title: "<spring:message code='jpm.list.shortcut.help.title' text='Help' />",
                     content: "<spring:message code='jpm.list.shortcut.help.content' text='<ul><li>Press \'f\' to search</li><li>Press \'s\' to sort</li><li>Press \'h\' for help</li></ul>' />"

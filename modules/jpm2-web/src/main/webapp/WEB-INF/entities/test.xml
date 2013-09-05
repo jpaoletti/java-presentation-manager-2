@@ -55,6 +55,12 @@
                     <property name="display" value="show list itemAudit" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="deleteSelected" />
+                    <property name="scope" value="selected" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="show" />
                     <property name="display" value="edit list itemAudit" />
                 </bean>
