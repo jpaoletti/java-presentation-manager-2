@@ -210,11 +210,13 @@
                     var instanceIds = $.map($('.selectable:checked'), function(n, i) {
                         return $(n).attr("data-id");
                     }).join(',');
-                    var btn = $(this);
-                    //We simulate a link
-                    var a = $("<a href='${cp}jpm/" + btn.attr("data-entity") + "/" + instanceIds + "/" + btn.attr("data-operation") + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
-                    $("body").append(a);
-                    a.trigger("click");
+                    if (instanceIds !== "") {
+                        var btn = $(this);
+                        //We simulate a link
+                        var a = $("<a href='${cp}jpm/" + btn.attr("data-entity") + "/" + instanceIds + "/" + btn.attr("data-operation") + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
+                        $("body").append(a);
+                        a.trigger("click");
+                    }
                 });
                 $("#help-btn").popover({
                     title: "<spring:message code='jpm.list.shortcut.help.title' text='Help' />",
