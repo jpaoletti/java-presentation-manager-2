@@ -139,6 +139,12 @@
                     <property name="configs" ref="default-bool-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="bigstring" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="align" value="center" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="test" />
                     <property name="width" value="150px" />
                     <property name="configs">
@@ -181,13 +187,13 @@
                                 <property name="icon" value="glyphicon-briefcase" />
                                 <property name="title" value="jpm.jpm-entity-test.panel2" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="integer date bool" />
+                                <property name="fields" value="integer decimal date bool" />
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="glyphicon-cog" />
                                 <property name="title" value="Another Test" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="decimal" />
+                                <property name="fields" value="bigstring" />
                             </bean>
                         </list>
                     </property>

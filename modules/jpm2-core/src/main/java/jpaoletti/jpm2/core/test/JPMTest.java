@@ -44,6 +44,7 @@ public class JPMTest implements Serializable {
     @ManyToOne()
     @JoinColumn(name = "test")
     private JPMTest test;
+    private String bigstring;
 
     public JPMTest(Long id, String string, Integer integer, Date date, Boolean bool) {
         this.id = id;
@@ -115,5 +116,13 @@ public class JPMTest implements Serializable {
 
     public void setDecimal(BigDecimal decimal) {
         this.decimal = decimal;
+    }
+
+    public String getBigstring() {
+        return bigstring;
+    }
+
+    public void setBigstring(String bigstring) {
+        this.bigstring = bigstring;
     }
 }
