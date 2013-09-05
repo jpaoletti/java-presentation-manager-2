@@ -55,7 +55,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
                 record.setOperation(getContext().getOperation().getId());
             }
 
-            if (observations != null) {
+            if (observations != null && !observations.equals("")) {
                 record.setObservations(observations);
             } else {
                 if (getContext().getObject() != null) {
