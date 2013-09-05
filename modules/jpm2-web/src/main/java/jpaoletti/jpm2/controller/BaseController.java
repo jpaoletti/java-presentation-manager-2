@@ -16,6 +16,7 @@ import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
+import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -102,17 +103,17 @@ public class BaseController {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ModelAndView handleTypeMismatchException(MissingServletRequestParameterException ex, HttpServletRequest req, HttpServletResponse resp) {
-        System.out.println("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
-        System.out.println("Invalid name is: " + ex.getParameterName());
-        System.out.println("Required type is: " + ex.getParameterType());
+        JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
+        JPMUtils.getLogger().warn("Invalid name is: " + ex.getParameterName());
+        JPMUtils.getLogger().warn("Required type is: " + ex.getParameterType());
         return null;
     }
 
     @ExceptionHandler(TypeMismatchException.class)
     public ModelAndView handleTypeMismatchException(TypeMismatchException ex, HttpServletRequest req, HttpServletResponse resp) {
-        System.out.println("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
-        System.out.println("Invalid value is: " + ex.getValue());
-        System.out.println("Required type is: " + ex.getRequiredType().getSimpleName());
+        JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
+        JPMUtils.getLogger().warn("Invalid value is: " + ex.getValue());
+        JPMUtils.getLogger().warn("Required type is: " + ex.getRequiredType().getSimpleName());
         return null;
     }
 
