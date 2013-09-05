@@ -10,7 +10,7 @@ import jpaoletti.jpm2.util.JPMUtils;
 public class ToStringConverter extends Converter {
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Object value = getValue(object, field);
         return process(value);
     }

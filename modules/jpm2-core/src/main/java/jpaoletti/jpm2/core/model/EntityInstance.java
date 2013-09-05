@@ -46,7 +46,7 @@ public class EntityInstance {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 try {
-                    values.put(field.getId(), converter.visualize(field, object));
+                    values.put(field.getId(), converter.visualize(field, object, (id != null) ? id.toString() : null));
                     fields.add(field);
                 } catch (IgnoreConvertionException ex) {
                 }

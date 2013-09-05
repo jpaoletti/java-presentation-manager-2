@@ -12,7 +12,7 @@ import jpaoletti.jpm2.core.security.BCrypt;
 public class Password extends Converter {
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
        return "@page:password-converter.jsp";
     }
 

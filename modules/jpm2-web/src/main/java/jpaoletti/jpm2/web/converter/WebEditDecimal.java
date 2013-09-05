@@ -12,7 +12,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebEditDecimal extends WebToString {
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final BigDecimal fieldValue = (BigDecimal) getValue(object, field);
         final String value = (fieldValue == null) ? field.getDefaultValue() : fieldValue.toString();
         return "<input class='form-control' step='any' name='field_" + field.getId() + "' type='number' value='" + (value != null ? value : "") + "'>";

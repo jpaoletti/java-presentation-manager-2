@@ -23,7 +23,7 @@ public class Converter extends PMCoreObject {
      * @return The string representation of the object
      * @throws ConverterException
      */
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         throw new IgnoreConvertionException();
     }
 

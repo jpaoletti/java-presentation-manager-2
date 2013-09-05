@@ -10,7 +10,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebShowBoolean extends WebToString {
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Boolean value = (Boolean) getValue(object, field);
         if (value == null || value) {
             return process("<span class=\"glyphicon glyphicon-ok\"></span>");

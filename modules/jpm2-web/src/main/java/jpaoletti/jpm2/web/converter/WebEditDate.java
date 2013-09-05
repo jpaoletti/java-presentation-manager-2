@@ -17,7 +17,7 @@ public class WebEditDate extends WebToString {
     public static final String RFC3339 = "yyyy-MM-dd";
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Date date = (Date) getValue(object, field);
         String value = field.getDefaultValue();
         if (date != null) {

@@ -24,7 +24,7 @@ public class WebEditObject extends Converter {
     }
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Object value = (object == null) ? null : getValue(object, field);
         final StringBuilder sb = new StringBuilder("@page:object-converter.jsp");
         sb.append("?entityId=").append(getEntity().getId());

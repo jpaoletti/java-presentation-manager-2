@@ -10,7 +10,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebEditBoolean extends WebToString {
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Boolean value = (Boolean) getValue(object, field);
         return "<input name='field_" + field.getId() + "' type=\"checkbox\" " + ((value == null || value) ? "checked" : "") + "> ";
     }

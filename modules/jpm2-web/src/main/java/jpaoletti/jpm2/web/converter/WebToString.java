@@ -11,12 +11,12 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebToString extends ToStringConverter {
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Object value = getValue(object, field);
         return wrap(process(value));
     }
 
     public String wrap(String process) {
-        return "<span class='to-string'>" + process + "</span>";
+        return "<span class='to-string' >" + process + "</span>";
     }
 }

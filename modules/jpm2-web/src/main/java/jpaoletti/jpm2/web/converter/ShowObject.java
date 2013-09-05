@@ -21,7 +21,7 @@ public class ShowObject extends Converter {
     private JPMContext context;
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
         final Object value = getValue(object, field);
         final String res = "@page:show-object-converter.jsp?entityId=" + getEntity().getId() + "&fields=" + getFields() + "&objectId=" + getContext().getEntity().getDao().getId(object);
         if (value == null) {

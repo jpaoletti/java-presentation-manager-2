@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +32,11 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
             }
         }
         for (Object object : objects) {
-            final EntityInstance instance = new EntityInstance(entity.getDao().getId(object), getFields(), entity.getOperationsFor(object, operation, OperationScope.ITEM));
+            final Serializable instanceId = entity.getDao().getId(object);
+            final EntityInstance instance = new EntityInstance(instanceId, getFields(), entity.getOperationsFor(object, operation, OperationScope.ITEM));
             for (Field field : getFields()) {
                 try {
-                    instance.getValues().put(field.getId(), getConverters().get(field.getId()).visualize(field, object));
+                    instance.getValues().put(field.getId(), getConverters().get(field.getId()).visualize(field, object, (instanceId != null) ? instanceId.toString() : null));
                 } catch (IgnoreConvertionException ex) {
                 }
             }

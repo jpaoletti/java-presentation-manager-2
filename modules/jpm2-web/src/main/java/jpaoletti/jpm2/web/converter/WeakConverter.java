@@ -24,9 +24,10 @@ public class WeakConverter extends Converter {
     }
 
     @Override
-    public Object visualize(Field field, Object object) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+
         return "@page:weak-converter.jsp?showList=" + isShowList() + "&showBtn=" + isShowBtn() + "&btnText=" + getBtnText() + "&btnIcon=" + getBtnIcon()
-                + "&weakId=" + getEntity().getId();
+                + "&weakId=" + getEntity().getId() + "&ownerId=" + instanceId;
     }
 
     public Entity getEntity() {
