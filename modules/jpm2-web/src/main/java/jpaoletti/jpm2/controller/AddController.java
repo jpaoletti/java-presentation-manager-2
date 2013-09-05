@@ -68,6 +68,8 @@ public class AddController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/add", method = RequestMethod.POST)
     public ModelAndView addCommit(@PathVariable Entity entity) throws PMException {
         final Operation operation = entity.getOperation("add");
+        getContext().setEntity(entity);
+        getContext().setOperation(operation);
         try {
             final String instanceId = getService().save(entity, operation,
                     new EntityInstance(null, entity, operation, null),

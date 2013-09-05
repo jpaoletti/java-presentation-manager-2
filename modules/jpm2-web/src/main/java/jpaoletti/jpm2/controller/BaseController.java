@@ -125,6 +125,15 @@ public class BaseController {
         getSession().setAttribute(CURRENT_HOME, newHome);
     }
 
+    protected void prepareItemOperation(Entity entity, String instanceId, String operationId) throws PMException {
+        getContext().setEntity(entity);
+        getContext().setOperation(entity.getOperation(operationId));
+        if (instanceId != null) {
+            getContext().setObject(entity.getDao().get(instanceId));
+            getContext().setEntityInstance(newEntityInstance(instanceId, entity));
+        }
+    }
+
     /**
      * Redirect to list depending on weaks entities.
      */

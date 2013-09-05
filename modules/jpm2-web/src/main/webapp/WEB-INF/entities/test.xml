@@ -43,10 +43,6 @@
                     </property>-->
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="show" />
-                    <property name="display" value="edit list" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
                     <property name="scope" value="general" />
                     <property name="context">
@@ -54,7 +50,20 @@
                     </property>
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="generalAudit" />
+                    <property name="scope" value="general" />
+                    <property name="display" value="show list itemAudit" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="show" />
+                    <property name="display" value="edit list itemAudit" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="edit" />
+                    <property name="display" value="show list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="itemAudit" />
                     <property name="display" value="show list" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">

@@ -5,6 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
+    <bean class="jpaoletti.jpm2.core.dao.AuditDAO" />
     <!-- ID TRANSFORMERS -->
     <bean id="transformer-str" class="jpaoletti.jpm2.core.idtransformer.Str" />
     <bean id="transformer-strToLong" class="jpaoletti.jpm2.core.idtransformer.StrToLong" />

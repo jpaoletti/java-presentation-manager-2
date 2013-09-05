@@ -80,7 +80,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                 pl.getFieldSearchs().put(field, field.getSearcher().visualization());
             }
         }
-        getJpm().audit();
+        //getJpm().audit(); //not for now
         return pl;
     }
 

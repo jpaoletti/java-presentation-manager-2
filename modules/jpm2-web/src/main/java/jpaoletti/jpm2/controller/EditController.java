@@ -31,10 +31,7 @@ public class EditController extends BaseController {
      */
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit", method = RequestMethod.GET)
     public ModelAndView editPrepare(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        getContext().setEntity(entity);
-        getContext().setOperation(entity.getOperation("edit"));
-        getContext().setObject(getService().get(entity, getContext().getOperation(), instanceId));
-        getContext().setEntityInstance(newEntityInstance(instanceId, entity));
+        prepareItemOperation(entity, instanceId, "edit");
         return newMav();
     }
 
