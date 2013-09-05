@@ -23,6 +23,7 @@
                                     <%@include file="inc/item-operations.jsp" %>
                                 </div>
                                 <div class="widget-content">
+                                    <spring:message code="jpm.audit.dateFormat" var="dateFormat" text="yyyy/MM/dd HH:mm:ss" />
                                     <table class="table table-bordered table-compact">
                                         <thead>
                                             <tr>
