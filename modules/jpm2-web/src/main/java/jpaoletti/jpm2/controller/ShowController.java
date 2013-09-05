@@ -64,7 +64,7 @@ public final class ShowController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET)
     public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         prepareItemOperation(entity, instanceId, "show");
-        return newMav();
+        return new ModelAndView("jpm-show");
     }
 
     public JPMService getService() {

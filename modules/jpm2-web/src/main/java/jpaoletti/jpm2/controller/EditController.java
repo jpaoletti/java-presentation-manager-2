@@ -32,7 +32,7 @@ public class EditController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit", method = RequestMethod.GET)
     public ModelAndView editPrepare(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         prepareItemOperation(entity, instanceId, "edit");
-        return newMav();
+        return new ModelAndView("jpm-edit");
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/edit", method = RequestMethod.POST)

@@ -37,9 +37,7 @@ public class AddController extends BaseController {
         getContext().setOperation(entity.getOperation("add"));
         getContext().setObject(JPMUtils.newInstance(entity.getClazz()));
         getContext().setEntityInstance(newEntityInstance(null, entity));
-        final ModelAndView mav = newMav();
-        mav.setViewName("jpm-edit");
-        return mav;
+        return new ModelAndView("jpm-edit");
     }
 
     /**

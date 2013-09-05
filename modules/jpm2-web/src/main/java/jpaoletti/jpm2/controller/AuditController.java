@@ -23,7 +23,7 @@ public class AuditController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/itemAudit", method = RequestMethod.GET)
     public ModelAndView getItemAudit(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         prepareItemOperation(entity, instanceId, "itemAudit");
-        final ModelAndView mav = newMav();
+        final ModelAndView mav = new ModelAndView("jpm-itemAudit");
         mav.addObject("audits", getService().getItemRecords(instanceId));
         return mav;
     }
@@ -31,7 +31,7 @@ public class AuditController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/generalAudit", method = RequestMethod.GET)
     public ModelAndView getGeneralAudit(@PathVariable Entity entity) throws PMException {
         prepareItemOperation(entity, null, "generalAudit");
-        final ModelAndView mav = newMav();
+        final ModelAndView mav = new ModelAndView("jpm-generalAudit");
         mav.addObject("audits", getService().getGeneralRecords());
         return mav;
     }

@@ -13,8 +13,6 @@ import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
-import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.TypeMismatchException;
@@ -46,34 +44,6 @@ public class BaseController {
     private MessageSource messageSource;
     //Messages TO-DO
     private List<Message> globalMessages = new ArrayList<>();
-
-    protected ModelAndView newMav() throws PMException {
-        final Entity entity = getContext().getEntity();
-        final Operation operation = getContext().getOperation();
-        final ModelAndView mav = new ModelAndView("jpm-" + operation.getId());
-        mav.addObject("entity", entity);
-        mav.addObject("operation", operation);
-        mav.addObject("generalOperations", entity.getOperationsFor(null, operation, OperationScope.GENERAL));
-        mav.addObject("selectedOperations", entity.getOperationsFor(null, operation, OperationScope.SELECTED));
-        if (getContext().getObject() != null) {
-            mav.addObject("object", getContext().getObject());
-            mav.addObject("itemOperations", entity.getOperationsFor(getContext().getObject(), operation, OperationScope.ITEM));
-        }
-        if (getContext().getEntityInstance() != null) {
-            mav.addObject("instance", getContext().getEntityInstance());
-            if (entity.isWeak()) {
-                mav.addObject("owner", getContext().getEntityInstance().getOwner());
-                mav.addObject("ownerId", getContext().getEntityInstance().getOwnerId());
-            }
-        }
-        if (!getContext().getEntityMessages().isEmpty()) {
-            mav.addObject("entityMessages", getContext().getEntityMessages());
-        }
-        if (!getContext().getFieldMessages().isEmpty()) {
-            mav.addObject("fieldMessages", getContext().getFieldMessages());
-        }
-        return mav;
-    }
 
     public UserDetails getUserDetails() {
         final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

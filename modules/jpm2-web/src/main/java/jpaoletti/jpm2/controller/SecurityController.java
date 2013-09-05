@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -31,7 +30,7 @@ public class SecurityController extends BaseController {
         getContext().setEntityInstance(newEntityInstance(instanceId, entity));
         final User user = getSecurityService().resetPassword(entity, operation, instanceId);
         getContext().setObject(user);
-        return newMav();
+        return new ModelAndView("jpm-resetPassword");
     }
 
     public SecurityService getSecurityService() {
