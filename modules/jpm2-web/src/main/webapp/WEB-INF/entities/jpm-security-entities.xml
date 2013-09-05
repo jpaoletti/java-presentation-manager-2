@@ -14,6 +14,7 @@
     <bean id="jpm-entity-auth" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.Authority" />
         <property name="dao" ref="jpm-dao-auth" />
+        <property name="home" value="security" />
         <property name="auth" value="ROLE_USERADMIN" />
         <property name="fields" >
             <list>
@@ -41,6 +42,7 @@
     <bean id="jpm-entity-user" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.User" />
         <property name="dao" ref="jpm-dao-user" />
+        <property name="home" value="security" />
         <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
@@ -152,6 +154,7 @@
     <bean id="jpm-entity-group" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.Group" />
         <property name="dao" ref="jpm-dao-group" />
+        <property name="home" value="security" />
         <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>

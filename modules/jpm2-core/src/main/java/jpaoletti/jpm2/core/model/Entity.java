@@ -27,6 +27,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private boolean countable; //Enable the use of "count" on lists
     private boolean paginable; //Enable pagination on lists
     private String auth; //Needed authority to access any operation on this entity
+    private String home; //default home if context one is not set.
     private List<Field> fields;
     private List<Entity> weaks;
     private List<PanelRow> panels;
@@ -35,10 +36,11 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public Entity() {
         super();
-        fieldsbyid = null;
-        paginable = true;
-        countable = true;
-        auditable = true;
+        this.fieldsbyid = null;
+        this.paginable = true;
+        this.countable = true;
+        this.auditable = true;
+        this.home = "index";
     }
 
     /**
@@ -473,5 +475,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setAuth(String auth) {
         this.auth = auth;
+    }
+
+    public String getHome() {
+        return home;
+    }
+
+    public void setHome(String home) {
+        this.home = home;
     }
 }
