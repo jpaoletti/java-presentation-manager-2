@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@include file="inc/default-taglibs.jsp" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
@@ -35,7 +36,7 @@
                                             <c:forEach items="${audits}" var="a">
                                                 <spring:message code="jpm.operation.${a.operation}" var="opTitle" />
                                                 <tr>
-                                                    <td>${a.datetime}</td>
+                                                    <td><fmt:formatDate value="${a.datetime}" pattern="${dateFormat}" /></td>
                                                     <td>${fn:replace(opTitle,'{0}','')}</td>
                                                     <td>${a.username}</td>
                                                     <td>${a.observations}</td>
