@@ -231,6 +231,23 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return operations;
     }
 
+    public List<Operation> getAllOperations() {
+        if (getParent() == null) {
+            return getOperations();
+        } else {
+            final List<Operation> res = new ArrayList<>();
+            if (getOperations() != null) {
+                res.addAll(getOperations());
+            }
+            for (Operation operation : getParent().getAllOperations()) {
+                if (!res.contains(operation)) {
+                    res.add(operation);
+                }
+            }
+            return res;
+        }
+    }
+
     public void setOperations(List<Operation> operations) {
         this.operations = operations;
     }
@@ -397,7 +414,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return The operation
      */
     public Operation getOperation(String id) {
-        for (Iterator<Operation> it = getOperations().iterator(); it.hasNext();) {
+        for (Iterator<Operation> it = getAllOperations().iterator(); it.hasNext();) {
             Operation oper = it.next();
             if (oper.getId().compareTo(id) == 0) {
                 return oper;
@@ -422,8 +439,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      */
     public List<Operation> getOperationsForScope(OperationScope... scopes) {
         final List<Operation> r = new ArrayList<>();
-        if (getOperations() != null) {
-            for (Operation op : getOperations()) {
+        if (getAllOperations() != null) {
+            for (Operation op : getAllOperations()) {
                 if (op.getScope() != null) {
                     String s = op.getScope().trim();
                     for (int i = 0; i < scopes.length; i++) {
@@ -442,7 +459,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     public List<Operation> getOperationsFor(Object object, Operation operation, OperationScope scope) throws PMException {
         final List<Operation> r = new ArrayList<>();
         if (operation != null) {
-            for (Operation op : getOperations()) {
+            for (Operation op : getAllOperations()) {
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
                     if (op.getCondition() == null || op.getCondition().check(object, op, operation.getId())) {
                         if (scope.is(op.getScope())) {
