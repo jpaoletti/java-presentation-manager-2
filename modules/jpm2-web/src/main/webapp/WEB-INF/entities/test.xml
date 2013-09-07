@@ -94,7 +94,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="integer" />
                     <property name="align" value="right" />
-                    <property name="searcher" ref="jpm-seracher-int"/>
+                    <property name="searcher" ref="jpm-searcher-int"/>
                     <property name="width" value="55px" />
                     <property name="configs">
                         <list>
@@ -117,7 +117,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="decimal" />
                     <property name="align" value="right" />
-                    <property name="searcher" ref="jpm-seracher-int"/>
+                    <property name="searcher" ref="jpm-searcher-int"/>
                     <property name="width" value="55px" />
                     <property name="configs">
                         <list>
