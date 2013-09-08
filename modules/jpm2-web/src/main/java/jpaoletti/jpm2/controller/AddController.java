@@ -51,7 +51,7 @@ public class AddController extends BaseController {
     public ModelAndView addWeakPrepare(@PathVariable Entity entity, @PathVariable String ownerId) throws PMException {
         final ModelAndView mav = addPrepare(entity);
         if (entity.isWeak()) {
-            mav.addObject("ownerId", ownerId);
+            getContext().getEntityInstance().setOwnerId(ownerId);
         }
         return mav;
     }
