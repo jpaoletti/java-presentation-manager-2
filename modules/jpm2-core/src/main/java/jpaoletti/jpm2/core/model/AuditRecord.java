@@ -33,6 +33,19 @@ public class AuditRecord implements Serializable {
     @Column(nullable = true)
     private String observations;
 
+    public AuditRecord() {
+    }
+
+    public AuditRecord(Long id, String username, String entity, String operation, String item, String observations) {
+        this.id = id;
+        this.username = username;
+        this.entity = entity;
+        this.operation = operation;
+        this.item = item;
+        this.observations = observations;
+        this.datetime = new Date();
+    }
+
     public Date getDatetime() {
         return datetime;
     }

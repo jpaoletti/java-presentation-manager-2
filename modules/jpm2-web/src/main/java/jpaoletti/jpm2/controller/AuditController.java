@@ -2,8 +2,6 @@ package jpaoletti.jpm2.controller;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
-import jpaoletti.jpm2.core.service.AuditService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,14 +15,11 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class AuditController extends BaseController {
 
-    @Autowired
-    private AuditService service;
-
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/itemAudit", method = RequestMethod.GET)
     public ModelAndView getItemAudit(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
         prepareItemOperation(entity, instanceId, "itemAudit");
         final ModelAndView mav = new ModelAndView("jpm-itemAudit");
-        mav.addObject("audits", getService().getItemRecords(instanceId));
+        mav.addObject("audits", getJpm().getAuditService().getItemRecords(entity, instanceId));
         return mav;
     }
 
@@ -32,15 +27,7 @@ public class AuditController extends BaseController {
     public ModelAndView getGeneralAudit(@PathVariable Entity entity) throws PMException {
         prepareItemOperation(entity, null, "generalAudit");
         final ModelAndView mav = new ModelAndView("jpm-generalAudit");
-        mav.addObject("audits", getService().getGeneralRecords());
+        mav.addObject("audits", getJpm().getAuditService().getGeneralRecords(entity));
         return mav;
-    }
-
-    public AuditService getService() {
-        return service;
-    }
-
-    public void setService(AuditService service) {
-        this.service = service;
     }
 }

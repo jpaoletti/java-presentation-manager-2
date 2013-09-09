@@ -6,13 +6,11 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.BCrypt;
 import jpaoletti.jpm2.core.security.User;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author jpaoletti
  */
-@Service
 public final class SecurityServiceImpl extends JPMServiceBase implements SecurityService {
 
     @Override
@@ -24,7 +22,7 @@ public final class SecurityServiceImpl extends JPMServiceBase implements Securit
         preExecute(operation, user);
         entity.getDao().update(user);
         postExecute(operation);
-        getJpm().audit();
+        getJpm().audit(getContext());
         return user;
     }
 }

@@ -26,7 +26,7 @@ public class PresentationManager {
     private String cssMode;
     private AuditService auditService;
     private CustomLoader customLoader;
-    @Autowired
+    @Autowired(required = false)
     private Map<String, Entity> entities;
     //private Map<Object, Monitor> monitors;
     private List<ClassConverter> classConverters;
@@ -200,15 +200,15 @@ public class PresentationManager {
         this.auditService = auditService;
     }
 
-    public void audit() {
+    public void audit(JPMContext context) {
         if (getAuditService() != null) {
-            getAuditService().register();
+            getAuditService().register(context);
         }
     }
 
-    public void audit(String s) {
+    public void audit(JPMContext context, String s) {
         if (getAuditService() != null) {
-            getAuditService().register(s);
+            getAuditService().register(context, s);
         }
     }
 }

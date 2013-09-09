@@ -92,7 +92,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         preExecute(operation, object);
         entity.getDao().update(object);
         postExecute(operation);
-        getJpm().audit();
+        getJpm().audit(getContext());
         return object;
     }
 
@@ -103,7 +103,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         preExecute(operation, object);
         entity.getDao().delete(object);
         postExecute(operation);
-        getJpm().audit();
+        getJpm().audit(getContext());
     }
 
     @Override
@@ -127,7 +127,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         preExecute(operation, object);
         entity.getDao().save(object);
         postExecute(operation);
-        getJpm().audit();
+        getJpm().audit(getContext());
         return entity.getDao().getId(object).toString();
     }
 
@@ -141,7 +141,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         entity.getDao().save(object);
         postExecute(operation);
         getContext().setObject(object);
-        getJpm().audit();
+        getJpm().audit(getContext());
         return entity.getDao().getId(object).toString();
     }
 }

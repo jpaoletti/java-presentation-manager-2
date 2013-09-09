@@ -6,35 +6,32 @@ import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.dao.AuditDAO;
 import jpaoletti.jpm2.core.model.AuditRecord;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author jpaoletti
  */
-@Service
 public class AuditServiceDatabase extends PMCoreObject implements AuditService {
 
-    @Autowired
-    private JPMContext context;
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
-    @Autowired
+    @Autowired(required = false)
     private AuditDAO dao;
 
     @Override
-    public void register(String observations) {
-        if (getContext().getEntity() != null && !getContext().getEntity().isAuditable()) {
+    public void register(JPMContext context, String observations) {
+        if (context.getEntity() != null && !context.getEntity().isAuditable()) {
             return;
         }
-        if (getContext().getOperation() != null && !getContext().getOperation().isAuditable()) {
+        if (context.getOperation() != null && !context.getOperation().isAuditable()) {
             return;
         }
         try {
@@ -44,56 +41,50 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
                 record.setUsername((getUserDetails()).getUsername());
             }
 
-            if (getContext().getEntity() != null) {
-                record.setEntity(getContext().getEntity().getId());
-                if (getContext().getObject() != null) {
-                    record.setItem(getContext().getEntity().getDao().getId(getContext().getObject()).toString());
+            if (context.getEntity() != null) {
+                record.setEntity(context.getEntity().getId());
+                if (context.getObject() != null) {
+                    record.setItem(context.getEntity().getDao().getId(context.getObject()).toString());
                 }
             }
 
-            if (getContext().getOperation() != null) {
-                record.setOperation(getContext().getOperation().getId());
+            if (context.getOperation() != null) {
+                record.setOperation(context.getOperation().getId());
             }
 
             if (observations != null && !observations.equals("")) {
                 record.setObservations(observations);
             } else {
-                if (getContext().getObject() != null) {
-                    record.setObservations(getContext().getObject().toString());
+                if (context.getObject() != null) {
+                    record.setObservations(context.getObject().toString());
                 }
             }
-            getSessionFactory().getCurrentSession().save(record);
+            if (getSessionFactory() != null) {
+                getSessionFactory().getCurrentSession().save(record);
+            }
         } catch (Exception ex) {
             JPMUtils.getLogger().error(ex);
         }
     }
 
-    public JPMContext getContext() {
-        return context;
-    }
-
-    public void setContext(JPMContext context) {
-        this.context = context;
+    @Override
+    public void register(JPMContext context) {
+        register(context, null);
     }
 
     @Override
-    public void register() {
-        register("");
-    }
-
-    @Override
-    public List<AuditRecord> getItemRecords(String instanceId) {
+    public List<AuditRecord> getItemRecords(Entity entity, String instanceId) {
         return getDao().list(
                 Order.desc("id"),
-                Restrictions.eq("entity", getContext().getEntity().getId()),
+                Restrictions.eq("entity", entity.getId()),
                 Restrictions.eq("item", instanceId));
     }
 
     @Override
-    public List<AuditRecord> getGeneralRecords() {
+    public List<AuditRecord> getGeneralRecords(Entity entity) {
         return getDao().list(
                 Order.desc("id"),
-                Restrictions.eq("entity", getContext().getEntity().getId()),
+                Restrictions.eq("entity", entity.getId()),
                 Restrictions.or(Restrictions.isNull("item"), Restrictions.eq("operation", "delete")));
     }
 

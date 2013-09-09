@@ -19,7 +19,7 @@ public class LoginController extends BaseController {
         final ModelAndView result = new ModelAndView("login");
         if (error != null) {
             result.addObject("error", error);
-            getJpm().audit("Login error: " + error);
+            getJpm().audit(getContext(), "Login error: " + error);
         }
         return result;
     }
