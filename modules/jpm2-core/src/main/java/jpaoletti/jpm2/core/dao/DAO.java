@@ -22,9 +22,6 @@ public interface DAO<T, ID extends Serializable> {
 
     public ID getId(Object object);
 
-    /**
-     * Retorna una lista con un solo ordenamiento.
-     */
     public List<T> list(Integer from, Integer max, Order order, Criterion... restrictions);
 
     public void save(Object object);
