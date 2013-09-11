@@ -3,7 +3,7 @@
     <ul>
         <li id="menu-home"><a href="${cp}index"><i class="glyphicon glyphicon-home"></i> <span><spring:message code="jpm.index.home" text="Home" /></span></a></li>
             <security:authorize ifAnyGranted="ROLE_DEVELOPER">
-            <li id="menu-status"><a href="jpmStatus"><i class="glyphicon glyphicon-cog"></i> <span><spring:message code="jpm.menu.status" text="Status" /></span></a></li>
+            <li id="menu-status"><a href="${cp}jpm"><i class="glyphicon glyphicon-cog"></i> <span><spring:message code="jpm.menu.status" text="Status" /></span></a></li>
             </security:authorize>
         <li id="menu-jpm-entity-test">
             <a href="${cp}jpm/jpm-entity-test"><i class="glyphicon glyphicon-th-list"></i><spring:message code="jpm.entity.title.test" text="Test Entity" /></a>
