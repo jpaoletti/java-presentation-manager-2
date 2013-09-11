@@ -206,5 +206,14 @@
                 </bean>
             </list>
         </property>
+        <property name="defaultSearchs">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.SearchDefinition">
+                    <constructor-arg value="bool" />
+                    <constructor-arg value="value" />
+                    <constructor-arg value="true" />
+                </bean>
+            </list>
+        </property>
     </bean>
 </beans>

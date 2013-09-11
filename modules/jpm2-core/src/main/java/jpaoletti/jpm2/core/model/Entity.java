@@ -33,6 +33,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private List<PanelRow> panels;
     private List<Operation> operations;
     private Map<String, Field> fieldsbyid;
+    private List<SearchDefinition> defaultSearchs;
 
     public Entity() {
         super();
@@ -500,5 +501,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setHome(String home) {
         this.home = home;
+    }
+
+    public List<SearchDefinition> getDefaultSearchs() {
+        return defaultSearchs;
+    }
+
+    public void setDefaultSearchs(List<SearchDefinition> defaultSearchs) {
+        this.defaultSearchs = defaultSearchs;
     }
 }

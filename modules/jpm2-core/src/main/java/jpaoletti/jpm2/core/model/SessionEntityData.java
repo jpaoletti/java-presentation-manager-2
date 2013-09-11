@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.model;
 
 import java.io.Serializable;
+import org.hibernate.criterion.Criterion;
 
 /**
  *
@@ -17,6 +18,13 @@ public class SessionEntityData implements Serializable {
     public SessionEntityData(Entity entity) {
         this.entity = entity;
         this.searchCriteria = new SearchCriteria();
+        if (entity.getDefaultSearchs() != null) {
+            for (SearchDefinition sd : entity.getDefaultSearchs()) {
+                final Field field = entity.getFieldById(sd.getFieldId());
+                final Criterion build = field.getSearcher().build(field, sd.getParameters());
+                searchCriteria.addDefinition(sd.getFieldId(), build);
+            }
+        }
         this.sort = new ListSort();
     }
 
