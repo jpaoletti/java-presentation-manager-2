@@ -45,12 +45,12 @@ public class ListController extends BaseController {
     public ObjectConverterData listObject(
             @PathVariable Entity entity,
             @RequestParam String textField,
+            @RequestParam(required = false, defaultValue = "false") boolean useToString,
             @RequestParam(required = false) String ownerId,
             @RequestParam(required = false) String filter,
             @RequestParam(required = false) String query,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
-        final Field field = entity.getFieldById(textField);
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
         final List<Criterion> restrictions = new ArrayList<>();
@@ -61,6 +61,7 @@ public class ListController extends BaseController {
                 restrictions.add(c);
             }
         }
+        final Field field = entity.getFieldById(textField);
         restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
         final List list = entity.getDao().list((page - 1) * ps, ps, restrictions.toArray(new Criterion[restrictions.size()]));
         r.setMore(list.size() == ps);
@@ -68,7 +69,7 @@ public class ListController extends BaseController {
         for (Object object : list) {
             r.getResults().add(new ObjectConverterDataItem(
                     entity.getDao().getId(object).toString(),
-                    JPMUtils.get(object, field.getProperty()).toString()));
+                    (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
         }
         return r;
     }

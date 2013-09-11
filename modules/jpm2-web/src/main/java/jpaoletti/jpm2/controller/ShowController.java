@@ -33,11 +33,15 @@ public final class ShowController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
-            @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam String textField,
+            @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String textField,
             @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
-        final Field field = entity.getFieldById(textField);
         final Object object = getService().get(entity, instanceId);
-        return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
+        if (textField != null) {
+            final Field field = entity.getFieldById(textField);
+            return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
+        } else {
+            return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), object.toString());
+        }
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/show.json", method = RequestMethod.GET, headers = "Accept=application/json")
