@@ -75,7 +75,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             }
         }
         pl.getContents().load(list, entity, operation);
-        for (Field field : entity.getAllFields()) {
+        for (Field field : entity.getOrderedFields()) {
             if (field.getSearcher() != null) {
                 pl.getFieldSearchs().put(field, field.getSearcher().visualization());
             }

@@ -24,7 +24,7 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
     }
 
     public void load(final List objects, Entity entity, Operation operation) throws PMException {
-        for (Field field : entity.getAllFields()) {
+        for (Field field : entity.getOrderedFields()) {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 getFields().add(field);

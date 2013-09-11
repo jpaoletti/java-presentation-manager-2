@@ -42,7 +42,7 @@ public class EntityInstance {
         values = new LinkedHashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
-        for (Field field : entity.getAllFields()) {
+        for (Field field : entity.getOrderedFields()) {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 try {
