@@ -16,7 +16,7 @@ public class WebShowDateTime extends WebToString {
         final Date value = (Date) getValue(object, field);
         if (value != null) {
             final DateTime dt = new DateTime(value);
-            return wrap(process(dt.toString(getConfig("format", "yyyy-MM-dd"))));
+            return wrap(field, process(dt.toString(getConfig("format", "yyyy-MM-dd"))));
         } else {
             return "-";
         }

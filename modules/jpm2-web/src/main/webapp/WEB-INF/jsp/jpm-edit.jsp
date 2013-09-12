@@ -52,11 +52,7 @@
             <%@include  file="inc/default-javascript.jsp" %>
             <script type="text/javascript">
                 jpmLoad(function() {
-                    $(".help-block:empty").remove();
-                    $(".to-string").each(function() {
-                        var v = $(this).html();
-                        $(this).html("<input disabled class='form-control' type='text' value='" + v + "' />");
-                    });
+                    jpmLoad(wrapToString);
                 });
             </script>
     </body>

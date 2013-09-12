@@ -2,6 +2,13 @@ String.prototype.trim = function() {
     return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
 };
 
+var wrapToString = function() {
+    $(".to-string").each(function() {
+        var v = $(this).html();
+        $(this).html("<input disabled class='form-control' type='text' value='" + v + "' style='text-align:" + $(this).attr("data-align") + "' />");
+    });
+};
+
 var delay = (function() {
     var timer = 0;
     return function(callback, ms) {
