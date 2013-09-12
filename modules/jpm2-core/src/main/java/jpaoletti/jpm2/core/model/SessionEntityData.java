@@ -26,6 +26,12 @@ public class SessionEntityData implements Serializable {
             }
         }
         this.sort = new ListSort();
+        if (entity.getDefaultSortField() != null) {
+            this.sort.set(entity.getFieldById(entity.getDefaultSortField()));
+            if (entity.getDefaultSortDirection() != null) {
+                this.sort.setDirection(entity.getDefaultSortDirection());
+            }
+        }
     }
 
     public Entity getEntity() {

@@ -14,6 +14,8 @@
         <property name="dao" ref="jpm-dao-test" />
         <property name="order" value="id string integer bool" />
         <property name="countable" value="false" />
+        <property name="defaultSortField" value="id" />
+        <property name="defaultSortDirection" value="DESC" />
         <property name="operations" >
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">

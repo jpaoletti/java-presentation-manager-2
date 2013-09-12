@@ -34,6 +34,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private List<Operation> operations;
     private Map<String, Field> fieldsbyid;
     private List<SearchDefinition> defaultSearchs;
+    private String defaultSortField;
+    private ListSort.SortDirection defaultSortDirection;
 
     public Entity() {
         super();
@@ -509,5 +511,21 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setDefaultSearchs(List<SearchDefinition> defaultSearchs) {
         this.defaultSearchs = defaultSearchs;
+    }
+
+    public String getDefaultSortField() {
+        return defaultSortField;
+    }
+
+    public void setDefaultSortField(String defaultSortField) {
+        this.defaultSortField = defaultSortField;
+    }
+
+    public ListSort.SortDirection getDefaultSortDirection() {
+        return defaultSortDirection;
+    }
+
+    public void setDefaultSortDirection(ListSort.SortDirection defaultSortDirection) {
+        this.defaultSortDirection = defaultSortDirection;
     }
 }
