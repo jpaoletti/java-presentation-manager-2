@@ -1,7 +1,9 @@
-package jpaoletti.jpm2.controller;
+package jpaoletti.jpm2.web.controller;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.service.SecurityService;
 import jpaoletti.jpm2.core.security.User;
@@ -19,18 +21,17 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class SecurityController extends BaseController {
 
+    public static final String OP_RESET_PASSWORD = "resetPassword";
     @Autowired
     private SecurityService securityService;
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/resetPassword")
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_RESET_PASSWORD)
     public ModelAndView resetPassword(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        final Operation operation = entity.getOperation("resetPassword");
-        getContext().setEntity(entity);
-        getContext().setOperation(operation);
-        getContext().setEntityInstance(newEntityInstance(instanceId, entity));
+        final Operation operation = entity.getOperation(OP_RESET_PASSWORD);
+        getContext().set(entity, operation);
         final User user = getSecurityService().resetPassword(entity, operation, instanceId);
-        getContext().setObject(user);
-        return new ModelAndView("jpm-resetPassword");
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(instanceId, user), entity, operation));
+        return new ModelAndView("jpm-" + OP_RESET_PASSWORD);
     }
 
     public SecurityService getSecurityService() {

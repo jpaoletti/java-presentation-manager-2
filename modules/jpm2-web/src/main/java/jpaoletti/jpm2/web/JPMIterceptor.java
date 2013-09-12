@@ -2,7 +2,7 @@ package jpaoletti.jpm2.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import jpaoletti.jpm2.controller.BaseController;
+import jpaoletti.jpm2.web.controller.BaseController;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
@@ -39,14 +39,14 @@ public class JPMIterceptor implements HandlerInterceptor {
                         mav.addObject("generalOperations", entity.getOperationsFor(null, operation, OperationScope.GENERAL));
                         mav.addObject("selectedOperations", entity.getOperationsFor(null, operation, OperationScope.SELECTED));
                     }
-                    final Object object = ctx.getObject();
-                    if (object != null) {
-                        mav.addObject("object", object);
-                        if (operation != null) {
-                            mav.addObject("itemOperations", entity.getOperationsFor(object, operation, OperationScope.ITEM));
-                        }
-                    }
                     if (ctx.getEntityInstance() != null) {
+                        final Object object = ctx.getEntityInstance().getIobject().getObject();
+                        if (object != null) {
+                            mav.addObject("object", object);
+                            if (operation != null) {
+                                mav.addObject("itemOperations", entity.getOperationsFor(object, operation, OperationScope.ITEM));
+                            }
+                        }
                         mav.addObject("instance", ctx.getEntityInstance());
                         if (entity.isWeak()) {
                             mav.addObject("owner", ctx.getEntityInstance().getOwner());

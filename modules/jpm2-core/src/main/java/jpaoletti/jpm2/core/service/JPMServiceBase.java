@@ -31,7 +31,7 @@ public class JPMServiceBase {
     private PresentationManager jpm;
 
     protected void processFields(Entity entity, Operation operation, Object object, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
-        preConversion(operation);
+        preConversion(operation, object);
         for (Map.Entry<String, Object> entry : entityInstance.getValues().entrySet()) {
             final String[] param = parameters.get("field_" + entry.getKey());
             final Object newValue = param == null ? null : (param.length == 1 ? param[0] : param);
@@ -57,9 +57,9 @@ public class JPMServiceBase {
         }
     }
 
-    public void preConversion(Operation operation) throws PMException {
+    public void preConversion(Operation operation, Object object) throws PMException {
         if (operation.getContext() != null) {
-            operation.getContext().preConversion();
+            operation.getContext().preConversion(object);
         }
     }
 
@@ -68,13 +68,13 @@ public class JPMServiceBase {
             operation.getValidator().validate(object);
         }
         if (operation.getContext() != null) {
-            operation.getContext().preExecute();
+            operation.getContext().preExecute(object);
         }
     }
 
-    public void postExecute(Operation operation) throws PMException {
+    public void postExecute(Operation operation, Object object) throws PMException {
         if (operation.getContext() != null) {
-            operation.getContext().postExecute();
+            operation.getContext().postExecute(object);
         }
     }
 

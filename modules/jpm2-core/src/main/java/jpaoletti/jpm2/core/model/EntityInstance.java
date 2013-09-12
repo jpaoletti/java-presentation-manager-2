@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.core.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,7 +16,7 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class EntityInstance {
 
-    private Serializable id; //Current intstance Id
+    private IdentifiedObject iobject;
     private Entity owner;
     private String ownerId;
     private List<Operation> operations; //Individual operations
@@ -27,18 +26,27 @@ public class EntityInstance {
     /**
      * Used for lists.
      */
-    public EntityInstance(Serializable id, List<Field> fields, List<Operation> operations) throws PMException {
+    public EntityInstance(IdentifiedObject iobject, List<Field> fields, List<Operation> operations) throws PMException {
+        this.iobject = iobject;
         this.values = new LinkedHashMap<>();
         this.operations = operations;
         this.fields = fields;
-        this.id = id;
     }
 
     /**
      * Used for single instance operations.
      */
-    public EntityInstance(Serializable id, Entity entity, Operation operation, Object object) throws PMException {
-        this.id = id;
+    public EntityInstance(Entity entity, Operation operation) throws PMException {
+        this(null, entity, operation);
+    }
+
+    /**
+     * Used for single instance operations.
+     */
+    public EntityInstance(IdentifiedObject iobject, Entity entity, Operation operation) throws PMException {
+        this.iobject = iobject;
+        final Object object = (iobject != null) ? iobject.getObject() : null;
+        final String id = (iobject != null) ? iobject.getId() : null;
         values = new LinkedHashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
@@ -46,18 +54,20 @@ public class EntityInstance {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 try {
-                    values.put(field.getId(), converter.visualize(field, object, (id != null) ? id.toString() : null));
+                    values.put(field.getId(), converter.visualize(field, object, id));
                     fields.add(field);
                 } catch (IgnoreConvertionException ex) {
                 }
             }
         }
-        operations = entity.getOperationsFor(object, operation, OperationScope.ITEM);
-        if (entity.isWeak() && object != null) {
-            this.owner = entity.getOwner().getOwner();
-            final Object ownerobject = JPMUtils.get(object, entity.getOwner().getLocalProperty());
-            if (ownerobject != null) {
-                this.ownerId = getOwner().getDao().getId(ownerobject).toString();
+        if (object != null) {
+            operations = entity.getOperationsFor(object, operation, OperationScope.ITEM);
+            if (entity.isWeak()) {
+                this.owner = entity.getOwner().getOwner();
+                final Object ownerobject = JPMUtils.get(object, entity.getOwner().getLocalProperty());
+                if (ownerobject != null) {
+                    this.ownerId = getOwner().getDao().getId(ownerobject).toString();
+                }
             }
         }
     }
@@ -74,12 +84,12 @@ public class EntityInstance {
         return values;
     }
 
-    public Serializable getId() {
-        return id;
+    public IdentifiedObject getIobject() {
+        return iobject;
     }
 
-    public void setId(Serializable id) {
-        this.id = id;
+    public void setIobject(IdentifiedObject iobject) {
+        this.iobject = iobject;
     }
 
     public final Entity getOwner() {
@@ -96,5 +106,9 @@ public class EntityInstance {
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getId() {
+        return (getIobject() != null) ? getIobject().getId() : "?";
     }
 }

@@ -54,16 +54,6 @@ public class JPMContextImpl implements JPMContext {
     }
 
     @Override
-    public Object getObject() {
-        return object;
-    }
-
-    @Override
-    public void setObject(Object object) {
-        this.object = object;
-    }
-
-    @Override
     public EntityInstance getEntityInstance() {
         return entityInstance;
     }
@@ -97,5 +87,11 @@ public class JPMContextImpl implements JPMContext {
 
     public void setEntityMessages(List<Message> entityMessages) {
         this.entityMessages = entityMessages;
+    }
+
+    @Override
+    public void set(Entity entity, Operation operation) {
+        this.entity = entity;
+        this.operation = operation;
     }
 }

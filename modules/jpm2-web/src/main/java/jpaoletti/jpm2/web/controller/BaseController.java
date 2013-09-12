@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.controller;
+package jpaoletti.jpm2.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.NotAuthorizedException;
-import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
+import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +69,6 @@ public class BaseController {
         return (SessionEntityData) getSession().getAttribute(entity.getId());
     }
 
-    protected EntityInstance newEntityInstance(String instanceId, Entity entity) throws PMException {
-        return new EntityInstance(instanceId, entity, getContext().getOperation(), getContext().getObject());
-    }
-
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ModelAndView handleTypeMismatchException(MissingServletRequestParameterException ex, HttpServletRequest req, HttpServletResponse resp) {
         JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
@@ -94,15 +92,6 @@ public class BaseController {
 
     public void setCurrentHome(String newHome) {
         getSession().setAttribute(CURRENT_HOME, newHome);
-    }
-
-    protected void prepareItemOperation(Entity entity, String instanceId, String operationId) throws PMException {
-        getContext().setEntity(entity);
-        getContext().setOperation(entity.getOperation(operationId));
-        if (instanceId != null) {
-            getContext().setObject(entity.getDao().get(instanceId));
-            getContext().setEntityInstance(newEntityInstance(instanceId, entity));
-        }
     }
 
     /**
@@ -162,5 +151,19 @@ public class BaseController {
 
     public void setMessageSource(MessageSource messageSource) {
         this.messageSource = messageSource;
+    }
+
+    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) {
+        final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
+        final Operation nextOp = entity.getOperation(nextOpId);
+        if (OperationScope.ITEM.is(nextOp.getScope())) {
+            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/" + nextOp);
+        } else {
+            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + nextOp);
+        }
+    }
+
+    protected JPMService getService() {
+        return getJpm().getService();
     }
 }

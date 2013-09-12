@@ -45,6 +45,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
                     <property name="scope" value="general" />
+                    <property name="follows" value="list" />
                     <property name="context">
                         <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
                     </property>

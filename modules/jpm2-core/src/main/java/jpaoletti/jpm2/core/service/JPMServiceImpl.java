@@ -7,19 +7,18 @@ import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author jpaoletti
  */
-@Service
 public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     /**
@@ -35,7 +34,6 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final List list = weak.getDao().list(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
         final PaginatedList pl = new PaginatedList();
         getContext().setEntity(entity);
-        getContext().setObject(owner);
         pl.setTotal((long) list.size());
         pl.getContents().load(list, weak, weak.getOperation("list"));
         return pl;
@@ -85,63 +83,65 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     @Override
-    public Object update(Entity entity, Operation operation, String instanceId, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
-        final Object object = entity.getDao().get(instanceId); //current object
-        getContext().setObject(object);
-        processFields(entity, operation, object, entityInstance, parameters);
+    public IdentifiedObject update(Entity entity, Operation operation, EntityInstance instance, Map<String, String[]> parameters) throws PMException {
+        final String instanceId = instance.getIobject().getId();
+        final Object object = entity.getDao().get(instanceId);
+        instance.getIobject().setObject(object);
+        processFields(entity, operation, object, instance, parameters);
         preExecute(operation, object);
         entity.getDao().update(object);
-        postExecute(operation);
-        getJpm().audit(getContext());
-        return object;
+        postExecute(operation, object);
+        getJpm().audit(entity, operation, instance.getIobject());
+        return new IdentifiedObject(instanceId, object);
     }
 
     @Override
-    public void delete(Entity entity, Operation operation, String instanceId) throws PMException {
+    public IdentifiedObject delete(Entity entity, Operation operation, String instanceId) throws PMException {
         final Object object = entity.getDao().get(instanceId); //current object
-        getContext().setObject(object);
         preExecute(operation, object);
         entity.getDao().delete(object);
-        postExecute(operation);
-        getJpm().audit(getContext());
+        postExecute(operation, object);
+        final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
+        getJpm().audit(entity, operation, iobject);
+        return iobject;
     }
 
     @Override
-    public Object get(Entity entity, Operation operation, String instanceId) throws PMException {
+    public IdentifiedObject get(Entity entity, Operation operation, String instanceId) throws PMException {
         preExecute(operation, null);
         final Object object = entity.getDao().get(instanceId); //current object
-        postExecute(operation);
-        return object;
+        postExecute(operation, object);
+        return new IdentifiedObject(instanceId, object);
     }
 
     @Override
-    public Object get(Entity entity, String instanceId) throws PMException {
-        return entity.getDao().get(instanceId);
+    public IdentifiedObject get(Entity entity, String instanceId) throws PMException {
+        return new IdentifiedObject(instanceId, entity.getDao().get(instanceId));
     }
 
     @Override
-    public String save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
+    public IdentifiedObject save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object object = JPMUtils.newInstance(entity.getClazz());
         processFields(entity, operation, object, entityInstance, parameters);
-        getContext().setObject(object);
         preExecute(operation, object);
         entity.getDao().save(object);
-        postExecute(operation);
-        getJpm().audit(getContext());
-        return entity.getDao().getId(object).toString();
+        postExecute(operation, object);
+        final String instanceId = entity.getDao().getId(object).toString();
+        final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
+        getJpm().audit(entity, operation, iobject);
+        return iobject;
     }
 
     @Override
-    public String save(Entity owner, String ownerId, Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
+    public IdentifiedObject save(Entity owner, String ownerId, Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object ownerObject = owner.getDao().get(ownerId);
         final Object object = JPMUtils.newInstance(entity.getClazz());
         JPMUtils.set(object, entity.getOwner().getLocalProperty(), ownerObject);
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao().save(object);
-        postExecute(operation);
-        getContext().setObject(object);
-        getJpm().audit(getContext());
-        return entity.getDao().getId(object).toString();
+        postExecute(operation, object);
+        final String instanceId = entity.getDao().getId(object).toString();
+        return new IdentifiedObject(instanceId, object);
     }
 }

@@ -2,11 +2,12 @@ package jpaoletti.jpm2.core.service;
 
 import java.util.Date;
 import java.util.List;
-import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.dao.AuditDAO;
 import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
+import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -27,11 +28,11 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     private AuditDAO dao;
 
     @Override
-    public void register(JPMContext context, String observations) {
-        if (context.getEntity() != null && !context.getEntity().isAuditable()) {
+    public void register(Entity entity, Operation operation, IdentifiedObject iobject, String observations) {
+        if (entity != null && !entity.isAuditable()) {
             return;
         }
-        if (context.getOperation() != null && !context.getOperation().isAuditable()) {
+        if (operation != null && !operation.isAuditable()) {
             return;
         }
         try {
@@ -40,23 +41,22 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
             if (getAuthentication() != null && getAuthentication().getPrincipal() != null) {
                 record.setUsername((getUserDetails()).getUsername());
             }
-
-            if (context.getEntity() != null) {
-                record.setEntity(context.getEntity().getId());
-                if (context.getObject() != null) {
-                    record.setItem(context.getEntity().getDao().getId(context.getObject()).toString());
+            if (entity != null) {
+                record.setEntity(entity.getId());
+                if (iobject != null) {
+                    record.setItem(iobject.getId());
                 }
             }
 
-            if (context.getOperation() != null) {
-                record.setOperation(context.getOperation().getId());
+            if (operation != null) {
+                record.setOperation(operation.getId());
             }
 
             if (observations != null && !observations.equals("")) {
                 record.setObservations(observations);
             } else {
-                if (context.getObject() != null) {
-                    record.setObservations(context.getObject().toString());
+                if (iobject != null) {
+                    record.setObservations(String.valueOf(iobject.getObject()));
                 }
             }
             if (getSessionFactory() != null) {
@@ -68,8 +68,8 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     }
 
     @Override
-    public void register(JPMContext context) {
-        register(context, null);
+    public void register(Entity entity, Operation operation, IdentifiedObject iobject) {
+        register(entity, operation, iobject, null);
     }
 
     @Override

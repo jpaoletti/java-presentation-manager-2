@@ -33,7 +33,8 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
         }
         for (Object object : objects) {
             final Serializable instanceId = entity.getDao().getId(object);
-            final EntityInstance instance = new EntityInstance(instanceId, getFields(), entity.getOperationsFor(object, operation, OperationScope.ITEM));
+            final IdentifiedObject iobject = new IdentifiedObject(String.valueOf(instanceId), object);
+            final EntityInstance instance = new EntityInstance(iobject, getFields(), entity.getOperationsFor(object, operation, OperationScope.ITEM));
             for (Field field : getFields()) {
                 try {
                     instance.getValues().put(field.getId(), getConverters().get(field.getId()).visualize(field, object, (instanceId != null) ? instanceId.toString() : null));

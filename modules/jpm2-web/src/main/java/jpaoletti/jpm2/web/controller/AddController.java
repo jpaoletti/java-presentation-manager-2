@@ -1,13 +1,12 @@
-package jpaoletti.jpm2.controller;
+package jpaoletti.jpm2.web.controller;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
-import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class AddController extends BaseController {
 
-    @Autowired
-    private JPMService service;
+    public static final String OP_ADD = "add";
 
     /**
      * GET method prepares form.
@@ -31,13 +29,13 @@ public class AddController extends BaseController {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/add", method = RequestMethod.GET)
+    @RequestMapping(value = "/jpm/{entity}/" + OP_ADD, method = RequestMethod.GET)
     public ModelAndView addPrepare(@PathVariable Entity entity) throws PMException {
-        getContext().setEntity(entity);
-        getContext().setOperation(entity.getOperation("add"));
-        getContext().setObject(JPMUtils.newInstance(entity.getClazz()));
-        getContext().setEntityInstance(newEntityInstance(null, entity));
-        return new ModelAndView("jpm-edit");
+        final Operation operation = entity.getOperation(OP_ADD);
+        getContext().set(entity, operation);
+        final Object object = JPMUtils.newInstance(entity.getClazz());
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation));
+        return new ModelAndView("jpm-" + EditController.OP_EDIT);
     }
 
     /**
@@ -47,7 +45,7 @@ public class AddController extends BaseController {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/add", method = RequestMethod.GET)
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/" + OP_ADD, method = RequestMethod.GET)
     public ModelAndView addWeakPrepare(@PathVariable Entity entity, @PathVariable String ownerId) throws PMException {
         final ModelAndView mav = addPrepare(entity);
         if (entity.isWeak()) {
@@ -63,16 +61,15 @@ public class AddController extends BaseController {
      * @return redirect to show
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/jpm/{entity}/" + OP_ADD, method = RequestMethod.POST)
     public ModelAndView addCommit(@PathVariable Entity entity) throws PMException {
-        final Operation operation = entity.getOperation("add");
-        getContext().setEntity(entity);
-        getContext().setOperation(operation);
+        final Operation operation = entity.getOperation(OP_ADD);
+        getContext().set(entity, operation);
         try {
-            final String instanceId = getService().save(entity, operation,
-                    new EntityInstance(null, entity, operation, null),
+            final IdentifiedObject newObject = getService().save(entity, operation,
+                    new EntityInstance(entity, operation),
                     getRequest().getParameterMap());
-            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
+            return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
@@ -95,23 +92,15 @@ public class AddController extends BaseController {
             @PathVariable Entity entity) throws PMException {
         final Operation operation = entity.getOperation("add");
         try {
-            final String instanceId = getService().save(owner, ownerId, entity, operation,
-                    new EntityInstance(null, entity, operation, null),
+            final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation,
+                    new EntityInstance(entity, operation),
                     getRequest().getParameterMap());
-            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/show");
+            return next(entity, operation, newObject.getId(), "show");
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
             return addWeakPrepare(entity, ownerId);
         }
-    }
-
-    public JPMService getService() {
-        return service;
-    }
-
-    public void setService(JPMService service) {
-        this.service = service;
     }
 }

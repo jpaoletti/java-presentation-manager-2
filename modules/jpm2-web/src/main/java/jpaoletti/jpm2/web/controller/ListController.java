@@ -1,10 +1,9 @@
-package jpaoletti.jpm2.controller;
+package jpaoletti.jpm2.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.NotAuthorizedException;
-import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -35,10 +34,9 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ListController extends BaseController {
 
+    public static final String OP_LIST = "list";
     @Autowired
     private WebApplicationContext ctx;
-    @Autowired
-    private JPMService service;
 
     @RequestMapping(value = "/jpm/{entity}.json", method = RequestMethod.GET, headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
     @ResponseBody
@@ -119,10 +117,8 @@ public class ListController extends BaseController {
             @PathVariable Entity weak) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-list-weak");
         final PaginatedList weakList = getService().getWeakList(entity, instanceId, weak);
-        getContext().setEntity(weak);
-        getContext().setOperation(weak.getOperation("list"));
-        mav.addObject("entity", weak);
-        mav.addObject("operation", getContext().getOperation());
+        final Operation operation = weak.getOperation(OP_LIST);
+        getContext().set(weak, operation);
         mav.addObject("paginatedList", weakList);
         return mav;
     }
@@ -193,22 +189,11 @@ public class ListController extends BaseController {
         return getSessionEntityData(entity).getSearchCriteria().getCriterion();
     }
 
-    public JPMService getService() {
-        return service;
-    }
-
-    public void setService(JPMService service) {
-        this.service = service;
-    }
-
     protected ModelAndView generalList(Entity entity, Integer page, Integer pageSize, String ownerId) throws PMException {
-        final ModelAndView mav = new ModelAndView("jpm-list");
-        getContext().setEntity(entity);
-        getContext().setOperation(entity.getOperation("list"));
-        final Operation operation = getContext().getOperation();
+        final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
+        final Operation operation = entity.getOperation(OP_LIST);
+        getContext().set(entity, operation);
         final PaginatedList paginatedList = getService().getPaginatedList(entity, operation, getSessionEntityData(entity), page, pageSize, ownerId);
-        mav.addObject("entity", entity);
-        mav.addObject("operation", operation);
         mav.addObject("paginatedList", paginatedList);
         mav.addObject("generalOperations", entity.getOperationsFor(null, operation, OperationScope.GENERAL));
         mav.addObject("selectedOperations", entity.getOperationsFor(null, operation, OperationScope.SELECTED));

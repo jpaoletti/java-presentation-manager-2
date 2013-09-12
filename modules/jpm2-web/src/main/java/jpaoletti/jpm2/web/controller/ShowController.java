@@ -1,17 +1,18 @@
-package jpaoletti.jpm2.controller;
+package jpaoletti.jpm2.web.controller;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
+import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,15 +28,15 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public final class ShowController extends BaseController {
 
-    @Autowired
-    private JPMService service;
+    public static final String OP_SHOW = "show";
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
             @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String textField,
             @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
-        final Object object = getService().get(entity, instanceId);
+        final IdentifiedObject iobject = getService().get(entity, instanceId);
+        final Object object = iobject.getObject();
         if (textField != null) {
             final Field field = entity.getFieldById(textField);
             return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
@@ -47,14 +48,14 @@ public final class ShowController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/show.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public Map<String, Object> showJSON(@PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
-        getContext().setOperation(entity.getOperation("show"));
-        final Object object = getService().get(entity, getContext().getOperation(), instanceId);
-        getContext().setObject(object);
+        final Operation operation = entity.getOperation(OP_SHOW);
+        getContext().set(entity, operation);
+        final Object object = getService().get(entity, operation, instanceId).getObject();
         final Map<String, Object> values = new LinkedHashMap<>();
         final String[] fs = fields.split("[,]");
         for (String fid : fs) {
             final Field field = entity.getFieldById(fid);
-            final Converter converter = field.getConverter(getContext().getOperation());
+            final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 try {
                     values.put(field.getTitle(entity), converter.visualize(field, object, instanceId));
@@ -65,17 +66,14 @@ public final class ShowController extends BaseController {
         return values;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show", method = RequestMethod.GET)
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_SHOW, method = RequestMethod.GET)
     public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        prepareItemOperation(entity, instanceId, "show");
-        return new ModelAndView("jpm-show");
-    }
-
-    public JPMService getService() {
-        return service;
-    }
-
-    public void setService(JPMService service) {
-        this.service = service;
+        final Operation operation = entity.getOperation(OP_SHOW);
+        getContext().set(entity, operation);
+        if (instanceId != null) {
+            final IdentifiedObject iobject = getService().get(entity, operation, instanceId);
+            getContext().setEntityInstance(new EntityInstance(iobject, entity, operation));
+        }
+        return new ModelAndView("jpm-" + OP_SHOW);
     }
 }

@@ -17,7 +17,7 @@ public interface OperationContext {
      *
      * @throws PMException
      */
-    public void preConversion() throws PMException;
+    public void preConversion(Object object) throws PMException;
 
     /**
      * This method is executed before trying to execute the main method of the
@@ -25,12 +25,12 @@ public interface OperationContext {
      *
      * @throws PMException
      */
-    public void preExecute() throws PMException;
+    public void preExecute(Object object) throws PMException;
 
     /**
      * This method is executed after the main method of the operation.
      *
      * @throws PMException
      */
-    public void postExecute() throws PMException;
+    public void postExecute(Object object) throws PMException;
 }

@@ -1,9 +1,10 @@
 package jpaoletti.jpm2.core.service;
 
 import java.util.List;
-import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
+import jpaoletti.jpm2.core.model.Operation;
 
 /**
  * Audit system.
@@ -12,9 +13,9 @@ import jpaoletti.jpm2.core.model.Entity;
  */
 public interface AuditService {
 
-    public void register(JPMContext context, String observations);
+    public void register(Entity entity, Operation operation, IdentifiedObject iobject, String observations);
 
-    public void register(JPMContext context);
+    public void register(Entity entity, Operation operation, IdentifiedObject iobject);
 
     public List<AuditRecord> getItemRecords(Entity entity, String instanceId);
 

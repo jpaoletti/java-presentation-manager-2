@@ -7,8 +7,11 @@ import java.util.Map;
 import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
+import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PMSession;
 import jpaoletti.jpm2.core.service.AuditService;
+import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +28,7 @@ public class PresentationManager {
     private String contact;
     private String cssMode;
     private AuditService auditService;
+    private JPMService service;
     private CustomLoader customLoader;
     @Autowired(required = false)
     private Map<String, Entity> entities;
@@ -200,15 +204,27 @@ public class PresentationManager {
         this.auditService = auditService;
     }
 
-    public void audit(JPMContext context) {
+    public void audit(String s) {
+        audit(null, null, null, s);
+    }
+
+    public void audit(Entity entity, Operation operation, IdentifiedObject iobject) {
         if (getAuditService() != null) {
-            getAuditService().register(context);
+            getAuditService().register(entity, operation, iobject);
         }
     }
 
-    public void audit(JPMContext context, String s) {
+    public void audit(Entity entity, Operation operation, IdentifiedObject iobject, String s) {
         if (getAuditService() != null) {
-            getAuditService().register(context, s);
+            getAuditService().register(entity, operation, iobject, s);
         }
+    }
+
+    public JPMService getService() {
+        return service;
+    }
+
+    public void setService(JPMService service) {
+        this.service = service;
     }
 }

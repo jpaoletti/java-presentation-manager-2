@@ -22,19 +22,14 @@ public interface JPMContext {
 
     public void setEntity(Entity entity);
 
+    public void set(Entity entity, Operation operation);
+
     /**
      * Current operation.
      */
     public Operation getOperation();
 
     public void setOperation(Operation operation);
-
-    /**
-     * Current selected object. May be null.
-     */
-    public Object getObject();
-
-    public void setObject(Object object);
 
     public EntityInstance getEntityInstance();
 

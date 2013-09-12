@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.service;
 import java.util.UUID;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.BCrypt;
 import jpaoletti.jpm2.core.security.User;
@@ -21,8 +22,8 @@ public final class SecurityServiceImpl extends JPMServiceBase implements Securit
         user.setNewPassword(value);
         preExecute(operation, user);
         entity.getDao().update(user);
-        postExecute(operation);
-        getJpm().audit(getContext());
+        postExecute(operation, user);
+        getJpm().audit(entity, operation, new IdentifiedObject(instanceId, user));
         return user;
     }
 }

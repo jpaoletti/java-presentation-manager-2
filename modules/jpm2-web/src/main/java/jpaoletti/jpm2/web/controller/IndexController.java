@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.controller;
+package jpaoletti.jpm2.web.controller;
 
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import org.hibernate.criterion.Restrictions;

@@ -18,15 +18,15 @@ public class OperationContextSupport extends PMCoreObject implements OperationCo
     private JPMContext context;
 
     @Override
-    public void preConversion() throws PMException {
+    public void preConversion(Object object) throws PMException {
     }
 
     @Override
-    public void preExecute() throws PMException {
+    public void preExecute(Object object) throws PMException {
     }
 
     @Override
-    public void postExecute() throws PMException {
+    public void postExecute(Object object) throws PMException {
     }
 
     public JPMContext getContext() {

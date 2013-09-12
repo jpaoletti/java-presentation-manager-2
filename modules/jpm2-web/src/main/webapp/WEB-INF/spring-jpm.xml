@@ -10,6 +10,9 @@
         <property name="auditService">
             <bean class="jpaoletti.jpm2.core.service.AuditServiceDatabase" />
         </property>
+        <property name="service">
+            <bean class="jpaoletti.jpm2.core.service.JPMServiceImpl" />
+        </property>
     </bean>
     <bean id="securityService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
     <import resource="jpm-default-beans.xml" />

@@ -45,8 +45,12 @@
                                             <td>${jpm.cssMode}</td>
                                         </tr>
                                         <tr>
-                                            <th>auditService</th>
-                                            <td>${jpm.auditService}</td>
+                                            <th>Service</th>
+                                            <td>${jpm.service.class}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>AuditService</th>
+                                            <td>${jpm.auditService.class}</td>
                                         </tr>
                                     </table>
                                 </div>

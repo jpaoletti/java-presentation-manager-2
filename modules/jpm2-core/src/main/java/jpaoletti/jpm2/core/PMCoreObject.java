@@ -24,6 +24,8 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     @Autowired
     private MessageSource messageSource;
+    @Autowired
+    PresentationManager jpm;
     private Boolean debug;
 
     /**
@@ -106,5 +108,13 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
         } catch (NoSuchMessageException e) {
             return key;
         }
+    }
+
+    public PresentationManager getJpm() {
+        return jpm;
+    }
+
+    public void setJpm(PresentationManager jpm) {
+        this.jpm = jpm;
     }
 }
