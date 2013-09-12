@@ -101,10 +101,14 @@ public class Message {
     }
 
     public String getArguments() {
-        final StringBuilder sb = new StringBuilder();
-        for (String string : getArgs()) {
-            sb.append(string).append(";");
+        if (getArgs().length > 0) {
+            final StringBuilder sb = new StringBuilder();
+            for (String string : getArgs()) {
+                sb.append(string).append(";");
+            }
+            return sb.toString().substring(0, sb.toString().length() - 1);
+        } else {
+            return "";
         }
-        return sb.toString().substring(0, sb.toString().length() - 1);
     }
 }

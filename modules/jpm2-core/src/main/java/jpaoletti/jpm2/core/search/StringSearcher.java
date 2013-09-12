@@ -1,8 +1,8 @@
 package jpaoletti.jpm2.core.search;
 
 import java.util.Map;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Field;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
@@ -18,14 +18,16 @@ public class StringSearcher implements Searcher {
     }
 
     @Override
-    public Criterion build(Field field, Map<String, String[]> parameters) {
+    public DescribedCriterion build(Field field, Map<String, String[]> parameters) {
         final String value = parameters.get("value")[0];
         final String operator = ((String[]) parameters.get("operator"))[0];
         switch (operator) {
             case "li":
-                return Restrictions.like(field.getProperty(), value, MatchMode.ANYWHERE);
+                return new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.like", value),
+                        Restrictions.like(field.getProperty(), value, MatchMode.ANYWHERE));
             default:
-                return Restrictions.eq(field.getProperty(), value);
+                return new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.eq", value),
+                        Restrictions.eq(field.getProperty(), value));
         }
     }
 }

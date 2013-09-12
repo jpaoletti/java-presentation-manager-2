@@ -34,14 +34,18 @@
                                         </div>
                                         <div class="btn-group">
                                             <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
+                                                <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
+                                                <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />
                                                 <c:if test="${empty owner}">
-                                                    <a type="button" href="<c:url value='/jpm/${entity.id}/removeSearch?i=${st.index}' />" class="btn btn-default removeSearchBtn">
-                                                        ${d} <span class="glyphicon glyphicon-remove"></span>
+                                                    <a type="button" href="${cp}jpm/${entity.id}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
+                                                        "${fieldTitle}" ${text}
+                                                        <span class="glyphicon glyphicon-remove"></span>
                                                     </a>
                                                 </c:if>
                                                 <c:if test="${not empty owner}">
-                                                    <a type="button" href="<c:url value='/jpm/${owner.id}/${ownerId}/${entity.id}/removeSearch?i=${st.index}' />" class="btn btn-default removeSearchBtn">
-                                                        ${d} <span class="glyphicon glyphicon-remove"></span>
+                                                    <a type="button" href="${cp}jpm/${owner.id}/${ownerId}/${entity.id}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
+                                                        "${fieldTitle}" ${text}
+                                                        <span class="glyphicon glyphicon-remove"></span>
                                                     </a>
                                                 </c:if>
                                             </c:forEach>
@@ -225,7 +229,7 @@
                 //<c:forEach items="${paginatedList.fields}" var="f"><c:if test="${not empty f.align}">
                 $("td[data-field='${f.id}']").css("text-align", "${f.align}");
                 //</c:if><c:if test="${not empty f.width}">
-                $("[data-field='${f.id}']").css("width", "${f.width}");
+                $("td[data-field='${f.id}'], th[data-field='${f.id}']").css("width", "${f.width}");
                 //</c:if></c:forEach>
                 $(document).on("keypress", function(e) {
                     if (e.which === parseInt("<spring:message code='jpm.list.shortcut.search' text='102' />")) { //search 'f'

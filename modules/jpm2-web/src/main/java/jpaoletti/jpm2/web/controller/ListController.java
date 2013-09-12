@@ -11,6 +11,7 @@ import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.PaginatedList;
+import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
@@ -130,7 +131,7 @@ public class ListController extends BaseController {
             HttpServletRequest request) throws PMException {
         final Field field = entity.getFieldById(fieldId);
         if (field.getSearcher() != null) {
-            final Criterion build = field.getSearcher().build(field, request.getParameterMap());
+            final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
             getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
         return "redirect:/jpm/" + entity.getId() + "/";
@@ -145,7 +146,7 @@ public class ListController extends BaseController {
             HttpServletRequest request) throws PMException {
         final Field field = entity.getFieldById(fieldId);
         if (field.getSearcher() != null) {
-            final Criterion build = field.getSearcher().build(field, request.getParameterMap());
+            final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
             getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
         return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";

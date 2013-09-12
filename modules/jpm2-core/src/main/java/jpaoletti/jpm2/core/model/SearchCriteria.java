@@ -3,6 +3,9 @@ package jpaoletti.jpm2.core.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.search.Searcher;
+import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -11,7 +14,7 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author jpaoletti
  */
-public class SearchCriteria implements Serializable{
+public class SearchCriteria implements Serializable {
 
     private Criterion criterion; //Global criteria search, Something like Restrictions.and(... , ...)
     private List<SearchCriteriaField> definitions; //Individual criterias
@@ -31,9 +34,9 @@ public class SearchCriteria implements Serializable{
         return definitions;
     }
 
-    public void addDefinition(String fieldId, Criterion c) {
-        getDefinitions().add(new SearchCriteriaField(fieldId, c));
-        addCriterion(c);
+    public void addDefinition(String fieldId, Searcher.DescribedCriterion describedCriterion) {
+        getDefinitions().add(new SearchCriteriaField(fieldId, describedCriterion));
+        addCriterion(describedCriterion.getCriterion());
     }
 
     public void removeDefinition(Integer i) {
@@ -57,18 +60,12 @@ public class SearchCriteria implements Serializable{
 
         private String fieldId;
         private Criterion criterion;
+        private Message description;
 
-        public SearchCriteriaField() {
-        }
-
-        public SearchCriteriaField(String fieldId, Criterion criterion) {
+        public SearchCriteriaField(String fieldId, DescribedCriterion describedCriterion) {
             this.fieldId = fieldId;
-            this.criterion = criterion;
-        }
-
-        @Override
-        public String toString() {
-            return getCriterion().toString();
+            this.criterion = describedCriterion.getCriterion();
+            this.description = describedCriterion.getDescription();
         }
 
         public String getFieldId() {
@@ -85,6 +82,14 @@ public class SearchCriteria implements Serializable{
 
         public void setCriterion(Criterion criterion) {
             this.criterion = criterion;
+        }
+
+        public Message getDescription() {
+            return description;
+        }
+
+        public void setDescription(Message description) {
+            this.description = description;
         }
     }
 }

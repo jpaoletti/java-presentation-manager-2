@@ -1,7 +1,7 @@
 package jpaoletti.jpm2.core.model;
 
 import java.io.Serializable;
-import org.hibernate.criterion.Criterion;
+import jpaoletti.jpm2.core.search.Searcher;
 
 /**
  *
@@ -21,7 +21,7 @@ public class SessionEntityData implements Serializable {
         if (entity.getDefaultSearchs() != null) {
             for (SearchDefinition sd : entity.getDefaultSearchs()) {
                 final Field field = entity.getFieldById(sd.getFieldId());
-                final Criterion build = field.getSearcher().build(field, sd.getParameters());
+                final Searcher.DescribedCriterion build = field.getSearcher().build(field, sd.getParameters());
                 searchCriteria.addDefinition(sd.getFieldId(), build);
             }
         }
