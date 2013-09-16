@@ -4,6 +4,7 @@
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
+        <link href="${cp}static/css/bootstrap-editable.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
     </head>
     <body>
         <c:set var="entityName" value="${entity.title}" />
@@ -99,7 +100,7 @@
                                             <a
                                                 class="btn btn-mini btn-default confirm-${o.confirm}" 
                                                 title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                                href="<c:url value='/jpm/${entity.id}/${item.id}/${o.id}' />">
+                                                href="${cp}jpm/${entity.id}/${item.id}/${o.id}">
                                                 <i class="glyphicon jpmicon-${o.id}"></i>
                                             </a>
                                         </c:forEach>
@@ -193,6 +194,7 @@
         </div>
         <%@include  file="inc/footer.jsp" %>
         <%@include  file="inc/default-javascript.jsp" %>
+        <script type='text/javascript' src="${cp}static/js/bootstrap-editable.min.js?v=${jpm.appversion}" ></script>
         <script type="text/javascript">
             function openSearchModal(field) {
                 $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
@@ -203,6 +205,12 @@
             }
             var sorting = false;
             jpmLoad(function() {
+                $(".inline-edit").each(function() {
+                    $(this).editable({
+                        url: '${cp}jpm/${entity.id}/' + $(this).closest("tr").attr("data-id") + '/iledit',
+                        send: "always"
+                    });
+                });
                 $("#select_unselect_all").on("click", function() {
                     if ($(this).is(":checked")) {
                         $(".selectable").prop("checked", true);
@@ -232,6 +240,7 @@
                 $("td[data-field='${f.id}'], th[data-field='${f.id}']").css("width", "${f.width}");
                 //</c:if></c:forEach>
                 $(document).on("keypress", function(e) {
+                    if ($(e.target).closest("input")[0]) {return;}
                     if (e.which === parseInt("<spring:message code='jpm.list.shortcut.search' text='102' />")) { //search 'f'
                         $("#search-dropdown").dropdown('toggle').focus();
                     } else
@@ -256,6 +265,7 @@
                             $(".sortable[data-index='" + (e.which - 48) + "']").trigger("click");
                         }
                     }
+
                 });
                 $("#search-dropdown").on("keypress", function(e) {
                     if (e.which > 48 && e.which <= 57) { // 1 - 9

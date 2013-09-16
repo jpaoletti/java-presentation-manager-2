@@ -23,6 +23,7 @@
     <!-- CONVERTERS -->
     <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
+    <bean id="jpm-converter-editable" class="jpaoletti.jpm2.web.converter.EditableToString" />
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
     <bean id="jpm-converter-show-bigstring" class="jpaoletti.jpm2.web.converter.ShowBigString" />
 
@@ -70,6 +71,16 @@
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
             <property name="operations" value="list show"/>
             <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-string"/>
+        </bean>
+    </util:list>
+    <util:list id="editable-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-editable"/>
         </bean>
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
             <property name="operations" value="add edit"/>

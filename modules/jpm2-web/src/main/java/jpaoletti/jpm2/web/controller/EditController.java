@@ -1,15 +1,22 @@
 package jpaoletti.jpm2.web.controller;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -21,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class EditController extends BaseController {
 
     public static final String OP_EDIT = "edit";
+    public static final String OP_INLINE_EDIT = "iledit";
 
     /**
      * GET method prepares form.
@@ -54,6 +62,30 @@ public class EditController extends BaseController {
                 getContext().getEntityMessages().add(e.getMsg());
             }
             return editPrepare(entity, instanceId);
+        }
+    }
+
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_INLINE_EDIT, method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> ileditCommit(
+            @PathVariable Entity entity,
+            @PathVariable String instanceId,
+            @RequestParam() String name,
+            @RequestParam() String value) throws PMException {
+        final Operation operation = entity.getOperation(OP_EDIT);
+        getContext().set(entity, operation);
+        try {
+            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), entity, operation);
+            getContext().setEntityInstance(instance);
+            final Map<String, String[]> params = new HashMap<>();
+            params.put("field_" + name, (String[]) Arrays.asList(value).toArray());
+            final Object tmp = instance.getValues().get(name);
+            instance.getValues().clear();
+            instance.getValues().put(name, tmp);
+            getJpm().getService().update(entity, operation, instance, params);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ValidationException e) {
+            return new ResponseEntity<>(getInternationalizedMessage(e.getMsg()), HttpStatus.BAD_REQUEST);
         }
     }
 }

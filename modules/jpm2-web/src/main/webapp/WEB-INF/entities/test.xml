@@ -92,7 +92,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="string" />
                     <property name="searcher" ref="jpm-searcher-string" />
-                    <property name="configs" ref="default-string-config" />
+                    <property name="configs" ref="editable-string-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="integer" />

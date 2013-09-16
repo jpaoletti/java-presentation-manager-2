@@ -166,4 +166,8 @@ public class BaseController {
     protected JPMService getService() {
         return getJpm().getService();
     }
+
+    protected String getInternationalizedMessage(Message msg) {
+        return getMessageSource().getMessage(msg.getKey(), msg.getArgs(), getLocale());
+    }
 }

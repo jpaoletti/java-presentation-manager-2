@@ -3,6 +3,7 @@
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
+        <link href="${cp}static/css/bootstrap-editable.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
     </head>
     <body>
         <c:set var="entityName" value="${entity.title}" />
@@ -34,8 +35,17 @@
         </div>
         <%@include  file="inc/footer.jsp" %>
         <%@include  file="inc/default-javascript.jsp" %>
+        <script type='text/javascript' src="${cp}static/js/bootstrap-editable.min.js?v=${jpm.appversion}" ></script>
         <script type="text/javascript">
             jpmLoad(wrapToString);
+            jpmLoad(function() {
+                $(".inline-edit").each(function() {
+                    $(this).editable({
+                        url: '${cp}jpm/${entity.id}/${instance.id}/iledit',
+                        send: "always"
+                    });
+                });
+            });
         </script>
     </body>
 </html>
