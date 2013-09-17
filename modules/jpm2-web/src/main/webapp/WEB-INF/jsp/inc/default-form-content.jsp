@@ -2,10 +2,10 @@
 <c:if test="${empty entity.panels}">
     <c:forEach items="${instance.values}" var="value">
         <div id="control-group-${value.key}" class="form-group">
-            <label class="col-lg-2 control-label" for="f_${value.key}">
+            <label class="col-lg-4 control-label" for="f_${value.key}">
                 <jpm:field-title entity="${entity}" fieldId="${value.key}" />
             </label>
-            <div class="col-lg-10">
+            <div class="col-lg-8">
                 <c:set var="field" value="${value.key}" scope="request" />
                 <c:set var="convertedValue" value="${value.value}"/>
                 <c:if test="${fn:startsWith(convertedValue, '@page:')}">
@@ -42,10 +42,10 @@
                             <c:forEach items="${panel.fieldList}" var="field">
                                 <c:if test="${not empty instance.values[field]}">
                                     <div id="control-group-${field}" class="form-group ${not empty fieldMessages[field] ? 'has-error':''}">
-                                        <label class="col-lg-2 control-label" for="f_${field}">
+                                        <label class="col-lg-4 control-label" for="f_${field}">
                                             <jpm:field-title entity="${entity}" fieldId="${field}" />
                                         </label>
-                                        <div class="col-lg-10">
+                                        <div class="col-lg-8">
                                             <c:set var="convertedValue" value="${instance.values[field]}"/>
                                             <c:set var="field" value="${field}" scope="request" />
                                             <c:if test="${fn:startsWith(convertedValue, '@page:')}">

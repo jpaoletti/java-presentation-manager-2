@@ -9,8 +9,8 @@
     </div>
     <script type="text/javascript">
         jpmLoad(function() {
-            $("#control-group-${field}").find(".col-lg-2").remove();
-            $("#control-group-${field}").find(".col-lg-10").removeClass("col-lg-10").addClass("col-lg-12");
+            $("#control-group-${field}").find(".col-lg-4").remove();
+            $("#control-group-${field}").find(".col-lg-8").removeClass("col-lg-8").addClass("col-lg-12");
             $("#weak${field}-list").load("${cp}jpm/${entity.id}/${instance.id}/${param.weakId}/weaklist");
         });
     </script>
