@@ -19,9 +19,9 @@ public class IndexController extends BaseController {
     private WebApplicationContext ctx;
 
     @RequestMapping(value = {"", "/", "/index", "/home"})
-    public String index() {
+    public ModelAndView index() {
         setCurrentHome("index");
-        return "index";
+        return new ModelAndView("index");
     }
 
     @RequestMapping(value = "/security")
