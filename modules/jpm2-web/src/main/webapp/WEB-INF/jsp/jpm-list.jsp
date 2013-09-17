@@ -208,7 +208,8 @@
                 $(".inline-edit").each(function() {
                     $(this).editable({
                         url: '${cp}jpm/${entity.id}/' + $(this).closest("tr").attr("data-id") + '/iledit',
-                        send: "always"
+                        send: "always", 
+                        emptytext: "-"
                     });
                 });
                 $("#select_unselect_all").on("click", function() {

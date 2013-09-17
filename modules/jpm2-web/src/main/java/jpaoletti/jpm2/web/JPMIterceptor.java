@@ -8,6 +8,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,6 +33,7 @@ public class JPMIterceptor implements HandlerInterceptor {
             final Entity entity = ctx.getEntity();
             final Operation operation = ctx.getOperation();
             if (mav != null) {
+                mav.addObject("locale", LocaleContextHolder.getLocale());
                 if (entity != null) {
                     mav.addObject("entity", entity);
                     if (operation != null) {

@@ -42,7 +42,8 @@
                 $(".inline-edit").each(function() {
                     $(this).editable({
                         url: '${cp}jpm/${entity.id}/${instance.id}/iledit',
-                        send: "always"
+                        send: "always",
+                        emptytext: "-"
                     });
                 });
             });
