@@ -29,7 +29,7 @@
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="navigable" value="true" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
@@ -48,7 +48,7 @@
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="navigable" value="true" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
@@ -57,7 +57,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="validator" >
                         <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" >
                             <property name="dao" ref="jpm-dao-user" />
@@ -160,7 +160,7 @@
             <list>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="navigable" value="true" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
@@ -169,7 +169,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="edit" />

@@ -445,10 +445,10 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         if (getAllOperations() != null) {
             for (Operation op : getAllOperations()) {
                 if (op.getScope() != null) {
-                    String s = op.getScope().trim();
+                    OperationScope s = op.getScope();
                     for (int i = 0; i < scopes.length; i++) {
                         OperationScope scope = scopes[i];
-                        if (scope.is(s)) {
+                        if (scope.equals(s)) {
                             r.add(op);
                             break;
                         }
@@ -465,7 +465,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
             for (Operation op : getAllOperations()) {
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
                     if (op.getCondition() == null || op.getCondition().check(object, op, operation.getId())) {
-                        if (scope.is(op.getScope())) {
+                        if (scope.equals(op.getScope())) {
                             r.add(op);
                         }
                     }

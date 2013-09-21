@@ -1,6 +1,8 @@
 package jpaoletti.jpm2.core.model;
 
 import java.io.Serializable;
+import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.search.Searcher;
 
 /**
@@ -15,12 +17,15 @@ public class SessionEntityData implements Serializable {
     private SearchCriteria searchCriteria;
     private ListSort sort;
 
-    public SessionEntityData(Entity entity) {
+    public SessionEntityData(Entity entity) throws PMException {
         this.entity = entity;
         this.searchCriteria = new SearchCriteria();
         if (entity.getDefaultSearchs() != null) {
             for (SearchDefinition sd : entity.getDefaultSearchs()) {
                 final Field field = entity.getFieldById(sd.getFieldId());
+                if (field == null) {
+                    throw new PMException(MessageFactory.error("jpm.field.not.found", sd.getFieldId()));
+                }
                 final Searcher.DescribedCriterion build = field.getSearcher().build(field, sd.getParameters());
                 searchCriteria.addDefinition(sd.getFieldId(), build);
             }

@@ -17,22 +17,11 @@ import jpaoletti.jpm2.core.PMCoreObject;
  */
 public class Operation extends PMCoreObject {
 
-    public static final String SCOPE_ITEM = "item";
-    public static final String SCOPE_GENERAL = "general";
-    public static final String SCOPE_SELECTED = "selected";
     //The operation Id. Must be unique and only one word
     private String id;
     //Determine if the operation is enabled or not.
     private boolean enabled;
-    /*
-     * Scope of the operation. Possibles values are: <dl> <dd> general
-     * </dd><dt>A general scope operation affects all the instances of the
-     * entity or none of them. </dt> <dd> item </dd><dt>An item scope operation
-     * affects only one instance.</dt> <dd> selected </dd><dt>A selected scope
-     * operation affects only selected instances.</dt> </dl>
-     *
-     */
-    private String scope;
+    private OperationScope scope;
     /**
      * A String with other operations id separated by blanks where this
      * operation will be shown
@@ -125,17 +114,14 @@ public class Operation extends PMCoreObject {
     /**
      * @return the scope
      */
-    public String getScope() {
-        if (scope == null || scope.trim().compareTo("") == 0) {
-            return SCOPE_ITEM;
+    public OperationScope getScope() {
+        if (scope == null) {
+            return OperationScope.ITEM;
         }
         return scope;
     }
 
-    /**
-     * @param scope the scope to set
-     */
-    public void setScope(String scope) {
+    public void setScope(OperationScope scope) {
         this.scope = scope;
     }
 

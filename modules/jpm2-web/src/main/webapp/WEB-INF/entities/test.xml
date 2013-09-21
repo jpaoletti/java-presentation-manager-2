@@ -21,7 +21,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="list" />
                     <property name="enabled" value="true" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="display" value="all" />
                     <property name="showTitle" value="true" />
                     <property name="confirm" value="false" />
@@ -46,7 +46,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="follows" value="list" />
                     <property name="context">
                         <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
@@ -54,12 +54,12 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="generalAudit" />
-                    <property name="scope" value="general" />
+                    <property name="scope" value="GENERAL" />
                     <property name="display" value="show list itemAudit" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="deleteSelected" />
-                    <property name="scope" value="selected" />
+                    <property name="scope" value="SELECTED" />
                     <property name="confirm" value="true" />
                     <property name="display" value="list" />
                 </bean>

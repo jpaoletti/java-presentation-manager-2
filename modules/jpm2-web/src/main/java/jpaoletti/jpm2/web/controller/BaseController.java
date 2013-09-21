@@ -156,7 +156,7 @@ public class BaseController {
     protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) {
         final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
         final Operation nextOp = entity.getOperation(nextOpId);
-        if (OperationScope.ITEM.is(nextOp.getScope())) {
+        if (OperationScope.ITEM.equals(nextOp.getScope())) {
             return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/" + nextOp);
         } else {
             return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + nextOp);
