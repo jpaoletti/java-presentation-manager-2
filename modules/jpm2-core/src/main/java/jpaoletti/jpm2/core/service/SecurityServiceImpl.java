@@ -7,11 +7,13 @@ import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.BCrypt;
 import jpaoletti.jpm2.core.security.User;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author jpaoletti
  */
+@Transactional
 public final class SecurityServiceImpl extends JPMServiceBase implements SecurityService {
 
     @Override

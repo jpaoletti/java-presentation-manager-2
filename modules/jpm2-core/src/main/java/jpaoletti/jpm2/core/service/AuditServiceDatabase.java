@@ -14,11 +14,13 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author jpaoletti
  */
+@Transactional
 public class AuditServiceDatabase extends PMCoreObject implements AuditService {
 
     @Autowired(required = false)

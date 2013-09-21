@@ -11,9 +11,6 @@ import org.hibernate.criterion.Order;
  */
 public interface DAO<T, ID extends Serializable> {
 
-    /**
-     * Retorna una lista.
-     */
     public Long count(Criterion... restrictions);
 
     public void delete(Object object);

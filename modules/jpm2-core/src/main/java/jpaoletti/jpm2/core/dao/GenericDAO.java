@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import jpaoletti.jpm2.core.idtransformer.IdTransformer;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
@@ -120,11 +119,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     }
 
     public Session getSession() {
-        try {
-            return sessionFactory.getCurrentSession();
-        } catch (HibernateException e) {
-            return sessionFactory.openSession();
-        }
+        return sessionFactory.getCurrentSession();
     }
 
     public IdTransformer getTransformer() {
