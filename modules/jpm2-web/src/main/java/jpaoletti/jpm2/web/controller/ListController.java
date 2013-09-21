@@ -186,7 +186,7 @@ public class ListController extends BaseController {
         return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
     }
 
-    protected Criterion getSearch(Entity entity) {
+    protected Criterion getSearch(Entity entity) throws PMException {
         return getSessionEntityData(entity).getSearchCriteria().getCriterion();
     }
 

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.NotAuthorizedException;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
@@ -60,7 +61,7 @@ public class BaseController {
         return LocaleContextHolder.getLocale();
     }
 
-    public SessionEntityData getSessionEntityData(Entity entity) {
+    public SessionEntityData getSessionEntityData(Entity entity) throws PMException {
         final Object sed = getSession().getAttribute(entity.getId());
         if (sed == null) {
             final SessionEntityData sessionEntityData = new SessionEntityData(entity);
