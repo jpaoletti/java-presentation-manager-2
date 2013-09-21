@@ -8,6 +8,7 @@
         }
         $("#field_${field}").select2({
             placeholder: "...",
+            allowClear: true,
             minimumInputLength: ${param.minSearch},
             ajax: {
                 url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
