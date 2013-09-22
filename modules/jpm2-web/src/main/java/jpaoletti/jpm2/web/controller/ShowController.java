@@ -2,6 +2,7 @@ package jpaoletti.jpm2.web.controller;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
@@ -33,13 +34,25 @@ public final class ShowController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
-            @PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String textField,
-            @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
+            @PathVariable Entity entity,
+            @PathVariable String instanceId,
+            @RequestParam(required = false) String textField) throws PMException {
         final IdentifiedObject iobject = getService().get(entity, instanceId);
         final Object object = iobject.getObject();
         if (textField != null) {
-            final Field field = entity.getFieldById(textField);
-            return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
+            if (!textField.contains("{")) {
+                final Field field = entity.getFieldById(textField);
+                return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
+            } else {
+                final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
+                String finalValue = textField;
+                while (matcher.find()) {
+                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                    final Field field2 = entity.getFieldById(_display_field);
+                    finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
+                }
+                return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), finalValue);
+            }
         } else {
             return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), object.toString());
         }

@@ -1,7 +1,11 @@
 package jpaoletti.jpm2.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
@@ -16,6 +20,7 @@ import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +40,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ListController extends BaseController {
 
+    public static final Pattern DISPLAY_PATTERN = Pattern.compile("\\{.*?\\}");
     public static final String OP_LIST = "list";
     @Autowired
     private WebApplicationContext ctx;
@@ -50,6 +56,7 @@ public class ListController extends BaseController {
             @RequestParam(required = false) String query,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
+
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
         final List<Criterion> restrictions = new ArrayList<>();
@@ -60,15 +67,26 @@ public class ListController extends BaseController {
                 restrictions.add(c);
             }
         }
-        final Field field = entity.getFieldById(textField);
-        restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+        //Field can be a conbintaion of fields like "[{code}] {description}"
+        //Old style is supported if there is no @ in the textField
+        if (!textField.contains("{")) {
+            final Field field = entity.getFieldById(textField);
+            restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+        } else {
+            final Disjunction disjunction = Restrictions.disjunction();
+            final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
+            while (matcher.find()) {
+                final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                final Field field2 = entity.getFieldById(_display_field);
+                disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
+            }
+            restrictions.add(disjunction);
+        }
         final List list = entity.getDao().list((page - 1) * ps, ps, restrictions.toArray(new Criterion[restrictions.size()]));
         r.setMore(list.size() == ps);
         r.setResults(new ArrayList<ObjectConverterDataItem>());
         for (Object object : list) {
-            r.getResults().add(new ObjectConverterDataItem(
-                    entity.getDao().getId(object).toString(),
-                    (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
+            getObjectDisplay(r, entity, object, useToString, textField);
         }
         return r;
     }
@@ -208,5 +226,25 @@ public class ListController extends BaseController {
 
     public void setCtx(WebApplicationContext ctx) {
         this.ctx = ctx;
+    }
+
+    protected void getObjectDisplay(final ObjectConverterData r, Entity entity, Object object, boolean useToString, String textField) {
+        if (!textField.contains("{")) {
+            final Field field = entity.getFieldById(textField);
+            r.getResults().add(new ObjectConverterDataItem(
+                    entity.getDao().getId(object).toString(),
+                    (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
+        } else {
+            final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
+            String finalValue = textField;
+            while (matcher.find()) {
+                final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                final Field field2 = entity.getFieldById(_display_field);
+                finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
+            }
+            r.getResults().add(new ObjectConverterDataItem(
+                    entity.getDao().getId(object).toString(),
+                    (useToString) ? object.toString() : finalValue));
+        }
     }
 }

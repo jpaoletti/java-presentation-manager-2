@@ -1,4 +1,4 @@
-<input name="field_${field}" id="field_${field}" value="${param.value}" />
+<input name="field_${field}" id="field_${field}" value="${param.value}" class="objectConverterInput" />
 <script type="text/javascript" src="${cp}static/js/select2.min.js"></script>
 <script type="text/javascript" src="${cp}static/js/locale/select2_locale_${locale.language}.js"></script>
 <script type="text/javascript">
@@ -7,8 +7,8 @@
             $('<link href="${cp}static/css/select2.css" rel="stylesheet">').appendTo("head");
         }
         $("#field_${field}").select2({
-            placeholder: "...",
-            allowClear: true,
+            placeholder: "...", allowClear: true,
+            width: 'copy', dropdownCssClass: "bigdrop",
             minimumInputLength: ${param.minSearch},
             ajax: {
                 url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
@@ -21,33 +21,22 @@
                         page: page
                     };
                 },
-                results: function(data, page) {
-                    return data;
-                }
+                results: function(data, page) {return data;}
             },
             initSelection: function(element, callback) {
                 var id = $(element).val();
                 if (id !== "") {
                     $.ajax("${cp}jpm/${param.entityId}/" + id + ".json", {
-                        data: {
-                            textField: "${param.textField}"
-                        },
+                        data: { textField: "${param.textField}"},
                         dataType: "json"
                     }).done(function(data) {
                         callback(data);
                     });
                 }
             },
-            formatResult: function(data) {
-                return data.text;
-            },
-            formatSelection: function(data) {
-                return data.text;
-            },
-            escapeMarkup: function(m) {
-                return m;
-            },
-            dropdownCssClass: "bigdrop"
+            formatResult: function(data) {return data.text;},
+            formatSelection: function(data) {return data.text;},
+            escapeMarkup: function(m) {return m;}
         });
     });
 </script>
