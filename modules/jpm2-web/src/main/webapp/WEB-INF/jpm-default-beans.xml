@@ -30,6 +30,7 @@
     <bean id="jpm-converter-edit-bool" class="jpaoletti.jpm2.web.converter.WebEditBoolean" />
     <bean id="jpm-converter-edit-string" class="jpaoletti.jpm2.web.converter.WebEditString" />
     <bean id="jpm-converter-edit-int" class="jpaoletti.jpm2.web.converter.WebEditInteger" />
+    <bean id="jpm-converter-edit-long" class="jpaoletti.jpm2.web.converter.WebEditLong" />
     <bean id="jpm-converter-edit-date" class="jpaoletti.jpm2.web.converter.WebEditDate" />
     <bean id="jpm-converter-edit-decimal" class="jpaoletti.jpm2.web.converter.WebEditDecimal" />
     <bean id="jpm-converter-edit-bigstring" class="jpaoletti.jpm2.web.converter.EditBigString" />
@@ -75,6 +76,16 @@
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-string"/>
+        </bean>
+    </util:list>
+    <util:list id="default-long-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-long"/>
         </bean>
     </util:list>
     <util:list id="editable-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
