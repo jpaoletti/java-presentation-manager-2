@@ -142,4 +142,16 @@
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
     </util:list>
+    <util:list id="default-enum-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show" />
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter">
+                <bean class="jpaoletti.jpm2.web.converter.EnumConverter" />
+            </property>
+        </bean>
+    </util:list>
 </beans>
