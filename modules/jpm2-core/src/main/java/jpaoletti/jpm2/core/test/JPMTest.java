@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,6 +46,8 @@ public class JPMTest implements Serializable {
     @JoinColumn(name = "test")
     private JPMTest test;
     private String bigstring;
+    @Enumerated
+    private TestEnum testEnum;
 
     public JPMTest(Long id, String string, Integer integer, Date date, Boolean bool) {
         this.id = id;
@@ -124,5 +127,13 @@ public class JPMTest implements Serializable {
 
     public void setBigstring(String bigstring) {
         this.bigstring = bigstring;
+    }
+
+    public TestEnum getTestEnum() {
+        return testEnum;
+    }
+
+    public void setTestEnum(TestEnum textEnum) {
+        this.testEnum = textEnum;
     }
 }
