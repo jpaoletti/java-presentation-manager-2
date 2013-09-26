@@ -5,7 +5,7 @@
 </c:if>
 <c:if test="${param.showList}">
     <div id="weak${field}-list">
-        <img alt="..." src="${cp}static/img/loading.gif"/>
+        <img alt="..." src="${cp}static/img/weakloading.gif"/>
     </div>
     <script type="text/javascript">
         jpmLoad(function() {

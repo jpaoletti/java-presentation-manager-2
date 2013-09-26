@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -48,6 +49,9 @@ public class JPMTest implements Serializable {
     private String bigstring;
     @Enumerated
     private TestEnum testEnum;
+    @Lob
+    @Column(columnDefinition = "mediumblob")
+    private byte[] file;
 
     public JPMTest(Long id, String string, Integer integer, Date date, Boolean bool) {
         this.id = id;
@@ -135,5 +139,13 @@ public class JPMTest implements Serializable {
 
     public void setTestEnum(TestEnum textEnum) {
         this.testEnum = textEnum;
+    }
+
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
     }
 }

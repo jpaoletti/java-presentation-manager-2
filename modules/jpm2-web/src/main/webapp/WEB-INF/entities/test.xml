@@ -197,6 +197,24 @@
                         </list>
                     </property>
                 </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="file" />
+                    <property name="width" value="150px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show" />
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EditFileConverter" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
         <property name="panels">
@@ -220,7 +238,7 @@
                                 <property name="icon" value="glyphicon-cog" />
                                 <property name="title" value="Another Test" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="testEnum bigstring" />
+                                <property name="fields" value="testEnum file bigstring" />
                             </bean>
                         </list>
                     </property>
