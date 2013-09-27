@@ -155,7 +155,6 @@ var initPage = function() {
         $(".help-block:empty").remove();
         $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
-        $("input[type='file']").closest("form").attr("enctype", "multipart/form-data");
         $(".sortable").click(function() {
             window.location = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field");
         });
