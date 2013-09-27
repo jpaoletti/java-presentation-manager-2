@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.web.converter;
 
 import java.io.Serializable;
+import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.NotAuthorizedException;
 import jpaoletti.jpm2.core.converter.Converter;
@@ -9,6 +10,9 @@ import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.ObjectConverterData;
+import jpaoletti.jpm2.web.controller.ListController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -22,6 +26,7 @@ public class ShowObject extends Converter {
     private Entity entity;
     private String fields;
     private String operation;
+    private String textField;
     @Autowired
     private JPMContext context;
 
@@ -59,8 +64,9 @@ public class ShowObject extends Converter {
                     throw new ConverterException(MessageFactory.error("jpm.converter.operation.not.exists", getEntity().getId(), getOperation()));
                 }
             }
+            final String finalValue = getFinalValue(value);
             return res
-                    + "&value=" + value.toString()
+                    + "&value=" + finalValue
                     + "&instanceId=" + localId
                     + "&operationId=" + getOperation()
                     + "&operationLink=" + operationLink
@@ -98,5 +104,33 @@ public class ShowObject extends Converter {
 
     public void setOperation(String operation) {
         this.operation = operation;
+    }
+
+    public String getTextField() {
+        return textField;
+    }
+
+    public void setTextField(String textField) {
+        this.textField = textField;
+    }
+
+    private String getFinalValue(Object value) {
+        if (getTextField() != null) {
+            if (!getTextField().contains("{")) {
+                final Field field = getEntity().getFieldById(getTextField());
+                return String.valueOf(JPMUtils.get(value, field.getProperty()));
+            } else {
+                final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
+                String finalValue = textField;
+                while (matcher.find()) {
+                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                    final Field field2 = entity.getFieldById(_display_field);
+                    finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(value, field2.getProperty())));
+                }
+                return finalValue;
+            }
+        } else {
+            return String.valueOf(value);
+        }
     }
 }
