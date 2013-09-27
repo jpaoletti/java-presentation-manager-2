@@ -63,7 +63,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                 list = dao.list(pl.from(), pl.getPageSize(), search, ownerC);
             }
             if (entity.isCountable()) {
-                pl.setTotal(dao.count(search));
+                pl.setTotal(dao.count(search, ownerC));
             }
             sessionEntityData.setPage(pl.getPage());
             sessionEntityData.setPageSize(pl.getPageSize());
