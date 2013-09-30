@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:if test="${not empty param.value}">
     <a href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}">${param.value}</a>
     <script type="text/javascript">
