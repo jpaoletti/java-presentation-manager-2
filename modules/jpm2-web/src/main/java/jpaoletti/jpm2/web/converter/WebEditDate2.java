@@ -12,9 +12,9 @@ import org.joda.time.DateTime;
  *
  * @author jpaoletti
  */
-public class WebEditDate extends WebToString {
+public class WebEditDate2 extends WebToString {
 
-    public static final String RFC3339 = "yyyy-MM-dd";
+    private String format = "yyyy-MM-dd";
 
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
@@ -22,9 +22,9 @@ public class WebEditDate extends WebToString {
         String value = field.getDefaultValue();
         if (date != null) {
             final DateTime dt = new DateTime(date);
-            value = dt.toString(RFC3339);
+            value = dt.toString(getFormat());
         }
-        return "<input class='form-control' name='field_" + field.getId() + "' type='date' value='" + value + "'>";
+        return "@page:date2-converter.jsp?value=" + value + "&format=" + getFormat();
     }
 
     @Override
@@ -32,12 +32,20 @@ public class WebEditDate extends WebToString {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {
-            final SimpleDateFormat sdf = new SimpleDateFormat(RFC3339);
+            final SimpleDateFormat sdf = new SimpleDateFormat(getFormat());
             try {
                 return sdf.parse(newValue.toString());
             } catch (ParseException ex) {
                 throw new ConverterException(MessageFactory.error("jpm.converter.error.invalid.date.format", newValue.toString()));
             }
         }
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 }
