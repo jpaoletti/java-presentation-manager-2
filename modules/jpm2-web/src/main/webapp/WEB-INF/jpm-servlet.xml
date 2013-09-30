@@ -24,6 +24,9 @@
     <mvc:resources mapping="/static/**" location="/static/" />
     <mvc:interceptors>
         <bean class="jpaoletti.jpm2.web.JPMIterceptor" />
+        <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="lang" />
+        </bean>
     </mvc:interceptors>
     <bean name="handlerMapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
     <bean name="handlerAdapter" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
