@@ -66,9 +66,8 @@ public class AddController extends BaseController {
         final Operation operation = entity.getOperation(OP_ADD);
         getContext().set(entity, operation);
         try {
-            final IdentifiedObject newObject = getService().save(entity, operation,
-                    new EntityInstance(entity, operation),
-                    getRequest().getParameterMap());
+            final IdentifiedObject newObject = getService().save(entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
+            getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
             return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
@@ -92,9 +91,8 @@ public class AddController extends BaseController {
             @PathVariable Entity entity) throws PMException {
         final Operation operation = entity.getOperation("add");
         try {
-            final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation,
-                    new EntityInstance(entity, operation),
-                    getRequest().getParameterMap());
+            final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
+            getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
             return next(entity, operation, newObject.getId(), "show");
         } catch (ValidationException e) {
             if (e.getMsg() != null) {

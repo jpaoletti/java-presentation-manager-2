@@ -157,10 +157,15 @@ public class BaseController {
     protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) {
         final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
         final Operation nextOp = entity.getOperation(nextOpId);
+        final EntityInstance instance = getContext().getEntityInstance();
         if (OperationScope.ITEM.equals(nextOp.getScope())) {
-            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + instanceId + "/" + nextOp);
+            return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s", entity.getId(), instanceId, nextOp));
         } else {
-            return new ModelAndView("redirect:/jpm/" + entity.getId() + "/" + nextOp);
+            if (instance != null && instance.getOwner() != null) {
+                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s", instance.getOwner().getId(), instance.getOwnerId(), entity.getId(), nextOp));
+            } else {
+                return new ModelAndView(String.format("redirect:/jpm/%s/%s", entity.getId(), nextOp));
+            }
         }
     }
 
