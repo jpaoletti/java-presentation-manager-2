@@ -40,4 +40,18 @@ public class AuditController extends BaseController {
         mav.addObject("audits", getJpm().getAuditService().getGeneralRecords(entity));
         return mav;
     }
+
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/" + OP_GENERAL_AUDIT, method = RequestMethod.GET)
+    public ModelAndView getGeneralAudit(
+            @PathVariable Entity owner,
+            @PathVariable String ownerId,
+            @PathVariable Entity entity) throws PMException {
+        final Operation operation = entity.getOperation(OP_GENERAL_AUDIT);
+        final ModelAndView mav = new ModelAndView("jpm-" + OP_GENERAL_AUDIT);
+        getContext().set(entity, operation);
+        mav.addObject("audits", getJpm().getAuditService().getGeneralRecords(entity));
+        mav.addObject("owner", owner);
+        mav.addObject("ownerId", ownerId);
+        return mav;
+    }
 }
