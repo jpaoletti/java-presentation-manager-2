@@ -19,6 +19,7 @@ public class SessionEntityData implements Serializable {
 
     public SessionEntityData(Entity entity) throws PMException {
         this.entity = entity;
+        this.pageSize = entity.getPageSize();
         this.searchCriteria = new SearchCriteria();
         if (entity.getDefaultSearchs() != null) {
             for (SearchDefinition sd : entity.getDefaultSearchs()) {

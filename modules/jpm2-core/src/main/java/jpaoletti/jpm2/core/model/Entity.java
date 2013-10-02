@@ -36,6 +36,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private List<SearchDefinition> defaultSearchs;
     private String defaultSortField;
     private ListSort.SortDirection defaultSortDirection;
+    private Integer pageSize;
 
     public Entity() {
         super();
@@ -44,6 +45,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.countable = true;
         this.auditable = true;
         this.home = "index";
+        this.pageSize = 10;
     }
 
     /**
@@ -527,5 +529,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setDefaultSortDirection(ListSort.SortDirection defaultSortDirection) {
         this.defaultSortDirection = defaultSortDirection;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }
