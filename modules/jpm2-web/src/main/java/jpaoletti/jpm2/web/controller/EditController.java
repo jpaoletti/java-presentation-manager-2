@@ -49,14 +49,21 @@ public class EditController extends BaseController {
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_EDIT, method = RequestMethod.POST)
-    public ModelAndView editCommit(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
+    public ModelAndView editCommit(
+            @PathVariable Entity entity,
+            @PathVariable String instanceId,
+            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Operation operation = entity.getOperation(OP_EDIT);
         getContext().set(entity, operation);
         try {
             final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), entity, operation);
             getContext().setEntityInstance(instance);
             getJpm().getService().update(entity, operation, instance, getRequest().getParameterMap());
-            return next(entity, operation, instanceId, ShowController.OP_SHOW);
+            if (repeat) {
+                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s?repeat=true", entity.getId(), instanceId, OP_EDIT));
+            } else {
+                return next(entity, operation, instanceId, ShowController.OP_SHOW);
+            }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());

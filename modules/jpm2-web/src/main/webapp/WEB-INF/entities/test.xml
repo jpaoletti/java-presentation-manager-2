@@ -48,6 +48,7 @@
                     <property name="id" value="add" />
                     <property name="scope" value="GENERAL" />
                     <property name="follows" value="list" />
+                    <property name="repeatable" value="true" />
                     <property name="context">
                         <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
                     </property>
@@ -69,6 +70,7 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="edit" />
+                    <property name="repeatable" value="true" />
                     <property name="display" value="show list" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">

@@ -49,6 +49,7 @@ public class Operation extends PMCoreObject {
     private boolean navigable; //Default: true, if navigable, impacts on NavigationList
     private boolean auditable; //Default: true, if navigable, impacts on NavigationList
     private String auth; //Needed authority to access any operation on this entity
+    private boolean repeatable;
 
     public Operation() {
         this.enabled = true;
@@ -59,6 +60,7 @@ public class Operation extends PMCoreObject {
         this.confirm = false;
         this.navigable = true;
         this.auditable = true;
+        this.repeatable = false;
     }
 
     public OperationCondition getCondition() {
@@ -321,5 +323,13 @@ public class Operation extends PMCoreObject {
             return false;
         }
         return true;
+    }
+
+    public boolean isRepeatable() {
+        return repeatable;
+    }
+
+    public void setRepeatable(boolean repeatable) {
+        this.repeatable = repeatable;
     }
 }
