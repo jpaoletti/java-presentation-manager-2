@@ -52,9 +52,9 @@ public class ListController extends BaseController {
             @RequestParam(required = false, defaultValue = "false") boolean useToString,
             @RequestParam(required = false) String ownerId,
             @RequestParam(required = false) String filter,
-            @RequestParam(required = false) String query,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer pageSize) throws PMException {
+            @RequestParam(required = false, defaultValue = "") String query,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "2147483647") Integer pageSize) throws PMException {
 
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
