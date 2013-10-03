@@ -13,7 +13,8 @@ THIS IS A WORK IN PROGRESS PROJECT.
 * Boostrap 3
 * jQuery 2
 * Less
-* <a href='http://ivaynberg.github.io/select2/index.html' >Select2</a>
+* <a href='http://ivaynberg.github.io/select2/index.html'>Select2</a>
+* <a href='http://blueimp.github.io/jQuery-File-Upload/'>jQuery File Upload</a>
 
 ## Functionalities
 
