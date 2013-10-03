@@ -11,7 +11,7 @@
         jpmLoad(function() {
             $("#control-group-${field}").find(".col-lg-4").remove();
             $("#control-group-${field}").find(".col-lg-8").removeClass("col-lg-8").addClass("col-lg-12");
-            $("#weak${field}-list").load("${cp}jpm/${entity.id}/${instance.id}/${param.weakId}/weaklist");
+            $("#weak${field}-list").load("${cp}jpm/${entity.id}/${instance.id}/${param.weakId}/weaklist?showOperations=${param.showOperations}");
         });
     </script>
 </c:if>

@@ -4,6 +4,7 @@
     <thead>
         <tr>
             <c:forEach items="${paginatedList.fields}" var="field">
+                <c:if test="${showOperations}"><th></th></c:if>
                 <th data-field="${field.id}">
                     <jpm:field-title entity="${entity}" fieldId="${field.id}" />
                 </th>
@@ -13,6 +14,18 @@
     <tbody>
         <c:forEach items="${paginatedList.contents}" var="item">
             <tr data-id="${item.id}">
+                <c:if test="${showOperations}">
+                    <td>
+                        <c:forEach items="${item.operations}" var="o">
+                            <a
+                                class="btn btn-mini btn-default confirm-${o.confirm}" 
+                                title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
+                                href="${cp}jpm/${entity.id}/${item.id}/${o.id}">
+                                <i class="glyphicon jpmicon-${o.id}"></i>
+                            </a>
+                        </c:forEach>
+                    </td>
+                </c:if>
                 <c:forEach items="${item.values}" var="v">
                     <td data-field="${v.key}">
                         <c:set var="convertedValue" value="${v.value}"/>

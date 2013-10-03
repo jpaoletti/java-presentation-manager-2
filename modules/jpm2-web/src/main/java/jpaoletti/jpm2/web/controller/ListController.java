@@ -135,12 +135,14 @@ public class ListController extends BaseController {
     public ModelAndView weaklist(
             @PathVariable Entity entity,
             @PathVariable String instanceId,
-            @PathVariable Entity weak) throws PMException {
+            @PathVariable Entity weak,
+            @RequestParam(required = false, defaultValue = "false") boolean showOperations) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-list-weak");
         final PaginatedList weakList = getService().getWeakList(entity, instanceId, weak);
         final Operation operation = weak.getOperation(OP_LIST);
         getContext().set(weak, operation);
         mav.addObject("paginatedList", weakList);
+        mav.addObject("showOperations", showOperations);
         return mav;
     }
 

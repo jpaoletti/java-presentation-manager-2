@@ -16,18 +16,20 @@ public class WeakConverter extends Converter {
     private boolean showBtn;
     private String btnText;
     private String btnIcon;
+    private boolean showOperations; //if true, weak list show items operations
 
     public WeakConverter() {
         this.showBtn = true;
         this.showList = true;
         this.btnIcon = "glyphicon-th-list";
+        this.showOperations = false;
     }
 
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
 
         return "@page:weak-converter.jsp?showList=" + isShowList() + "&showBtn=" + isShowBtn() + "&btnText=" + getBtnText() + "&btnIcon=" + getBtnIcon()
-                + "&weakId=" + getEntity().getId() + "&ownerId=" + instanceId;
+                + "&weakId=" + getEntity().getId() + "&ownerId=" + instanceId + "&showOperations=" + isShowOperations();
     }
 
     public Entity getEntity() {
@@ -68,5 +70,13 @@ public class WeakConverter extends Converter {
 
     public void setBtnIcon(String btnIcon) {
         this.btnIcon = btnIcon;
+    }
+
+    public boolean isShowOperations() {
+        return showOperations;
+    }
+
+    public void setShowOperations(boolean showOperations) {
+        this.showOperations = showOperations;
     }
 }
