@@ -86,6 +86,11 @@ public class BaseController {
         return null;
     }
 
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public String handleUnsupportedOperationException(UnsupportedOperationException ex, HttpServletRequest req, HttpServletResponse resp) {
+        return "not-implemented";
+    }
+
     @ExceptionHandler(NotAuthorizedException.class)
     public String handleNotAuthorizedException() {
         return "not-authotized";
