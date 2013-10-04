@@ -17,6 +17,13 @@
                             <h1><spring:message code="jpm.not.implemented" text="Not implemented" /></h1>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-lg-11 col-lg-offset-1">
+                            <br /><br /><br />
+                            <a href="javascript:history.back();" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> <spring:message code="jpm.back" text="Back" /></a>
+                            <br /><br /><br />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
