@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.controller;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.EntityInstanceOwner;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
@@ -62,7 +63,7 @@ public class AddController extends BaseController {
             @RequestParam(required = false) String lastId) throws PMException {
         final ModelAndView mav = addPrepare(entity, lastId);
         if (entity.isWeak()) {
-            getContext().getEntityInstance().setOwnerId(ownerId);
+            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner().getOwner(), new IdentifiedObject(ownerId)));
         }
         return mav;
     }
@@ -111,11 +112,12 @@ public class AddController extends BaseController {
             @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Operation operation = entity.getOperation("add");
         try {
+            getContext().set(entity, operation);
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s?repeat=true&lastId=%s", instance.getOwner().getId(), instance.getOwnerId(), entity.getId(), OP_ADD, newObject.getId()));
+                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s?repeat=true&lastId=%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId(), OP_ADD, newObject.getId()));
             } else {
                 return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
             }

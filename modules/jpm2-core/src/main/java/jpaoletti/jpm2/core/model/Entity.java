@@ -461,12 +461,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return r;
     }
 
-    public List<Operation> getOperationsFor(Object object, Operation operation, OperationScope scope) throws PMException {
+    public List<Operation> getOperationsFor(EntityInstance instance, Operation operation, OperationScope scope) throws PMException {
         final List<Operation> r = new ArrayList<>();
         if (operation != null) {
             for (Operation op : getAllOperations()) {
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
-                    if (op.getCondition() == null || op.getCondition().check(object, op, operation.getId())) {
+                    if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
                         if (scope.equals(op.getScope())) {
                             r.add(op);
                         }
