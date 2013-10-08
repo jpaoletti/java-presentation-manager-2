@@ -40,13 +40,17 @@ public class JPMServiceBase {
                 final Converter converter = field.getConverter(operation);
                 final Object convertedValue = converter.build(field, object, newValue);
                 final List<FieldValidator> validators = field.getValidators(operation);
+                boolean set = true;
                 for (FieldValidator fieldValidator : validators) {
                     final Message msg = fieldValidator.validate(object, convertedValue);
                     if (msg != null) {
                         getContext().addFieldMsg(field, msg);
+                        set = false;
                     }
                 }
-                JPMUtils.set(object, field.getProperty(), convertedValue);
+                if (set) {
+                    JPMUtils.set(object, field.getProperty(), convertedValue);
+                }
             } catch (IgnoreConvertionException e) {
             } catch (ConverterException e) {
                 getContext().addFieldMsg(field, e.getMsg());
