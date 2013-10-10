@@ -17,6 +17,7 @@ import org.springframework.beans.factory.BeanNameAware;
 public class Entity extends PMCoreObject implements BeanNameAware {
 
     private String id; // Represents the entity id. This must me unique.
+    private Integer numericId; //Optional reference id
     private String clazz;//The full name of the class represented by the entity.
     private GenericDAO dao;
     private String order;
@@ -537,5 +538,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public Integer getNumericId() {
+        return numericId;
+    }
+
+    public void setNumericId(Integer numericId) {
+        this.numericId = numericId;
     }
 }

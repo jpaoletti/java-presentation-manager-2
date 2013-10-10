@@ -196,6 +196,18 @@ public class PresentationManager {
         return getEntities().get(entityId);
     }
 
+    /**
+     * Getter for entities based on numericId.
+     */
+    public Entity getEntity(Integer numericId) {
+        for (Map.Entry<String, Entity> entry : getEntities().entrySet()) {
+            if (entry.getValue().getNumericId() != null && numericId.equals(entry.getValue().getNumericId())) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
     public AuditService getAuditService() {
         return auditService;
     }
