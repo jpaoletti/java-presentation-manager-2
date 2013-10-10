@@ -17,8 +17,7 @@ import jpaoletti.jpm2.util.JPMUtils;
 public class EntityInstance {
 
     private IdentifiedObject iobject;
-    private Entity owner;
-    private String ownerId;
+    private EntityInstanceOwner owner;
     private List<Operation> operations; //Individual operations
     private List<Field> fields;
     private Map<String, Object> values;
@@ -26,11 +25,11 @@ public class EntityInstance {
     /**
      * Used for lists.
      */
-    public EntityInstance(IdentifiedObject iobject, List<Field> fields, List<Operation> operations) throws PMException {
+    public EntityInstance(IdentifiedObject iobject, List<Field> fields, Entity entity, Operation operation) throws PMException {
         this.iobject = iobject;
         this.values = new LinkedHashMap<>();
-        this.operations = operations;
         this.fields = fields;
+        configureItemOperations(entity, operation);
     }
 
     /**
@@ -61,14 +60,11 @@ public class EntityInstance {
             }
         }
         if (object != null) {
-            operations = entity.getOperationsFor(object, operation, OperationScope.ITEM);
             if (entity.isWeak()) {
-                this.owner = entity.getOwner().getOwner();
                 final Object ownerobject = JPMUtils.get(object, entity.getOwner().getLocalProperty());
-                if (ownerobject != null) {
-                    this.ownerId = getOwner().getDao().getId(ownerobject).toString();
-                }
+                configureOwner(entity, ownerobject);
             }
+            configureItemOperations(entity, operation);
         }
     }
 
@@ -92,23 +88,33 @@ public class EntityInstance {
         this.iobject = iobject;
     }
 
-    public final Entity getOwner() {
+    public EntityInstanceOwner getOwner() {
         return owner;
     }
 
-    public void setOwner(Entity owner) {
+    public void setOwner(EntityInstanceOwner owner) {
         this.owner = owner;
     }
 
     public String getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+        return getOwner().getIobject().getId();
     }
 
     public String getId() {
         return (getIobject() != null) ? getIobject().getId() : "?";
+    }
+
+    protected final void configureItemOperations(Entity entity, Operation operation) throws PMException {
+        this.operations = entity.getOperationsFor(this, operation, OperationScope.ITEM);
+    }
+
+    public final void configureOwner(Entity entity, final Object ownerobject) {
+        final Entity ownerEntity = entity.getOwner().getOwner();
+        if (ownerobject != null) {
+            final String ownerId = String.valueOf(ownerEntity.getDao().getId(ownerobject));
+            this.owner = new EntityInstanceOwner(ownerEntity, new IdentifiedObject(ownerId, ownerobject));
+        } else {
+            this.owner = new EntityInstanceOwner(ownerEntity, null);
+        }
     }
 }

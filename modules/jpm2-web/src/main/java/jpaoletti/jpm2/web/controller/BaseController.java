@@ -80,7 +80,7 @@ public class BaseController {
      */
     protected String toList(final EntityInstance instance, Entity entity) {
         if (instance.getOwner() != null) {
-            return String.format("redirect:/jpm/%s/%s/%s", instance.getOwner().getId(), instance.getOwnerId(), entity.getId());
+            return String.format("redirect:/jpm/%s/%s/%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId());
         } else {
             return String.format("redirect:/jpm/%s", entity.getId());
         }
@@ -142,7 +142,7 @@ public class BaseController {
             return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s", entity.getId(), instanceId, nextOp));
         } else {
             if (instance != null && instance.getOwner() != null) {
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s", instance.getOwner().getId(), instance.getOwnerId(), entity.getId(), nextOp));
+                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId(), nextOp));
             } else {
                 return new ModelAndView(String.format("redirect:/jpm/%s/%s", entity.getId(), nextOp));
             }

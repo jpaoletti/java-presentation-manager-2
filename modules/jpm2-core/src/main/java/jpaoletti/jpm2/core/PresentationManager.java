@@ -33,6 +33,8 @@ public class PresentationManager {
     private CustomLoader customLoader;
     @Autowired(required = false)
     private Map<String, Entity> entities;
+    @Autowired(required = false)
+    private List<Entity> entityList;
     //private Map<Object, Monitor> monitors;
     private List<ClassConverter> classConverters;
     private final Map<String, PMSession> sessions = new HashMap<>();
@@ -242,5 +244,13 @@ public class PresentationManager {
 
     public void setService(JPMService service) {
         this.service = service;
+    }
+
+    public List<Entity> getEntityList() {
+        return entityList;
+    }
+
+    public void setEntityList(List<Entity> entityList) {
+        this.entityList = entityList;
     }
 }

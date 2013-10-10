@@ -13,5 +13,5 @@ public interface OperationCondition {
     /**
      * object is posible to be null.
      */
-    public boolean check(final Object object, final Operation operation, final String displayAt) throws PMException;
+    public boolean check(final EntityInstance instance, final Operation operation, final String displayAt) throws PMException;
 }
