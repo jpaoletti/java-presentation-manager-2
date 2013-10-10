@@ -8,13 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
-import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -252,7 +251,7 @@ public class ListController extends BaseController {
         }
     }
 
-    protected Operation getOperation(Entity entity) {
+    protected Operation getOperation(Entity entity) throws OperationNotFoundException {
         return entity.getOperation(OP_LIST);
     }
 }
