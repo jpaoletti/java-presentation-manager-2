@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.util.JPMUtils;
 
 /**

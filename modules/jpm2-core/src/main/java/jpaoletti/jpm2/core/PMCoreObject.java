@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core;
 
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import java.io.Serializable;
 import jpaoletti.jpm2.core.model.PMCoreConstants;
 import jpaoletti.jpm2.util.JPMUtils;

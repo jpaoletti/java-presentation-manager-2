@@ -1,4 +1,6 @@
-package jpaoletti.jpm2.core.converter;
+package jpaoletti.jpm2.core.exception;
+
+import jpaoletti.jpm2.core.exception.ConverterException;
 
 /**
  * An exception that tell the engine to ignore this conversion

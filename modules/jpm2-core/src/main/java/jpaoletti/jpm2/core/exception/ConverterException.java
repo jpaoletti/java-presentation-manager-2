@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.core.converter;
+package jpaoletti.jpm2.core.exception;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.Message;

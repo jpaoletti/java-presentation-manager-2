@@ -1,7 +1,8 @@
 package jpaoletti.jpm2.web.converter;
 
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 
@@ -26,7 +27,7 @@ public class WeakConverter extends Converter {
     }
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
 
         return "@page:weak-converter.jsp?showList=" + isShowList() + "&showBtn=" + isShowBtn() + "&btnText=" + getBtnText() + "&btnIcon=" + getBtnIcon()
                 + "&weakId=" + getEntity().getId() + "&ownerId=" + instanceId + "&showOperations=" + isShowOperations();

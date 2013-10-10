@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.converter.ConverterException;
-import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Field;
 
 /**
@@ -18,7 +19,7 @@ public class EditFileConverter extends Converter {
     private String accept = "'@'"; // /(\.|\/)(gif|jpe?g|png)$/i
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
             final byte[] value = (byte[]) getValue(object, field);
             if (value != null && value.length > 0) {

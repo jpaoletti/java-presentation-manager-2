@@ -7,9 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
-import jpaoletti.jpm2.core.NotAuthorizedException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -68,32 +69,6 @@ public class BaseController {
             getSession().setAttribute(entity.getId(), sessionEntityData);
         }
         return (SessionEntityData) getSession().getAttribute(entity.getId());
-    }
-
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ModelAndView handleTypeMismatchException(MissingServletRequestParameterException ex, HttpServletRequest req, HttpServletResponse resp) {
-        JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
-        JPMUtils.getLogger().warn("Invalid name is: " + ex.getParameterName());
-        JPMUtils.getLogger().warn("Required type is: " + ex.getParameterType());
-        return null;
-    }
-
-    @ExceptionHandler(TypeMismatchException.class)
-    public ModelAndView handleTypeMismatchException(TypeMismatchException ex, HttpServletRequest req, HttpServletResponse resp) {
-        JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
-        JPMUtils.getLogger().warn("Invalid value is: " + ex.getValue());
-        JPMUtils.getLogger().warn("Required type is: " + ex.getRequiredType().getSimpleName());
-        return null;
-    }
-
-    @ExceptionHandler(UnsupportedOperationException.class)
-    public String handleUnsupportedOperationException(UnsupportedOperationException ex, HttpServletRequest req, HttpServletResponse resp) {
-        return "not-implemented";
-    }
-
-    @ExceptionHandler(NotAuthorizedException.class)
-    public String handleNotAuthorizedException() {
-        return "not-authotized";
     }
 
     public void setCurrentHome(String newHome) {
@@ -159,7 +134,7 @@ public class BaseController {
         this.messageSource = messageSource;
     }
 
-    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) {
+    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) throws OperationNotFoundException {
         final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
         final Operation nextOp = entity.getOperation(nextOpId);
         final EntityInstance instance = getContext().getEntityInstance();

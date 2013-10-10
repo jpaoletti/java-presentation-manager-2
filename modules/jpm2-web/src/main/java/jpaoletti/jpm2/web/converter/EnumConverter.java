@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import jpaoletti.jpm2.core.JPMContext;
-import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.Field;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class EnumConverter extends WebToString {
     private JPMContext context;
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = (object == null) ? null : getValue(object, field);
         final Class enumClass = getEnumClass(field);
         final List<String> options = new ArrayList<>();

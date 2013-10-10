@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.exception.EntityNotFoundException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
@@ -192,7 +193,10 @@ public class PresentationManager {
         return null;
     }
 
-    public Entity getEntity(String entityId) {
+    public Entity getEntity(String entityId) throws EntityNotFoundException {
+        if (!getEntities().containsKey(entityId)) {
+            throw new EntityNotFoundException(entityId);
+        }
         return getEntities().get(entityId);
     }
 

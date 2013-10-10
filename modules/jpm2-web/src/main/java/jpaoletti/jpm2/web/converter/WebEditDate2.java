@@ -3,7 +3,8 @@ package jpaoletti.jpm2.web.converter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Field;
 import org.joda.time.DateTime;
@@ -17,7 +18,7 @@ public class WebEditDate2 extends WebToString {
     private String format = "yyyy-MM-dd";
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Date date = (Date) getValue(object, field);
         String value = field.getDefaultValue();
         if (date != null) {

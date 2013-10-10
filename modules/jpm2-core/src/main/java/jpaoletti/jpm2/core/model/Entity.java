@@ -4,6 +4,8 @@ import java.util.*;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.GenericDAO;
+import jpaoletti.jpm2.core.exception.FieldNotFoundException;
+import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.BeanNameAware;
 
@@ -79,8 +81,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @param id The Field id
      * @return The Field with the given id
      */
-    public Field getFieldById(String id) {
-        return getFieldsbyid().get(id);
+    public Field getFieldById(String id) throws FieldNotFoundException {
+        final Field res = getFieldsbyid().get(id);
+        if (res == null) {
+            throw new FieldNotFoundException(getId(), id);
+        }
+        return res;
     }
 
     /**
@@ -414,19 +420,19 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     /**
      * Returns the operation of the given id or a new default operation. If no
-     * operation was found, null is returned.
+     * operation was found, OperationNotFoundException is trhown.
      *
      * @param id The id
      * @return The operation
      */
-    public Operation getOperation(String id) {
+    public Operation getOperation(String id) throws OperationNotFoundException {
         for (Iterator<Operation> it = getAllOperations().iterator(); it.hasNext();) {
             Operation oper = it.next();
             if (oper.getId().compareTo(id) == 0) {
                 return oper;
             }
         }
-        return null;
+        throw new OperationNotFoundException(getId(), id);
     }
 
     public List<Operation> getItemOperations() {

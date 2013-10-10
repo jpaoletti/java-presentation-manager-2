@@ -1,4 +1,6 @@
-package jpaoletti.jpm2.core;
+package jpaoletti.jpm2.core.exception;
+
+import jpaoletti.jpm2.core.PMException;
 
 /**
  *

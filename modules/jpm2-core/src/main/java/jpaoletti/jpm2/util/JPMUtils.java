@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.util;
 
+import jpaoletti.jpm2.core.exception.ConfigurationException;
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jboss.logging.Logger;
@@ -92,13 +93,14 @@ public class JPMUtils {
      * @return The value of the property of the object
      *
      */
-    public static Object get(Object obj, String propertyName) {
+    public static Object get(Object obj, String propertyName) throws ConfigurationException {
         try {
             if (obj != null && propertyName != null) {
                 return PropertyUtils.getNestedProperty(obj, propertyName);
             }
-        } catch (NullPointerException e) {
-        } catch (NestedNullException e) {
+        } catch (NullPointerException | NestedNullException e) {
+        } catch (NoSuchMethodException e) {
+            throw new ConfigurationException("Property not found: " + propertyName);
         } catch (Exception e) {
             getLogger().error(e);
             return "-undefined-";

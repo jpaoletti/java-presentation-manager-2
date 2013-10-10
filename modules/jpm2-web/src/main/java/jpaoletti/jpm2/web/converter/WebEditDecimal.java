@@ -1,7 +1,8 @@
 package jpaoletti.jpm2.web.converter;
 
 import java.math.BigDecimal;
-import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Field;
 
@@ -12,7 +13,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebEditDecimal extends WebToString {
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final BigDecimal fieldValue = (BigDecimal) getValue(object, field);
         final String value = (fieldValue == null) ? field.getDefaultValue() : fieldValue.toString();
         return "<input class='form-control' step='any' name='field_" + field.getId() + "' type='number' value='" + (value != null ? value : "") + "'>";

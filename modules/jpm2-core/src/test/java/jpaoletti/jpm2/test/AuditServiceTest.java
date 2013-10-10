@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.dao.AuditDAO;
+import jpaoletti.jpm2.core.exception.EntityNotFoundException;
 import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.service.AuditService;
@@ -57,7 +58,7 @@ public class AuditServiceTest {
     }
 
     @Test
-    public void test() {
+    public void test() throws EntityNotFoundException {
         final Entity entity = getJpm().getEntity("jpm-entity-test");
         final List<AuditRecord> list = new ArrayList<>();
         list.add(new AuditRecord(1L, "user", entity.getId(), "show", "1", "Test"));

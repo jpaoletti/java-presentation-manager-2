@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.converter.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;

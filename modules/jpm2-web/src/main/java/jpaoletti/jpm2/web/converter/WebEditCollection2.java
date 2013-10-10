@@ -1,7 +1,8 @@
 package jpaoletti.jpm2.web.converter;
 
 import java.util.Collection;
-import jpaoletti.jpm2.core.converter.ConverterException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
 
@@ -16,7 +17,7 @@ public class WebEditCollection2 extends WebEditObject {
     }
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException {
+    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
         final String res = "@page:collection-converter2.jsp?entityId=" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {

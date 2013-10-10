@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import jpaoletti.jpm2.core.NotAuthorizedException;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
@@ -77,9 +77,6 @@ public class ListController extends BaseController {
             while (matcher.find()) {
                 final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
                 final Field field2 = entity.getFieldById(_display_field);
-                if (field2 == null) {
-                    throw new PMException(MessageFactory.error("jpm.field.not.found", _display_field));
-                }
                 disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
             }
             restrictions.add(disjunction);
@@ -232,7 +229,7 @@ public class ListController extends BaseController {
         this.ctx = ctx;
     }
 
-    protected void getObjectDisplay(final ObjectConverterData r, Entity entity, Object object, boolean useToString, String textField) {
+    protected void getObjectDisplay(final ObjectConverterData r, Entity entity, Object object, boolean useToString, String textField) throws ConfigurationException {
         if (!textField.contains("{")) {
             final Field field = entity.getFieldById(textField);
             r.getResults().add(new ObjectConverterDataItem(
