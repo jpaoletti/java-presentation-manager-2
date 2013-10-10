@@ -2,12 +2,12 @@ package jpaoletti.jpm2.core.dao;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import jpaoletti.jpm2.core.idtransformer.IdTransformer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.jodah.typetools.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,63 +56,36 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         getSession().delete(object);
     }
 
-    /**
-     * Retorna una lista.
-     */
     @Override
-    public Long count(Criterion... restrictions) {
-        final Criteria c = getBaseCriteria(restrictions);
+    public Long count(DAOListConfiguration configuration) {
+        final Criteria c = getBaseCriteria(configuration);
         c.setProjection(Projections.rowCount());
         return (Long) c.uniqueResult();
     }
 
-    /**
-     * /**
-     * Retorna una lista.
-     */
-    public List<T> list(Criterion... restrictions) {
-        final Criteria c = getBaseCriteria(restrictions);
-        return c.list();
-    }
-
-    /**
-     * Retorna una lista paginada.
-     */
-    public List<T> list(Integer from, Integer max, Criterion... restrictions) {
-        final Criteria c = getBaseCriteria(restrictions);
-        c.setMaxResults(max);
-        c.setFirstResult(from);
-        return c.list();
-    }
-
-    /**
-     * Retorna una lista con un solo ordenamiento.
-     */
-    public List<T> list(Order order, Criterion... restrictions) {
-        final Criteria c = getBaseCriteria(restrictions);
-        c.addOrder(order);
-        return c.list();
-    }
-
-    /**
-     * Retorna una lista con un solo ordenamiento.
-     */
     @Override
-    public List<T> list(Integer from, Integer max, Order order, Criterion... restrictions) {
-        final Criteria c = getBaseCriteria(restrictions);
-        c.addOrder(order);
-        c.setMaxResults(max);
-        c.setFirstResult(from);
+    public List<T> list(DAOListConfiguration configuration) {
+        final Criteria c = getBaseCriteria(configuration);
+        if (configuration.getMax() != null) {
+            c.setMaxResults(configuration.getMax());
+        }
+        if (configuration.getFrom() != null) {
+            c.setFirstResult(configuration.getFrom());
+        }
+        if (configuration.getOrder() != null) {
+            c.addOrder(configuration.getOrder());
+        }
         return c.list();
     }
 
-    protected Criteria getBaseCriteria(Criterion[] restrictions) {
-        final Criteria c = getSession().createCriteria(getPersistentClass());
-        if (restrictions != null) {
-            for (Criterion criterion : restrictions) {
-                if (criterion != null) {
-                    c.add(criterion);
-                }
+    protected Criteria getBaseCriteria(DAOListConfiguration configuration) {
+        Criteria c = getSession().createCriteria(getPersistentClass());
+        for (Map.Entry<String, String> alias : configuration.getAliases().entrySet()) {
+            c = c.createAlias(alias.getKey(), alias.getValue());
+        }
+        for (Criterion criterion : configuration.getRestrictions()) {
+            if (criterion != null) {
+                c.add(criterion);
             }
         }
         return c;

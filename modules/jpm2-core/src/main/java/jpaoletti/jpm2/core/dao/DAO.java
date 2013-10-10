@@ -3,7 +3,6 @@ package jpaoletti.jpm2.core.dao;
 import java.io.Serializable;
 import java.util.List;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 
 /**
  *
@@ -11,7 +10,7 @@ import org.hibernate.criterion.Order;
  */
 public interface DAO<T, ID extends Serializable> {
 
-    public Long count(Criterion... restrictions);
+    public Long count(DAOListConfiguration configuration);
 
     public void delete(Object object);
 
@@ -19,7 +18,7 @@ public interface DAO<T, ID extends Serializable> {
 
     public ID getId(Object object);
 
-    public List<T> list(Integer from, Integer max, Order order, Criterion... restrictions);
+    public List<T> list(DAOListConfiguration configuration);
 
     public void save(Object object);
 

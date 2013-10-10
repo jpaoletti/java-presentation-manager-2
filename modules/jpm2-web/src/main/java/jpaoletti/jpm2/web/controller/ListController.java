@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -82,7 +83,7 @@ public class ListController extends BaseController {
             }
             restrictions.add(disjunction);
         }
-        final List list = entity.getDao().list((page - 1) * ps, ps, restrictions.toArray(new Criterion[restrictions.size()]));
+        final List list = entity.getDao().list(new DAOListConfiguration((page - 1) * ps, ps).withRestrictions(restrictions));
         r.setMore(list.size() == ps);
         r.setResults(new ArrayList<ObjectConverterDataItem>());
         for (Object object : list) {
@@ -207,10 +208,6 @@ public class ListController extends BaseController {
             @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
         return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
-    }
-
-    protected Criterion getSearch(Entity entity) throws PMException {
-        return getSessionEntityData(entity).getSearchCriteria().getCriterion();
     }
 
     protected ModelAndView generalList(Entity entity, Integer page, Integer pageSize, String ownerId) throws PMException {

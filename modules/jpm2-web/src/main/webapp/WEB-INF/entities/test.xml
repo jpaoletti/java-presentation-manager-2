@@ -5,7 +5,7 @@
     <!--
     http://static.springsource.org/spring/docs/2.5.6/reference/extensible-xml.html
     -->
-    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.JPMTestDAO" >
+    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.JPMTestDAOImpl" >
         <property name="transformer" ref="transformer-strToLong" />
     </bean>
     

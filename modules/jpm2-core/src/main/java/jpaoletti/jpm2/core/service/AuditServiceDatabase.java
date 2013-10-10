@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.dao.AuditDAO;
+import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
@@ -76,18 +77,18 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
 
     @Override
     public List<AuditRecord> getItemRecords(Entity entity, String instanceId) {
-        return getDao().list(
+        return getDao().list(new DAOListConfiguration(
                 Order.desc("id"),
                 Restrictions.eq("entity", entity.getId()),
-                Restrictions.eq("item", instanceId));
+                Restrictions.eq("item", instanceId)));
     }
 
     @Override
     public List<AuditRecord> getGeneralRecords(Entity entity) {
-        return getDao().list(
+        return getDao().list(new DAOListConfiguration(
                 Order.desc("id"),
                 Restrictions.eq("entity", entity.getId()),
-                Restrictions.or(Restrictions.isNull("item"), Restrictions.eq("operation", "delete")));
+                Restrictions.or(Restrictions.isNull("item"), Restrictions.eq("operation", "delete"))));
     }
 
     public AuditDAO getDao() {

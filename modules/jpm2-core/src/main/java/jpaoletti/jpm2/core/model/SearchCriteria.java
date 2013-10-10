@@ -2,7 +2,9 @@ package jpaoletti.jpm2.core.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
@@ -18,13 +20,23 @@ public class SearchCriteria implements Serializable {
 
     private Criterion criterion; //Global criteria search, Something like Restrictions.and(... , ...)
     private List<SearchCriteriaField> definitions; //Individual criterias
+    private Map<String, String> aliases;
 
     public SearchCriteria() {
         this.definitions = new ArrayList<>();
+        this.aliases = new HashMap<>();
     }
 
     public Criterion getCriterion() {
         return criterion;
+    }
+
+    public Map<String, String> getAliases() {
+        return aliases;
+    }
+
+    public void setAliases(Map<String, String> aliases) {
+        this.aliases = aliases;
     }
 
     /**
@@ -36,6 +48,7 @@ public class SearchCriteria implements Serializable {
 
     public void addDefinition(String fieldId, Searcher.DescribedCriterion describedCriterion) {
         getDefinitions().add(new SearchCriteriaField(fieldId, describedCriterion));
+        getAliases().putAll(describedCriterion.getAliases());
         addCriterion(describedCriterion.getCriterion());
     }
 
@@ -44,7 +57,8 @@ public class SearchCriteria implements Serializable {
         //Resets criterion
         this.criterion = null;
         for (SearchCriteriaField d : getDefinitions()) {
-            addCriterion(d.getCriterion());
+            addCriterion(d.getDescribedCriterion().getCriterion());
+            getAliases().putAll(d.getDescribedCriterion().getAliases());
         }
     }
 
@@ -59,13 +73,15 @@ public class SearchCriteria implements Serializable {
     public static class SearchCriteriaField {
 
         private String fieldId;
-        private Criterion criterion;
-        private Message description;
+        private DescribedCriterion describedCriterion;
 
         public SearchCriteriaField(String fieldId, DescribedCriterion describedCriterion) {
             this.fieldId = fieldId;
-            this.criterion = describedCriterion.getCriterion();
-            this.description = describedCriterion.getDescription();
+            this.describedCriterion = describedCriterion;
+        }
+
+        public Message getDescription() {
+            return getDescribedCriterion().getDescription();
         }
 
         public String getFieldId() {
@@ -76,20 +92,12 @@ public class SearchCriteria implements Serializable {
             this.fieldId = fieldId;
         }
 
-        public Criterion getCriterion() {
-            return criterion;
+        public DescribedCriterion getDescribedCriterion() {
+            return describedCriterion;
         }
 
-        public void setCriterion(Criterion criterion) {
-            this.criterion = criterion;
-        }
-
-        public Message getDescription() {
-            return description;
-        }
-
-        public void setDescription(Message description) {
-            this.description = description;
+        public void setDescribedCriterion(DescribedCriterion describedCriterion) {
+            this.describedCriterion = describedCriterion;
         }
     }
 }

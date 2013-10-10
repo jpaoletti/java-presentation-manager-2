@@ -64,7 +64,7 @@ public class AuditServiceTest {
         list.add(new AuditRecord(1L, "user", entity.getId(), "show", "1", "Test"));
         list.add(new AuditRecord(2L, "user", entity.getId(), "add", null, "Test2"));
         list.add(new AuditRecord(3L, "user", "other", "add", null, "Test3"));
-        when(getDao().list(any(Order.class))).thenReturn(list);
+        //when(getDao().list(any(Order.class))).thenReturn(list);
         Assert.assertNotNull(service);
         //Assert.assertEquals(1, getService().getGeneralRecords(entity).size());
         //Assert.assertEquals(1, getService().getItemRecords(entity, "1").size());
