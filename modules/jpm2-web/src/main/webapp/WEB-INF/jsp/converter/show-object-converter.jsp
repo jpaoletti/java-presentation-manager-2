@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:if test="${not empty param.value}">
-    <a href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}">${param.value}</a>
+    <a disabled href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}" class="form-control">${param.value}<span class="glyphicon glyphicon-comment pull-right"></span></a>
     <script type="text/javascript">
         $("body").on("click", "#field_${field}_${param.instanceId}_${param.objectId}", function() {
             $.getJSON("${cp}jpm/${param.entityId}/${param.instanceId}/show.json?fields=${param.fields}", function(data) {
