@@ -35,6 +35,12 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
             final Serializable instanceId = entity.getDao().getId(object);
             final IdentifiedObject iobject = new IdentifiedObject(String.valueOf(instanceId), object);
             final EntityInstance instance = new EntityInstance(iobject, getFields(), entity, operation);
+            if (entity.getHighlighter() != null) {
+                final String highlight = entity.getHighlighter().highlight(instance);
+                if (highlight != null) {
+                    instance.setHighlight(highlight);
+                }
+            }
             for (Field field : getFields()) {
                 try {
                     instance.getValues().put(field.getId(), getConverters().get(field.getId()).visualize(field, object, (instanceId != null) ? instanceId.toString() : null));

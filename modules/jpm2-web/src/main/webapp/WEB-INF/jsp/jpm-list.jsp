@@ -90,7 +90,7 @@
                                 </thead>
                                 <tbody>
                                     <c:forEach items="${paginatedList.contents}" var="item">
-                                        <tr data-id="${item.id}">
+                                        <tr data-id="${item.id}" class="instance-row ${item.highlight}">
                                             <th class="operation-list" style="width: ${fn:length(item.operations) * 30 + 20}px">
                                     <div class="btn-group nowrap">
                                         <c:if test="${not empty selectedOperations}">

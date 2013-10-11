@@ -26,7 +26,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private Entity parent;
     private boolean auditable;
     private EntityOwner owner;
-    private Highlights highlights;
     private boolean countable; //Enable the use of "count" on lists
     private boolean paginable; //Enable pagination on lists
     private String auth; //Needed authority to access any operation on this entity
@@ -40,6 +39,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private String defaultSortField;
     private ListSort.SortDirection defaultSortDirection;
     private Integer pageSize;
+    private Highlighter highlighter;
 
     public Entity() {
         super();
@@ -264,18 +264,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.operations = operations;
     }
 
-    /**
-     * @param highlights the highlights to set
-     */
-    public void setHighlights(Highlights highlights) {
-        this.highlights = highlights;
+    public Highlighter getHighlighter() {
+        return highlighter;
     }
 
-    /**
-     * @return the highlights
-     */
-    public Highlights getHighlights() {
-        return highlights;
+    public void setHighlighter(Highlighter highlighter) {
+        this.highlighter = highlighter;
     }
 
     /**
@@ -338,34 +332,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setCountable(boolean countable) {
         this.countable = countable;
-    }
-
-    /**
-     * Looks for an apropiate highlight for this field+instance
-     *
-     * @param field
-     * @param instance
-     * @return the highlight
-     */
-    public Highlight getHighlight(Field field, Object instance) {
-        if (getHighlights() == null) {
-            return null;
-        }
-        return getHighlights().getHighlight(this, field, instance);
-    }
-
-    /**
-     * Looks for all the apropiate highlight for this field+instance
-     *
-     * @param field
-     * @param instance
-     * @return the highlight
-     */
-    public List<Highlight> getHighlights(Field field, Object instance) {
-        if (getHighlights() == null) {
-            return null;
-        }
-        return getHighlights().getHighlights(this, field, instance);
     }
 
     /**

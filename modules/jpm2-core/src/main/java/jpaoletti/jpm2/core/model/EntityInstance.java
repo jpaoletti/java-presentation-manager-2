@@ -21,6 +21,7 @@ public class EntityInstance {
     private List<Operation> operations; //Individual operations
     private List<Field> fields;
     private Map<String, Object> values;
+    private String highlight;
 
     /**
      * Used for lists.
@@ -29,6 +30,7 @@ public class EntityInstance {
         this.iobject = iobject;
         this.values = new LinkedHashMap<>();
         this.fields = fields;
+        this.highlight = "";
         configureItemOperations(entity, operation);
     }
 
@@ -116,5 +118,13 @@ public class EntityInstance {
         } else {
             this.owner = new EntityInstanceOwner(ownerEntity, null);
         }
+    }
+
+    public String getHighlight() {
+        return highlight;
+    }
+
+    public void setHighlight(String highlight) {
+        this.highlight = highlight;
     }
 }
