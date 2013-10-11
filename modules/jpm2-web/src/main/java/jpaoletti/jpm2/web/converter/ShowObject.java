@@ -28,6 +28,7 @@ public class ShowObject extends Converter {
     private String fields;
     private String operation;
     private String textField;
+    private Integer cutOff;
     @Autowired
     private JPMContext context;
 
@@ -120,22 +121,35 @@ public class ShowObject extends Converter {
     }
 
     private String getFinalValue(Object value) throws FieldNotFoundException, ConfigurationException {
+        String finalValue;
         if (getTextField() != null) {
             if (!getTextField().contains("{")) {
                 final Field field = getEntity().getFieldById(getTextField());
                 return String.valueOf(JPMUtils.get(value, field.getProperty()));
             } else {
                 final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
-                String finalValue = textField;
+                finalValue = textField;
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
                     final Field field2 = entity.getFieldById(_display_field);
                     finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(value, field2.getProperty())));
                 }
-                return finalValue;
             }
         } else {
-            return String.valueOf(value);
+            finalValue = String.valueOf(value);
+
         }
+        if (getCutOff() != null && finalValue.length() > getCutOff()) {
+            finalValue = finalValue.substring(0, getCutOff()) + "...";
+        }
+        return finalValue;
+    }
+
+    public Integer getCutOff() {
+        return cutOff;
+    }
+
+    public void setCutOff(Integer cutOff) {
+        this.cutOff = cutOff;
     }
 }
