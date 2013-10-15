@@ -1,4 +1,6 @@
-<title>${jpm.title}</title>
+<c:set var="entityName" value="${entity.title}" />
+<spring:message var="operationName" code="${operation.title}" arguments="${entityName}" text=""/>
+<title>${jpm.title} ${not empty operationName?'- '.concat(operationName):''} ${instance.iobject.object}</title>
 <meta charset="utf-8">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
