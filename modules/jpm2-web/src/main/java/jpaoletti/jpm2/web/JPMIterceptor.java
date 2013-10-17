@@ -72,7 +72,7 @@ public class JPMIterceptor implements HandlerInterceptor {
                     }
                 }
             }
-            if (entity != null) {
+            if (entity != null && ctx.getEntity().getHome() != null) {
                 hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome());
             }
         }
