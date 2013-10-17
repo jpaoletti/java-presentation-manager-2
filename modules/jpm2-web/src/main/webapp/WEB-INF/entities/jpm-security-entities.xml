@@ -150,6 +150,18 @@
             </list>
         </property>
     </bean>
+    <bean id="user" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.security.User" />
+        <property name="dao" ref="jpm-dao-user" />
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="profile" />
+                    <property name="display" value="none" />
+                </bean>
+            </list>
+        </property>
+    </bean>
 
     <bean id="jpm-entity-group" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.security.Group" />
