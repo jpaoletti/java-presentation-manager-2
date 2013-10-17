@@ -47,7 +47,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.paginable = true;
         this.countable = true;
         this.auditable = true;
-        this.home = "index";
         this.pageSize = 10;
     }
 

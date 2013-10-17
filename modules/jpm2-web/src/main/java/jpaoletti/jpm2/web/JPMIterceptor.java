@@ -10,6 +10,7 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -29,6 +30,10 @@ public class JPMIterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest hsr, HttpServletResponse hsr1, Object o, ModelAndView mav) throws Exception {
+        try {
+            mav.addObject("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        } catch (Exception e) {
+        }
         final JPMContext ctx = getContext();
         if (ctx != null) {
             final Entity entity = ctx.getEntity();
@@ -67,7 +72,7 @@ public class JPMIterceptor implements HandlerInterceptor {
                     }
                 }
             }
-            if (entity != null) {
+            if (entity != null && ctx.getEntity().getHome() != null) {
                 hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome());
             }
         }

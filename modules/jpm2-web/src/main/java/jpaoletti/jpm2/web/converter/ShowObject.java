@@ -39,7 +39,7 @@ public class ShowObject extends Converter {
         final String res = "@page:show-object-converter.jsp"
                 + "?entityId=" + getEntity().getId()
                 + "&fields=" + getFields()
-                + "&objectId=" + getContext().getEntity().getDao().getId(object);
+                + (object != null ? "&objectId=" + getContext().getEntity().getDao().getId(object) : "");
         if (value == null) {
             return res;
         } else {
