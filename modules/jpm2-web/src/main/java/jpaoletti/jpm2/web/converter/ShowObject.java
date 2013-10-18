@@ -76,6 +76,8 @@ public class ShowObject extends Converter {
                         + "&operationTitle=" + operationTitle;
             } catch (ConfigurationException ex) {
                 throw new ConverterException(ex.getMessage());
+            } catch (NotAuthorizedException ex) {
+                throw new ConverterException("Not authorized.");
             }
         }
     }

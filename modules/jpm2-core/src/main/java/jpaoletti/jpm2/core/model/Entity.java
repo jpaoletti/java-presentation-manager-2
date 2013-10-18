@@ -5,6 +5,7 @@ import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.BeanNameAware;
@@ -164,7 +165,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return the clazz
      */
     public String getClazz() {
-        return clazz;
+        if (clazz != null) {
+            return clazz;
+        } else if (getParent() != null) {
+            return getParent().getClazz();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -345,7 +352,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * Returns the entity title key.
      */
     public String getTitle() {
-        return getMessage(String.format("jpm.entity.title.%s", getId()));
+        final String key = String.format("jpm.entity.title.%s", getId());
+        final String title = getMessage(key);
+        if (title.equals(key) && getParent() != null) {
+            return getParent().getTitle();
+        }
+        return title;
     }
 
     /**
@@ -360,7 +372,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     public List<PanelRow> getPanels() {
-        return panels;
+        if (panels != null) {
+            return panels;
+        } else if (getParent() != null) {
+            return getParent().getPanels();
+        } else {
+            return null;
+        }
     }
 
     public void setPanels(List<PanelRow> panels) {
@@ -376,7 +394,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     public GenericDAO getDao() {
-        return dao;
+        if (dao != null) {
+            return dao;
+        } else if (getParent() != null) {
+            return getParent().getDao();
+        } else {
+            return null;
+        }
     }
 
     public void setDao(GenericDAO dao) {
@@ -390,10 +414,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @param id The id
      * @return The operation
      */
-    public Operation getOperation(String id) throws OperationNotFoundException {
+    public Operation getOperation(String id) throws OperationNotFoundException, NotAuthorizedException {
         for (Iterator<Operation> it = getAllOperations().iterator(); it.hasNext();) {
             Operation oper = it.next();
             if (oper.getId().compareTo(id) == 0) {
+                if (oper.getAuth() != null && !userHasRole(oper.getAuth())) {
+                    throw new NotAuthorizedException();
+                }
                 return oper;
             }
         }
@@ -496,7 +523,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     public String getDefaultSortField() {
-        return defaultSortField;
+        if (defaultSortField != null) {
+            return defaultSortField;
+        } else if (getParent() != null) {
+            return getParent().getDefaultSortField();
+        } else {
+            return null;
+        }
     }
 
     public void setDefaultSortField(String defaultSortField) {
@@ -504,7 +537,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     public ListSort.SortDirection getDefaultSortDirection() {
-        return defaultSortDirection;
+        if (defaultSortDirection != null) {
+            return defaultSortDirection;
+        } else if (getParent() != null) {
+            return getParent().getDefaultSortDirection();
+        } else {
+            return null;
+        }
     }
 
     public void setDefaultSortDirection(ListSort.SortDirection defaultSortDirection) {

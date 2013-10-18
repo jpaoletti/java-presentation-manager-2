@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
@@ -18,15 +17,11 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.core.service.JPMService;
-import jpaoletti.jpm2.util.JPMUtils;
-import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -134,7 +129,7 @@ public class BaseController {
         this.messageSource = messageSource;
     }
 
-    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) throws OperationNotFoundException {
+    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) throws OperationNotFoundException, NotAuthorizedException {
         final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
         final Operation nextOp = entity.getOperation(nextOpId);
         final EntityInstance instance = getContext().getEntityInstance();
