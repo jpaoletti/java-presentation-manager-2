@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  *
@@ -12,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "authorities")
-public class Authority implements Serializable {
+public class Authority implements GrantedAuthority, Serializable {
 
     @Id
     @Column(name = "authority")
@@ -28,6 +29,11 @@ public class Authority implements Serializable {
 
     @Override
     public String toString() {
+        return getId();
+    }
+
+    @Override
+    public String getAuthority() {
         return getId();
     }
 }

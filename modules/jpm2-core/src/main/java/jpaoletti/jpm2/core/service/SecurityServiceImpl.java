@@ -2,7 +2,6 @@ package jpaoletti.jpm2.core.service;
 
 import java.util.UUID;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.dao.UserDAO;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
@@ -19,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public final class SecurityServiceImpl extends JPMServiceBase implements SecurityService {
 
-    @Autowired
-    private UserDAO userDAO;
     @Autowired
     private BCrypt encoder;
 
@@ -39,29 +36,15 @@ public final class SecurityServiceImpl extends JPMServiceBase implements Securit
 
     @Override
     public void changePassword(Entity entity, Operation operation, String instanceId, String current, String newpass) throws PMException {
-        final User user = authenticate(instanceId, current);
+        final User user = (User) entity.getDao().get(instanceId);
+        if (!getEncoder().matches(current, user.getPassword())) {
+            throw new NotAuthorizedException();
+        }
         user.setPassword(BCrypt.hashpw(newpass, BCrypt.gensalt()));
         preExecute(operation, user);
         entity.getDao().update(user);
         postExecute(operation, user);
         getJpm().audit(entity, operation, new IdentifiedObject(instanceId, user));
-    }
-
-    @Override
-    public User authenticate(String username, String password) throws NotAuthorizedException {
-        final User user = (User) getUserDAO().get(username);
-        if (!getEncoder().matches(password, user.getPassword())) {
-            throw new NotAuthorizedException();
-        }
-        return user;
-    }
-
-    public UserDAO getUserDAO() {
-        return userDAO;
-    }
-
-    public void setUserDAO(UserDAO userDAO) {
-        this.userDAO = userDAO;
     }
 
     public BCrypt getEncoder() {
