@@ -149,6 +149,14 @@ function initFunctions() {
     });
 }
 
+var uniqBy = function(ary, key) {
+    var seen = {};
+    return ary.filter(function(elem) {
+        var k = key(elem);
+        return (seen[k] === 1) ? 0 : seen[k] = 1;
+    });
+}
+
 var initPage = function() {
     try {
         //Clean empty help-blocks
@@ -171,6 +179,30 @@ var initPage = function() {
         $('.tip-top').tooltip({placement: 'top'});
         $('.tip-bottom').tooltip({placement: 'bottom'});
 
+        $("#userNavRecent");
+        {
+            var url = $(location).attr('href');
+            if (!url.match(/#$/)) {
+                var cookieName = "jpm_recent";
+                var _recentArray = $.cookie(cookieName)
+                var recentArray = new Array();
+                if (typeof _recentArray !== "undefined") {
+                    recentArray = $.parseJSON(_recentArray);
+                }
+                var array = Array.prototype.slice.call(recentArray);
+                if (array.length >= 10) {
+                    array.shift();
+                }
+                var title = document.title;
+                title = title.substring(title.indexOf("- ")+1);
+                array.push({'url': url, 'title': title});
+                var finalArray = uniqBy(array, JSON.stringify);
+                $.cookie(cookieName, JSON.stringify(finalArray), { path: '/' });
+                $.each(finalArray, function(i, item) {
+                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>"+item.title+"</a></li>")
+                });
+            }
+        }
         initFunctions();
     } finally {
         $("#loading-div").fadeOut();
