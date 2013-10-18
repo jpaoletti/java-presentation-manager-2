@@ -68,20 +68,22 @@ public class ListController extends BaseController {
                 restrictions.add(c);
             }
         }
-        //Field can be a conbintaion of fields like "[{code}] {description}"
-        //Old style is supported if there is no @ in the textField
-        if (!textField.contains("{")) {
-            final Field field = entity.getFieldById(textField);
-            restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
-        } else {
-            final Disjunction disjunction = Restrictions.disjunction();
-            final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-            while (matcher.find()) {
-                final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                final Field field2 = entity.getFieldById(_display_field);
-                disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
+        if (!"".equals(query)) {
+            //Field can be a conbintaion of fields like "[{code}] {description}"
+            //Old style is supported if there is no @ in the textField
+            if (!textField.contains("{")) {
+                final Field field = entity.getFieldById(textField);
+                restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+            } else {
+                final Disjunction disjunction = Restrictions.disjunction();
+                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
+                while (matcher.find()) {
+                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                    final Field field2 = entity.getFieldById(_display_field);
+                    disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
+                }
+                restrictions.add(disjunction);
             }
-            restrictions.add(disjunction);
         }
         final List list = entity.getDao().list(new DAOListConfiguration((page - 1) * ps, ps).withRestrictions(restrictions));
         r.setMore(list.size() == ps);
@@ -248,7 +250,7 @@ public class ListController extends BaseController {
         }
     }
 
-    protected Operation getOperation(Entity entity) throws OperationNotFoundException {
+    protected Operation getOperation(Entity entity) throws OperationNotFoundException, NotAuthorizedException {
         return entity.getOperation(OP_LIST);
     }
 }
