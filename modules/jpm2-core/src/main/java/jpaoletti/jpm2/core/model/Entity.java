@@ -436,11 +436,19 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     public List<Operation> getOperationsFor(EntityInstance instance, Operation operation, OperationScope scope) throws PMException {
         final List<Operation> r = new ArrayList<>();
         if (operation != null) {
+            //IF
             for (Operation op : getAllOperations()) {
+                //Operation is displayed and enabled and no the same we are checking
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
-                    if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
-                        if (scope.equals(op.getScope())) {
-                            r.add(op);
+                    //User has role
+                    if (op.getAuth() == null || userHasRole(op.getAuth())) {
+                        //Conditions are ok
+                        if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
+                            //Scope is adecuate
+                            if (scope.equals(op.getScope())) {
+                                //the we add the operation to list.
+                                r.add(op);
+                            }
                         }
                     }
                 }
