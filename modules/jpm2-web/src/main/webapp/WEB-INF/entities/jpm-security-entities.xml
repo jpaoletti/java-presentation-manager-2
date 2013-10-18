@@ -59,9 +59,7 @@
                     <property name="id" value="add" />
                     <property name="scope" value="GENERAL" />
                     <property name="validator" >
-                        <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" >
-                            <property name="dao" ref="jpm-dao-user" />
-                        </bean>
+                        <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" />
                     </property>
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
