@@ -8,6 +8,9 @@
     <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.JPMTestDAOImpl" >
         <property name="transformer" ref="transformer-strToLong" />
     </bean>
+    <bean id="jpm-dao-weaktest" class="jpaoletti.jpm2.core.test.JPMTestWeakDAOImpl" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
     
     <bean id="jpm-entity-test" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTest" />
@@ -220,6 +223,32 @@
                         </list>
                     </property>
                 </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="weaks" />
+                    <property name="width" value="150px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                        <property name="entity" ref="jpm-entity-weaktest" />
+                                        <property name="showList" value="false" />
+                                    </bean>
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                        <property name="entity" ref="jpm-entity-weaktest" />
+                                        <property name="showOperations" value="true" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
         <property name="panels">
@@ -231,19 +260,19 @@
                                 <property name="icon" value="glyphicon-bell" />
                                 <property name="title" value="jpm.jpm-entity-test.panel1" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="id string test" />
+                                <property name="fields" value="id string test integer decimal" />
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="glyphicon-briefcase" />
                                 <property name="title" value="jpm.jpm-entity-test.panel2" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="integer decimal date bool" />
+                                <property name="fields" value="date bool testEnum file bigstring" />
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="glyphicon-cog" />
                                 <property name="title" value="Another Test" />
                                 <property name="blocks" value="4" />
-                                <property name="fields" value="testEnum file bigstring" />
+                                <property name="fields" value="weaks" />
                             </bean>
                         </list>
                     </property>
@@ -256,6 +285,71 @@
                     <constructor-arg value="bool" />
                     <constructor-arg value="value" />
                     <constructor-arg value="true" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="jpm-entity-weaktest" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTestWeak" />
+        <property name="dao" ref="jpm-dao-weaktest" />
+        <property name="owner">
+            <bean class="jpaoletti.jpm2.core.model.EntityOwner">
+                <property name="owner" ref="jpm-entity-test" />
+                <property name="localProperty" value="test" />
+            </bean>
+        </property>
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="all" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="repeatable" value="true" />
+                    <property name="follows" value="list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="none" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="delete" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="show list" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="id" />
+                    <property name="configs" ref="default-id-field-config" />
+                    <property name="width" value="55px" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="text" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="glyphicon-bell" />
+                                <property name="title" value="jpm.jpm-entity-test.panel1" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="id text" />
+                            </bean>
+                        </list>
+                    </property>
                 </bean>
             </list>
         </property>

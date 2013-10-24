@@ -22,6 +22,7 @@
             <list>
                 <value>jpaoletti.jpm2.core.model.AuditRecord</value>
                 <value>jpaoletti.jpm2.core.test.JPMTest</value>
+                <value>jpaoletti.jpm2.core.test.JPMTestWeak</value>
                 <value>jpaoletti.jpm2.core.security.Authority</value>
                 <value>jpaoletti.jpm2.core.security.User</value>
                 <value>jpaoletti.jpm2.core.security.Group</value>

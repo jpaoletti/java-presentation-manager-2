@@ -2,7 +2,9 @@ package jpaoletti.jpm2.core.test;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -12,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import org.hibernate.annotations.Type;
@@ -52,6 +55,8 @@ public class JPMTest implements Serializable {
     @Lob
     @Column(columnDefinition = "mediumblob")
     private byte[] file;
+    @OneToMany(mappedBy = "test")
+    private List<JPMTestWeak> weaks;
 
     public JPMTest(Long id, String string, Integer integer, Date date, Boolean bool) {
         this.id = id;
@@ -59,6 +64,7 @@ public class JPMTest implements Serializable {
         this.integer = integer;
         this.date = date;
         this.bool = bool;
+        this.weaks = new ArrayList<>();
     }
 
     public JPMTest() {
@@ -147,5 +153,13 @@ public class JPMTest implements Serializable {
 
     public void setFile(byte[] file) {
         this.file = file;
+    }
+
+    public List<JPMTestWeak> getWeaks() {
+        return weaks;
+    }
+
+    public void setWeaks(List<JPMTestWeak> weaks) {
+        this.weaks = weaks;
     }
 }
