@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.web.controller;
 
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.EntityInstanceOwner;
@@ -72,6 +73,7 @@ public class AddController extends BaseController {
      * POST method finalizes the operation
      *
      * @param entity
+     * @param repeat
      * @return redirect to show
      * @throws PMException
      */
@@ -84,6 +86,7 @@ public class AddController extends BaseController {
         try {
             final IdentifiedObject newObject = getService().save(entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
+            getContext().setGlobalMessage(MessageFactory.info("jpm.add.success"));
             if (repeat) {
                 return new ModelAndView(String.format("redirect:/jpm/%s/%s?repeat=true&lastId=%s", entity.getId(), OP_ADD, newObject.getId()));
             } else {
@@ -100,7 +103,10 @@ public class AddController extends BaseController {
     /**
      * POST method finalizes the operation
      *
+     * @param owner
+     * @param ownerId
      * @param entity
+     * @param repeat
      * @return redirect to show
      * @throws PMException
      */
@@ -115,6 +121,7 @@ public class AddController extends BaseController {
             getContext().set(entity, operation);
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
+            getContext().setGlobalMessage(MessageFactory.info("jpm.add.success"));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
                 return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s?repeat=true&lastId=%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId(), OP_ADD, newObject.getId()));

@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.core.message;
 
+import java.io.Serializable;
+
 /**
  * Message types: error, warning, information.
  *
@@ -8,7 +10,7 @@ package jpaoletti.jpm2.core.message;
  * @version v1.1
  *
  */
-public enum MessageType {
+public enum MessageType implements Serializable {
 
     ERROR("error"), WARN("warn"), INFO("info");
     private String name;

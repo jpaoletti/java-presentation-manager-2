@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.message;
 
+import java.io.Serializable;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 
@@ -13,7 +14,7 @@ import jpaoletti.jpm2.core.model.Field;
  * @version v1.1
  *
  */
-public class Message {
+public class Message implements Serializable{
 
     private MessageType type;
     private Entity entity;

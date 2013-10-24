@@ -17,6 +17,8 @@ public interface JPMContext {
 
     /**
      * Current entity.
+     *
+     * @return current entity
      */
     public Entity getEntity();
 
@@ -26,6 +28,8 @@ public interface JPMContext {
 
     /**
      * Current operation.
+     *
+     * @return current operation
      */
     public Operation getOperation();
 
@@ -40,4 +44,8 @@ public interface JPMContext {
     public Map<String, List<Message>> getFieldMessages();
 
     public List<Message> getEntityMessages();
+
+    public Message getGlobalMessage();
+
+    public void setGlobalMessage(Message message);
 }

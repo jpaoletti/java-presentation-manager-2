@@ -23,10 +23,10 @@ public class JPMContextImpl implements JPMContext {
 
     private Entity entity;
     private Operation operation;
-    private Object object;
     private EntityInstance entityInstance;
     private Map<String, List<Message>> fieldMessages; //field
     private List<Message> entityMessages;
+    private Message globalMessage;
 
     public JPMContextImpl() {
         this.fieldMessages = new HashMap<>();
@@ -93,5 +93,15 @@ public class JPMContextImpl implements JPMContext {
     public void set(Entity entity, Operation operation) {
         this.entity = entity;
         this.operation = operation;
+    }
+
+    @Override
+    public Message getGlobalMessage() {
+        return this.globalMessage;
+    }
+
+    @Override
+    public void setGlobalMessage(Message message) {
+        this.globalMessage = message;
     }
 }
