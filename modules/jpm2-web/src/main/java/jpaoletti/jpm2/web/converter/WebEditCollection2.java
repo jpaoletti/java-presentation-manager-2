@@ -39,14 +39,14 @@ public class WebEditCollection2 extends WebEditObject {
             try {
                 final Collection<Object> c = (Collection<Object>) getValue(object, field);
                 c.clear();
-                final String[] split = (String[]) newValue;
+                final String[] split = ((newValue instanceof String) ? (new String[]{newValue.toString()}) : (String[]) newValue);
                 for (String s : split) {
                     c.add(getEntity().getDao().get(s));
                 }
                 return c;
             } catch (Exception ex) {
-                JPMUtils.getLogger().error(ex);
-                return null;
+                JPMUtils.getLogger().error("", ex);
+                throw new ConverterException("error.converting.collection");
             }
         }
     }
