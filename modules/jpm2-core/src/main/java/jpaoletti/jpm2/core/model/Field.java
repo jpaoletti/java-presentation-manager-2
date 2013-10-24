@@ -8,6 +8,7 @@ import java.util.Objects;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.search.Searcher;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +120,7 @@ public class Field extends PMCoreObject {
         //First we check permissions
         for (FieldConfig config : getConfigs()) {
             if (config.includes(operationId)) {
-                if (config.getAuth() != null && !userHasRole(config.getAuth())) {
+                if (config.getAuth() != null && !SecurityUtils.userHasRole(config.getAuth())) {
                     return false;
                 }
             }

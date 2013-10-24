@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.model;
 import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 
 /**
  * A field configuration item for one or more operations. Works also as a
@@ -78,7 +79,7 @@ public class FieldConfig extends PMCoreObject {
     }
 
     boolean match(Operation operation) {
-        return includes(operation.getId()) && (getAuth().equalsIgnoreCase(ALL) || userHasRole(getAuth()));
+        return includes(operation.getId()) && (getAuth().equalsIgnoreCase(ALL) || SecurityUtils.userHasRole(getAuth()));
     }
 
     public FieldValidator getValidator() {

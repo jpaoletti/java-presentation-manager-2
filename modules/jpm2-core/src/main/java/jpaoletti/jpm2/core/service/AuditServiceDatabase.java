@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -41,8 +42,8 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
         try {
             final AuditRecord record = new AuditRecord();
             record.setDatetime(new Date());
-            if (getAuthentication() != null && getAuthentication().getPrincipal() != null) {
-                record.setUsername((getUserDetails()).getUsername());
+            if (SecurityUtils.getAuthentication() != null && SecurityUtils.getAuthentication().getPrincipal() != null) {
+                record.setUsername((SecurityUtils.getUserDetails()).getUsername());
             }
             if (entity != null) {
                 record.setEntity(entity.getId());

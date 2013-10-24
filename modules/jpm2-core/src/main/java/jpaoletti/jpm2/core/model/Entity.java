@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.BeanNameAware;
 
@@ -80,6 +81,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      *
      * @param id The Field id
      * @return The Field with the given id
+     * @throws jpaoletti.jpm2.core.exception.FieldNotFoundException when the
+     * field was not found for this entity
      */
     public Field getFieldById(String id) throws FieldNotFoundException {
         final Field res = getFieldsbyid().get(id);
@@ -413,14 +416,15 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      *
      * @param id The id
      * @return The operation
+     * @throws jpaoletti.jpm2.core.exception.OperationNotFoundException when
+     * operation does not exists for this entity.
+     * @throws jpaoletti.jpm2.core.exception.NotAuthorizedException when the
+     * operation exists but the user has no permission to access it.
      */
     public Operation getOperation(String id) throws OperationNotFoundException, NotAuthorizedException {
-        for (Iterator<Operation> it = getAllOperations().iterator(); it.hasNext();) {
-            Operation oper = it.next();
+        for (Operation oper : getAllOperations()) {
             if (oper.getId().compareTo(id) == 0) {
-                if (oper.getAuth() != null && !userHasRole(oper.getAuth())) {
-                    throw new NotAuthorizedException();
-                }
+                oper.checkAuthorization();
                 return oper;
             }
         }
@@ -468,7 +472,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                 //Operation is displayed and enabled and no the same we are checking
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
                     //User has role
-                    if (op.getAuth() == null || userHasRole(op.getAuth())) {
+                    if (op.getAuth() == null || SecurityUtils.userHasRole(op.getAuth())) {
                         //Conditions are ok
                         if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
                             //Scope is adecuate

@@ -3,16 +3,12 @@ package jpaoletti.jpm2.core;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import java.io.Serializable;
 import jpaoletti.jpm2.core.model.PMCoreConstants;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * This is the superclass of all the core objects of Presentation Manager and it
@@ -57,42 +53,14 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
         return debug;
     }
 
-    public boolean userHasRole(String role) {
-        final Authentication authentication = getAuthentication();
-        if (authentication == null) {
-            return false;
-        }
-        for (final GrantedAuthority auth : authentication.getAuthorities()) {
-            if (role.equals(auth.getAuthority())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Authentication getAuthentication() {
-        final SecurityContext context = SecurityContextHolder.getContext();
-        if (context == null) {
-            return null;
-        }
-        return context.getAuthentication();
-    }
-
     public void checkAuthorization() throws NotAuthorizedException {
-        if (getAuth() != null && !userHasRole(getAuth())) {
+        if (getAuth() != null && !SecurityUtils.userHasRole(getAuth())) {
             throw new NotAuthorizedException();
         }
     }
 
-    /**
-     * Override me
-     */
     public String getAuth() {
         return null;
-    }
-
-    protected UserDetails getUserDetails() {
-        return (UserDetails) getAuthentication().getPrincipal();
     }
 
     public MessageSource getMessageSource() {
