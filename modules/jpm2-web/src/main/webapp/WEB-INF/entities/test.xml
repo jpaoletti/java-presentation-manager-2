@@ -166,6 +166,7 @@
                                     <bean class="jpaoletti.jpm2.web.converter.ShowObject">
                                         <property name="entity" ref="jpm-entity-test" />
                                         <property name="fields" value="id,string,integer,date,bool" />
+                                        <property name="operation" value="show" />
                                     </bean>
                                 </property>
                             </bean>
