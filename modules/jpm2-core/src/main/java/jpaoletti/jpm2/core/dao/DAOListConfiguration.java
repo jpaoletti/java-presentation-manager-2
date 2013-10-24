@@ -105,6 +105,11 @@ public class DAOListConfiguration {
         return this;
     }
 
+    public DAOListConfiguration withAlias(String key, String value) {
+        getAliases().put(key, value);
+        return this;
+    }
+
     public DAOListConfiguration withRestrictions(List<Criterion> restrictions) {
         setRestrictions(restrictions);
         return this;
