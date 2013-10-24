@@ -8,10 +8,11 @@ import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
-import jpaoletti.jpm2.core.message.MessageFactory;
+import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.controller.ListController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class ShowObject extends Converter {
     private Entity entity;
     private String fields;
     private String operation;
+    private String operationAuth;
     private String textField;
     private Integer cutOff;
     @Autowired
@@ -47,13 +49,9 @@ public class ShowObject extends Converter {
                 final Serializable localId = getEntity().getDao().getId(value);
                 String operationLink = "";
                 String operationTitle = "";
-                if (getOperation() != null) {
-                    final Operation op = getEntity().getOperation(getOperation());
-                    if (op != null) {
-                        try {
-                            op.checkAuthorization();
-                        } catch (NotAuthorizedException ex) {
-                        }
+                if (getOperation() != null && (getOperationAuth()==null || SecurityUtils.userHasRole(getOperationAuth()))) {
+                    try {
+                        final Operation op = getEntity().getOperation(getOperation());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
                         switch (op.getScope()) {
                             case ITEM:
@@ -63,8 +61,8 @@ public class ShowObject extends Converter {
                                 operationLink = "jpm/" + getEntity().getId() + "/" + getOperation();
                                 break;
                         }
-                    } else {
-                        throw new ConverterException(MessageFactory.error("jpm.converter.operation.not.exists", getEntity().getId(), getOperation()));
+                    } catch (NotAuthorizedException | OperationNotFoundException ex) {
+                        //We don't care for now
                     }
                 }
                 final String finalValue = getFinalValue(value);
@@ -76,8 +74,6 @@ public class ShowObject extends Converter {
                         + "&operationTitle=" + operationTitle;
             } catch (ConfigurationException ex) {
                 throw new ConverterException(ex.getMessage());
-            } catch (NotAuthorizedException ex) {
-                throw new ConverterException("Not authorized.");
             }
         }
     }
@@ -153,5 +149,13 @@ public class ShowObject extends Converter {
 
     public void setCutOff(Integer cutOff) {
         this.cutOff = cutOff;
+    }
+
+    public String getOperationAuth() {
+        return operationAuth;
+    }
+
+    public void setOperationAuth(String operationAuth) {
+        this.operationAuth = operationAuth;
     }
 }
