@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PMSession;
 import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.core.service.JPMService;
+import jpaoletti.jpm2.core.service.SecurityServiceImpl;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -205,13 +207,17 @@ public class PresentationManager {
     /**
      * Getter for entities based on numericId.
      */
-    public Entity getEntity(Integer numericId) {
+    public List<Entity> getEntities(Integer numericId) {
+        final List<Entity> res = new ArrayList<>();
         for (Map.Entry<String, Entity> entry : getEntities().entrySet()) {
-            if (entry.getValue().getNumericId() != null && numericId.equals(entry.getValue().getNumericId())) {
-                return entry.getValue();
+            final Entity entity = entry.getValue();
+            if (entity.getNumericId() != null && numericId.equals(entity.getNumericId())) {
+                if (entity.getAuth() == null || SecurityServiceImpl.userHasRole(entity.getAuth())) {
+                    res.add(entity);
+                }
             }
         }
-        return null;
+        return res;
     }
 
     public AuditService getAuditService() {
