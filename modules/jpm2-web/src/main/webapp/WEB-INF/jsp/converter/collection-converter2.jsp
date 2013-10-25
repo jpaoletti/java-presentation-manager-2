@@ -1,7 +1,7 @@
 <div id="${field}CollectionContainer"></div>
 <script type="text/javascript">
     jpmLoad(function() {
-        $.ajax("${cp}jpm/${param.entityId}.json?textField=${param.textField}", {
+        $.ajax("${cp}jpm/${param.entityId}.json?textField=${param.textField}&filter=${param.filter}", {
             dataType: "json",
             async: false,
             success: function(data) {

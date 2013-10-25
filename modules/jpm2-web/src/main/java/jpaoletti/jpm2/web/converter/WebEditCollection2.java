@@ -19,7 +19,12 @@ public class WebEditCollection2 extends WebEditObject {
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
-        final String res = "@page:collection-converter2.jsp?entityId=" + getEntity().getId() + "&textField=" + getTextField() + "&pageSize=" + getPageSize() + "&minSearch=" + getMinSearch();
+        final String res = "@page:collection-converter2.jsp"
+                + "?entityId=" + getEntity().getId()
+                + "&textField=" + getTextField()
+                + "&filter=" + getFilter().getId()
+                + "&pageSize=" + getPageSize()
+                + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
             return res;
         } else {
