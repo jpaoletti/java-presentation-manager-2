@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class SecurityUtils {
 
     public static boolean userHasRole(String role) {
+        if (role == null) {
+            return true;
+        }
         final Authentication authentication = getAuthentication();
         if (authentication == null) {
             return false;

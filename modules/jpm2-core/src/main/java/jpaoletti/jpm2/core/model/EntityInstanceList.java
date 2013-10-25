@@ -27,8 +27,10 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
         for (Field field : entity.getOrderedFields()) {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
-                getFields().add(field);
-                getConverters().put(field.getId(), converter);
+                if (field.shouldDisplay(operation.getId())) {
+                    getFields().add(field);
+                    getConverters().put(field.getId(), converter);
+                }
             }
         }
         for (Object object : objects) {

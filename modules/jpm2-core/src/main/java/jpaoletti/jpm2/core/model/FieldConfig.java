@@ -59,11 +59,7 @@ public class FieldConfig extends PMCoreObject {
 
     @Override
     public String getAuth() {
-        if (auth == null) {
-            return ALL;
-        } else {
-            return auth.trim();
-        }
+        return auth;
     }
 
     public void setAuth(String auth) {
@@ -79,7 +75,11 @@ public class FieldConfig extends PMCoreObject {
     }
 
     boolean match(Operation operation) {
-        return includes(operation.getId()) && (getAuth().equalsIgnoreCase(ALL) || SecurityUtils.userHasRole(getAuth()));
+        if (operation != null) {
+            return includes(operation.getId()) && (getAuth() == null || SecurityUtils.userHasRole(getAuth()));
+        } else {
+            return false;
+        }
     }
 
     public FieldValidator getValidator() {

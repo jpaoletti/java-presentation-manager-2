@@ -85,7 +85,7 @@ public class Field extends PMCoreObject {
     public List<FieldConfig> getConfigs() {
         if (configs == null) {
             configs = new ArrayList<>();
-            configs.add(new FieldConfig(FieldConfig.ALL, FieldConfig.ALL, getDefaultConverter()));
+            configs.add(new FieldConfig(FieldConfig.ALL, null, getDefaultConverter()));
         }
         return configs;
     }

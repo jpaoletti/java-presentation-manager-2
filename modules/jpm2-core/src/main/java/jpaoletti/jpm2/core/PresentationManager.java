@@ -12,9 +12,9 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PMSession;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.core.service.JPMService;
-import jpaoletti.jpm2.core.service.SecurityServiceImpl;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -206,13 +206,16 @@ public class PresentationManager {
 
     /**
      * Getter for entities based on numericId.
+     *
+     * @param numericId
+     * @return list of entities with the given numeric id
      */
     public List<Entity> getEntities(Integer numericId) {
         final List<Entity> res = new ArrayList<>();
         for (Map.Entry<String, Entity> entry : getEntities().entrySet()) {
             final Entity entity = entry.getValue();
             if (entity.getNumericId() != null && numericId.equals(entity.getNumericId())) {
-                if (entity.getAuth() == null || SecurityServiceImpl.userHasRole(entity.getAuth())) {
+                if (entity.getAuth() == null || SecurityUtils.userHasRole(entity.getAuth())) {
                     res.add(entity);
                 }
             }
