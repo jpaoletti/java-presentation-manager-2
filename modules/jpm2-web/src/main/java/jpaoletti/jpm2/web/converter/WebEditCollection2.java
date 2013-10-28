@@ -22,7 +22,7 @@ public class WebEditCollection2 extends WebEditObject {
         final String res = "@page:collection-converter2.jsp"
                 + "?entityId=" + getEntity().getId()
                 + "&textField=" + getTextField()
-                + "&filter=" + getFilter().getId()
+                + "&filter=" + ((getFilter() != null) ? getFilter().getId() : "")
                 + "&pageSize=" + getPageSize()
                 + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
