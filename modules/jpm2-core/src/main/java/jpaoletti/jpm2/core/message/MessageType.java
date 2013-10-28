@@ -3,7 +3,7 @@ package jpaoletti.jpm2.core.message;
 import java.io.Serializable;
 
 /**
- * Message types: error, warning, information.
+ * Message types: success, error, warning, information.
  *
  * @author jpaoletti
  * @since 13/09/2011
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public enum MessageType implements Serializable {
 
-    ERROR("error"), WARN("warn"), INFO("info");
+    SUCCESS("success"), ERROR("danger"), WARN("warning"), INFO("info");
     private String name;
 
     private MessageType(String name) {

@@ -86,7 +86,7 @@ public class AddController extends BaseController {
         try {
             final IdentifiedObject newObject = getService().save(entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
-            getContext().setGlobalMessage(MessageFactory.info("jpm.add.success"));
+            getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
                 return new ModelAndView(String.format("redirect:/jpm/%s/%s?repeat=true&lastId=%s", entity.getId(), OP_ADD, newObject.getId()));
             } else {
@@ -121,7 +121,7 @@ public class AddController extends BaseController {
             getContext().set(entity, operation);
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
-            getContext().setGlobalMessage(MessageFactory.info("jpm.add.success"));
+            getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
                 return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s?repeat=true&lastId=%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId(), OP_ADD, newObject.getId()));

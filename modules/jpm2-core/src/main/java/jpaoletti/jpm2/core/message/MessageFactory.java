@@ -1,8 +1,5 @@
 package jpaoletti.jpm2.core.message;
 
-import jpaoletti.jpm2.core.model.Entity;
-import jpaoletti.jpm2.core.model.Field;
-
 /**
  * Factory for messages
  *
@@ -14,66 +11,47 @@ import jpaoletti.jpm2.core.model.Field;
 public class MessageFactory {
 
     /**
-     * Create a system scoped information message
+     * Create an information message
+     *
+     * @param key Message key
+     * @param args Message arguments
+     * @return a new Message of type info with the given key and arguments
      */
     public static Message info(String key, String... args) {
         return message(MessageType.INFO, key, args);
     }
 
     /**
-     * Create a system scoped warning message
+     * Create a warning message
+     *
+     * @param key Message key
+     * @param args Message arguments
+     * @return a new Message of type warning with the given key and arguments
      */
     public static Message warn(String key, String... args) {
         return message(MessageType.WARN, key, args);
     }
 
     /**
-     * Create a system scoped error message
+     * Create an error message
+     *
+     * @param key Message key
+     * @param args Message arguments
+     * @return a new Message of type error with the given key and arguments
      */
     public static Message error(String key, String... args) {
         return message(MessageType.ERROR, key, args);
     }
 
     /**
-     * Create an entity scoped information message
+     * Create success message
+     *
+     * @param key Message key
+     * @param args Message arguments
+     * @return a new Message of type error with the given key and arguments
      */
-    public static Message info(Entity entity, String key, String... args) {
-        return message(MessageType.INFO, entity, key, args);
-    }
-
-    /**
-     * Create an entity scoped warning message
-     */
-    public static Message warn(Entity entity, String key, String... args) {
-        return message(MessageType.WARN, entity, key, args);
-    }
-
-    /**
-     * Create an entity scoped error message
-     */
-    public static Message error(Entity entity, String key, String... args) {
-        return message(MessageType.ERROR, entity, key, args);
-    }
-
-    /**
-     * Create a field scoped information message
-     */
-    public static Message info(Entity entity, Field field, String key, String... args) {
-        return message(MessageType.INFO, entity, field, key, args);
-    }
-
-    /**
-     * Create a field scoped warning message
-     */
-    public static Message warn(Entity entity, Field field, String key, String... args) {
-        return message(MessageType.WARN, entity, field, key, args);
-    }
-
-    /**
-     * Create a field scoped error message
-     */
-    public static Message error(Entity entity, Field field, String key, String... args) {
-        return message(MessageType.ERROR, entity, field, key, args);
+    public static Message success(String key, String... args) {
+        return message(MessageType.SUCCESS, key, args);
     }
 
     private static Message message(MessageType type, String key, String... args) {
@@ -84,16 +62,4 @@ public class MessageFactory {
         return message;
     }
 
-    private static Message message(MessageType type, Entity entity, String key, String... args) {
-        final Message message = message(type, key, args);
-        message.setEntity(entity);
-        return message;
-    }
-
-    private static Message message(MessageType type, Entity entity, Field field, String key, String... args) {
-        final Message message = message(type, key, args);
-        message.setEntity(entity);
-        message.setField(field);
-        return message;
-    }
 }

@@ -1,5 +1,5 @@
 <c:if test="${not empty globalMessage}">
-    <div id="globalMessage" class="alert alert-info flyover flyover-top">
+    <div id="globalMessage" class="alert alert-${globalMessage.type.name} flyover flyover-top">
         <p>
         <spring:message code='${globalMessage.key}' text='${globalMessage.key}' arguments="${globalMessage.arguments}" />
         <c:set scope="session" var="globalMessage" value="" />

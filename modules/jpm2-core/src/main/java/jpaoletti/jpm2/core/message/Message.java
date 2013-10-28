@@ -1,8 +1,6 @@
 package jpaoletti.jpm2.core.message;
 
 import java.io.Serializable;
-import jpaoletti.jpm2.core.model.Entity;
-import jpaoletti.jpm2.core.model.Field;
 
 /**
  * This class represents any message that system want to send to the user. It
@@ -14,51 +12,22 @@ import jpaoletti.jpm2.core.model.Field;
  * @version v1.1
  *
  */
-public class Message implements Serializable{
+public class Message implements Serializable {
 
     private MessageType type;
-    private Entity entity;
-    private Field field;
     private String key;
     private String[] args;
 
-    /**
-     * Determine if this message is system scoped.
-     *
-     * @return true when message is not asociated with an entity or field
-     */
-    public boolean isSystemScoped() {
-        return getEntity() == null && getField() == null;
-    }
-
-    /**
-     * Determine if this message is entity scoped.
-     *
-     * @return true when message is asociated with an entity but not to a field
-     */
-    public boolean isEntityScoped() {
-        return getEntity() != null && getField() == null;
-    }
-
-    /**
-     * Determine if this message is field scoped.
-     *
-     * @return true when message is asociated with an entity and field
-     */
-    public boolean isFieldScoped() {
-        return getEntity() != null && getField() != null;
-    }
-
     public boolean isError() {
-        return getType() == MessageType.ERROR;
+        return getType().equals(MessageType.ERROR);
     }
 
     public boolean isWarn() {
-        return getType() == MessageType.WARN;
+        return getType().equals(MessageType.WARN);
     }
 
     public boolean isInfo() {
-        return getType() == MessageType.INFO;
+        return getType().equals(MessageType.INFO);
     }
 
     public String[] getArgs() {
@@ -67,22 +36,6 @@ public class Message implements Serializable{
 
     public void setArgs(String[] args) {
         this.args = args;
-    }
-
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
-        this.entity = entity;
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    public void setField(Field field) {
-        this.field = field;
     }
 
     public String getKey() {

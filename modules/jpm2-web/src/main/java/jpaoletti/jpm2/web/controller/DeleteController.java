@@ -2,6 +2,7 @@ package jpaoletti.jpm2.web.controller;
 
 import java.util.List;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
@@ -27,6 +28,7 @@ public class DeleteController extends BaseController {
         final Operation operation = entity.getOperation(OP_DELETE);
         getContext().set(entity, operation);
         final IdentifiedObject iobject = getService().delete(entity, getContext().getOperation(), instanceId);
+        getContext().setGlobalMessage(MessageFactory.success("jpm.delete.success"));
         return toList(new EntityInstance(iobject, entity, operation), entity);
     }
 
@@ -38,6 +40,7 @@ public class DeleteController extends BaseController {
         for (String instanceId : instanceIds) {
             iobject = getService().delete(entity, operation, instanceId);
         }
+        getContext().setGlobalMessage(MessageFactory.success("jpm.multidelete.success"));
         return toList(new EntityInstance(iobject, entity, operation), entity);
     }
 
