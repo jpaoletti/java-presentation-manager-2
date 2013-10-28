@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.service.SecurityService;
 import jpaoletti.jpm2.core.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +47,7 @@ public class SecurityController extends BaseController {
         final Operation operation = entity.getOperation(OP_PROFILE);
         getContext().set(entity, operation);
         final IdentifiedObject iobject = getService().get(entity, operation, instanceId);
-        final User user = (User) iobject.getObject();
+        final UserDetails user = (UserDetails) iobject.getObject();
         if (!getUserDetails().getUsername().equals(user.getUsername())) {
             throw new NotAuthorizedException();
         }
