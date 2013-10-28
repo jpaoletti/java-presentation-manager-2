@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.idtransformer.IdTransformer;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.jodah.typetools.TypeResolver;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  *
  * @author jpaoletti
+ * @param <T>
+ * @param <ID>
  */
 public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, ID> {
 
@@ -80,6 +83,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
 
     protected Criteria getBaseCriteria(DAOListConfiguration configuration) {
         Criteria c = getSession().createCriteria(getPersistentClass());
+        c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         for (Map.Entry<String, String> alias : configuration.getAliases().entrySet()) {
             c = c.createAlias(alias.getKey(), alias.getValue());
         }
