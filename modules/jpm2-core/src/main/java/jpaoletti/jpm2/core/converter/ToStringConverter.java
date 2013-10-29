@@ -23,6 +23,7 @@ public class ToStringConverter extends Converter {
     private PadDirection padDirection = PadDirection.LEFT;
     private Integer cutOff;
     private String properties;
+    private String nullValue = "-";
 
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -31,7 +32,7 @@ public class ToStringConverter extends Converter {
     }
 
     protected String process(final Object value) {
-        String res = getFinalValue(value, getProperties());
+        String res = (value == null) ? getNullValue() : getFinalValue(value, getProperties());
         if (getCutOff() != null && res.length() > getCutOff()) {
             res = res.substring(0, getCutOff()) + "...";
         }
@@ -126,6 +127,14 @@ public class ToStringConverter extends Converter {
 
     public void setProperties(String properties) {
         this.properties = properties;
+    }
+
+    public String getNullValue() {
+        return nullValue;
+    }
+
+    public void setNullValue(String nullValue) {
+        this.nullValue = nullValue;
     }
 
     public static enum PadDirection {
