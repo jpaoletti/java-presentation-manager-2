@@ -2,8 +2,10 @@ package jpaoletti.jpm2.web.controller;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
@@ -92,7 +94,13 @@ public class EditController extends BaseController {
             getJpm().getService().update(entity, operation, instance, params);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (ValidationException e) {
-            return new ResponseEntity<>(getInternationalizedMessage(e.getMsg()), HttpStatus.BAD_REQUEST);
+            final StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, List<Message>> entry : getContext().getFieldMessages().entrySet()) {
+                for (Message message : entry.getValue()) {
+                    sb.append(getInternationalizedMessage(message)).append(". ");
+                }
+            }
+            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -108,7 +108,7 @@
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="list show"/>
-                                <property name="converter" ref="jpm-converter-show"/>
+                                <property name="converter" ref="jpm-converter-editable-int"/>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="add edit"/>
