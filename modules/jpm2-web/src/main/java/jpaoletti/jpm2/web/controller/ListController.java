@@ -3,11 +3,11 @@ package jpaoletti.jpm2.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
+import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.Entity;
@@ -41,7 +41,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ListController extends BaseController {
 
-    public static final Pattern DISPLAY_PATTERN = Pattern.compile("\\{.*?\\}");
     public static final String OP_LIST = "list";
     @Autowired
     private WebApplicationContext ctx;
@@ -130,7 +129,7 @@ public class ListController extends BaseController {
      * @param entity Owner entity
      * @param instanceId Owner entity's id
      * @param weak weak entity
-     * @param field Owner field
+     * @param showOperations
      * @return
      * @throws PMException
      */
@@ -237,7 +236,7 @@ public class ListController extends BaseController {
                     entity.getDao().getId(object).toString(),
                     (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
         } else {
-            final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
+            final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
             String finalValue = textField;
             while (matcher.find()) {
                 final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");

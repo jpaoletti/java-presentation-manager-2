@@ -12,14 +12,25 @@ import org.joda.time.DateTime;
  */
 public class WebShowDateTime extends WebToString {
 
+    private String format = "yyyy-MM-dd";
+
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Date value = (Date) getValue(object, field);
         if (value != null) {
             final DateTime dt = new DateTime(value);
-            return wrap(field, process(dt.toString(getConfig("format", "yyyy-MM-dd"))));
+            return wrap(field, process(dt.toString(getFormat())));
         } else {
             return "-";
         }
     }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
 }

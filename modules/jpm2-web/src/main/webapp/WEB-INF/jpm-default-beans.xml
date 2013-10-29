@@ -40,26 +40,14 @@
     <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
 
     <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
-        <property name="properties">
-            <props>
-                <prop key="prefix">U$S</prop>
-                <prop key="suffix"> .-</prop>
-            </props>
-        </property>
+        <property name="prefix" value="U$S" />
+        <property name="suffix" value=".-"/>
     </bean>
     <bean id="jpm-converter-show-date" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
-        <property name="properties">
-            <props>
-                <prop key="format">dd/MM/yyyy</prop>
-            </props>
-        </property>
+        <property name="format" value="dd/MM/yyyy"/>
     </bean>
     <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
-        <property name="properties">
-            <props>
-                <prop key="format">dd/MM/yyyy HH:mm:ss</prop>
-            </props>
-        </property>
+        <property name="format" value="dd/MM/yyyy HH:mm:ss"/>
     </bean>
 
     <!-- DEFAULT CONFIG LISTS-->

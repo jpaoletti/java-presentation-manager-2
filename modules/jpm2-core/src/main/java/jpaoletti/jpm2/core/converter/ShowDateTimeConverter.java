@@ -12,10 +12,21 @@ import org.joda.time.DateTime;
  */
 public class ShowDateTimeConverter extends ToStringConverter {
 
+    private String format = "yyyy-MM-dd";
+
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Date value = (Date) getValue(object, field);
         final DateTime dt = new DateTime(value);
-        return process(dt.toString(getConfig("format", "yyyy-MM-dd")));
+        return process(dt.toString(getFormat()));
     }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
 }

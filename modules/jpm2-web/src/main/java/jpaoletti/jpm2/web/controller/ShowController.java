@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -44,7 +45,7 @@ public final class ShowController extends BaseController {
                 final Field field = entity.getFieldById(textField);
                 return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
             } else {
-                final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
+                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 String finalValue = textField;
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");

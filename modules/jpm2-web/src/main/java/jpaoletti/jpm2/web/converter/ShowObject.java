@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.converter.Converter;
+import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
@@ -14,7 +15,6 @@ import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
-import jpaoletti.jpm2.web.controller.ListController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -125,7 +125,7 @@ public class ShowObject extends Converter {
                 final Field field = getEntity().getFieldById(getTextField());
                 return String.valueOf(JPMUtils.get(value, field.getProperty()));
             } else {
-                final Matcher matcher = ListController.DISPLAY_PATTERN.matcher(textField);
+                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 finalValue = textField;
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");

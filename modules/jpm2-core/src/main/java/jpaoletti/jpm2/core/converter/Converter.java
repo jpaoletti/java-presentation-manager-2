@@ -2,7 +2,6 @@ package jpaoletti.jpm2.core.converter;
 
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.exception.ConverterException;
-import java.util.Properties;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
@@ -18,13 +17,15 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class Converter extends PMCoreObject {
 
-    private Properties properties;
-
     /**
      * This method transforms the given value into an object to visualize it
      *
+     * @param field
+     * @param object
+     * @param instanceId
      * @return The string representation of the object
      * @throws ConverterException
+     * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      */
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         throw new IgnoreConvertionException();
@@ -34,41 +35,16 @@ public class Converter extends PMCoreObject {
      * This method takes a specific format of the object from the visualization
      * (usually a string) and transforms it in the required object. TODO
      *
+     * @param field
+     * @param object
+     * @param newValue
      * @return The value to be set in the entity instance.
      * @throws ConverterException
+     * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      *
      */
     public Object build(Field field, Object object, Object newValue) throws ConverterException, ConfigurationException {
         throw new IgnoreConvertionException();
-    }
-
-    /**
-     * Getter for a specific property with a default value in case its not
-     * defined. Only works for string.
-     *
-     * @param name Property name
-     * @param def Default value
-     * @return Property value only if its a string
-     */
-    public String getConfig(String name, String def) {
-        debug("Converter.getConfig(" + name + "," + def + ")");
-        if (properties != null) {
-            Object obj = properties.get(name);
-            if (obj instanceof String) {
-                return obj.toString();
-            }
-        }
-        return def;
-    }
-
-    /**
-     * Getter for any property in the properties object
-     *
-     * @param name The property name
-     * @return The property value
-     */
-    public String getConfig(String name) {
-        return getConfig(name, null);
     }
 
     /**
@@ -77,6 +53,7 @@ public class Converter extends PMCoreObject {
      * @param einstance The entity instance
      * @param field The field
      * @return The field value on the entity instance
+     * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      */
     protected Object getValue(Object einstance, Field field) throws ConfigurationException {
         return getValue(einstance, field.getProperty());
@@ -88,25 +65,12 @@ public class Converter extends PMCoreObject {
      * @param obj The object
      * @param propertyName The name of the property to get
      * @return The property value
+     * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      */
     public Object getValue(Object obj, String propertyName) throws ConfigurationException {
         if (obj != null && propertyName != null) {
             return JPMUtils.get(obj, propertyName);
         }
         return null;
-    }
-
-    /**
-     * @return the properties
-     */
-    public Properties getProperties() {
-        return properties;
-    }
-
-    /**
-     * @param properties the properties to set
-     */
-    public void setProperties(Properties properties) {
-        this.properties = properties;
     }
 }

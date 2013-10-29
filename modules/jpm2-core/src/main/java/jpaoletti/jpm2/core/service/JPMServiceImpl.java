@@ -26,10 +26,11 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     /**
      *
-     * @param entity Weak entity
-     * @param owner Instance of the owner entity.
-     * @param ownerField
-     * @return
+     * @param entity Owner entity
+     * @param instanceId Owner id
+     * @param weak Weak entity
+     * @return Weak entity paginated list
+     * @throws jpaoletti.jpm2.core.PMException
      */
     @Override
     public PaginatedList getWeakList(Entity entity, String instanceId, Entity weak) throws PMException {
