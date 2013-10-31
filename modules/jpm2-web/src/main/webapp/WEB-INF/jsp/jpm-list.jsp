@@ -100,7 +100,8 @@
                                             <a
                                                 class="btn btn-mini btn-default confirm-${o.confirm}" 
                                                 title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                                href="${cp}jpm/${entity.id}/${item.id}/${o.id}">
+                                                <!--href="${cp}jpm/${entity.id}/${item.id}/${o.id}">-->
+                                                <!--href="${cp}jpm/${entityPath}/${item.id}/${o.id}">-->
                                                 <i class="glyphicon jpmicon-${o.id}"></i>
                                             </a>
                                         </c:forEach>

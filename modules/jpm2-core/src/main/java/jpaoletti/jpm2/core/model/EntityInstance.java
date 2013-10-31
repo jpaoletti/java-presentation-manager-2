@@ -25,6 +25,12 @@ public class EntityInstance {
 
     /**
      * Used for lists.
+     *
+     * @param iobject
+     * @param fields
+     * @param entity
+     * @param operation
+     * @throws jpaoletti.jpm2.core.PMException
      */
     public EntityInstance(IdentifiedObject iobject, List<Field> fields, Entity entity, Operation operation) throws PMException {
         this.iobject = iobject;
@@ -36,15 +42,29 @@ public class EntityInstance {
 
     /**
      * Used for single instance operations.
+     *
+     * @param entity
+     * @param operation
+     * @throws jpaoletti.jpm2.core.PMException
      */
     public EntityInstance(Entity entity, Operation operation) throws PMException {
         this(null, entity, operation);
     }
 
+    public EntityInstance(IdentifiedObject iobject, Entity entity, Operation operation) throws PMException {
+        this(iobject, entity, operation, null);
+    }
+
     /**
      * Used for single instance operations.
+     *
+     * @param iobject
+     * @param entity
+     * @param operation
+     * @param ownerEntity
+     * @throws jpaoletti.jpm2.core.PMException
      */
-    public EntityInstance(IdentifiedObject iobject, Entity entity, Operation operation) throws PMException {
+    public EntityInstance(IdentifiedObject iobject, Entity entity, Operation operation, Entity ownerEntity) throws PMException {
         this.iobject = iobject;
         final Object object = (iobject != null) ? iobject.getObject() : null;
         final String id = (iobject != null) ? iobject.getId() : null;
@@ -62,9 +82,9 @@ public class EntityInstance {
             }
         }
         if (object != null) {
-            if (entity.isWeak()) {
-                final Object ownerobject = JPMUtils.get(object, entity.getOwner().getLocalProperty());
-                configureOwner(entity, ownerobject);
+            if (entity.isWeak() && ownerEntity != null) {
+                final Object ownerobject = JPMUtils.get(object, entity.getOwner(ownerEntity).getLocalProperty());
+                configureOwner(entity, ownerEntity, ownerobject);
             }
             configureItemOperations(entity, operation);
         }
@@ -110,8 +130,7 @@ public class EntityInstance {
         this.operations = entity.getOperationsFor(this, operation, OperationScope.ITEM);
     }
 
-    public final void configureOwner(Entity entity, final Object ownerobject) {
-        final Entity ownerEntity = entity.getOwner().getOwner();
+    public final void configureOwner(Entity entity, Entity ownerEntity, final Object ownerobject) {
         if (ownerobject != null) {
             final String ownerId = String.valueOf(ownerEntity.getDao().getId(ownerobject));
             this.owner = new EntityInstanceOwner(ownerEntity, new IdentifiedObject(ownerId, ownerobject));

@@ -35,7 +35,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     public PaginatedList getWeakList(Entity entity, String instanceId, Entity weak) throws PMException {
         final Object owner = entity.getDao().get(instanceId);
-        final List list = weak.getDao().list(new DAOListConfiguration(Restrictions.eq(weak.getOwner().getLocalProperty(), owner)));
+        final List list = weak.getDao().list(new DAOListConfiguration(Restrictions.eq(weak.getOwner(entity).getLocalProperty(), owner)));
         final PaginatedList pl = new PaginatedList();
         getContext().setEntity(entity);
         pl.setTotal((long) list.size());
@@ -44,15 +44,15 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     @Override
-    public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, String ownerId) throws PMException {
+    public PaginatedList getPaginatedList(Entity entity, Entity ownerEntity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, String ownerId) throws PMException {
         entity.checkAuthorization();
         operation.checkAuthorization();
         final DAOListConfiguration configuration = new DAOListConfiguration();
         final PaginatedList pl = new PaginatedList();
         final Criterion search = sessionEntityData.getSearchCriteria().getCriterion();
         if (ownerId != null) {
-            final Object owner = entity.getOwner().getOwner().getDao().get(ownerId);
-            configuration.getRestrictions().add(Restrictions.eq(entity.getOwner().getLocalProperty(), owner));
+            final Object owner = ownerEntity.getDao().get(ownerId);
+            configuration.getRestrictions().add(Restrictions.eq(entity.getOwner(ownerEntity).getLocalProperty(), owner));
         }
         if (search != null) {
             configuration.getRestrictions().add(search);
@@ -138,7 +138,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public IdentifiedObject save(Entity owner, String ownerId, Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object ownerObject = owner.getDao().get(ownerId);
         final Object object = JPMUtils.newInstance(entity.getClazz());
-        JPMUtils.set(object, entity.getOwner().getLocalProperty(), ownerObject);
+        JPMUtils.set(object, entity.getOwner(owner).getLocalProperty(), ownerObject);
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao().save(object);

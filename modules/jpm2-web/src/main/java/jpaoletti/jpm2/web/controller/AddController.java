@@ -49,6 +49,7 @@ public class AddController extends BaseController {
     /**
      * GET method prepares form.
      *
+     * @param owner
      * @param entity Entity being added
      * @param ownerId Id of the owner
      * @param lastId Id of the latest added instance. Just for repeated
@@ -59,14 +60,19 @@ public class AddController extends BaseController {
      */
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/" + OP_ADD, method = RequestMethod.GET)
     public ModelAndView addWeakPrepare(
+            @PathVariable Entity owner,
             @PathVariable Entity entity,
             @PathVariable String ownerId,
             @RequestParam(required = false) String lastId) throws PMException {
-        final ModelAndView mav = addPrepare(entity, lastId);
+        final Operation operation = entity.getOperation(OP_ADD);
+        getContext().set(entity, operation);
+        //If there is a "lastId" , the object values are used as defaults
+        final Object object = (lastId == null) ? JPMUtils.newInstance(entity.getClazz()) : getService().get(entity, lastId).getObject();
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation, owner));
         if (entity.isWeak()) {
-            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner().getOwner(), new IdentifiedObject(ownerId)));
+            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(owner, new IdentifiedObject(ownerId)));
         }
-        return mav;
+        return new ModelAndView("jpm-" + EditController.OP_EDIT);
     }
 
     /**
@@ -120,7 +126,7 @@ public class AddController extends BaseController {
         try {
             getContext().set(entity, operation);
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
-            getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
+            getContext().setEntityInstance(new EntityInstance(newObject, entity, operation, owner));
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
@@ -132,7 +138,7 @@ public class AddController extends BaseController {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return addWeakPrepare(entity, ownerId, null);
+            return addWeakPrepare(owner, entity, ownerId, null);
         }
     }
 }

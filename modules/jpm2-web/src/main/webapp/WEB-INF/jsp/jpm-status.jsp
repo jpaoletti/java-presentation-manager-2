@@ -99,8 +99,8 @@
                                                                 <td>${e.order}</td>
                                                             </tr>
                                                             <tr>
-                                                                <th>Owner</th>
-                                                                <td>${e.owner}</td>
+                                                                <th>Owners</th>
+                                                                <td>${e.owners}</td>
                                                             </tr>
                                                             <tr>
                                                                 <th>Countable</th>

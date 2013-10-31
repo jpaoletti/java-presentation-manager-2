@@ -19,7 +19,7 @@ public interface JPMService {
     public PaginatedList getWeakList(Entity entity, String instanceId, Entity weak) throws PMException;
 
     @Transactional
-    public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, String ownerId) throws PMException;
+    public PaginatedList getPaginatedList(Entity entity, Entity ownerEntity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, String ownerId) throws PMException;
 
     @Transactional
     public IdentifiedObject update(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;

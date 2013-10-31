@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.BeanNameAware;
@@ -27,7 +28,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private String order;
     private Entity parent;
     private boolean auditable;
-    private EntityOwner owner;
+    private List<EntityOwner> owners; //several owners for different fields
     private boolean countable; //Enable the use of "count" on lists
     private boolean paginable; //Enable pagination on lists
     private String auth; //Needed authority to access any operation on this entity
@@ -50,6 +51,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.countable = true;
         this.auditable = true;
         this.pageSize = 10;
+        this.owners = new ArrayList<>();
     }
 
     /**
@@ -216,20 +218,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.auditable = auditable;
     }
 
-    /**
-     * Getter for owner
-     *
-     * @return the owner
-     */
-    public EntityOwner getOwner() {
-        return owner;
+    public List<EntityOwner> getOwners() {
+        return owners;
     }
 
-    /**
-     * @param owner the owner to set
-     */
-    public void setOwner(EntityOwner owner) {
-        this.owner = owner;
+    public void setOwners(List<EntityOwner> owners) {
+        this.owners = owners;
     }
 
     /**
@@ -348,7 +342,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return true if the entity is weak
      */
     public boolean isWeak() {
-        return getOwner() != null;
+        return !getOwners().isEmpty();
     }
 
     /**
@@ -568,5 +562,14 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setNumericId(Integer numericId) {
         this.numericId = numericId;
+    }
+
+    public EntityOwner getOwner(Entity ownerEntity) throws PMException {
+        for (EntityOwner owner : getOwners()) {
+            if (owner.getOwner().equals(ownerEntity)) {
+                return owner;
+            }
+        }
+        throw new PMException(MessageFactory.error("not.owner.found", getId(), ownerEntity.getId()));
     }
 }

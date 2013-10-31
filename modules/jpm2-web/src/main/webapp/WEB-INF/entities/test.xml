@@ -293,11 +293,13 @@
     <bean id="jpm-entity-weaktest" class="jpaoletti.jpm2.core.model.Entity" >
         <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTestWeak" />
         <property name="dao" ref="jpm-dao-weaktest" />
-        <property name="owner">
-            <bean class="jpaoletti.jpm2.core.model.EntityOwner">
-                <property name="owner" ref="jpm-entity-test" />
-                <property name="localProperty" value="test" />
-            </bean>
+        <property name="owners">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.EntityOwner">
+                    <property name="owner" ref="jpm-entity-test" />
+                    <property name="localProperty" value="test" />
+                </bean>
+            </list>
         </property>
         <property name="operations" >
             <list>
