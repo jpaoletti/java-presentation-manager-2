@@ -5,6 +5,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.EntityPath;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 
@@ -20,11 +21,15 @@ public interface JPMContext {
      *
      * @return current entity
      */
+    public EntityPath getEntityPath();
+
     public Entity getEntity();
 
     public void setEntity(Entity entity);
 
     public void set(Entity entity, Operation operation);
+
+    public void set(EntityPath entityPath, String operationId) throws PMException;
 
     /**
      * Current operation.

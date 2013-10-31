@@ -40,6 +40,9 @@ public class JPMIterceptor implements HandlerInterceptor {
             final Operation operation = ctx.getOperation();
             if (mav != null) {
                 mav.addObject("locale", LocaleContextHolder.getLocale());
+                if (ctx.getEntityPath() != null) {
+                    mav.addObject("entityPath", ctx.getEntityPath());
+                }
                 if (entity != null) {
                     mav.addObject("entity", entity);
                     final EntityInstance instance = ctx.getEntityInstance();

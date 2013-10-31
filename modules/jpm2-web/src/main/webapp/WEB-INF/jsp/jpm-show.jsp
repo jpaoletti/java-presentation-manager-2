@@ -41,7 +41,7 @@
             jpmLoad(function() {
                 $(".inline-edit").each(function() {
                     $(this).editable({
-                        url: '${cp}jpm/${entity.id}/${instance.id}/iledit',
+                        url: '${cp}jpm/${entityPath}/${instance.id}/iledit',
                         send: "always",
                         emptytext: "-"
                     });

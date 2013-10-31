@@ -2,10 +2,9 @@ package jpaoletti.jpm2.web.controller;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
-import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.EntityPath;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
-import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.service.SecurityService;
 import jpaoletti.jpm2.core.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,31 +28,29 @@ public class SecurityController extends BaseController {
     @Autowired
     private SecurityService securityService;
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_RESET_PASSWORD)
-    public ModelAndView resetPassword(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        final Operation operation = entity.getOperation(OP_RESET_PASSWORD);
-        getContext().set(entity, operation);
-        final User user = getSecurityService().resetPassword(entity, operation, instanceId);
-        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(instanceId, user), entity, operation));
+    @RequestMapping(value = "/jpm/{entityPath}/{instanceId}/" + OP_RESET_PASSWORD)
+    public ModelAndView resetPassword(@PathVariable EntityPath entityPath, @PathVariable String instanceId) throws PMException {
+        getContext().set(entityPath, OP_RESET_PASSWORD);
+        final User user = getSecurityService().resetPassword(entityPath.getEntity(), getContext().getOperation(), instanceId);
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(instanceId, user), entityPath.getEntity(), getContext().getOperation()));
         return new ModelAndView("jpm-" + OP_RESET_PASSWORD);
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_PROFILE)
+    @RequestMapping(value = "/jpm/{entityPath}/{instanceId}/" + OP_PROFILE)
     public ModelAndView profile(
-            @PathVariable Entity entity,
+            @PathVariable EntityPath entityPath,
             @PathVariable String instanceId,
             @RequestParam(required = false) String current,
             @RequestParam(required = false) String newpass) throws PMException {
-        final Operation operation = entity.getOperation(OP_PROFILE);
-        getContext().set(entity, operation);
-        final IdentifiedObject iobject = getService().get(entity, operation, instanceId);
+        getContext().set(entityPath, OP_PROFILE);
+        final IdentifiedObject iobject = getService().get(entityPath.getEntity(), getContext().getOperation(), instanceId);
         final UserDetails user = (UserDetails) iobject.getObject();
         if (!getUserDetails().getUsername().equals(user.getUsername())) {
             throw new NotAuthorizedException();
         }
-        getContext().setEntityInstance(new EntityInstance(iobject, entity, operation));
+        getContext().setEntityInstance(new EntityInstance(iobject, entityPath.getEntity(), getContext().getOperation()));
         if (current != null) {
-            getSecurityService().changePassword(entity, operation, instanceId, current, newpass);
+            getSecurityService().changePassword(entityPath.getEntity(), getContext().getOperation(), instanceId, current, newpass);
         }
         return new ModelAndView("jpm-" + OP_PROFILE);
     }

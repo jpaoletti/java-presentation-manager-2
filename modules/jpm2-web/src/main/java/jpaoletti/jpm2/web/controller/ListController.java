@@ -14,6 +14,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.EntityPath;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
@@ -103,25 +104,25 @@ public class ListController extends BaseController {
         if (entityPath.getEntity().isWeak()) {
             throw new NotAuthorizedException();
         }
-        final ModelAndView mav = generalList(entityPath.getEntity(), null, page, pageSize, null);
+        final ModelAndView mav = generalList(entityPath, null, page, pageSize, null);
         getContext().setEntityInstance(new EntityInstance(entityPath.getEntity(), getOperation(entityPath.getEntity())));
         return mav;
     }
 
     //   /jpm/owner1.owner2/xxx/entity1/list
-    @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/list", "/jpm/{owner}/{ownerId}/{entity}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/jpm/{ownerPath}/{ownerId}/{entityPath}/list", "/jpm/{owner}/{ownerId}/{entity}"}, method = RequestMethod.GET)
     public ModelAndView list(
-            @PathVariable EntityPath owner,
+            @PathVariable EntityPath ownerPath,
             @PathVariable String ownerId,
-            @PathVariable Entity entity,
+            @PathVariable EntityPath entityPath,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
-        if (!entity.isWeak()) {
+        if (!entityPath.getEntity().isWeak()) {
             throw new NotAuthorizedException();
         }
-        final ModelAndView mav = generalList(entity, owner.getEntity(), page, pageSize, ownerId);
-        final EntityInstance instance = new EntityInstance(entity, getOperation(entity));
-        instance.configureOwner(entity, owner.getEntity(), owner.getEntity().getDao().get(ownerId));
+        final ModelAndView mav = generalList(entityPath, ownerPath, page, pageSize, ownerId);
+        final EntityInstance instance = new EntityInstance(entityPath.getEntity(), getOperation(entityPath.getEntity()));
+        instance.configureOwner(entityPath.getEntity(), ownerPath.getEntity(), ownerPath.getEntity().getDao().get(ownerId));
         getContext().setEntityInstance(instance);
         return mav;
     }
@@ -140,14 +141,15 @@ public class ListController extends BaseController {
     public ModelAndView weaklist(
             @PathVariable EntityPath entityPath,
             @PathVariable String instanceId,
-            @PathVariable Entity weak,
+            @PathVariable EntityPath weak,
             @RequestParam(required = false, defaultValue = "false") boolean showOperations) throws PMException {
         final Entity entity = entityPath.getEntity();
         final ModelAndView mav = new ModelAndView("jpm-list-weak");
-        final PaginatedList weakList = getService().getWeakList(entity, instanceId, weak);
-        final Operation operation = getOperation(weak);
-        getContext().set(weak, operation);
+        final PaginatedList weakList = getService().getWeakList(entity, instanceId, weak.getEntity());
+        getContext().set(weak, OP_LIST);
+        final IdentifiedObject iobject = getService().get(entity, instanceId);
         getContext().setEntityInstance(new EntityInstance(entity, getOperation(entity)));
+        getContext().getEntityInstance().configureOwner(weak.getEntity(), entity, iobject.getObject());
         mav.addObject("paginatedList", weakList);
         mav.addObject("showOperations", showOperations);
         return mav;
@@ -221,13 +223,16 @@ public class ListController extends BaseController {
         return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
     }
 
-    protected ModelAndView generalList(Entity entity, Entity ownerEntity, Integer page, Integer pageSize, String ownerId) throws PMException {
+    protected ModelAndView generalList(EntityPath entityPath, EntityPath ownerEntity, Integer page, Integer pageSize, String ownerId) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
-        final Operation operation = getOperation(entity);
-        getContext().set(entity, operation);
-        final PaginatedList paginatedList = getService().getPaginatedList(entity, ownerEntity, operation, getSessionEntityData(entity), page, pageSize, ownerId);
+        getContext().set(entityPath, OP_LIST);
+        final PaginatedList paginatedList = getService().getPaginatedList(
+                entityPath.getEntity(),
+                (ownerEntity != null) ? ownerEntity.getEntity() : null,
+                getContext().getOperation(),
+                getSessionEntityData(entityPath.getEntity()), page, pageSize, ownerId);
         mav.addObject("paginatedList", paginatedList);
-        mav.addObject("sessionEntityData", getSessionEntityData(entity));
+        mav.addObject("sessionEntityData", getSessionEntityData(entityPath.getEntity()));
         return mav;
     }
 

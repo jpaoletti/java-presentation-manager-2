@@ -38,7 +38,7 @@
                                                 <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
                                                 <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />
                                                 <c:if test="${empty owner}">
-                                                    <a type="button" href="${cp}jpm/${entity.id}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
+                                                    <a type="button" href="${cp}jpm/${entityPath}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
                                                         "${fieldTitle}" ${text}
                                                         <span class="glyphicon glyphicon-remove"></span>
                                                     </a>
@@ -100,8 +100,7 @@
                                             <a
                                                 class="btn btn-mini btn-default confirm-${o.confirm}" 
                                                 title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                                <!--href="${cp}jpm/${entity.id}/${item.id}/${o.id}">-->
-                                                <!--href="${cp}jpm/${entityPath}/${item.id}/${o.id}">-->
+                                                href="${cp}jpm/${not empty owner.id ? owner.id.concat("."):""}${entityPath}/${item.id}/${o.id}">
                                                 <i class="glyphicon jpmicon-${o.id}"></i>
                                             </a>
                                         </c:forEach>
@@ -156,7 +155,7 @@
         </div>
         <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
             <c:if test="${empty owner}">
-                <c:set var="addSearchUrl" value="${cp}jpm/${entity.id}/addSearch"/>
+                <c:set var="addSearchUrl" value="${cp}jpm/${entityPath}/addSearch"/>
             </c:if>
             <c:if test="${not empty owner}">
                 <c:set var="addSearchUrl" value="${cp}jpm/${owner.id}/${ownerId}/${entity.id}/addSearch"/>
@@ -208,7 +207,7 @@
             jpmLoad(function() {
                 $(".inline-edit").each(function() {
                     $(this).editable({
-                        url: '${cp}jpm/${entity.id}/' + $(this).closest("tr").attr("data-id") + '/iledit',
+                        url: '${cp}jpm/${entityPath}/' + $(this).closest("tr").attr("data-id") + '/iledit',
                         send: "always", 
                         emptytext: "-"
                     });

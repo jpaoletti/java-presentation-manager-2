@@ -22,7 +22,7 @@
                     <a
                         class="btn btn-mini btn-default confirm-${o.confirm} weak-operation" 
                         title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                        href="${cp}jpm/${entity.id}/${item.id}/${o.id}">
+                        href="${cp}jpm/${owner.id}.${entityPath}/${item.id}/${o.id}">
                         <i class="glyphicon jpmicon-${o.id}"></i>
                     </a>
                 </c:forEach>
@@ -46,6 +46,6 @@
 </table>
 <script type="text/javascript">
     $(".inline-edit").each(function() {
-        $(this).editable({ url: '${cp}jpm/${entity.id}/' + $(this).closest("tr").attr("data-id") + '/iledit', send: "always", emptytext: "-" });
+        $(this).editable({ url: '${cp}jpm/${entityPath}/' + $(this).closest("tr").attr("data-id") + '/iledit', send: "always", emptytext: "-" });
     });
 </script>

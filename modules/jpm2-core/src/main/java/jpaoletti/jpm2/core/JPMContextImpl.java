@@ -7,6 +7,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.EntityPath;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import org.springframework.context.annotation.Scope;
@@ -27,6 +28,7 @@ public class JPMContextImpl implements JPMContext {
     private Map<String, List<Message>> fieldMessages; //field
     private List<Message> entityMessages;
     private Message globalMessage;
+    private EntityPath entityPath;
 
     public JPMContextImpl() {
         this.fieldMessages = new HashMap<>();
@@ -103,5 +105,20 @@ public class JPMContextImpl implements JPMContext {
     @Override
     public void setGlobalMessage(Message message) {
         this.globalMessage = message;
+    }
+
+    @Override
+    public void set(EntityPath entityPath, String operationId) throws PMException{
+        set(entityPath.getEntity(), entityPath.getEntity().getOperation(operationId));
+        this.entityPath = entityPath;
+    }
+
+    @Override
+    public EntityPath getEntityPath() {
+        return entityPath;
+    }
+
+    public void setEntityPath(EntityPath entityPath) {
+        this.entityPath = entityPath;
     }
 }

@@ -13,7 +13,6 @@ import jpaoletti.jpm2.core.exception.EntityNotFoundException;
  */
 public class EntityPath {
 
-    private PresentationManager jpm;
     private List<Entity> owners;
     private Entity entity;
 
@@ -31,14 +30,6 @@ public class EntityPath {
             }
         }
         this.entity = jpm.getEntity(split[split.length - 1]);
-    }
-
-    public final PresentationManager getJpm() {
-        return jpm;
-    }
-
-    public void setJpm(PresentationManager jpm) {
-        this.jpm = jpm;
     }
 
     @Override
@@ -65,6 +56,17 @@ public class EntityPath {
 
     public void setEntity(Entity entity) {
         this.entity = entity;
+    }
+
+    /**
+     * @return the last owner
+     */
+    public Entity getOwner() {
+        if (getOwners().isEmpty()) {
+            return null;
+        } else {
+            return getOwners().get(getOwners().size() - 1);
+        }
     }
 
 }

@@ -3,7 +3,7 @@
     <div class="btn-group">
         <c:forEach items="${generalOperations}" var="o">
             <c:if test="${empty owner}">
-                <a href="${cp}jpm/${entity.id}/${o.id}" class="btn confirm-${o.confirm}" title="<spring:message code='${o.title}' text='${o.title}' arguments='${entityName}' />">
+                <a href="${cp}jpm/${entityPath}/${o.id}" class="btn confirm-${o.confirm}" title="<spring:message code='${o.title}' text='${o.title}' arguments='${entityName}' />">
                     <span class="glyphicon jpmicon-${o.id}"></span>
                 </a>
             </c:if>

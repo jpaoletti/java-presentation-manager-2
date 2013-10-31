@@ -315,6 +315,10 @@
                     <property name="follows" value="list" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="show" />
+                    <property name="display" value="edit list itemAudit" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="edit" />
                     <property name="display" value="none" />
                 </bean>

@@ -9,9 +9,9 @@ import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.EntityPath;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
-import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
@@ -28,11 +28,11 @@ import org.springframework.web.servlet.ModelAndView;
  * @author jpaoletti
  */
 @Controller
-public final class ShowController extends BaseController {
+public class ShowController extends BaseController {
 
     public static final String OP_SHOW = "show";
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "/jpm/{entityPath}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
             @PathVariable Entity entity,
@@ -59,17 +59,17 @@ public final class ShowController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show.json", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "/jpm/{entityPath}/{instanceId}/show.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
-    public Map<String, Object> showJSON(@PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
-        final Operation operation = entity.getOperation(OP_SHOW);
-        getContext().set(entity, operation);
-        final Object object = getService().get(entity, operation, instanceId).getObject();
+    public Map<String, Object> showJSON(@PathVariable EntityPath entityPath, @PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
+        getContext().set(entityPath, OP_SHOW);
+        final Entity entity = entityPath.getEntity();
+        final Object object = getService().get(entity, getContext().getOperation(), instanceId).getObject();
         final Map<String, Object> values = new LinkedHashMap<>();
         final String[] fs = fields.split("[,]");
         for (String fid : fs) {
             final Field field = entity.getFieldById(fid);
-            final Converter converter = field.getConverter(operation);
+            final Converter converter = field.getConverter(getContext().getOperation());
             if (converter != null) {
                 try {
                     values.put(field.getTitle(entity), converter.visualize(field, object, instanceId));
@@ -80,13 +80,12 @@ public final class ShowController extends BaseController {
         return values;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_SHOW, method = RequestMethod.GET)
-    public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        final Operation operation = entity.getOperation(OP_SHOW);
-        getContext().set(entity, operation);
+    @RequestMapping(value = "/jpm/{entityPath}/{instanceId}/" + OP_SHOW, method = RequestMethod.GET)
+    public ModelAndView show(@PathVariable EntityPath entityPath, @PathVariable String instanceId) throws PMException {
+        getContext().set(entityPath, OP_SHOW);
         if (instanceId != null) {
-            final IdentifiedObject iobject = getService().get(entity, operation, instanceId);
-            getContext().setEntityInstance(new EntityInstance(iobject, entity, operation));
+            final IdentifiedObject iobject = getService().get(entityPath.getEntity(), getContext().getOperation(), instanceId);
+            getContext().setEntityInstance(new EntityInstance(iobject, entityPath.getEntity(), getContext().getOperation()));
         }
         return new ModelAndView("jpm-" + OP_SHOW);
     }
