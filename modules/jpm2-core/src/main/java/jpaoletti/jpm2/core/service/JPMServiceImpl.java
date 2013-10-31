@@ -144,6 +144,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         entity.getDao().save(object);
         postExecute(operation, object);
         final String instanceId = entity.getDao().getId(object).toString();
-        return new IdentifiedObject(instanceId, object);
+        final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
+        getJpm().audit(entity, operation, iobject);
+        return iobject;
     }
 }
