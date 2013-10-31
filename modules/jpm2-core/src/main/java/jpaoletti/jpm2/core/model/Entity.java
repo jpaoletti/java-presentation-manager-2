@@ -42,6 +42,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private ListSort.SortDirection defaultSortDirection;
     private Integer pageSize;
     private Highlighter highlighter;
+    private String auditId; //Optional ID for auditoring
 
     public Entity() {
         super();
@@ -569,4 +570,17 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     public void setNumericId(Integer numericId) {
         this.numericId = numericId;
     }
+
+    public String getAuditId() {
+        if (auditId == null) {
+            return getId();
+        } else {
+            return auditId;
+        }
+    }
+
+    public void setAuditId(String auditId) {
+        this.auditId = auditId;
+    }
+
 }

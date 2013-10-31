@@ -46,7 +46,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
                 record.setUsername((SecurityUtils.getUserDetails()).getUsername());
             }
             if (entity != null) {
-                record.setEntity(entity.getId());
+                record.setEntity(entity.getAuditId());
                 if (iobject != null) {
                     record.setItem(iobject.getId());
                 }
@@ -80,7 +80,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     public List<AuditRecord> getItemRecords(Entity entity, String instanceId) {
         return getDao().list(new DAOListConfiguration(
                 Order.desc("id"),
-                Restrictions.eq("entity", entity.getId()),
+                Restrictions.eq("entity", entity.getAuditId()),
                 Restrictions.eq("item", instanceId)));
     }
 
@@ -88,7 +88,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     public List<AuditRecord> getGeneralRecords(Entity entity) {
         return getDao().list(new DAOListConfiguration(
                 Order.desc("id"),
-                Restrictions.eq("entity", entity.getId()),
+                Restrictions.eq("entity", entity.getAuditId()),
                 Restrictions.or(Restrictions.isNull("item"), Restrictions.eq("operation", "delete"))));
     }
 
