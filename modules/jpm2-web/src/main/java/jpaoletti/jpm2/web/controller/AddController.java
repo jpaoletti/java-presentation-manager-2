@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.web.controller;
 
+import jpaoletti.jpm2.web.controller.interfaces.IAddController;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
@@ -21,9 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author jpaoletti
  */
 @Controller
-public class AddController extends BaseController {
-
-    public static final String OP_ADD = "add";
+public class AddController extends BaseController implements IAddController {
 
     /**
      * GET method prepares form.
@@ -35,6 +34,7 @@ public class AddController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/" + OP_ADD, method = RequestMethod.GET)
+    @Override
     public ModelAndView addPrepare(
             @PathVariable Entity entity,
             @RequestParam(required = false) String lastId) throws PMException {
@@ -58,6 +58,7 @@ public class AddController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/" + OP_ADD, method = RequestMethod.GET)
+    @Override
     public ModelAndView addWeakPrepare(
             @PathVariable Entity entity,
             @PathVariable String ownerId,
@@ -78,6 +79,7 @@ public class AddController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/" + OP_ADD, method = RequestMethod.POST)
+    @Override
     public ModelAndView addCommit(
             @PathVariable Entity entity,
             @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
@@ -111,6 +113,7 @@ public class AddController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/add", method = RequestMethod.POST)
+    @Override
     public ModelAndView addWeakCommit(
             @PathVariable Entity owner,
             @PathVariable String ownerId,
