@@ -59,20 +59,18 @@ public final class ShowController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/show.json", method = RequestMethod.GET, headers = "Accept=application/json")
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
-    public Map<String, Object> showJSON(@PathVariable Entity entity, @PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
-        final Operation operation = entity.getOperation(OP_SHOW);
-        getContext().set(entity, operation);
-        final Object object = getService().get(entity, operation, instanceId).getObject();
+    public Map<String, Object> showJSON(@PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
+        final Object object = getService().get(getContext().getEntity(), getContext().getOperation(), instanceId).getObject();
         final Map<String, Object> values = new LinkedHashMap<>();
         final String[] fs = fields.split("[,]");
         for (String fid : fs) {
-            final Field field = entity.getFieldById(fid);
-            final Converter converter = field.getConverter(operation);
+            final Field field = getContext().getEntity().getFieldById(fid);
+            final Converter converter = field.getConverter(getContext().getOperation());
             if (converter != null) {
                 try {
-                    values.put(field.getTitle(entity), converter.visualize(field, object, instanceId));
+                    values.put(field.getTitle(getContext().getEntity()), converter.visualize(field, object, instanceId));
                 } catch (IgnoreConvertionException ex) {
                 }
             }
@@ -80,14 +78,10 @@ public final class ShowController extends BaseController {
         return values;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_SHOW, method = RequestMethod.GET)
-    public ModelAndView show(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        final Operation operation = entity.getOperation(OP_SHOW);
-        getContext().set(entity, operation);
-        if (instanceId != null) {
-            final IdentifiedObject iobject = getService().get(entity, operation, instanceId);
-            getContext().setEntityInstance(new EntityInstance(iobject, entity, operation));
-        }
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}", method = RequestMethod.GET)
+    public ModelAndView show(@PathVariable String instanceId) throws PMException {
+        final IdentifiedObject iobject = getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
+        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
         return new ModelAndView("jpm-" + OP_SHOW);
     }
 }

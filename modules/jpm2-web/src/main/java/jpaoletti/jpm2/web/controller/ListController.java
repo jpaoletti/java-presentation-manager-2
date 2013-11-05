@@ -93,30 +93,28 @@ public class ListController extends BaseController {
         return r;
     }
 
-    @RequestMapping(value = {"/jpm/{entity}", "/jpm/{entity}/list"}, method = RequestMethod.GET)
-    public ModelAndView list(
-            @PathVariable Entity entity,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer pageSize) throws PMException {
+    @RequestMapping(value = {"/jpm/{entity}/{operationId:" + OP_LIST + "}"}, method = RequestMethod.GET)
+    public ModelAndView list(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
+        final Entity entity = getContext().getEntity();
         if (entity.isWeak()) {
             throw new NotAuthorizedException();
         }
-        ModelAndView mav = generalList(entity, page, pageSize, null);
-        getContext().setEntityInstance(new EntityInstance(entity, getOperation(entity)));
+        ModelAndView mav = generalList(page, pageSize, null);
+        getContext().setEntityInstance(new EntityInstance(entity, getContext().getOperation()));
         return mav;
     }
 
-    @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/list", "/jpm/{owner}/{ownerId}/{entity}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_LIST + "}"}, method = RequestMethod.GET)
     public ModelAndView list(
             @PathVariable Entity owner,
             @PathVariable String ownerId,
-            @PathVariable Entity entity,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
+        final Entity entity = getContext().getEntity();
         if (!entity.isWeak()) {
             throw new NotAuthorizedException();
         }
-        final ModelAndView mav = generalList(entity, page, pageSize, ownerId);
+        final ModelAndView mav = generalList(page, pageSize, ownerId);
         final EntityInstance instance = new EntityInstance(entity, getOperation(entity));
         instance.configureOwner(entity, owner.getDao().get(ownerId));
         getContext().setEntityInstance(instance);
@@ -159,7 +157,7 @@ public class ListController extends BaseController {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
             getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
-        return "redirect:/jpm/" + entity.getId() + "/";
+        return "redirect:/jpm/" + entity.getId() + "/list";
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
@@ -174,7 +172,7 @@ public class ListController extends BaseController {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
             getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
-        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
+        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/list";
     }
 
     @RequestMapping(value = "/jpm/{entity}/removeSearch")
@@ -182,7 +180,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return "redirect:/jpm/" + entity.getId() + "/";
+        return "redirect:/jpm/" + entity.getId() + "/list";
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeSearch")
@@ -192,13 +190,13 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
+        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/list";
     }
 
     @RequestMapping(value = "/jpm/{entity}/sort")
     public String sort(@PathVariable Entity entity, @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
-        return "redirect:/jpm/" + entity.getId() + "/";
+        return "redirect:/jpm/" + entity.getId() + "/list";
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/sort")
@@ -208,14 +206,13 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
-        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/";
+        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/list";
     }
 
-    protected ModelAndView generalList(Entity entity, Integer page, Integer pageSize, String ownerId) throws PMException {
+    protected ModelAndView generalList(Integer page, Integer pageSize, String ownerId) throws PMException {
+        final Entity entity = getContext().getEntity();
         final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
-        final Operation operation = getOperation(entity);
-        getContext().set(entity, operation);
-        final PaginatedList paginatedList = getService().getPaginatedList(entity, operation, getSessionEntityData(entity), page, pageSize, ownerId);
+        final PaginatedList paginatedList = getService().getPaginatedList(entity, getContext().getOperation(), getSessionEntityData(entity), page, pageSize, ownerId);
         mav.addObject("paginatedList", paginatedList);
         mav.addObject("sessionEntityData", getSessionEntityData(entity));
         return mav;

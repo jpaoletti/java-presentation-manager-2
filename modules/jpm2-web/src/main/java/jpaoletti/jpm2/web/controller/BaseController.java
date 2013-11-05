@@ -72,12 +72,16 @@ public class BaseController {
 
     /**
      * Redirect to list depending on weaks entities.
+     *
+     * @param instance
+     * @param entity
+     * @return
      */
     protected String toList(final EntityInstance instance, Entity entity) {
         if (instance.getOwner() != null) {
-            return String.format("redirect:/jpm/%s/%s/%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId());
+            return String.format("redirect:/jpm/%s/%s/%s/list", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId());
         } else {
-            return String.format("redirect:/jpm/%s", entity.getId());
+            return String.format("redirect:/jpm/%s/list", entity.getId());
         }
     }
 

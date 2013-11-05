@@ -28,28 +28,22 @@ public class AddController extends BaseController {
     /**
      * GET method prepares form.
      *
-     * @param entity Entity being added
      * @param lastId Id of the latest added instance. Just for repeated
      *
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/" + OP_ADD, method = RequestMethod.GET)
-    public ModelAndView addPrepare(
-            @PathVariable Entity entity,
-            @RequestParam(required = false) String lastId) throws PMException {
-        final Operation operation = entity.getOperation(OP_ADD);
-        getContext().set(entity, operation);
+    @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
+    public ModelAndView addPrepare(@RequestParam(required = false) String lastId) throws PMException {
         //If there is a "lastId" , the object values are used as defaults
-        final Object object = (lastId == null) ? JPMUtils.newInstance(entity.getClazz()) : getService().get(entity, lastId).getObject();
-        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation));
+        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), lastId).getObject();
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext().getEntity(), getContext().getOperation()));
         return new ModelAndView("jpm-" + EditController.OP_EDIT);
     }
 
     /**
      * GET method prepares form.
      *
-     * @param entity Entity being added
      * @param ownerId Id of the owner
      * @param lastId Id of the latest added instance. Just for repeated
      * operation
@@ -57,14 +51,11 @@ public class AddController extends BaseController {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/" + OP_ADD, method = RequestMethod.GET)
-    public ModelAndView addWeakPrepare(
-            @PathVariable Entity entity,
-            @PathVariable String ownerId,
-            @RequestParam(required = false) String lastId) throws PMException {
-        final ModelAndView mav = addPrepare(entity, lastId);
-        if (entity.isWeak()) {
-            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner().getOwner(), new IdentifiedObject(ownerId)));
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
+    public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
+        final ModelAndView mav = addPrepare(lastId);
+        if (getContext().getEntity().isWeak()) {
+            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner().getOwner(), new IdentifiedObject(ownerId)));
         }
         return mav;
     }
@@ -72,17 +63,14 @@ public class AddController extends BaseController {
     /**
      * POST method finalizes the operation
      *
-     * @param entity
      * @param repeat
      * @return redirect to show
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/" + OP_ADD, method = RequestMethod.POST)
-    public ModelAndView addCommit(
-            @PathVariable Entity entity,
-            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
-        final Operation operation = entity.getOperation(OP_ADD);
-        getContext().set(entity, operation);
+    @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.POST)
+    public ModelAndView addCommit(@RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+        final Entity entity = getContext().getEntity();
+        final Operation operation = getContext().getOperation();
         try {
             final IdentifiedObject newObject = getService().save(entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
@@ -96,7 +84,7 @@ public class AddController extends BaseController {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return addPrepare(entity, null);
+            return addPrepare(null);
         }
     }
 
@@ -105,20 +93,16 @@ public class AddController extends BaseController {
      *
      * @param owner
      * @param ownerId
-     * @param entity
      * @param repeat
      * @return redirect to show
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/add", method = RequestMethod.POST)
-    public ModelAndView addWeakCommit(
-            @PathVariable Entity owner,
-            @PathVariable String ownerId,
-            @PathVariable Entity entity,
+    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.POST)
+    public ModelAndView addWeakCommit(@PathVariable Entity owner, @PathVariable String ownerId,
             @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
-        final Operation operation = entity.getOperation("add");
+        final Entity entity = getContext().getEntity();
+        final Operation operation = getContext().getOperation();
         try {
-            getContext().set(entity, operation);
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
@@ -132,7 +116,7 @@ public class AddController extends BaseController {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return addWeakPrepare(entity, ownerId, null);
+            return addWeakPrepare(ownerId, null);
         }
     }
 }

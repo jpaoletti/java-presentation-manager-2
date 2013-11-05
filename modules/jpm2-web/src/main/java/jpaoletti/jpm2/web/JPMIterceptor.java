@@ -1,9 +1,11 @@
 package jpaoletti.jpm2.web;
 
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.web.controller.BaseController;
 import jpaoletti.jpm2.core.JPMContext;
+import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -22,9 +25,21 @@ public class JPMIterceptor implements HandlerInterceptor {
 
     @Autowired
     private JPMContext context;
+    @Autowired
+    private PresentationManager jpm;
 
     @Override
-    public boolean preHandle(HttpServletRequest hsr, HttpServletResponse hsr1, Object o) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse hsr1, Object o) throws Exception {
+        final Map pathVariables = (Map) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (pathVariables != null && !pathVariables.isEmpty()) {
+            if (pathVariables.containsKey("entity")) {
+                final Entity entity = getJpm().getEntity((String) pathVariables.get("entity"));
+                if (pathVariables.containsKey("operationId")) {
+                    final Operation operation = entity.getOperation((String) pathVariables.get("operationId"));
+                    getContext().set(entity, operation);
+                }
+            }
+        }
         return true;
     }
 
@@ -97,5 +112,13 @@ public class JPMIterceptor implements HandlerInterceptor {
 
     public void setContext(JPMContext context) {
         this.context = context;
+    }
+
+    public PresentationManager getJpm() {
+        return jpm;
+    }
+
+    public void setJpm(PresentationManager jpm) {
+        this.jpm = jpm;
     }
 }

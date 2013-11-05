@@ -35,42 +35,33 @@ public class EditController extends BaseController {
     /**
      * GET method prepares form.
      *
-     * @param entity
+     * @param instanceId
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_EDIT, method = RequestMethod.GET)
-    public ModelAndView editPrepare(@PathVariable Entity entity, @PathVariable String instanceId) throws PMException {
-        final Operation operation = entity.getOperation(OP_EDIT);
-        getContext().set(entity, operation);
-        if (instanceId != null) {
-            final IdentifiedObject iobject = getJpm().getService().get(entity, operation, instanceId);
-            getContext().setEntityInstance(new EntityInstance(iobject, entity, operation));
-        }
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.GET)
+    public ModelAndView editPrepare(@PathVariable String instanceId) throws PMException {
+        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
+        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
         return new ModelAndView("jpm-" + OP_EDIT);
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/" + OP_EDIT, method = RequestMethod.POST)
-    public ModelAndView editCommit(
-            @PathVariable Entity entity,
-            @PathVariable String instanceId,
-            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
-        final Operation operation = entity.getOperation(OP_EDIT);
-        getContext().set(entity, operation);
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.POST)
+    public ModelAndView editCommit(@PathVariable String instanceId, @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         try {
-            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), entity, operation);
+            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext().getEntity(), getContext().getOperation());
             getContext().setEntityInstance(instance);
-            getJpm().getService().update(entity, operation, instance, getRequest().getParameterMap());
+            getJpm().getService().update(getContext().getEntity(), getContext().getOperation(), instance, getRequest().getParameterMap());
             if (repeat) {
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s?repeat=true", entity.getId(), instanceId, OP_EDIT));
+                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s?repeat=true", getContext().getEntity().getId(), instanceId, OP_EDIT));
             } else {
-                return next(entity, operation, instanceId, ShowController.OP_SHOW);
+                return next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW);
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return editPrepare(entity, instanceId);
+            return editPrepare(instanceId);
         }
     }
 
