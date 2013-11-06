@@ -7,6 +7,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.util.JPMUtils;
 
 /**
@@ -98,7 +99,10 @@ public class EntityInstance {
         this.owner = owner;
     }
 
-    public String getOwnerId() {
+    public String getOwnerId() throws NotAuthorizedException {
+        if (getOwner().getIobject() == null) {
+            throw new NotAuthorizedException();
+        }
         return getOwner().getIobject().getId();
     }
 
