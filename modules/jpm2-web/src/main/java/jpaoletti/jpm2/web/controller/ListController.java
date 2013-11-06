@@ -96,7 +96,7 @@ public class ListController extends BaseController {
     @RequestMapping(value = {"/jpm/{entity}/{operationId:" + OP_LIST + "}"}, method = RequestMethod.GET)
     public ModelAndView list(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
         final Entity entity = getContext().getEntity();
-        if (entity.isWeak()) {
+        if (entity.isWeak() && !entity.getOwner().isOptional()) {
             throw new NotAuthorizedException();
         }
         ModelAndView mav = generalList(page, pageSize, null);

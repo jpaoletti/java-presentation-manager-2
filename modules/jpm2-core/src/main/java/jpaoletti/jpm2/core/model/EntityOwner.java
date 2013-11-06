@@ -15,6 +15,15 @@ public class EntityOwner extends PMCoreObject {
     private Entity owner;
     // The property of the local entity that points to the owner (optional)
     private String localProperty;
+    private boolean optional = false;
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
 
     /**
      * @return the localProperty
