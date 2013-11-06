@@ -86,6 +86,11 @@
         </bean>
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
             <property name="operations" value="add edit"/>
+            <property name="validator">
+                <bean class="jpaoletti.jpm2.core.validator.StringMin">
+                    <property name="min" value="2" />
+                </bean>
+            </property>
             <property name="converter" ref="jpm-converter-edit-string"/>
         </bean>
     </util:list>
