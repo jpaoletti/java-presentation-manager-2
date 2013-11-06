@@ -84,7 +84,9 @@ public class AddController extends BaseController {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return addPrepare(null);
+            final Object object = e.getValidatedObject();
+            getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation));
+            return new ModelAndView("jpm-" + EditController.OP_EDIT);
         }
     }
 
@@ -116,7 +118,12 @@ public class AddController extends BaseController {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return addWeakPrepare(ownerId, null);
+            final Object object = e.getValidatedObject();
+            getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation));
+            if (getContext().getEntity().isWeak()) {
+                getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner().getOwner(), new IdentifiedObject(ownerId)));
+            }
+            return new ModelAndView("jpm-" + EditController.OP_EDIT);
         }
     }
 }

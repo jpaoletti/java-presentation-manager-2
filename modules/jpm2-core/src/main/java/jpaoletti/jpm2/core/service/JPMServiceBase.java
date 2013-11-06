@@ -57,7 +57,7 @@ public class JPMServiceBase {
             }
         }
         if (!getContext().getFieldMessages().isEmpty()) {
-            throw new ValidationException(null);
+            throw new ValidationException(object);
         }
     }
 

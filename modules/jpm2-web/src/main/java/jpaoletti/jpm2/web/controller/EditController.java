@@ -61,7 +61,9 @@ public class EditController extends BaseController {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
-            return editPrepare(instanceId);
+            final IdentifiedObject iobject = new IdentifiedObject(instanceId, e.getValidatedObject());
+            getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+            return new ModelAndView("jpm-" + OP_EDIT);
         }
     }
 
