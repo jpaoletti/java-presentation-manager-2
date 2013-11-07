@@ -37,6 +37,8 @@ public class JPMIterceptor implements HandlerInterceptor {
                 if (pathVariables.containsKey("operationId")) {
                     final Operation operation = entity.getOperation((String) pathVariables.get("operationId"));
                     getContext().set(entity, operation);
+                } else {
+                    getContext().setEntity(entity);
                 }
             }
         }
