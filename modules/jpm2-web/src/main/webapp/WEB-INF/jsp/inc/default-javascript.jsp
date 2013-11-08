@@ -18,6 +18,7 @@
 <script type="text/javascript" src="${cp}static/js/bootstrap.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/jquery.jpanelmenu.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
+        var contextPath = "${cp}";
         //This initialize the internationalized javascript messages
         var messages = new Array();
         messages["jpm.modal.confirm.title"] = "<spring:message code='jpm.modal.confirm.title' text='Confirm' />";
