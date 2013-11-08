@@ -76,8 +76,9 @@ public class BaseController {
      * @param instance
      * @param entity
      * @return
+     * @throws jpaoletti.jpm2.core.exception.NotAuthorizedException
      */
-    protected String toList(final EntityInstance instance, Entity entity) {
+    protected String toList(final EntityInstance instance, Entity entity) throws NotAuthorizedException {
         if (instance.getOwner() != null) {
             return String.format("redirect:/jpm/%s/%s/%s/list", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId());
         } else {
