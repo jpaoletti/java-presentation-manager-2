@@ -18,10 +18,12 @@ public class WebEditObject extends Converter {
     private String textField;
     private Integer pageSize;
     private Integer minSearch;
+    private String placeHolder;
 
     public WebEditObject() {
         this.pageSize = 10;
         this.minSearch = 0;
+        this.placeHolder = "...";
     }
 
     @Override
@@ -38,6 +40,7 @@ public class WebEditObject extends Converter {
         if (getFilter() != null) {
             sb.append("&filter=").append(getFilter().getId());
         }
+        sb.append("&placeHolder=").append(getPlaceHolder());
         return sb.toString();
     }
 
@@ -88,5 +91,13 @@ public class WebEditObject extends Converter {
 
     public void setFilter(ListFilter filter) {
         this.filter = filter;
+    }
+
+    public String getPlaceHolder() {
+        return placeHolder;
+    }
+
+    public void setPlaceHolder(String placeHolder) {
+        this.placeHolder = placeHolder;
     }
 }

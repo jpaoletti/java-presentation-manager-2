@@ -7,7 +7,7 @@
             $('<link href="${cp}static/css/select2.css" rel="stylesheet">').appendTo("head");
         }
         $("#field_${field}").select2({
-            placeholder: "...", allowClear: true,
+            placeholder: "${param.placeHolder}", allowClear: true,
             width: 'copy', dropdownCssClass: "bigdrop",
             minimumInputLength: ${param.minSearch},
             ajax: {
