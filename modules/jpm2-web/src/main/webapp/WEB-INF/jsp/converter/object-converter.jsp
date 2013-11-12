@@ -1,4 +1,4 @@
-<input name="field_${field}" id="field_${field}" value="${param.value}" class="objectConverterInput" />
+<input name="field_${field}" id="field_${field}" value="${param.value}" class="objectConverterInput form-control" />
 <script type="text/javascript" src="${cp}static/js/select2.min.js"></script>
 <script type="text/javascript" src="${cp}static/js/locale/select2_locale_${locale.language}.js"></script>
 <script type="text/javascript">
