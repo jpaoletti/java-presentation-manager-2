@@ -14,7 +14,7 @@ public class IntegerSearcher implements Searcher {
     public static final String DESCRIPTION_KEY = "jpm.searcher.integerSearcher";
 
     @Override
-    public String visualization() {
+    public String visualization(Field field) {
         return "@page:number-searcher.jsp";
     }
 

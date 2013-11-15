@@ -13,7 +13,7 @@ import org.hibernate.criterion.Restrictions;
 public class StringSearcher implements Searcher {
 
     @Override
-    public String visualization() {
+    public String visualization(Field field) {
         return "@page:string-searcher.jsp";
     }
 

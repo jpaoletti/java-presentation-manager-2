@@ -12,7 +12,7 @@ import org.hibernate.criterion.Restrictions;
 public class BoolSearcher implements Searcher {
 
     @Override
-    public String visualization() {
+    public String visualization(Field field) {
         return "@page:bool-searcher.jsp";
     }
 

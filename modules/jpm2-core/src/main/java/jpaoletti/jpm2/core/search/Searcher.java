@@ -12,7 +12,7 @@ import org.hibernate.criterion.Criterion;
  */
 public interface Searcher {
 
-    public String visualization();
+    public String visualization(Field field);
 
     public DescribedCriterion build(Field field, Map<String, String[]> parameters);
 
