@@ -225,10 +225,16 @@
                     }).join(',');
                     if (instanceIds !== "") {
                         var btn = $(this);
+                        var confirm = btn.attr("data-confirm") === "true";
+                        var link = "${cp}jpm/" + btn.attr("data-entity") + "/" + instanceIds + "/" + btn.attr("data-operation");
+                        if (confirm) {
                         //We simulate a link
-                        var a = $("<a href='${cp}jpm/" + btn.attr("data-entity") + "/" + instanceIds + "/" + btn.attr("data-operation") + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
-                        $("body").append(a);
-                        a.trigger("click");
+                            var a = $("<a href='" + link + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
+                            $("body").append(a);
+                            a.trigger("click");
+                        } else {
+                            document.location = link;
+                        }
                     }
                 });
                 $("#help-btn").popover({
