@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.core.converter;
+package jpaoletti.jpm2.web.converter;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -10,7 +10,7 @@ import jpaoletti.jpm2.core.model.Field;
  *
  * @author jpaoletti
  */
-public class ShowDecimalConverter extends ToStringConverter {
+public class WebShowDecimalConverter extends WebToString {
 
     private String format = "#0.00";
 
@@ -18,10 +18,10 @@ public class ShowDecimalConverter extends ToStringConverter {
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final BigDecimal value = (BigDecimal) getValue(object, field);
         if (value == null) {
-            return process("");
+            return wrap(field, process(""));
         } else {
             final DecimalFormat df = new DecimalFormat(getFormat());
-            return process(df.format(value.doubleValue()));
+            return wrap(field, process(df.format(value.doubleValue())));
         }
     }
 
