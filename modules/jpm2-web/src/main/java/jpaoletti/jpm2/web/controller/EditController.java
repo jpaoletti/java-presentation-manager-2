@@ -43,6 +43,7 @@ public class EditController extends BaseController {
     public ModelAndView editPrepare(@PathVariable String instanceId) throws PMException {
         final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
         getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return new ModelAndView("jpm-" + OP_EDIT);
     }
 

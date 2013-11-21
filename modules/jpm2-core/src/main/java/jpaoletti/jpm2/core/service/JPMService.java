@@ -21,10 +21,10 @@ public interface JPMService {
     @Transactional
     public PaginatedList getPaginatedList(Entity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, String ownerId) throws PMException;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public IdentifiedObject update(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public IdentifiedObject delete(Entity entity, Operation operation, String instanceId) throws PMException;
 
     /**
@@ -39,7 +39,7 @@ public interface JPMService {
      */
     public IdentifiedObject get(Entity entity, String instanceId) throws PMException;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public IdentifiedObject save(Entity entity, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
 
     @Transactional

@@ -38,6 +38,7 @@ public class AddController extends BaseController {
         //If there is a "lastId" , the object values are used as defaults
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), lastId).getObject();
         getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext().getEntity(), getContext().getOperation()));
+        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return new ModelAndView("jpm-" + EditController.OP_EDIT);
     }
 
@@ -57,6 +58,7 @@ public class AddController extends BaseController {
         if (getContext().getEntity().isWeak()) {
             getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner().getOwner(), new IdentifiedObject(ownerId)));
         }
+        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return mav;
     }
 

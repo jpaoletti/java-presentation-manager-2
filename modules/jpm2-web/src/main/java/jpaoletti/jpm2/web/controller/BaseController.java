@@ -156,4 +156,12 @@ public class BaseController {
     protected String getInternationalizedMessage(Message msg) {
         return getMessageSource().getMessage(msg.getKey(), msg.getArgs(), getLocale());
     }
+
+    protected void checkOperationCondition(Operation operation, EntityInstance instance) throws PMException {
+        if (operation.getCondition() != null) {
+            if (!operation.getCondition().check(instance, operation, null)) {
+                throw new NotAuthorizedException();
+            };
+        }
+    }
 }

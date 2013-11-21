@@ -84,6 +84,9 @@
                     <property name="id" value="delete" />
                     <property name="confirm" value="true" />
                     <property name="display" value="edit show list" />
+                    <property name="condition">
+                        <bean class="jpaoletti.jpm2.core.test.DeleteTestCondition" />
+                    </property>
                 </bean>
             </list>
         </property>

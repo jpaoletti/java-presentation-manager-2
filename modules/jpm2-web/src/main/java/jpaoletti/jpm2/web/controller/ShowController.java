@@ -11,7 +11,6 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
-import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
@@ -82,6 +81,7 @@ public final class ShowController extends BaseController {
     public ModelAndView show(@PathVariable String instanceId) throws PMException {
         final IdentifiedObject iobject = getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
         getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return new ModelAndView("jpm-" + OP_SHOW);
     }
 }

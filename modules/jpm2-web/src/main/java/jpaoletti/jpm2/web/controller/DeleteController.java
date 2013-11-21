@@ -23,7 +23,10 @@ public class DeleteController extends BaseController {
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_DELETE + "}", method = RequestMethod.GET)
     public String delete(@PathVariable String instanceId) throws PMException {
-        final IdentifiedObject iobject = getService().delete(getContext().getEntity(), getContext().getOperation(), instanceId);
+        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
+        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
+        getService().delete(getContext().getEntity(), getContext().getOperation(), instanceId);
         getContext().setGlobalMessage(MessageFactory.success("jpm.delete.success"));
         return toList(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()), getContext().getEntity());
     }
@@ -32,7 +35,10 @@ public class DeleteController extends BaseController {
     public String deleteSelected(@PathVariable List<String> instanceIds) throws PMException {
         IdentifiedObject iobject = null;
         for (String instanceId : instanceIds) {
-            iobject = getService().delete(getContext().getEntity(), getContext().getOperation(), instanceId);
+            iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
+            getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+            checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
+            getService().delete(getContext().getEntity(), getContext().getOperation(), instanceId);
         }
         getContext().setGlobalMessage(MessageFactory.success("jpm.multidelete.success"));
         return toList(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()), getContext().getEntity());
