@@ -78,8 +78,11 @@ public class ListController extends BaseController {
                 final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field);
-                    disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
+                    //Starting with !, properties are ignored
+                    if (!_display_field.startsWith("!")) {
+                        final Field field2 = entity.getFieldById(_display_field);
+                        disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
+                    }
                 }
                 restrictions.add(disjunction);
             }
@@ -237,7 +240,7 @@ public class ListController extends BaseController {
             String finalValue = textField;
             while (matcher.find()) {
                 final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                final Field field2 = entity.getFieldById(_display_field);
+                final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""));
                 finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
             }
             r.getResults().add(new ObjectConverterDataItem(
