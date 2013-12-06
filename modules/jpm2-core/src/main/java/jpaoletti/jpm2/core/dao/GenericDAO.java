@@ -59,6 +59,13 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         getSession().delete(object);
     }
 
+    /**
+     * Deletes all.
+     */
+    public void deleteAll() {
+        getSession().createQuery("DELETE FROM " + getPersistentClass().getName()).executeUpdate();
+    }
+
     @Override
     public Long count(DAOListConfiguration configuration) {
         final Criteria c = getBaseCriteria(configuration);
