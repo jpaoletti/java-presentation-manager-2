@@ -583,4 +583,11 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.auditId = auditId;
     }
 
+    public boolean isContainingListOperation() {
+        try {
+            return getOperation("list") != null;
+        } catch (OperationNotFoundException | NotAuthorizedException ex) {
+            return false;
+        }
+    }
 }
