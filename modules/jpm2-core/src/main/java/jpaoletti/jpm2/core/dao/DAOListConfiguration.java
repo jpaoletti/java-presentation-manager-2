@@ -30,7 +30,8 @@ public class DAOListConfiguration {
     }
 
     public DAOListConfiguration(Criterion... restrictions) {
-        this.restrictions = Arrays.asList(restrictions);
+        this.restrictions = new ArrayList<>();
+        this.restrictions.addAll(Arrays.asList(restrictions));
     }
 
     public DAOListConfiguration(Integer from, Integer max, Criterion... restrictions) {
