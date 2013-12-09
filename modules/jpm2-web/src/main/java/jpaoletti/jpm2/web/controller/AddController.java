@@ -54,9 +54,12 @@ public class AddController extends BaseController {
      */
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
     public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
-        final ModelAndView mav = addPrepare(lastId);
+        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), lastId).getObject();
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext().getEntity(), getContext().getOperation()));
+        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
         if (getContext().getEntity().isWeak()) {
-            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner().getOwner(), new IdentifiedObject(ownerId)));
+            final IdentifiedObject iobjectOwner = getService().get(getContext().getEntity().getOwner().getOwner(), ownerId);
+            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner().getOwner(), iobjectOwner));
         }
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return mav;

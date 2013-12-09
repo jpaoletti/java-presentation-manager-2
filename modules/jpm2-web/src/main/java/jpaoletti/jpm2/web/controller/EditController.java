@@ -41,9 +41,7 @@ public class EditController extends BaseController {
      */
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.GET)
     public ModelAndView editPrepare(@PathVariable String instanceId) throws PMException {
-        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
-        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
-        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
+        initItemControllerOperation(instanceId);
         return new ModelAndView("jpm-" + OP_EDIT);
     }
 

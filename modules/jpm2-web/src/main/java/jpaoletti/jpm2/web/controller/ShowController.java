@@ -79,9 +79,7 @@ public final class ShowController extends BaseController {
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}", method = RequestMethod.GET)
     public ModelAndView show(@PathVariable String instanceId) throws PMException {
-        final IdentifiedObject iobject = getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
-        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
-        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
+        initItemControllerOperation(instanceId);
         return new ModelAndView("jpm-" + OP_SHOW);
     }
 }

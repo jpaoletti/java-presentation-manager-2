@@ -13,6 +13,7 @@ import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
@@ -163,5 +164,12 @@ public class BaseController {
                 throw new NotAuthorizedException();
             };
         }
+    }
+
+    protected IdentifiedObject initItemControllerOperation(String instanceId) throws PMException {
+        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
+        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+        checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
+        return iobject;
     }
 }
