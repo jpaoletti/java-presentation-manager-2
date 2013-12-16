@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.web.converter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -21,17 +23,21 @@ public class EnumConverter extends WebToString {
 
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Object value = (object == null) ? null : getValue(object, field);
-        final Class enumClass = getEnumClass(field);
-        final List<String> options = new ArrayList<>();
-        for (Object option : EnumSet.allOf(enumClass)) {
-            options.add(((Enum) option).name() + "@" + String.valueOf(option));
+        try {
+            final Object value = (object == null) ? null : getValue(object, field);
+            final Class enumClass = getEnumClass(field);
+            final List<String> options = new ArrayList<>();
+            for (Object option : EnumSet.allOf(enumClass)) {
+                options.add(((Enum) option).name() + "@" + String.valueOf(option));
+            }
+            final StringBuilder sb = new StringBuilder("@page:enum-converter.jsp?options=" + URLEncoder.encode(StringUtils.join(options, ","), "UTF-8"));
+            if (value != null) {
+                sb.append("&value=").append(((Enum) value).name());
+            }
+            return sb.toString();
+        } catch (UnsupportedEncodingException ignoreme) {
+            return "";
         }
-        final StringBuilder sb = new StringBuilder("@page:enum-converter.jsp?options=" + StringUtils.join(options, ","));
-        if (value != null) {
-            sb.append("&value=").append(((Enum) value).name());
-        }
-        return sb.toString();
     }
 
     @Override
