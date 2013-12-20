@@ -6,9 +6,9 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
-import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
@@ -81,9 +81,9 @@ public class BaseController {
      */
     protected String toList(final EntityInstance instance, Entity entity) throws NotAuthorizedException {
         if (instance.getOwner() != null) {
-            return String.format("redirect:/jpm/%s/%s/%s/list", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId());
+            return buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, ListController.OP_LIST, null);
         } else {
-            return String.format("redirect:/jpm/%s/list", entity.getId());
+            return buildRedirect(entity, null, ListController.OP_LIST, null);
         }
     }
 
@@ -140,12 +140,12 @@ public class BaseController {
         final Operation nextOp = entity.getOperation(nextOpId);
         final EntityInstance instance = getContext().getEntityInstance();
         if (OperationScope.ITEM.equals(nextOp.getScope())) {
-            return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s", entity.getId(), instanceId, nextOp));
+            return new ModelAndView(buildRedirect(entity, instanceId, nextOpId, null));
         } else {
             if (instance != null && instance.getOwner() != null) {
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId(), nextOp));
+                return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, nextOp.getId(), null));
             } else {
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s", entity.getId(), nextOp));
+                return new ModelAndView(buildRedirect(entity, null, nextOp.getId(), null));
             }
         }
     }
@@ -167,9 +167,36 @@ public class BaseController {
     }
 
     protected IdentifiedObject initItemControllerOperation(String instanceId) throws PMException {
-        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
-        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
+        getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return iobject;
+    }
+
+    public String buildRedirect(Entity entity, String instanceId, String operation, String parameters) {
+        return buildRedirect(null, null, entity, instanceId, operation, parameters);
+    }
+
+    public String buildRedirect(Entity owner, String ownerId, Entity entity, String instanceId, String operation, String parameters) {
+        final StringBuilder sb = new StringBuilder("redirect:/jpm");
+        if (owner != null) {
+            sb.append("/").append(owner.getId());
+            if (getContext().getEntityContext() != null) {
+                sb.append(PresentationManager.CONTEXT_SEPARATOR).append(getContext().getEntityContext());
+            }
+            sb.append("/").append(ownerId);
+        }
+        sb.append("/").append(entity.getId());
+        if (getContext().getEntityContext() != null) {
+            sb.append(PresentationManager.CONTEXT_SEPARATOR).append(getContext().getEntityContext());
+        }
+        if (instanceId != null) {
+            sb.append("/").append(instanceId);
+        }
+        sb.append("/").append(operation);
+        if (parameters != null) {
+            sb.append("?").append(parameters);
+        }
+        return sb.toString();
     }
 }
