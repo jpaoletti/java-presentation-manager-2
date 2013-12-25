@@ -8,6 +8,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.EntityNotFoundException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
@@ -23,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jpaoletti
  */
 public class PresentationManager {
+
+    public static final String CONTEXT_SPLIT_STR = "[!]";
+    public static final String CONTEXT_SEPARATOR = "!";
 
     private static Long sessionIdSeed = 0L;
     private String title;
@@ -221,6 +225,15 @@ public class PresentationManager {
             }
         }
         return res;
+    }
+
+    public ContextualEntity getContextualEntity(String id) throws EntityNotFoundException {
+        if (!id.contains(CONTEXT_SEPARATOR)) {
+            return new ContextualEntity(getEntity(id), null);
+        } else {
+            final String[] split = id.split(CONTEXT_SPLIT_STR);
+            return new ContextualEntity(getEntity(split[0]), split[1]);
+        }
     }
 
     public AuditService getAuditService() {

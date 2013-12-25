@@ -48,12 +48,13 @@ public class EditController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.POST)
     public ModelAndView editCommit(@PathVariable String instanceId, @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         try {
-            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext().getEntity(), getContext().getOperation());
+            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext());
             getContext().setEntityInstance(instance);
-            getJpm().getService().update(getContext().getEntity(), getContext().getOperation(), instance, getRequest().getParameterMap());
+            getJpm().getService().update(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instance, getRequest().getParameterMap());
             if (repeat) {
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s?repeat=true", getContext().getEntity().getId(), instanceId, OP_EDIT));
+                return new ModelAndView(buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeat=true"));
             } else {
+                //BUG follows list in weak not working
                 return next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW);
             }
         } catch (ValidationException e) {
@@ -61,7 +62,7 @@ public class EditController extends BaseController {
                 getContext().getEntityMessages().add(e.getMsg());
             }
             final IdentifiedObject iobject = new IdentifiedObject(instanceId, e.getValidatedObject());
-            getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+            getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
             return new ModelAndView("jpm-" + OP_EDIT);
         }
     }
@@ -76,14 +77,14 @@ public class EditController extends BaseController {
         final Operation operation = entity.getOperation(OP_EDIT);
         getContext().set(entity, operation);
         try {
-            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), entity, operation);
+            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext());
             getContext().setEntityInstance(instance);
             final Map<String, String[]> params = new HashMap<>();
             params.put("field_" + name, (String[]) Arrays.asList(value).toArray());
             final Object tmp = instance.getValues().get(name);
             instance.getValues().clear();
             instance.getValues().put(name, tmp);
-            getJpm().getService().update(entity, operation, instance, params);
+            getJpm().getService().update(entity, getContext().getEntityContext(), operation, instance, params);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (ValidationException e) {
             final StringBuilder sb = new StringBuilder();

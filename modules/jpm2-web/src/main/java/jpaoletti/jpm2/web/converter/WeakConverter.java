@@ -17,6 +17,7 @@ public class WeakConverter extends Converter {
     private boolean showBtn;
     private String btnText;
     private String btnIcon;
+    private String context;
     private boolean showOperations; //if true, weak list show items operations
 
     public WeakConverter() {
@@ -28,9 +29,20 @@ public class WeakConverter extends Converter {
 
     @Override
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-
-        return "@page:weak-converter.jsp?showList=" + isShowList() + "&showBtn=" + isShowBtn() + "&btnText=" + getBtnText() + "&btnIcon=" + getBtnIcon()
-                + "&weakId=" + getEntity().getId() + "&ownerId=" + instanceId + "&showOperations=" + isShowOperations();
+        final StringBuilder res = new StringBuilder("@page:weak-converter.jsp");
+        res.append("?showList=").append(isShowList());
+        res.append("&showBtn=").append(isShowBtn());
+        res.append("&btnText=").append(getBtnText());
+        res.append("&btnIcon=").append(getBtnIcon());
+        res.append("&weakId=").append(getEntity().getId());
+        res.append("&ownerId=").append(instanceId);
+        res.append("&showOperations=").append(isShowOperations());
+        if (getContext() != null) {
+            res.append("&context=!").append(getContext());
+        } else {
+            res.append("&context=");
+        }
+        return res.toString();
     }
 
     public Entity getEntity() {
@@ -80,4 +92,13 @@ public class WeakConverter extends Converter {
     public void setShowOperations(boolean showOperations) {
         this.showOperations = showOperations;
     }
+
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
+
 }

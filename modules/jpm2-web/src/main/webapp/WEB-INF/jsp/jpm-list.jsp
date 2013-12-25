@@ -15,7 +15,7 @@
             <div id="content">
                 <%@include file="inc/default-content-header.jsp" %>
                 <%@include file="inc/default-breadcrumb.jsp" %>
-                <div class="container-fluid">
+                <div class="container-fluid" id="container-${fn:replace(contextualEntity,'!', '-')}-${operation.id}">
                     <div class="row"><br/>
                         <div class="panel panel-default">
                             <div class="panel-heading operation-list">
@@ -38,13 +38,14 @@
                                                 <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
                                                 <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />
                                                 <c:if test="${empty owner}">
-                                                    <a type="button" href="${cp}jpm/${entity.id}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
+                                                    <a type="button" href="${cp}jpm/${contextualEntity}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
                                                         "${fieldTitle}" ${text}
                                                         <span class="glyphicon glyphicon-remove"></span>
                                                     </a>
                                                 </c:if>
                                                 <c:if test="${not empty owner}">
-                                                    <a type="button" href="${cp}jpm/${owner.id}/${ownerId}/${entity.id}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
+                                                    <!-- BUG NEED OWNER CONTEXT -->
+                                                    <a type="button" href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
                                                         "${fieldTitle}" ${text}
                                                         <span class="glyphicon glyphicon-remove"></span>
                                                     </a>
@@ -100,7 +101,7 @@
                                             <a
                                                 class="btn btn-mini btn-default confirm-${o.confirm}" 
                                                 title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                                href="${cp}jpm/${entity.id}/${item.id}/${o.id}">
+                                                href="${cp}jpm/${contextualEntity}/${item.id}/${o.id}">
                                                 <i class="glyphicon jpmicon-${o.id}"></i>
                                             </a>
                                         </c:forEach>
@@ -155,10 +156,10 @@
         </div>
         <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
             <c:if test="${empty owner}">
-                <c:set var="addSearchUrl" value="${cp}jpm/${entity.id}/addSearch"/>
+                <c:set var="addSearchUrl" value="${cp}jpm/${contextualEntity}/addSearch"/>
             </c:if>
             <c:if test="${not empty owner}">
-                <c:set var="addSearchUrl" value="${cp}jpm/${owner.id}/${ownerId}/${entity.id}/addSearch"/>
+                <c:set var="addSearchUrl" value="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/addSearch"/>
             </c:if>
             <form method="POST" id='addSearchForm' action="${addSearchUrl}">
                 <input type="hidden" name="entityId" value="${entityId}"/>
@@ -207,7 +208,7 @@
             jpmLoad(function() {
                 $(".inline-edit").each(function() {
                     $(this).editable({
-                        url: '${cp}jpm/${entity.id}/' + $(this).closest("tr").attr("data-id") + '/iledit',
+                        url: '${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit',
                         send: "always", 
                         emptytext: "-"
                     });
@@ -226,7 +227,7 @@
                     if (instanceIds !== "") {
                         var btn = $(this);
                         var confirm = btn.attr("data-confirm") === "true";
-                        var link = "${cp}jpm/" + btn.attr("data-entity") + "/" + instanceIds + "/" + btn.attr("data-operation");
+                        var link = "${cp}jpm/" + btn.attr("data-entity") + "${entityContext}/" + instanceIds + "/" + btn.attr("data-operation");
                         if (confirm) {
                         //We simulate a link
                             var a = $("<a href='" + link + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");

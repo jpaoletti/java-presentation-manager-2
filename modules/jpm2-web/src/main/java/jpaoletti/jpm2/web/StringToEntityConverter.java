@@ -19,12 +19,11 @@ public class StringToEntityConverter implements Converter<String, Entity> {
     @Override
     public Entity convert(String s) {
         try {
-            return getJpm().getEntity(s);
+            return getJpm().getContextualEntity(s).getEntity();
         } catch (EntityNotFoundException ex) {
             JPMUtils.getLogger().error(ex.getMessage());
             return null;
         }
-
     }
 
     public PresentationManager getJpm() {

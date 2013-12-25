@@ -13,7 +13,7 @@
             <div id="content">
                 <%@include file="inc/default-content-header.jsp" %>
                 <%@include file="inc/default-breadcrumb.jsp" %>
-                <div class="container-fluid">
+                <div class="container-fluid" id="container-${fn:replace(contextualEntity,'!', '-')}-${operation.id}">
                     <div class="row"><br/>
                         <div class="col-12">
                             <div class="widget-box">

@@ -22,27 +22,27 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
     private BCrypt encoder;
 
     @Override
-    public User resetPassword(Entity entity, Operation operation, String instanceId) throws PMException {
+    public User resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException {
         final String value = UUID.randomUUID().toString().substring(0, 8);
-        final User user = (User) entity.getDao().get(instanceId);
+        final User user = (User) entity.getDao(context).get(instanceId);
         user.setPassword(BCrypt.hashpw(value, BCrypt.gensalt()));
         user.setNewPassword(value);
         preExecute(operation, user);
-        entity.getDao().update(user);
+        entity.getDao(context).update(user);
         postExecute(operation, user);
         getJpm().audit(entity, operation, new IdentifiedObject(instanceId, user));
         return user;
     }
 
     @Override
-    public void changePassword(Entity entity, Operation operation, String instanceId, String current, String newpass) throws PMException {
-        final User user = (User) entity.getDao().get(instanceId);
+    public void changePassword(Entity entity, String context, Operation operation, String instanceId, String current, String newpass) throws PMException {
+        final User user = (User) entity.getDao(context).get(instanceId);
         if (!getEncoder().matches(current, user.getPassword())) {
             throw new NotAuthorizedException();
         }
         user.setPassword(BCrypt.hashpw(newpass, BCrypt.gensalt()));
         preExecute(operation, user);
-        entity.getDao().update(user);
+        entity.getDao(context).update(user);
         postExecute(operation, user);
         getJpm().audit(entity, operation, new IdentifiedObject(instanceId, user));
     }

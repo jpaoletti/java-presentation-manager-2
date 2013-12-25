@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
@@ -26,26 +27,50 @@ public class EntityInstance {
 
     /**
      * Used for lists.
+     *
+     * @param iobject
+     * @param fields
+     * @param ctx
+     * @throws jpaoletti.jpm2.core.PMException
      */
-    public EntityInstance(IdentifiedObject iobject, List<Field> fields, Entity entity, Operation operation) throws PMException {
+    public EntityInstance(IdentifiedObject iobject, List<Field> fields, JPMContext ctx) throws PMException {
         this.iobject = iobject;
         this.values = new LinkedHashMap<>();
         this.fields = fields;
         this.highlight = "";
-        configureItemOperations(entity, operation);
+        configureItemOperations(ctx.getEntity(), ctx.getEntityContext(), ctx.getOperation());
     }
 
     /**
      * Used for single instance operations.
+     *
+     * @param ctx
+     * @throws jpaoletti.jpm2.core.PMException
      */
-    public EntityInstance(Entity entity, Operation operation) throws PMException {
-        this(null, entity, operation);
+    public EntityInstance(JPMContext ctx) throws PMException {
+        this(null, ctx);
     }
 
     /**
      * Used for single instance operations.
+     *
+     * @param iobject
+     * @param ctx
+     * @throws jpaoletti.jpm2.core.PMException
      */
-    public EntityInstance(IdentifiedObject iobject, Entity entity, Operation operation) throws PMException {
+    public EntityInstance(IdentifiedObject iobject, JPMContext ctx) throws PMException {
+        this(ctx.getEntity(), iobject, ctx);
+    }
+
+    /**
+     * Used for single instance operations.
+     *
+     * @param entity
+     * @param iobject
+     * @param ctx
+     * @throws jpaoletti.jpm2.core.PMException
+     */
+    public EntityInstance(Entity entity, IdentifiedObject iobject, JPMContext ctx) throws PMException {
         this.iobject = iobject;
         final Object object = (iobject != null) ? iobject.getObject() : null;
         final String id = (iobject != null) ? iobject.getId() : null;
@@ -53,7 +78,7 @@ public class EntityInstance {
         fields = new ArrayList<>();
         operations = new ArrayList<>();
         for (Field field : entity.getOrderedFields()) {
-            final Converter converter = field.getConverter(operation);
+            final Converter converter = field.getConverter(ctx.getOperation());
             if (converter != null) {
                 try {
                     values.put(field.getId(), converter.visualize(field, object, id));
@@ -63,11 +88,11 @@ public class EntityInstance {
             }
         }
         if (object != null) {
-            if (entity.isWeak()) {
-                final Object ownerobject = JPMUtils.get(object, entity.getOwner().getLocalProperty());
-                configureOwner(entity, ownerobject);
+            if (entity.isWeak(ctx.getEntityContext())) {
+                final Object ownerobject = JPMUtils.get(object, entity.getOwner(ctx.getEntityContext()).getLocalProperty());
+                configureOwner(entity, ctx.getEntityContext(), ownerobject);
             }
-            configureItemOperations(entity, operation);
+            configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
         }
     }
 
@@ -110,14 +135,14 @@ public class EntityInstance {
         return (getIobject() != null) ? getIobject().getId() : "?";
     }
 
-    protected final void configureItemOperations(Entity entity, Operation operation) throws PMException {
-        this.operations = entity.getOperationsFor(this, operation, OperationScope.ITEM);
+    protected final void configureItemOperations(Entity entity, String context, Operation operation) throws PMException {
+        this.operations = entity.getOperationsFor(this, context, operation, OperationScope.ITEM);
     }
 
-    public final void configureOwner(Entity entity, final Object ownerobject) {
-        final Entity ownerEntity = entity.getOwner().getOwner();
+    public final void configureOwner(Entity entity, String context, final Object ownerobject) {
+        final Entity ownerEntity = entity.getOwner(context).getOwner();
         if (ownerobject != null) {
-            final String ownerId = String.valueOf(ownerEntity.getDao().getId(ownerobject));
+            final String ownerId = String.valueOf(ownerEntity.getDao(context).getId(ownerobject));
             this.owner = new EntityInstanceOwner(ownerEntity, new IdentifiedObject(ownerId, ownerobject));
         } else {
             this.owner = new EntityInstanceOwner(ownerEntity, null);

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 public class JPMContextImpl implements JPMContext {
 
     private Entity entity;
+    private String entityContext;
     private Operation operation;
     private EntityInstance entityInstance;
     private Map<String, List<Message>> fieldMessages; //field
@@ -31,6 +33,13 @@ public class JPMContextImpl implements JPMContext {
     public JPMContextImpl() {
         this.fieldMessages = new HashMap<>();
         this.entityMessages = new ArrayList<>();
+    }
+
+    public JPMContextImpl(Entity entity, String entityContext, Operation operation) {
+        this();
+        this.entity = entity;
+        this.entityContext = entityContext;
+        this.operation = operation;
     }
 
     @Override
@@ -104,4 +113,20 @@ public class JPMContextImpl implements JPMContext {
     public void setGlobalMessage(Message message) {
         this.globalMessage = message;
     }
+
+    @Override
+    public String getEntityContext() {
+        return entityContext;
+    }
+
+    @Override
+    public void setEntityContext(String entityContext) {
+        this.entityContext = entityContext;
+    }
+
+    @Override
+    public ContextualEntity getContextualEntity() {
+        return new ContextualEntity(getEntity(), getEntityContext());
+    }
+
 }

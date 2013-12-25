@@ -3,13 +3,14 @@ package jpaoletti.jpm2.web;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import jpaoletti.jpm2.web.controller.BaseController;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
+import jpaoletti.jpm2.web.controller.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +34,10 @@ public class JPMIterceptor implements HandlerInterceptor {
         final Map pathVariables = (Map) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (pathVariables != null && !pathVariables.isEmpty()) {
             if (pathVariables.containsKey("entity")) {
-                final Entity entity = getJpm().getEntity((String) pathVariables.get("entity"));
+                final String entityId = (String) pathVariables.get("entity");
+                final ContextualEntity contextualEntity = getJpm().getContextualEntity(entityId);
+                final Entity entity = contextualEntity.getEntity();
+                getContext().setEntityContext(contextualEntity.getContext());
                 if (pathVariables.containsKey("operationId")) {
                     final Operation operation = entity.getOperation((String) pathVariables.get("operationId"));
                     getContext().set(entity, operation);
@@ -59,12 +63,13 @@ public class JPMIterceptor implements HandlerInterceptor {
                 mav.addObject("locale", LocaleContextHolder.getLocale());
                 if (entity != null) {
                     mav.addObject("entity", entity);
+                    mav.addObject("contextualEntity", ctx.getContextualEntity());
                     final EntityInstance instance = ctx.getEntityInstance();
                     mav.addObject("instance", instance);
                     if (operation != null) {
                         mav.addObject("operation", operation);
-                        mav.addObject("generalOperations", entity.getOperationsFor(instance, operation, OperationScope.GENERAL));
-                        mav.addObject("selectedOperations", entity.getOperationsFor(instance, operation, OperationScope.SELECTED));
+                        mav.addObject("generalOperations", entity.getOperationsFor(instance, ctx.getEntityContext(), operation, OperationScope.GENERAL));
+                        mav.addObject("selectedOperations", entity.getOperationsFor(instance, ctx.getEntityContext(), operation, OperationScope.SELECTED));
                     }
                     if (instance != null) {
                         if (instance.getIobject() != null) {
@@ -72,11 +77,11 @@ public class JPMIterceptor implements HandlerInterceptor {
                             if (object != null) {
                                 mav.addObject("object", object);
                                 if (operation != null) {
-                                    mav.addObject("itemOperations", entity.getOperationsFor(instance, operation, OperationScope.ITEM));
+                                    mav.addObject("itemOperations", entity.getOperationsFor(instance, ctx.getEntityContext(), operation, OperationScope.ITEM));
                                 }
                             }
                         }
-                        if (entity.isWeak() && instance.getOwner() != null) {
+                        if (entity.isWeak(ctx.getEntityContext()) && instance.getOwner() != null) {
                             mav.addObject("owner", instance.getOwner().getEntity());
                             mav.addObject("ownerId", instance.getOwnerId());
                         }
@@ -90,10 +95,13 @@ public class JPMIterceptor implements HandlerInterceptor {
                 }
             }
             if (entity != null && ctx.getEntity().getHome() != null) {
-                hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome());
+                hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome(ctx.getEntityContext()));
             }
             if (ctx.getGlobalMessage() != null && mav != null) {
                 hsr.getSession().setAttribute("globalMessage", ctx.getGlobalMessage());
+            }
+            if (ctx.getEntityContext() != null && mav != null) {
+                mav.addObject("entityContext", PresentationManager.CONTEXT_SEPARATOR + ctx.getEntityContext());
             }
         }
         try {

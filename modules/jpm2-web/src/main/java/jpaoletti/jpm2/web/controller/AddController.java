@@ -36,8 +36,8 @@ public class AddController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
     public ModelAndView addPrepare(@RequestParam(required = false) String lastId) throws PMException {
         //If there is a "lastId" , the object values are used as defaults
-        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), lastId).getObject();
-        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext().getEntity(), getContext().getOperation()));
+        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return new ModelAndView("jpm-" + EditController.OP_EDIT);
     }
@@ -54,12 +54,12 @@ public class AddController extends BaseController {
      */
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
     public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
-        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), lastId).getObject();
-        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext().getEntity(), getContext().getOperation()));
+        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
         final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
-        if (getContext().getEntity().isWeak()) {
-            final IdentifiedObject iobjectOwner = getService().get(getContext().getEntity().getOwner().getOwner(), ownerId);
-            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner().getOwner(), iobjectOwner));
+        if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
+            final IdentifiedObject iobjectOwner = getService().get(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), getContext().getEntityContext(), ownerId);
+            getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), iobjectOwner));
         }
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return mav;
@@ -77,11 +77,11 @@ public class AddController extends BaseController {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         try {
-            final IdentifiedObject newObject = getService().save(entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
-            getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
+            final IdentifiedObject newObject = getService().save(entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
+            getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s?repeat=true&lastId=%s", entity.getId(), OP_ADD, newObject.getId()));
+                return new ModelAndView(buildRedirect(entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
             } else {
                 return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
             }
@@ -90,7 +90,7 @@ public class AddController extends BaseController {
                 getContext().getEntityMessages().add(e.getMsg());
             }
             final Object object = e.getValidatedObject();
-            getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation));
+            getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
             return new ModelAndView("jpm-" + EditController.OP_EDIT);
         }
     }
@@ -110,12 +110,12 @@ public class AddController extends BaseController {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         try {
-            final IdentifiedObject newObject = getService().save(owner, ownerId, entity, operation, new EntityInstance(entity, operation), getRequest().getParameterMap());
-            getContext().setEntityInstance(new EntityInstance(newObject, entity, operation));
+            final IdentifiedObject newObject = getService().save(owner, ownerId, entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
+            getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
-                return new ModelAndView(String.format("redirect:/jpm/%s/%s/%s/%s?repeat=true&lastId=%s", instance.getOwner().getEntity().getId(), instance.getOwnerId(), entity.getId(), OP_ADD, newObject.getId()));
+                return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
             } else {
                 return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
             }
@@ -124,9 +124,9 @@ public class AddController extends BaseController {
                 getContext().getEntityMessages().add(e.getMsg());
             }
             final Object object = e.getValidatedObject();
-            getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), entity, operation));
-            if (getContext().getEntity().isWeak()) {
-                getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner().getOwner(), new IdentifiedObject(ownerId)));
+            getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
+            if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
+                getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner(getContext().getEntityContext()).getOwner(), new IdentifiedObject(ownerId)));
             }
             return new ModelAndView("jpm-" + EditController.OP_EDIT);
         }

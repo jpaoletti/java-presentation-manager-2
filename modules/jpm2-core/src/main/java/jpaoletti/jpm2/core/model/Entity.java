@@ -1,9 +1,13 @@
 package jpaoletti.jpm2.core.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.dao.GenericDAO;
+import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
@@ -23,7 +27,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private String id; // Represents the entity id. This must me unique.
     private Integer numericId; //Optional reference id
     private String clazz;//The full name of the class represented by the entity.
-    private GenericDAO dao;
+    private DAO dao;
     private String order;
     private Entity parent;
     private boolean auditable;
@@ -44,6 +48,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private Highlighter highlighter;
     private String auditId; //Optional ID for auditoring
 
+    private List<EntityContext> contexts;
+
     public Entity() {
         super();
         this.fieldsbyid = null;
@@ -51,6 +57,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.countable = true;
         this.auditable = true;
         this.pageSize = 10;
+        this.contexts = new ArrayList<>();
     }
 
     /**
@@ -218,12 +225,20 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     /**
-     * Getter for owner
+     * Getter for owner. Use the one with context!
      *
      * @return the owner
      */
     public EntityOwner getOwner() {
         return owner;
+    }
+
+    public EntityOwner getOwner(String context) {
+        final EntityContext ctx = getContext(context);
+        if (ctx != null) {
+            return ctx.getOwner();
+        }
+        return getOwner();
     }
 
     /**
@@ -258,13 +273,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
             return getOperations();
         } else {
             final List<Operation> res = new ArrayList<>();
-            if (getOperations() != null) {
-                res.addAll(getOperations());
-            }
             for (Operation operation : getParent().getAllOperations()) {
-                if (!res.contains(operation)) {
+                if (getOperations() == null || !getOperations().contains(operation)) {
                     res.add(operation);
                 }
+            }
+            if (getOperations() != null) {
+                res.addAll(getOperations());
             }
             return res;
         }
@@ -352,8 +367,14 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return getOwner() != null;
     }
 
+    public boolean isWeak(String context) {
+        return getOwner(context) != null;
+    }
+
     /**
      * Returns the entity title key.
+     *
+     * @return
      */
     public String getTitle() {
         final String key = String.format("jpm.entity.title.%s", getId());
@@ -362,17 +383,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
             return getParent().getTitle();
         }
         return title;
-    }
-
-    /**
-     * @return true if the entity has operations with selected scope
-     */
-    public boolean hasSelectedScopeOperations() {
-        if (getOperations() != null) {
-            return getOperationsForScope(OperationScope.SELECTED).size() > 0;
-        } else {
-            return false;
-        }
     }
 
     public List<PanelRow> getPanels() {
@@ -397,17 +407,24 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.parent = parent;
     }
 
-    public GenericDAO getDao() {
+    public DAO getDao() {
+        return getDao(null);
+    }
+
+    public DAO getDao(String context) {
+        final EntityContext ctx = getContext(context);
+        if (ctx != null && ctx.getDao() != null) {
+            return ctx.getDao();
+        }
         if (dao != null) {
             return dao;
         } else if (getParent() != null) {
-            return getParent().getDao();
-        } else {
-            return null;
+            return getParent().getDao(context);
         }
+        return null;
     }
 
-    public void setDao(GenericDAO dao) {
+    public void setDao(DAO dao) {
         this.dao = dao;
     }
 
@@ -432,40 +449,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         throw new OperationNotFoundException(getId(), id);
     }
 
-    public List<Operation> getItemOperations() {
-        return getOperationsForScope(OperationScope.ITEM);
-    }
-
-    public List<Operation> getGeneralOperations() {
-        return getOperationsForScope(OperationScope.GENERAL);
-    }
-
-    /**
-     * Returns an Operations object for the given scope
-     *
-     * @param scopes The scopes
-     * @return The Operations
-     */
-    public List<Operation> getOperationsForScope(OperationScope... scopes) {
-        final List<Operation> r = new ArrayList<>();
-        if (getAllOperations() != null) {
-            for (Operation op : getAllOperations()) {
-                if (op.getScope() != null) {
-                    OperationScope s = op.getScope();
-                    for (int i = 0; i < scopes.length; i++) {
-                        OperationScope scope = scopes[i];
-                        if (scope.equals(s)) {
-                            r.add(op);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return r;
-    }
-
-    public List<Operation> getOperationsFor(EntityInstance instance, Operation operation, OperationScope scope) throws PMException {
+    public List<Operation> getOperationsFor(EntityInstance instance, String context, Operation operation, OperationScope scope) throws PMException {
         final List<Operation> r = new ArrayList<>();
         if (operation != null) {
             //IF
@@ -479,6 +463,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                             //Scope is adecuate
                             if (scope.equals(op.getScope())) {
                                 //the we add the operation to list.
+                                //TODO CHECK CONTEXT
                                 r.add(op);
                             }
                         }
@@ -512,6 +497,14 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     public String getHome() {
+        return home;
+    }
+
+    public String getHome(String context) {
+        final EntityContext ctx = getContext(context);
+        if (ctx != null && ctx.getHome() != null) {
+            return ctx.getHome();
+        }
         return home;
     }
 
@@ -589,5 +582,24 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         } catch (OperationNotFoundException | NotAuthorizedException ex) {
             return false;
         }
+    }
+
+    public List<EntityContext> getContexts() {
+        return contexts;
+    }
+
+    public void setContexts(List<EntityContext> contexts) {
+        this.contexts = contexts;
+    }
+
+    public EntityContext getContext(String id) {
+        if (id != null) {
+            for (EntityContext entityContext : getContexts()) {
+                if (id.equals(entityContext.getId())) {
+                    return entityContext;
+                }
+            }
+        }
+        return null;
     }
 }

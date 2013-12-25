@@ -3,12 +3,12 @@ package jpaoletti.jpm2.web.converter;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.JPMContext;
-import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.converter.Converter;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -41,15 +41,15 @@ public class ShowObject extends Converter {
         final String res = "@page:show-object-converter.jsp"
                 + "?entityId=" + getEntity().getId()
                 + "&fields=" + getFields()
-                + (object != null ? "&objectId=" + getContext().getEntity().getDao().getId(object) : "");
+                + (object != null ? "&objectId=" + getContext().getEntity().getDao(getContext().getEntityContext()).getId(object) : "");
         if (value == null) {
             return res;
         } else {
             try {
-                final Serializable localId = getEntity().getDao().getId(value);
+                final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
                 String operationLink = "";
                 String operationTitle = "";
-                if (getOperation() != null && (getOperationAuth()==null || SecurityUtils.userHasRole(getOperationAuth()))) {
+                if (getOperation() != null && (getOperationAuth() == null || SecurityUtils.userHasRole(getOperationAuth()))) {
                     try {
                         final Operation op = getEntity().getOperation(getOperation());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));

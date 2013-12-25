@@ -31,6 +31,6 @@
 <script type="text/javascript" src="${cp}static/js/custom.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
         jpmLoad(function() {
-            $("#menu-${entity.id}").addClass("active");
+            $("#menu-${fn:replace(contextualEntity,'!', '-')}").addClass("active");
         });
 </script>

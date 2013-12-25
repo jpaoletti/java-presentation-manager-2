@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -48,4 +49,10 @@ public interface JPMContext {
     public Message getGlobalMessage();
 
     public void setGlobalMessage(Message message);
+
+    public void setEntityContext(String entityContext);
+
+    public String getEntityContext();
+
+    public ContextualEntity getContextualEntity();
 }

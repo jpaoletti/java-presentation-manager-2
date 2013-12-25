@@ -24,9 +24,9 @@ public class DeleteController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_DELETE + "}", method = RequestMethod.GET)
     public String delete(@PathVariable String instanceId) throws PMException {
         final IdentifiedObject iobject = initItemControllerOperation(instanceId);
-        getService().delete(getContext().getEntity(), getContext().getOperation(), instanceId);
+        getService().delete(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
         getContext().setGlobalMessage(MessageFactory.success("jpm.delete.success"));
-        return toList(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()), getContext().getEntity());
+        return toList(new EntityInstance(iobject, getContext()), getContext().getEntity());
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceIds}/{operationId:" + OP_DELETE_SELECTED + "}", method = RequestMethod.GET)
@@ -34,10 +34,10 @@ public class DeleteController extends BaseController {
         IdentifiedObject iobject = null;
         for (String instanceId : instanceIds) {
             iobject = initItemControllerOperation(instanceId);
-            getService().delete(getContext().getEntity(), getContext().getOperation(), instanceId);
+            getService().delete(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
         }
         getContext().setGlobalMessage(MessageFactory.success("jpm.multidelete.success"));
-        return toList(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()), getContext().getEntity());
+        return toList(new EntityInstance(iobject, getContext()), getContext().getEntity());
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}", method = RequestMethod.DELETE)

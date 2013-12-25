@@ -8,7 +8,6 @@ import jpaoletti.jpm2.core.converter.Converter;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
-import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -37,12 +36,12 @@ public final class ShowController extends BaseController {
             @PathVariable Entity entity,
             @PathVariable String instanceId,
             @RequestParam(required = false) String textField) throws PMException {
-        final IdentifiedObject iobject = getService().get(entity, instanceId);
+        final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), instanceId);
         final Object object = iobject.getObject();
         if (textField != null) {
             if (!textField.contains("{")) {
                 final Field field = entity.getFieldById(textField);
-                return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
+                return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
             } else {
                 final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 String finalValue = textField;
@@ -51,17 +50,17 @@ public final class ShowController extends BaseController {
                     final Field field2 = entity.getFieldById(_display_field);
                     finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
                 }
-                return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), finalValue);
+                return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), finalValue);
             }
         } else {
-            return new ObjectConverterDataItem(entity.getDao().getId(object).toString(), object.toString());
+            return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), object.toString());
         }
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
     public Map<String, Object> showJSON(@PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
-        final Object object = getService().get(getContext().getEntity(), getContext().getOperation(), instanceId).getObject();
+        final Object object = getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId).getObject();
         final Map<String, Object> values = new LinkedHashMap<>();
         final String[] fs = fields.split("[,]");
         for (String fid : fs) {

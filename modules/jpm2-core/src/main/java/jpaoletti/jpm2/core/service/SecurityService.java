@@ -21,8 +21,8 @@ public interface SecurityService {
      * @throws PMException
      */
     @Transactional
-    public User resetPassword(Entity entity, Operation operation, String instanceId) throws PMException;
+    public User resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException;
 
     @Transactional
-    public void changePassword(Entity entity, Operation operation, String instanceId, String current, String newpass) throws PMException;
+    public void changePassword(Entity entity, String context, Operation operation, String instanceId, String current, String newpass) throws PMException;
 }

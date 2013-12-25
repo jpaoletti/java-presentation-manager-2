@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
-import jpaoletti.jpm2.core.exception.ConfigurationException;
-import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.PMException;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
@@ -87,7 +88,7 @@ public class ListController extends BaseController {
                 restrictions.add(disjunction);
             }
         }
-        final List list = entity.getDao().list(new DAOListConfiguration((page - 1) * ps, ps).withRestrictions(restrictions));
+        final List list = entity.getDao(getContext().getEntityContext()).list(new DAOListConfiguration((page - 1) * ps, ps).withRestrictions(restrictions));
         r.setMore(list.size() == ps);
         r.setResults(new ArrayList<ObjectConverterDataItem>());
         for (Object object : list) {
@@ -99,27 +100,28 @@ public class ListController extends BaseController {
     @RequestMapping(value = {"/jpm/{entity}/{operationId:" + OP_LIST + "}"}, method = RequestMethod.GET)
     public ModelAndView list(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) throws PMException {
         final Entity entity = getContext().getEntity();
-        if (entity.isWeak() && !entity.getOwner().isOptional()) {
+        if (entity.isWeak(getContext().getEntityContext()) && !entity.getOwner(getContext().getEntityContext()).isOptional()) {
             throw new NotAuthorizedException();
         }
-        ModelAndView mav = generalList(page, pageSize, null);
-        getContext().setEntityInstance(new EntityInstance(entity, getContext().getOperation()));
+        ModelAndView mav = generalList(page, pageSize, null, null);
+        getContext().setEntityInstance(new EntityInstance(getContext()));
         return mav;
     }
 
     @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_LIST + "}"}, method = RequestMethod.GET)
     public ModelAndView list(
-            @PathVariable Entity owner,
+            @PathVariable String owner,
             @PathVariable String ownerId,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
         final Entity entity = getContext().getEntity();
-        if (!entity.isWeak()) {
+        if (!entity.isWeak(getContext().getEntityContext())) {
             throw new NotAuthorizedException();
         }
-        final ModelAndView mav = generalList(page, pageSize, ownerId);
-        final EntityInstance instance = new EntityInstance(entity, getOperation(entity));
-        instance.configureOwner(entity, owner.getDao().get(ownerId));
+        final ContextualEntity cowner = getJpm().getContextualEntity(owner);
+        final ModelAndView mav = generalList(page, pageSize, cowner, ownerId);
+        final EntityInstance instance = new EntityInstance(getContext());
+        instance.configureOwner(entity, getContext().getEntityContext(), cowner.getDao().get(ownerId));
         getContext().setEntityInstance(instance);
         return mav;
     }
@@ -127,24 +129,33 @@ public class ListController extends BaseController {
     /**
      * List for weak entities.
      *
-     * @param entity Owner entity
+     * @param _entity Owner entity
      * @param instanceId Owner entity's id
-     * @param weak weak entity
+     * @param _weak weak entity
      * @param showOperations
      * @return
      * @throws PMException
      */
     @RequestMapping(value = {"/jpm/{entity}/{instanceId}/{weak}/weaklist"}, method = RequestMethod.GET)
     public ModelAndView weaklist(
-            @PathVariable Entity entity,
+            @PathVariable(value = "entity") String _entity,
             @PathVariable String instanceId,
-            @PathVariable Entity weak,
+            @PathVariable(value = "weak") String _weak,
             @RequestParam(required = false, defaultValue = "false") boolean showOperations) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-list-weak");
-        final PaginatedList weakList = getService().getWeakList(entity, instanceId, weak);
+        final ContextualEntity centity = getJpm().getContextualEntity(_entity);
+        final ContextualEntity cweak = getJpm().getContextualEntity(_weak);
+        final Entity entity = centity.getEntity();
+        final Entity weak = cweak.getEntity();
+
+        final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak);
+
         final Operation operation = getOperation(weak);
+        getContext().set(entity, getOperation(entity));
+        getContext().setEntityContext(centity.getContext());
+        getContext().setEntityInstance(new EntityInstance(getContext()));
         getContext().set(weak, operation);
-        getContext().setEntityInstance(new EntityInstance(entity, getOperation(entity)));
+        getContext().setEntityContext(cweak.getContext());
         mav.addObject("paginatedList", weakList);
         mav.addObject("showOperations", showOperations);
         return mav;
@@ -160,7 +171,7 @@ public class ListController extends BaseController {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
             getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
-        return "redirect:/jpm/" + entity.getId() + "/list";
+        return buildRedirect(entity, null, OP_LIST, null);
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
@@ -175,7 +186,7 @@ public class ListController extends BaseController {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
             getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
         }
-        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/list";
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
     }
 
     @RequestMapping(value = "/jpm/{entity}/removeSearch")
@@ -183,7 +194,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return "redirect:/jpm/" + entity.getId() + "/list";
+        return buildRedirect(entity, null, OP_LIST, null);
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeSearch")
@@ -193,13 +204,13 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/list";
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
     }
 
     @RequestMapping(value = "/jpm/{entity}/sort")
     public String sort(@PathVariable Entity entity, @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
-        return "redirect:/jpm/" + entity.getId() + "/list";
+        return buildRedirect(entity, null, OP_LIST, null);
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/sort")
@@ -209,13 +220,16 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
-        return "redirect:/jpm/" + owner.getId() + "/" + ownerId + "/" + entity.getId() + "/list";
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
     }
 
-    protected ModelAndView generalList(Integer page, Integer pageSize, String ownerId) throws PMException {
+    protected ModelAndView generalList(Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException {
         final Entity entity = getContext().getEntity();
         final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
-        final PaginatedList paginatedList = getService().getPaginatedList(entity, getContext().getOperation(), getSessionEntityData(entity), page, pageSize, ownerId);
+        final PaginatedList paginatedList = getService().getPaginatedList(
+                getContext().getContextualEntity(),
+                getContext().getOperation(),
+                getSessionEntityData(entity), page, pageSize, owner, ownerId);
         mav.addObject("paginatedList", paginatedList);
         mav.addObject("sessionEntityData", getSessionEntityData(entity));
         return mav;
@@ -233,7 +247,7 @@ public class ListController extends BaseController {
         if (!textField.contains("{")) {
             final Field field = entity.getFieldById(textField);
             r.getResults().add(new ObjectConverterDataItem(
-                    entity.getDao().getId(object).toString(),
+                    entity.getDao(getContext().getEntityContext()).getId(object).toString(),
                     (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
         } else {
             final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
@@ -244,7 +258,7 @@ public class ListController extends BaseController {
                 finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
             }
             r.getResults().add(new ObjectConverterDataItem(
-                    entity.getDao().getId(object).toString(),
+                    entity.getDao(getContext().getEntityContext()).getId(object).toString(),
                     (useToString) ? object.toString() : finalValue));
         }
     }

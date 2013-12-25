@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jpaoletti.jpm2.core.JPMContextImpl;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
@@ -23,8 +24,8 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
         this.converters = new HashMap<>();
     }
 
-    public void load(final List objects, Entity entity, Operation operation) throws PMException {
-        for (Field field : entity.getOrderedFields()) {
+    public void load(final List objects, ContextualEntity entity, Operation operation) throws PMException {
+        for (Field field : entity.getEntity().getOrderedFields()) {
             final Converter converter = field.getConverter(operation);
             if (converter != null) {
                 if (field.shouldDisplay(operation.getId())) {
@@ -36,9 +37,9 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
         for (Object object : objects) {
             final Serializable instanceId = entity.getDao().getId(object);
             final IdentifiedObject iobject = new IdentifiedObject(String.valueOf(instanceId), object);
-            final EntityInstance instance = new EntityInstance(iobject, getFields(), entity, operation);
-            if (entity.getHighlighter() != null) {
-                final String highlight = entity.getHighlighter().highlight(instance);
+            final EntityInstance instance = new EntityInstance(iobject, getFields(), new JPMContextImpl(entity.getEntity(), entity.getContext(), operation));
+            if (entity.getEntity().getHighlighter() != null) {
+                final String highlight = entity.getEntity().getHighlighter().highlight(instance);
                 if (highlight != null) {
                     instance.setHighlight(highlight);
                 }

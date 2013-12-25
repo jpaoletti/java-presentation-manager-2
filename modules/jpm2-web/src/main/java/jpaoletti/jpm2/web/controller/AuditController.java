@@ -22,9 +22,9 @@ public class AuditController extends BaseController {
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_ITEM_AUDIT + "}", method = RequestMethod.GET)
     public ModelAndView getItemAudit(@PathVariable String instanceId) throws PMException {
-        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getOperation(), instanceId);
+        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
         final ModelAndView mav = new ModelAndView("jpm-" + OP_ITEM_AUDIT);
-        getContext().setEntityInstance(new EntityInstance(iobject, getContext().getEntity(), getContext().getOperation()));
+        getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
         mav.addObject("audits", getJpm().getAuditService().getItemRecords(getContext().getEntity(), instanceId));
         return mav;
     }
