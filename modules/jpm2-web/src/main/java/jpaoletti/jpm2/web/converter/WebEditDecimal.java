@@ -42,8 +42,8 @@ public class WebEditDecimal extends WebToString {
 
     public DecimalFormat getFormater() {
         final DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
-        otherSymbols.setDecimalSeparator(',');
-        otherSymbols.setGroupingSeparator('.');
+        otherSymbols.setDecimalSeparator(getDecimalSeparator());
+        otherSymbols.setGroupingSeparator(getGroupingSeparator());
         return new DecimalFormat(getFormat(), otherSymbols);
     }
 
