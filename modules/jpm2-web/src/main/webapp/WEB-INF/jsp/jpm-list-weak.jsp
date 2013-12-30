@@ -20,7 +20,7 @@
             <div class="btn-group nowrap">
                 <c:forEach items="${item.operations}" var="o">
                     <a
-                        class="btn btn-mini btn-default confirm-${o.confirm} weak-operation" 
+                        class="btn btn-xs btn-default confirm-${o.confirm} weak-operation" 
                         title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
                         href="${cp}jpm/${entity.id}/${item.id}/${o.id}">
                         <i class="glyphicon jpmicon-${o.id}"></i>
