@@ -1,9 +1,4 @@
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow:hidden;
-}
-body {
+body, #footer {
 	background-color: #444444;
 	background-image: -webkit-gradient(linear, 0 0%, 0 100%, from(#555555), to(#111111));
 	background-image: -webkit-linear-gradient(top, #555555 0%, #111111 100%);
@@ -12,16 +7,6 @@ body {
     background-image: -o-linear-gradient(top, #555555 0%, #111111 100%);
     background-image: linear-gradient(top, #555555 0%, #111111 100%);
     background-position: fixed;
-    padding: 0;
-    margin: 0;
-}
-
-#container {
-    top: 0;
-    position: absolute;
-    left: 50%;
-    margin-left: -200px;
-    margin-top: 50px;
 }
 
 #logo, #loginbox {

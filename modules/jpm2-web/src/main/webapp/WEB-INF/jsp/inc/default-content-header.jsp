@@ -1,4 +1,4 @@
-<div id="content-header">
+<div id="content-header" class="page-header">
     <h1>${operationName}</h1>
     <div class="btn-group">
         <c:forEach items="${generalOperations}" var="o">

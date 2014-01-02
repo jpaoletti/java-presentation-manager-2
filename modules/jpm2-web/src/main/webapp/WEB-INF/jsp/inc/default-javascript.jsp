@@ -1,3 +1,4 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:if test="${not empty globalMessage}">
     <div id="globalMessage" class="alert alert-${globalMessage.type.name} flyover flyover-top">
         <p>

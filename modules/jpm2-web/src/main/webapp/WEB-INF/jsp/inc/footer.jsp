@@ -1,10 +1,11 @@
-<footer class="row">
-    <div id="footer">
+<div id="footer">
+    <div class="container">
         <p class="text-muted credit">
-            <span>
+            <small>
                 <spring:message code="jpm.copyright" text="??" arguments="jpaoletti,2013" argumentSeparator="," /> 
                 - v${jpm.appversion}
                 - <a href="mailto:${jpm.contact}" ><spring:message code='jpm.contact' text='Contact' /> </a>
-            </span></p>
+            </small>
+        </p>
     </div>
-</footer>
+</div>
