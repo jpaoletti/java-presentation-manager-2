@@ -46,6 +46,11 @@
 </table>
 <script type="text/javascript">
     $(".inline-edit").each(function() {
-        $(this).editable({ url: '${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit', send: "always", emptytext: "-" });
+        $(this).editable({url: '${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit', send: "always", emptytext: "-"});
     });
+    //<c:forEach items="${paginatedList.fields}" var="f"><c:if test="${not empty f.align}">
+    $("td[data-field='${f.id}']").css("text-align", "${f.align}");
+    //</c:if><c:if test="${not empty f.width}">
+    $("td[data-field='${f.id}'], th[data-field='${f.id}']").css("width", "${f.width}");
+    //</c:if></c:forEach>
 </script>
