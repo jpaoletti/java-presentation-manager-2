@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.security;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,6 +11,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Security User. Just for CRUD operations.
@@ -18,16 +21,16 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
 
     @Id
     private String username;
     private String password;
     private boolean enabled;
     @ManyToMany(targetEntity = Group.class)
-    @JoinTable(name = "group_members", joinColumns =
-            @JoinColumn(name = "username"), inverseJoinColumns =
-            @JoinColumn(name = "group_id"))
+    @JoinTable(name = "group_members", joinColumns
+            = @JoinColumn(name = "username"), inverseJoinColumns
+            = @JoinColumn(name = "group_id"))
     private List<Group> groups;
     @Transient
     private String newPassword;
@@ -37,6 +40,7 @@ public class User implements Serializable {
         this.groups = new ArrayList<>();
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -45,6 +49,7 @@ public class User implements Serializable {
         this.username = username;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -53,6 +58,7 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
@@ -80,5 +86,29 @@ public class User implements Serializable {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        final List<GrantedAuthority> res = new ArrayList<>();
+        for (Group group : getGroups()) {
+            res.addAll(group.getAuthorities());
+        }
+        return res;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
     }
 }

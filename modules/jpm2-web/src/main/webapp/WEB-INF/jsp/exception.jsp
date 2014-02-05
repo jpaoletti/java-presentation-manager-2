@@ -4,8 +4,7 @@
     <head>
         <%@include file="inc/default-head.jsp" %>
     </head>
-    <jpm:jpm-body>
-        <div id="content-header" class="page-header"></div>
+    <jpm:jpm-body showMenu="false">
         <div class="row">
             <div class="col-lg-12 center" style="text-align: center;">
                 <h1><spring:message code="jpm.pmexception" text="Error" /></h1>

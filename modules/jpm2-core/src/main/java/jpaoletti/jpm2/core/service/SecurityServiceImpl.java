@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.BCrypt;
 import jpaoletti.jpm2.core.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -22,7 +23,7 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
     private BCrypt encoder;
 
     @Override
-    public User resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException {
+    public UserDetails resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException {
         final String value = UUID.randomUUID().toString().substring(0, 8);
         final User user = (User) entity.getDao(context).get(instanceId);
         user.setPassword(BCrypt.hashpw(value, BCrypt.gensalt()));

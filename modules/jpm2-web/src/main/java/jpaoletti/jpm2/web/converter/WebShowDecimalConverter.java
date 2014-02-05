@@ -18,10 +18,10 @@ public class WebShowDecimalConverter extends WebToString {
     public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final BigDecimal value = (BigDecimal) getValue(object, field);
         if (value == null) {
-            return wrap(field, process(""));
+            return wrap(field, process(""), value);
         } else {
             final DecimalFormat df = new DecimalFormat(getFormat());
-            return wrap(field, process(df.format(value.doubleValue())));
+            return wrap(field, process(df.format(value.doubleValue())), value);
         }
     }
 

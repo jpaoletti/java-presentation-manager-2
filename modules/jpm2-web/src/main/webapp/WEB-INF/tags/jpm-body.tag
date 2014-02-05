@@ -10,14 +10,16 @@
         </c:if>
         <div class="container">
             <div class="row">
-                <c:if test="${(empty showMenu) or showMenu}">
-                    <div class="col-md-2">
-                        <div class="bs-sidebar hidden-print affix">
-                            <jsp:include page="../jsp/inc/menu/${currentHome}-menu.jsp" />
+                <c:catch var="e">
+                    <c:if test="${(empty showMenu) or showMenu}">
+                        <div class="col-md-2">
+                            <div class="bs-sidebar hidden-print affix">
+                                <jsp:include page="../jsp/inc/menu/${currentHome}-menu.jsp" />
+                            </div>
                         </div>
-                    </div>
-                </c:if>
-                <div class="${((empty showMenu) or showMenu)?'col-md-10':'col-md-12'}">
+                    </c:if>
+                </c:catch>
+                <div class="${(((empty showMenu) or showMenu) and empty e)?'col-md-10':'col-md-12'}">
                     <jsp:doBody />
                 </div>
             </div>

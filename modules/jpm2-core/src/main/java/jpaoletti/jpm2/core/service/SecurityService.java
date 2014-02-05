@@ -3,7 +3,7 @@ package jpaoletti.jpm2.core.service;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.security.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -21,7 +21,7 @@ public interface SecurityService {
      * @throws PMException
      */
     @Transactional
-    public User resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException;
+    public UserDetails resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException;
 
     @Transactional
     public void changePassword(Entity entity, String context, Operation operation, String instanceId, String current, String newpass) throws PMException;
