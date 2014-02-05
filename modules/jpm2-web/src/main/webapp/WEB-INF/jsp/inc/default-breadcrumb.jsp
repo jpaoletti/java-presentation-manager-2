@@ -16,12 +16,6 @@
                ${instance.owner.iobject.object}
             </a>
         </li>
-        <li>
-            <a href="${cp}jpm/${owner.id}/${ownerId}/show">
-                <span class="glyphicon jpmicon-show"></span> <spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> 
-                ${instance.owner.iobject.object}
-            </a>
-        </li>
     </c:if>
     <c:if test="${operation.id ne 'list' and entity.containingListOperation}">
         <li>
