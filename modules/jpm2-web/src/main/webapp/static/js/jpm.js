@@ -203,6 +203,26 @@ var initPage = function() {
                 });
             }
         }
+
+        $(".inline-boolean").on("click", function() {
+            var instanceId = $(this).attr("data-id");
+            var field = $(this).attr("data-field-name");
+            var i = $(this).find("span");
+            var icon = i.attr("class");
+            var iconT = $(this).attr("data-true-icon");
+            var iconF = $(this).attr("data-false-icon");
+            $.ajax({
+                url: contextPath + "/jpm/" + contextualEntity + "/" + instanceId + "/iledit?name=" + field + "&value="+((icon === iconT) ? "" : "1"),
+                type: "POST",
+                success: function() {
+                    if (icon === iconT) {
+                        i.removeClass(iconT).addClass(iconF);
+                    } else {
+                        i.removeClass(iconF).addClass(iconT);
+                    }
+                }
+            });
+        });
         initFunctions();
     } finally {
         $("#loading-div").fadeOut();
