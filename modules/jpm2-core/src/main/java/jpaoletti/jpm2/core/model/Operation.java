@@ -287,6 +287,14 @@ public class Operation extends PMCoreObject {
         this.properties = properties;
     }
 
+    public String getProperty(String name, String def) {
+        if (getProperties() == null || getProperties().isEmpty()) {
+            return def;
+        } else {
+            return getProperties().getProperty(name, def);
+        }
+    }
+
     public boolean isEnabled() {
         return enabled;
     }

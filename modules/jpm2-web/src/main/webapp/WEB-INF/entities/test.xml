@@ -32,6 +32,11 @@
                     <property name="compact" value="false" />
                     <property name="popup" value="false" />
                     <property name="navigable" value="true" />
+                    <property name="properties">
+                        <props>
+                            <prop key="compactOperations">true</prop>
+                        </props>
+                    </property>
                     <!-- <property name="follows" value="otheroper" />-->
                     <!--<property name="condition">
                         <bean class="some.OperationCondition">
