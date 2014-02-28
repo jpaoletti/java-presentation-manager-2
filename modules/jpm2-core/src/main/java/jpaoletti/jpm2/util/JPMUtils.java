@@ -102,7 +102,7 @@ public class JPMUtils {
         } catch (NoSuchMethodException e) {
             throw new ConfigurationException("Property not found: " + propertyName);
         } catch (Exception e) {
-            getLogger().error(e);
+            getLogger().error("Unexpected error", e);
             return "-undefined-";
         }
         return null;
