@@ -118,7 +118,7 @@ public class ShowObject extends Converter {
         this.textField = textField;
     }
 
-    private String getFinalValue(Object value) throws FieldNotFoundException, ConfigurationException {
+    protected String getFinalValue(Object value) throws FieldNotFoundException, ConfigurationException {
         String finalValue;
         if (getTextField() != null) {
             if (!getTextField().contains("{")) {
