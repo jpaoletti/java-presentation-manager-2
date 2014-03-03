@@ -88,7 +88,7 @@
                         <tbody>
                             <c:forEach items="${paginatedList.contents}" var="item">
                                 <tr data-id="${item.id}" class="instance-row ${item.highlight}">
-                                    <th class="operation-list" style="width: ${(compactOperations)?((empty selectedOperations)?40:70):(fn:length(item.operations) * 30 + 25)}px">
+                                    <th class="operation-list" style="width: ${(not compactOperations)?(fn:length(item.operations) * 30 + 25):((empty selectedOperations)?40:70)}px">
                             <div class="btn-group nowrap">
                                 <c:if test="${not empty selectedOperations}">
                                     <input type="checkbox" class="pull-left selectable" data-id="${item.id}" />
