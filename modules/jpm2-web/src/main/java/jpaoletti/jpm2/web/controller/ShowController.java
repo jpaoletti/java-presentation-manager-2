@@ -68,7 +68,8 @@ public final class ShowController extends BaseController {
             final Converter converter = field.getConverter(getContext().getOperation());
             if (converter != null) {
                 try {
-                    values.put(field.getTitle(getContext().getEntity()), converter.visualize(field, object, instanceId));
+                    values.put(field.getTitle(getContext().getEntity()),
+                            converter.visualize(getContext().getContextualEntity(), field, object, instanceId));
                 } catch (IgnoreConvertionException ex) {
                 }
             }

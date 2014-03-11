@@ -46,7 +46,8 @@ public class EntityInstanceList extends ArrayList<EntityInstance> {
             }
             for (Field field : getFields()) {
                 try {
-                    instance.getValues().put(field.getId(), getConverters().get(field.getId()).visualize(field, object, (instanceId != null) ? instanceId.toString() : null));
+                    instance.getValues().put(field.getId(), getConverters().get(field.getId())
+                            .visualize(entity, field, object, (instanceId != null) ? instanceId.toString() : null));
                 } catch (IgnoreConvertionException ex) {
                 }
             }

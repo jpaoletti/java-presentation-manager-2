@@ -8,6 +8,7 @@ import java.util.List;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class EnumConverter extends WebToString {
     private JPMContext context;
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
             final Object value = (object == null) ? null : getValue(object, field);
             final Class enumClass = getEnumClass(field);
@@ -41,7 +42,7 @@ public class EnumConverter extends WebToString {
     }
 
     @Override
-    public Object build(Field field, Object object, Object newValue) throws ConverterException {
+    public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {

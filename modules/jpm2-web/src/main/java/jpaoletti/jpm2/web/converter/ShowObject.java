@@ -10,6 +10,7 @@ import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
@@ -35,7 +36,7 @@ public class ShowObject extends Converter {
     private JPMContext context;
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
 
         final String res = "@page:show-object-converter.jsp"

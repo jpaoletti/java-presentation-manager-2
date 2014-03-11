@@ -1,10 +1,11 @@
 package jpaoletti.jpm2.core.converter;
 
-import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
-import jpaoletti.jpm2.core.exception.ConverterException;
-import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
+import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
 
 /**
@@ -20,6 +21,7 @@ public class Converter extends PMCoreObject {
     /**
      * This method transforms the given value into an object to visualize it
      *
+     * @param contextualEntity
      * @param field
      * @param object
      * @param instanceId
@@ -27,7 +29,7 @@ public class Converter extends PMCoreObject {
      * @throws ConverterException
      * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      */
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         throw new IgnoreConvertionException();
     }
 
@@ -35,6 +37,7 @@ public class Converter extends PMCoreObject {
      * This method takes a specific format of the object from the visualization
      * (usually a string) and transforms it in the required object. TODO
      *
+     * @param contextualEntity
      * @param field
      * @param object
      * @param newValue
@@ -43,7 +46,7 @@ public class Converter extends PMCoreObject {
      * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      *
      */
-    public Object build(Field field, Object object, Object newValue) throws ConverterException, ConfigurationException {
+    public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException, ConfigurationException {
         throw new IgnoreConvertionException();
     }
 

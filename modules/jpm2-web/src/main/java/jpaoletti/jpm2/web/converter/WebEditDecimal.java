@@ -7,6 +7,7 @@ import java.text.ParseException;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.message.MessageFactory;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 
 /**
@@ -20,14 +21,14 @@ public class WebEditDecimal extends WebToString {
     private Character groupingSeparator = ',';
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final BigDecimal fieldValue = (BigDecimal) getValue(object, field);
         final String value = (fieldValue == null) ? field.getDefaultValue() : getFormater().format(fieldValue);
         return "@page:decimal-converter.jsp?value=" + value + "&options=" + getOptions();
     }
 
     @Override
-    public Object build(Field field, Object object, Object newValue) throws ConverterException {
+    public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {

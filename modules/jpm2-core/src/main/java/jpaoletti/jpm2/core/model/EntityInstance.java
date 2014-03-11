@@ -59,29 +59,33 @@ public class EntityInstance {
      * @throws jpaoletti.jpm2.core.PMException
      */
     public EntityInstance(IdentifiedObject iobject, JPMContext ctx) throws PMException {
-        this(ctx.getEntity(), iobject, ctx);
+        this(ctx.getContextualEntity(), iobject, ctx);
     }
 
     /**
      * Used for single instance operations.
+     *
+     * @param contextualEntity
      *
      * @param entity
      * @param iobject
      * @param ctx
      * @throws jpaoletti.jpm2.core.PMException
      */
-    public EntityInstance(Entity entity, IdentifiedObject iobject, JPMContext ctx) throws PMException {
+    public EntityInstance(ContextualEntity contextualEntity, IdentifiedObject iobject, JPMContext ctx) throws PMException {
         this.iobject = iobject;
         final Object object = (iobject != null) ? iobject.getObject() : null;
         final String id = (iobject != null) ? iobject.getId() : null;
         values = new LinkedHashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
+        final Entity entity = contextualEntity.getEntity();
         for (Field field : entity.getOrderedFields()) {
             final Converter converter = field.getConverter(ctx.getOperation());
             if (converter != null) {
                 try {
-                    values.put(field.getId(), converter.visualize(field, object, id));
+                    values.put(field.getId(), converter.visualize(
+                            contextualEntity, field, object, id));
                     fields.add(field);
                 } catch (IgnoreConvertionException ex) {
                 }

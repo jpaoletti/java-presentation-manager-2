@@ -6,6 +6,7 @@ import java.util.Date;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.message.MessageFactory;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import org.joda.time.DateTime;
 
@@ -18,7 +19,7 @@ public class WebEditDate extends WebToString {
     public static final String RFC3339 = "yyyy-MM-dd";
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Date date = (Date) getValue(object, field);
         String value = field.getDefaultValue();
         if (date != null) {
@@ -29,7 +30,7 @@ public class WebEditDate extends WebToString {
     }
 
     @Override
-    public Object build(Field field, Object object, Object newValue) throws ConverterException {
+    public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {

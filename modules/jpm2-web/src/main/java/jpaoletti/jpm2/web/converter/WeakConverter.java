@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.converter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 
@@ -28,7 +29,7 @@ public class WeakConverter extends Converter {
     }
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final StringBuilder res = new StringBuilder("@page:weak-converter.jsp");
         res.append("?showList=").append(isShowList());
         res.append("&showBtn=").append(isShowBtn());

@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 
 /**
@@ -19,7 +20,7 @@ public class EditFileConverter extends Converter {
     private String accept = "'@'"; // /(\.|\/)(gif|jpe?g|png)$/i
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
             final byte[] value = (byte[]) getValue(object, field);
             if (value != null && value.length > 0) {
@@ -46,7 +47,7 @@ public class EditFileConverter extends Converter {
     }
 
     @Override
-    public Object build(Field field, Object object, Object newValue) throws ConverterException {
+    public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue != null && newValue.equals("@current:")) {
             throw new IgnoreConvertionException();
         }

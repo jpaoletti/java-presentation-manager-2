@@ -2,6 +2,7 @@ package jpaoletti.jpm2.web.converter;
 
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 
 /**
@@ -15,10 +16,10 @@ public class WebILEditBoolean extends WebEditBoolean {
     private String falseIcon = "glyphicon-remove";
 
     @Override
-    public Object visualize(Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Boolean fieldValue = (Boolean) getValue(object, field);
         final Boolean value = (fieldValue == null) ? Boolean.valueOf(field.getDefaultValue()) : fieldValue;
-        return "<a href='javascript:;' data-field-name='" + field.getId() + "' data-id='" + instanceId + "' data-true-icon='glyphicon " + getTrueIcon() + "' data-false-icon='glyphicon " + getFalseIcon() + "' class='inline-boolean' data-align='" + field.getAlign() + "'><span class='glyphicon " + (value ? getTrueIcon() : getFalseIcon()) + "'></span></a>";
+        return "<a href='javascript:;' data-entity-id='" + contextualEntity.toString() + "' data-field-name='" + field.getId() + "' data-id='" + instanceId + "' data-true-icon='glyphicon " + getTrueIcon() + "' data-false-icon='glyphicon " + getFalseIcon() + "' class='inline-boolean' data-align='" + field.getAlign() + "'><span class='glyphicon " + (value ? getTrueIcon() : getFalseIcon()) + "'></span></a>";
     }
 
     public String getTrueIcon() {

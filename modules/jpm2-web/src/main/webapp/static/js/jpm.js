@@ -194,25 +194,26 @@ var initPage = function() {
                     array.shift();
                 }
                 var title = document.title;
-                title = title.substring(title.indexOf("- ")+1);
+                title = title.substring(title.indexOf("- ") + 1);
                 array.push({'url': url, 'title': title});
                 var finalArray = uniqBy(array, JSON.stringify);
-                $.cookie(cookieName, JSON.stringify(finalArray), { path: '/' });
+                $.cookie(cookieName, JSON.stringify(finalArray), {path: '/'});
                 $.each(finalArray, function(i, item) {
-                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>"+item.title+"</a></li>")
+                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>" + item.title + "</a></li>")
                 });
             }
         }
 
-        $(".inline-boolean").on("click", function() {
+        $("body").on("click", ".inline-boolean", function() {
             var instanceId = $(this).attr("data-id");
             var field = $(this).attr("data-field-name");
+            var entity = $(this).attr("data-entity-id");
             var i = $(this).find("span");
             var icon = i.attr("class");
             var iconT = $(this).attr("data-true-icon");
             var iconF = $(this).attr("data-false-icon");
             $.ajax({
-                url: contextPath + "/jpm/" + contextualEntity + "/" + instanceId + "/iledit?name=" + field + "&value="+((icon === iconT) ? "" : "1"),
+                url: contextPath + "/jpm/" + entity + "/" + instanceId + "/iledit?name=" + field + "&value=" + ((icon === iconT) ? "" : "1"),
                 type: "POST",
                 success: function() {
                     if (icon === iconT) {

@@ -55,12 +55,16 @@ public class AddController extends BaseController {
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
     public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
-        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
-        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
+        IdentifiedObject iobjectOwner = null;
         if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
-            final IdentifiedObject iobjectOwner = getService().get(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), getContext().getEntityContext(), ownerId);
+            iobjectOwner = getService().get(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), getContext().getEntityContext(), ownerId);
+            JPMUtils.set(object, getContext().getEntity().getOwner().getLocalProperty(), iobjectOwner.getObject());
+        }
+        getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
+        if (iobjectOwner != null) {
             getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), iobjectOwner));
         }
+        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return mav;
     }
