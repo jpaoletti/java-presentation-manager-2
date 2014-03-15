@@ -37,6 +37,7 @@ public class JPMIterceptor implements HandlerInterceptor {
                 final String entityId = (String) pathVariables.get("entity");
                 final ContextualEntity contextualEntity = getJpm().getContextualEntity(entityId);
                 final Entity entity = contextualEntity.getEntity();
+                entity.checkAuthorization();
                 getContext().setEntityContext(contextualEntity.getContext());
                 if (pathVariables.containsKey("operationId")) {
                     final Operation operation = entity.getOperation((String) pathVariables.get("operationId"));
