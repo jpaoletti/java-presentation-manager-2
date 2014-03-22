@@ -28,9 +28,9 @@ public class Group implements Serializable {
     @Column(name = "group_name")
     private String name;
     @ManyToMany
-    @JoinTable(name = "group_authorities", joinColumns =
-            @JoinColumn(name = "group_id"), inverseJoinColumns =
-            @JoinColumn(name = "authority"))
+    @JoinTable(name = "group_authorities", joinColumns
+            = @JoinColumn(name = "group_id"), inverseJoinColumns
+            = @JoinColumn(name = "authority"))
     private List<Authority> authorities;
 
     public Group() {
@@ -63,6 +63,10 @@ public class Group implements Serializable {
 
     @Override
     public String toString() {
-        return getName();
+        if (getId() == null) {
+            return "...";
+        } else {
+            return getName();
+        }
     }
 }
