@@ -11,7 +11,6 @@ import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.BeanNameAware;
 
@@ -457,7 +456,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                 //Operation is displayed and enabled and no the same we are checking
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
                     //User has role
-                    if (op.getAuth() == null || SecurityUtils.userHasRole(op.getAuth())) {
+                    try {
+                        op.checkAuthorization();
                         //Conditions are ok
                         if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
                             //Scope is adecuate
@@ -467,6 +467,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                                 r.add(op);
                             }
                         }
+                    } catch (NotAuthorizedException ignoreme) {
                     }
                 }
             }
