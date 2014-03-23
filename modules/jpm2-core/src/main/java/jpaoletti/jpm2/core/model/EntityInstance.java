@@ -38,7 +38,16 @@ public class EntityInstance {
         this.values = new LinkedHashMap<>();
         this.fields = fields;
         this.highlight = "";
-        configureItemOperations(ctx.getEntity(), ctx.getEntityContext(), ctx.getOperation());
+        final Object object = (iobject != null) ? iobject.getObject() : null;
+        final Entity entity = ctx.getEntity();
+        if (object != null) {
+            if (entity.isWeak(ctx.getEntityContext())) {
+                final Object ownerobject = JPMUtils.get(object, entity.getOwner(ctx.getEntityContext()).getLocalProperty());
+                configureOwner(entity, ctx.getEntityContext(), ownerobject);
+            }
+            configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
+        }
+        configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
     }
 
     /**
@@ -81,13 +90,15 @@ public class EntityInstance {
         operations = new ArrayList<>();
         final Entity entity = contextualEntity.getEntity();
         for (Field field : entity.getOrderedFields()) {
-            final Converter converter = field.getConverter(ctx.getOperation());
-            if (converter != null) {
-                try {
-                    values.put(field.getId(), converter.visualize(
-                            contextualEntity, field, object, id));
-                    fields.add(field);
-                } catch (IgnoreConvertionException ex) {
+            if (field.shouldDisplay(ctx.getOperation().getId())) {
+                final Converter converter = field.getConverter(ctx.getOperation());
+                if (converter != null) {
+                    try {
+                        values.put(field.getId(), converter.visualize(
+                                contextualEntity, field, object, id));
+                        fields.add(field);
+                    } catch (IgnoreConvertionException ex) {
+                    }
                 }
             }
         }
