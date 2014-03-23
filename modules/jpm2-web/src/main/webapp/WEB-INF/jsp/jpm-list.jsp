@@ -78,7 +78,7 @@
                                         data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
                                         class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                         <c:if test="${field.sortable}">
-                                            <span class="glyphicon ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt'):'glyphicon-sort'} pull-right"></span>
+                                            <span class="sort-icon glyphicon ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt'):'glyphicon-sort'} pull-right"></span>
                                         </c:if>
                                         <jpm:field-title entity="${entity}" fieldId="${field.id}" />
                                     </th>
