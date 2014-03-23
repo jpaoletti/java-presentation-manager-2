@@ -38,7 +38,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     @Override
     public PaginatedList getPaginatedList(ContextualEntity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException {
-        entity.getEntity().checkAuthorization();
+        entity.checkAuthorization();
         operation.checkAuthorization();
         final DAOListConfiguration configuration = new DAOListConfiguration();
         final PaginatedList pl = new PaginatedList();
