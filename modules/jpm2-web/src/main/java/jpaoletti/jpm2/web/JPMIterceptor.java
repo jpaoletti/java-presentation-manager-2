@@ -37,7 +37,6 @@ public class JPMIterceptor implements HandlerInterceptor {
                 final String entityId = (String) pathVariables.get("entity");
                 final ContextualEntity contextualEntity = getJpm().getContextualEntity(entityId);
                 final Entity entity = contextualEntity.getEntity();
-                entity.checkAuthorization();
                 getContext().setEntityContext(contextualEntity.getContext());
                 if (pathVariables.containsKey("operationId")) {
                     final Operation operation = entity.getOperation((String) pathVariables.get("operationId"));
@@ -95,7 +94,8 @@ public class JPMIterceptor implements HandlerInterceptor {
                     }
                 }
             }
-            if (entity != null && ctx.getEntity().getHome() != null) {
+            //Ignores json request 
+            if (entity != null && ctx.getEntity().getHome() != null && !hsr.getRequestURL().toString().contains(".json")) {
                 hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome(ctx.getEntityContext()));
             }
             if (ctx.getGlobalMessage() != null && mav != null) {
