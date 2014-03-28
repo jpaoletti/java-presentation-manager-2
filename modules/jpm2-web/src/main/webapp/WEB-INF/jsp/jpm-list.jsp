@@ -74,7 +74,7 @@
                                     <a href="javascript:;" id="help-btn" data-toggle="popover" data-html="true"><i class="glyphicon glyphicon-cog"></i></a>
                                 </th>
                                 <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
-                                    <th data-field="${field.id}" data-entity="${entity.id}" data-index='${st.index+1}'
+                                    <th data-field="${field.id}" data-entity="${contextualEntity}" data-index='${st.index+1}'
                                         data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
                                         class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                         <c:if test="${field.sortable}">
