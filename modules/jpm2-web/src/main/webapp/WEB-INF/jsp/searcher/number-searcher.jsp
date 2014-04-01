@@ -10,6 +10,6 @@
         </select>
     </div>
     <div class="col-lg-9">
-        <input class='form-control page-size' name='value' type='number' value="0">
+        <input class='form-control' name='value' type='number' value="0">
     </div>
 </div>
