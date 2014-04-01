@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.search.Searcher;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,7 @@ public class Field extends PMCoreObject {
     private String property;
     private String width;
     private String display;
+    private String auth;
     private String defaultValue;
     private String align; //left right center, TODO
     private Searcher searcher;
@@ -118,10 +119,17 @@ public class Field extends PMCoreObject {
             return false;
         }
         //First we check permissions
+        try {
+            checkAuthorization();
+        } catch (NotAuthorizedException ex) {
+            return false;
+        }
         for (FieldConfig config : getConfigs()) {
             if (config.includes(operationId)) {
-                if (config.getAuth() != null && !SecurityUtils.userHasRole(config.getAuth())) {
-                    return false;
+                try {
+                    config.checkAuthorization();
+                    return true;
+                } catch (NotAuthorizedException ex) {
                 }
             }
         }
@@ -311,5 +319,14 @@ public class Field extends PMCoreObject {
             return false;
         }
         return true;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
+    }
+
+    @Override
+    public String getAuth() {
+        return this.auth;
     }
 }
