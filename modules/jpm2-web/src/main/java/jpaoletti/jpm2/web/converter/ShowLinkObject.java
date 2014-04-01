@@ -13,13 +13,16 @@ import jpaoletti.jpm2.core.model.Field;
  */
 public class ShowLinkObject extends ShowObject {
 
+    private String ctx;
+
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
 
         final String res = "@page:link-object-converter.jsp"
                 + "?entityId=" + getEntity().getId()
-                + (object != null ? "&objectId=" + getEntity().getDao(getContext().getEntityContext()).getId(value) : "");
+                + ((getCtx() != null) ? "&ctx=" + getCtx() : "")
+                + (object != null ? "&objectId=" + getEntity().getDao(getCtx()).getId(value) : "");
         if (value == null) {
             return res;
         } else {
@@ -32,5 +35,13 @@ public class ShowLinkObject extends ShowObject {
                 throw new ConverterException(ex.getMessage());
             }
         }
+    }
+
+    public String getCtx() {
+        return ctx;
+    }
+
+    public void setCtx(String ctx) {
+        this.ctx = ctx;
     }
 }
