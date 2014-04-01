@@ -17,6 +17,7 @@ import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
+import jpaoletti.jpm2.core.model.RelatedListFilter;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
@@ -52,6 +53,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String textField,
             @RequestParam(required = false, defaultValue = "false") boolean useToString,
+            @RequestParam(required = false) String relatedValue,
             @RequestParam(required = false) String ownerId,
             @RequestParam(required = false) String filter,
             @RequestParam(required = false, defaultValue = "") String query,
@@ -63,6 +65,9 @@ public class ListController extends BaseController {
         final List<Criterion> restrictions = new ArrayList<>();
         if (filter != null && !"".equals(filter)) {
             final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
+            if (lfilter instanceof RelatedListFilter) {
+                ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
+            }
             final Criterion c = lfilter.getListFilter(entity, getSessionEntityData(entity), ownerId);
             if (c != null) {
                 restrictions.add(c);

@@ -6,12 +6,13 @@
         if (!$("link[href='${cp}static/css/select2.css']").length) {
             $('<link href="${cp}static/css/select2.css" rel="stylesheet">').appendTo("head");
         }
+        var related = ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").select2("val")'):'""'};
         $("#field_${field}").select2({
             placeholder: "${param.placeHolder}", allowClear: true,
             width: 'copy', dropdownCssClass: "bigdrop",
             minimumInputLength: ${param.minSearch},
             ajax: {
-                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
+                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}&relatedValue=" + related,
                 dataType: 'json',
                 data: function(term, page) {
                     return {

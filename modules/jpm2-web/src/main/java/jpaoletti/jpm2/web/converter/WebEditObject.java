@@ -20,6 +20,7 @@ public class WebEditObject extends Converter {
     private Integer pageSize;
     private Integer minSearch;
     private String placeHolder;
+    private String related;
 
     public WebEditObject() {
         this.pageSize = 10;
@@ -40,6 +41,9 @@ public class WebEditObject extends Converter {
         }
         if (getFilter() != null) {
             sb.append("&filter=").append(getFilter().getId());
+        }
+        if (getRelated() != null) {
+            sb.append("&related=").append(getRelated());
         }
         sb.append("&placeHolder=").append(getPlaceHolder());
         return sb.toString();
@@ -100,5 +104,13 @@ public class WebEditObject extends Converter {
 
     public void setPlaceHolder(String placeHolder) {
         this.placeHolder = placeHolder;
+    }
+
+    public String getRelated() {
+        return related;
+    }
+
+    public void setRelated(String related) {
+        this.related = related;
     }
 }
