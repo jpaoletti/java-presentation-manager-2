@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -43,6 +44,14 @@ public class ExceptionController {
     @ExceptionHandler(NotAuthorizedException.class)
     public String handleNotAuthorizedException() {
         return "not-authotized";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleTypeMismatchException(Exception ex, HttpServletRequest req, HttpServletResponse resp) {
+        final ModelAndView mav = new ModelAndView("exception");
+        mav.addObject("message", MessageFactory.error("unexpected.exception", ex.getMessage()));
+        JPMUtils.getLogger().fatal("Unexpected Exception", ex);
+        return mav;
     }
 
     @ExceptionHandler(PMException.class)
