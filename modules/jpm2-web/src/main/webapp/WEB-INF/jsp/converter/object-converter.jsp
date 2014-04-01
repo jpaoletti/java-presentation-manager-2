@@ -6,16 +6,16 @@
         if (!$("link[href='${cp}static/css/select2.css']").length) {
             $('<link href="${cp}static/css/select2.css" rel="stylesheet">').appendTo("head");
         }
-        var related = ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").select2("val")'):'""'};
         $("#field_${field}").select2({
             placeholder: "${param.placeHolder}", allowClear: true,
             width: 'copy', dropdownCssClass: "bigdrop",
             minimumInputLength: ${param.minSearch},
             ajax: {
-                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}&relatedValue=" + related,
+                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
                 dataType: 'json',
                 data: function(term, page) {
                     return {
+                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").select2("val")'):'""'},
                         textField: "${param.textField}",
                         query: term, // search term
                         pageSize: ${param.pageSize},
