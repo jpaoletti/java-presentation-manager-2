@@ -77,7 +77,11 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public String toString() {
-        return getUsername();
+        if (getUsername() == null) {
+            return "...";
+        } else {
+            return getUsername();
+        }
     }
 
     public String getNewPassword() {
