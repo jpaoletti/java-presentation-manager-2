@@ -77,6 +77,9 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public String toString() {
+        if (getUsername() == null) {
+            return "...";
+        }
         return getUsername();
     }
 
