@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.dao.DAO;
 
@@ -8,7 +9,7 @@ import jpaoletti.jpm2.core.dao.DAO;
  *
  * @author jpaoletti
  */
-public class ContextualEntity {
+public class ContextualEntity extends PMCoreObject {
 
     private Entity entity;
     private String context;
