@@ -79,9 +79,8 @@ public class User implements Serializable, UserDetails {
     public String toString() {
         if (getUsername() == null) {
             return "...";
-        } else {
-            return getUsername();
         }
+        return getUsername();
     }
 
     public String getNewPassword() {
