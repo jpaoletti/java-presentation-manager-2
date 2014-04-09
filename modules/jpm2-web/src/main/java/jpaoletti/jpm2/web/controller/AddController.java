@@ -96,6 +96,9 @@ public class AddController extends BaseController {
             final Object object = e.getValidatedObject();
             getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
             return new ModelAndView("jpm-" + EditController.OP_EDIT);
+        } catch (Exception e) {
+            JPMUtils.getLogger().error("Unexpected error in add commit", e);
+            throw e;
         }
     }
 

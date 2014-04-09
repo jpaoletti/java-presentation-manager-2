@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.model;
 
 import java.util.Objects;
+import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.dao.DAO;
 
 /**
@@ -8,12 +9,13 @@ import jpaoletti.jpm2.core.dao.DAO;
  *
  * @author jpaoletti
  */
-public class EntityContext {
+public class EntityContext extends PMCoreObject {
 
     private String id;
     private EntityOwner owner;
     private DAO dao;
     private String home;
+    private String auth;
 
     public String getId() {
         return id;
@@ -21,6 +23,15 @@ public class EntityContext {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 
     public EntityOwner getOwner() {

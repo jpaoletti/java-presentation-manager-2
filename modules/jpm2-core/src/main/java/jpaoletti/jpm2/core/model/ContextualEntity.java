@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.model;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.dao.DAO;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 
 /**
  * Helper to contain the context and the entity.
@@ -17,6 +18,15 @@ public class ContextualEntity extends PMCoreObject {
     public ContextualEntity(Entity entity, String context) {
         this.entity = entity;
         this.context = context;
+    }
+
+    @Override
+    public void checkAuthorization() throws NotAuthorizedException {
+        getEntity().checkAuthorization();
+        final EntityContext ctx = getEntity().getContext(getContext());
+        if (ctx != null) {
+            ctx.checkAuthorization();
+        }
     }
 
     @Override
