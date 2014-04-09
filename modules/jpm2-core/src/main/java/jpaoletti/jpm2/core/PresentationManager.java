@@ -8,12 +8,12 @@ import java.util.Map;
 import jpaoletti.jpm2.core.converter.ClassConverter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.EntityNotFoundException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PMSession;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -219,8 +219,10 @@ public class PresentationManager {
         for (Map.Entry<String, Entity> entry : getEntities().entrySet()) {
             final Entity entity = entry.getValue();
             if (entity.getNumericId() != null && numericId.equals(entity.getNumericId())) {
-                if (entity.getAuth() == null || SecurityUtils.userHasRole(entity.getAuth())) {
+                try {
+                    entity.checkAuthorization();
                     res.add(entity);
+                } catch (NotAuthorizedException ex) {
                 }
             }
         }
