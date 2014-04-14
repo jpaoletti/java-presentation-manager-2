@@ -2,12 +2,12 @@
 <div id="form-content-container-${entity.id}">
     <c:if test="${empty entity.panels}">
         <c:forEach items="${instance.values}" var="value">
-            <div id="control-group-${value.key}" class="form-group">
+            <c:set var="field" value="${value.key}" scope="request" />
+            <div id="control-group-${value.key}" class="form-group ${not empty fieldMessages[field] ? 'has-error':''}">
                 <label class="col-lg-4 control-label" for="f_${value.key}">
                     <jpm:field-title entity="${entity}" fieldId="${value.key}" />
                 </label>
                 <div class="col-lg-8">
-                    <c:set var="field" value="${value.key}" scope="request" />
                     <c:set var="convertedValue" value="${value.value}"/>
                     <c:if test="${fn:startsWith(convertedValue, '@page:')}">
                         <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
