@@ -33,7 +33,7 @@ public class EnumConverter extends WebToString {
             }
             final StringBuilder sb = new StringBuilder("@page:enum-converter.jsp?options=" + URLEncoder.encode(StringUtils.join(options, ","), "UTF-8"));
             if (value != null) {
-                sb.append("&value=").append(((Enum) value).toString());
+                sb.append("&value=").append(((Enum) value).name());
             }
             return sb.toString();
         } catch (UnsupportedEncodingException ignoreme) {
