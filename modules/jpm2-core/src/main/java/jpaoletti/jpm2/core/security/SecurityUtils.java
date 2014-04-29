@@ -12,17 +12,20 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public class SecurityUtils {
 
-    public static boolean userHasRole(String role) {
-        if (role == null) {
+    public static boolean userHasRole(String roles) {
+        if (roles == null) {
             return true;
         }
         final Authentication authentication = getAuthentication();
         if (authentication == null) {
             return false;
         }
-        for (final GrantedAuthority auth : authentication.getAuthorities()) {
-            if (role.equals(auth.getAuthority())) {
-                return true;
+        String[] split = roles.split("[,]");
+        for (String role : split) {
+            for (final GrantedAuthority auth : authentication.getAuthorities()) {
+                if (role.equals(auth.getAuthority())) {
+                    return true;
+                }
             }
         }
         return false;
