@@ -4,15 +4,22 @@ import jpaoletti.jpm2.core.exception.ConfigurationException;
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jboss.logging.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility helpers
  *
  * @author jpaoletti
  */
-public class JPMUtils {
+@Component
+public class JPMUtils implements ApplicationContextAware {
 
     public static final String LOGGER_NAME = "jpaoletti.jpm2";
+
+    private static ApplicationContext context;
 
     /**
      * Pad to the left
@@ -100,7 +107,8 @@ public class JPMUtils {
             }
         } catch (NullPointerException | NestedNullException e) {
         } catch (NoSuchMethodException e) {
-            throw new ConfigurationException("Property not found: " + propertyName);
+            getLogger().warn("NoSuchMethodException: " + propertyName, e);
+            return null;
         } catch (Exception e) {
             getLogger().error("Unexpected error", e);
             return "-undefined-";
@@ -122,5 +130,14 @@ public class JPMUtils {
         } catch (Exception e) {
             getLogger().error(e);
         }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) throws BeansException {
+        JPMUtils.context = context;
+    }
+
+    public static ApplicationContext getApplicationContext() {
+        return context;
     }
 }
