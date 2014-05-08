@@ -24,29 +24,29 @@ public class IntegerSearcher implements Searcher {
         final String operator = parameters.get("operator")[0];
         switch (operator) {
             case "ne":
-                return new DescribedCriterion(
+                return SearcherHelper.addAliases(new DescribedCriterion(
                         MessageFactory.info(DESCRIPTION_KEY, "!=", String.valueOf(value)),
-                        Restrictions.ne(field.getProperty(), value));
+                        Restrictions.ne(field.getProperty(), value)), field);
             case ">":
-                return new DescribedCriterion(
+                return SearcherHelper.addAliases(new DescribedCriterion(
                         MessageFactory.info(DESCRIPTION_KEY, ">", String.valueOf(value)),
-                        Restrictions.gt(field.getProperty(), value));
+                        Restrictions.gt(field.getProperty(), value)), field);
             case ">=":
-                return new DescribedCriterion(
+                return SearcherHelper.addAliases(new DescribedCriterion(
                         MessageFactory.info(DESCRIPTION_KEY, ">=", String.valueOf(value)),
-                        Restrictions.ge(field.getProperty(), value));
+                        Restrictions.ge(field.getProperty(), value)), field);
             case "<":
-                return new DescribedCriterion(
+                return SearcherHelper.addAliases(new DescribedCriterion(
                         MessageFactory.info(DESCRIPTION_KEY, "<", String.valueOf(value)),
-                        Restrictions.lt(field.getProperty(), value));
+                        Restrictions.lt(field.getProperty(), value)), field);
             case "<=":
-                return new DescribedCriterion(
+                return SearcherHelper.addAliases(new DescribedCriterion(
                         MessageFactory.info(DESCRIPTION_KEY, "<=", String.valueOf(value)),
-                        Restrictions.le(field.getProperty(), value));
+                        Restrictions.le(field.getProperty(), value)), field);
             default:
-                return new DescribedCriterion(
+                return SearcherHelper.addAliases(new DescribedCriterion(
                         MessageFactory.info(DESCRIPTION_KEY, "=", String.valueOf(value)),
-                        Restrictions.eq(field.getProperty(), value));
+                        Restrictions.eq(field.getProperty(), value)), field);
         }
     }
 

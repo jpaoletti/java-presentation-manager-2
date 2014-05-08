@@ -21,13 +21,14 @@ public class StringSearcher implements Searcher {
     public DescribedCriterion build(Field field, Map<String, String[]> parameters) {
         final String value = parameters.get("value")[0];
         final String operator = ((String[]) parameters.get("operator"))[0];
+        DescribedCriterion describedCriterion;
         switch (operator) {
             case "li":
-                return new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.like", value),
-                        Restrictions.like(field.getProperty(), value, MatchMode.ANYWHERE));
+                describedCriterion = new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.like", value), Restrictions.like(field.getProperty(), value, MatchMode.ANYWHERE));
+                break;
             default:
-                return new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.eq", value),
-                        Restrictions.eq(field.getProperty(), value));
+                describedCriterion = new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.eq", value), Restrictions.eq(field.getProperty(), value));
         }
+        return SearcherHelper.addAliases(describedCriterion, field);
     }
 }

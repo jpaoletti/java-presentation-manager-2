@@ -19,8 +19,8 @@ public class BoolSearcher implements Searcher {
     @Override
     public DescribedCriterion build(Field field, Map<String, String[]> parameters) {
         final boolean value = parameters.get("value") != null && !"false".equals(parameters.get("value")[0]);
-        return new DescribedCriterion(
+        return SearcherHelper.addAliases(new DescribedCriterion(
                 value ? MessageFactory.info("jpm.searcher.boolSearcher.eq.true") : MessageFactory.info("jpm.searcher.boolSearcher.eq.false"),
-                Restrictions.eq(field.getProperty(), value));
+                Restrictions.eq(field.getProperty(), value)), field);
     }
 }
