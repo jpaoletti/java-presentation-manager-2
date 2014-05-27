@@ -94,12 +94,16 @@ public class JPMIterceptor implements HandlerInterceptor {
                     }
                 }
             }
-            //Ignores json request 
-            if (entity != null && ctx.getEntity().getHome() != null && !hsr.getRequestURL().toString().contains(".json")) {
-                hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome(ctx.getEntityContext()));
-            }
-            if (ctx.getGlobalMessage() != null && mav != null) {
-                hsr.getSession().setAttribute("globalMessage", ctx.getGlobalMessage());
+            try {
+                //Ignores json request
+                if (entity != null && ctx.getEntity().getHome() != null && !hsr.getRequestURL().toString().contains(".json")) {
+                    hsr.getSession().setAttribute(BaseController.CURRENT_HOME, ctx.getEntity().getHome(ctx.getEntityContext()));
+                }
+                if (ctx.getGlobalMessage() != null && mav != null) {
+                    hsr.getSession().setAttribute("globalMessage", ctx.getGlobalMessage());
+                }
+            } catch (Exception e) {
+                //Some times session can't be created
             }
             if (ctx.getEntityContext() != null && mav != null) {
                 mav.addObject("entityContext", PresentationManager.CONTEXT_SEPARATOR + ctx.getEntityContext());
