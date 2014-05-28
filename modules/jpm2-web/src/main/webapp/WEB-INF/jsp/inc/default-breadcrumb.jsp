@@ -4,32 +4,41 @@
     </li>
     <c:if test="${not empty owner}">
         <c:if test="${owner.containingListOperation}">
-            <li>
-            <a href="${cp}jpm/${owner.id}${entityContext}/list">
-                <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${owner.title}" />
-            </a>
-            </li>
+            <c:if test="${empty instance.owner.owner}">
+                <li>
+                    <a href="${cp}jpm/${owner.id}${entityContext}/list">
+                        <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${owner.title}" />
+                    </a>
+                </li>
+            </c:if>
+            <c:if test="${not empty instance.owner.owner}">
+                <li>
+                    <a href="${cp}jpm/${instance.owner.owner.entity.id}/${instance.owner.owner.iobject.id}/${owner.id}${entityContext}/list">
+                        <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${owner.title}" />
+                    </a>
+                </li>
+            </c:if>
         </c:if>
         <li>
             <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show">
-               <span class="glyphicon jpmicon-show"></span> <spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> 
-               ${instance.owner.iobject.object}
+                <span class="glyphicon jpmicon-show"></span> <spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> 
+                ${instance.owner.iobject.object}
             </a>
         </li>
     </c:if>
     <c:if test="${operation.id ne 'list' and entity.containingListOperation}">
         <li>
-        <c:if test="${not empty owner}">
-            <!-- BUG NEED OWNER CONTEXT --> 
-            <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/list">
-                <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
-            </a>
-        </c:if>
-        <c:if test="${empty owner}">
-            <a href="${cp}jpm/${contextualEntity}/list">
-                <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
-            </a>
-        </c:if>
+            <c:if test="${not empty owner}">
+                <!-- BUG NEED OWNER CONTEXT --> 
+                <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/list">
+                    <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
+                </a>
+            </c:if>
+            <c:if test="${empty owner}">
+                <a href="${cp}jpm/${contextualEntity}/list">
+                    <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
+                </a>
+            </c:if>
         </li>
     </c:if>
     <li class="active">

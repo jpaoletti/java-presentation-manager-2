@@ -7,6 +7,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -154,7 +155,7 @@ public class EntityInstance {
         this.operations = entity.getOperationsFor(this, context, operation, OperationScope.ITEM);
     }
 
-    public final void configureOwner(Entity entity, String context, final Object ownerobject) {
+    public final void configureOwner(Entity entity, String context, final Object ownerobject) throws ConfigurationException {
         final Entity ownerEntity = entity.getOwner(context).getOwner();
         if (ownerobject != null) {
             final String ownerId = String.valueOf(ownerEntity.getDao(context).getId(ownerobject));
