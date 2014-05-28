@@ -42,6 +42,12 @@
         <script type="text/javascript">
             jpmLoad(function() {
                 $("#j_username").focus();
+                $("#loginform").on("submit", function(){
+                    if($("#j_username").val().trim()===""){
+                        $("#j_username").focus();
+                        return false;
+                    }
+                });
             });
         </script>
     </jpm:jpm-body>
