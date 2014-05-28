@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.converter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -21,11 +22,13 @@ public class WebEditObject extends Converter {
     private Integer minSearch;
     private String placeHolder;
     private String related;
+    private boolean readonly;
 
     public WebEditObject() {
         this.pageSize = 10;
         this.minSearch = 0;
         this.placeHolder = "...";
+        this.readonly = false;
     }
 
     @Override
@@ -36,6 +39,7 @@ public class WebEditObject extends Converter {
         sb.append("&textField=").append(getTextField());
         sb.append("&pageSize=").append(getPageSize());
         sb.append("&minSearch=").append(getMinSearch());
+        sb.append("&readonly=").append(isReadonly());
         if (value != null) {
             sb.append("&value=").append(getEntity().getDao().getId(value));
         }
@@ -51,6 +55,9 @@ public class WebEditObject extends Converter {
 
     @Override
     public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
+        if (isReadonly()) {
+            throw new IgnoreConvertionException("Readonly");
+        }
         if (newValue == null || "".equals(newValue)) {
             return null;
         } else {
@@ -112,5 +119,13 @@ public class WebEditObject extends Converter {
 
     public void setRelated(String related) {
         this.related = related;
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
     }
 }

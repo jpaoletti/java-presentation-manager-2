@@ -38,6 +38,6 @@
             formatResult: function(data) {return data.text;},
             formatSelection: function(data) {return data.text;},
             escapeMarkup: function(m) {return m;}
-        });
+        }).select2("readonly", ${param.readonly});
     });
 </script>
