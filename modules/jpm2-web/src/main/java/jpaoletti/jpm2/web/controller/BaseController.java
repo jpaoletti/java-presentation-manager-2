@@ -159,6 +159,8 @@ public class BaseController {
     }
 
     protected void checkOperationCondition(Operation operation, EntityInstance instance) throws PMException {
+        getContext().getContextualEntity().checkAuthorization();
+        operation.checkAuthorization();
         if (operation.getCondition() != null) {
             if (!operation.getCondition().check(instance, operation, null)) {
                 throw new NotAuthorizedException();
