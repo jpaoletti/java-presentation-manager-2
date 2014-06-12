@@ -47,7 +47,7 @@ public final class ShowController extends BaseController {
                 String finalValue = textField;
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field);
+                    final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""));
                     finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
                 }
                 return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), finalValue);
