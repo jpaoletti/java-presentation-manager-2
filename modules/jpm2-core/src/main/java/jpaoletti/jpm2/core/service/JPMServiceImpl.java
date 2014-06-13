@@ -5,6 +5,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -70,7 +71,11 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         pl.getContents().load(list, entity, operation);
         for (Field field : entity.getEntity().getOrderedFields()) {
             if (field.getSearcher() != null) {
-                pl.getFieldSearchs().put(field, field.getSearcher().visualization(field));
+                try {
+                    field.checkAuthorization();
+                    pl.getFieldSearchs().put(field, field.getSearcher().visualization(field));
+                } catch (NotAuthorizedException e) {
+                }
             }
         }
         //getJpm().audit(); //not for now
