@@ -108,7 +108,7 @@ public class ListController extends BaseController {
         if (entity.isWeak(getContext().getEntityContext()) && !entity.getOwner(getContext().getEntityContext()).isOptional()) {
             throw new NotAuthorizedException();
         }
-        ModelAndView mav = generalList(page, pageSize, null, null);
+        final ModelAndView mav = generalList(page, pageSize, null, null);
         getContext().setEntityInstance(new EntityInstance(getContext()));
         return mav;
     }
