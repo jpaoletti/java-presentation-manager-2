@@ -2,8 +2,8 @@ package jpaoletti.jpm2.core.dao;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import jpaoletti.jpm2.core.idtransformer.IdTransformer;
+import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -40,7 +40,12 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         if (id.getClass().equals(idClass)) {
             return (T) getSession().get(getPersistentClass(), id);
         } else {
-            return (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+            try {
+                return (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+            } catch (Exception e) {
+                JPMUtils.getLogger().warn("Invalid ID transformation", e);
+                return null;
+            }
         }
     }
 
@@ -91,8 +96,12 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     protected Criteria getBaseCriteria(DAOListConfiguration configuration) {
         Criteria c = getSession().createCriteria(getPersistentClass());
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-        for (Map.Entry<String, String> alias : configuration.getAliases().entrySet()) {
-            c = c.createAlias(alias.getKey(), alias.getValue());
+        for (DAOListConfiguration.DAOListConfigurationAlias alias : configuration.getAliases()) {
+            if (alias.getJoinType() != null) {
+                c = c.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
+            } else {
+                c = c.createAlias(alias.getProperty(), alias.getAlias());
+            }
         }
         for (Criterion criterion : configuration.getRestrictions()) {
             if (criterion != null) {
@@ -126,5 +135,10 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
      */
     public void setPersistentClass(Class<T> persistentClass) {
         this.persistentClass = persistentClass;
+    }
+
+    @Override
+    public void detach(Object object) {
+        getSession().evict(object);
     }
 }
