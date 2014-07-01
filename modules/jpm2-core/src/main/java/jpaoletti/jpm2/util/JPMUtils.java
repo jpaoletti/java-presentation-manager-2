@@ -3,6 +3,8 @@ package jpaoletti.jpm2.util;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.jboss.logging.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -139,5 +141,17 @@ public class JPMUtils implements ApplicationContextAware {
 
     public static ApplicationContext getApplicationContext() {
         return context;
+    }
+
+    public static <T> T initializeAndUnproxy(T entity) {
+        if (entity == null) {
+            throw new NullPointerException("Entity passed for initialization is null");
+        }
+        Hibernate.initialize(entity);
+        if (entity instanceof HibernateProxy) {
+            entity = (T) ((HibernateProxy) entity).getHibernateLazyInitializer()
+                    .getImplementation();
+        }
+        return entity;
     }
 }
