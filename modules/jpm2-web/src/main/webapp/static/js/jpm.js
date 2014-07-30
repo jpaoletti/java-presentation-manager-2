@@ -213,7 +213,7 @@ var initPage = function() {
             var iconT = $(this).attr("data-true-icon");
             var iconF = $(this).attr("data-false-icon");
             $.ajax({
-                url: contextPath + "/jpm/" + entity + "/" + instanceId + "/iledit?name=" + field + "&value=" + ((icon === iconT) ? "" : "1"),
+                url: contextPath + "jpm/" + entity + "/" + instanceId + "/iledit?name=" + field + "&value=" + ((icon === iconT) ? "" : "1"),
                 type: "POST",
                 success: function() {
                     if (icon === iconT) {
