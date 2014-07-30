@@ -9,6 +9,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.jodah.typetools.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,8 +88,10 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         if (configuration.getFrom() != null) {
             c.setFirstResult(configuration.getFrom());
         }
-        if (configuration.getOrder() != null) {
-            c.addOrder(configuration.getOrder());
+        if (!configuration.getOrders().isEmpty()) {
+            for (Order order : configuration.getOrders()) {
+                c.addOrder(order);
+            }
         }
         return c.list();
     }

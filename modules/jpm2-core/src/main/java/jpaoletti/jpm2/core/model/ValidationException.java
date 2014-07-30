@@ -16,6 +16,11 @@ public class ValidationException extends PMException {
         this.validatedObject = validatedObject;
     }
 
+    public ValidationException(Message msg, Object validatedObject) {
+        super(msg);
+        this.validatedObject = validatedObject;
+    }
+
     public ValidationException(Message msg) {
         super(msg);
     }

@@ -50,10 +50,10 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         }
         if (search != null) {
             configuration.getRestrictions().add(search);
-            configuration.getAliases().putAll(sessionEntityData.getSearchCriteria().getAliases());
+            configuration.getAliases().addAll(sessionEntityData.getSearchCriteria().getAliases());
         }
         if (sessionEntityData.getSort().isSorted()) {
-            configuration.setOrder(sessionEntityData.getSort().getOrder());
+            configuration.withOrder(sessionEntityData.getSort().getOrder());
         }
         final DAO dao = entity.getDao();
         if (entity.getEntity().isPaginable()) {

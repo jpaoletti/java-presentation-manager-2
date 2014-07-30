@@ -1,7 +1,9 @@
 package jpaoletti.jpm2.web.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.PMException;
@@ -43,6 +45,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ListController extends BaseController {
 
+    public static final String PAGE1 = "page=1";
     public static final String OP_LIST = "list";
     @Autowired
     private WebApplicationContext ctx;
@@ -62,6 +65,7 @@ public class ListController extends BaseController {
 
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
+        final DAOListConfiguration cl = new DAOListConfiguration((page - 1) * ps, ps);
         final List<Criterion> restrictions = new ArrayList<>();
         if (filter != null && !"".equals(filter)) {
             final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
@@ -74,11 +78,24 @@ public class ListController extends BaseController {
             }
         }
         if (!"".equals(query)) {
+            final Map<String, String[]> searcherParameters = new LinkedHashMap();
+            searcherParameters.put("value", new String[]{query});
+            searcherParameters.put("operator", new String[]{"li"});
             //Field can be a conbintaion of fields like "[{code}] {description}"
-            //Old style is supported if there is no @ in the textField
+            //Old style is supported if there is no { in the textField
             if (!textField.contains("{")) {
                 final Field field = entity.getFieldById(textField);
-                restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+                if (field.getSearcher() == null) {
+                    restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+                } else {
+                    try {
+                        final DescribedCriterion dc = field.getSearcher().build(field, searcherParameters);
+                        cl.getAliases().addAll(dc.getAliases());
+                        restrictions.add(dc.getCriterion());
+                    } catch (Exception e) {
+                        //We ignore any errors avoiding the filter
+                    }
+                }
             } else {
                 final Disjunction disjunction = Restrictions.disjunction();
                 final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
@@ -87,13 +104,28 @@ public class ListController extends BaseController {
                     //Starting with !, properties are ignored
                     if (!_display_field.startsWith("!")) {
                         final Field field2 = entity.getFieldById(_display_field);
-                        disjunction.add(Restrictions.like(field2.getProperty(), query, MatchMode.ANYWHERE));
+                        final String property = field2.getProperty();
+                        if (property.contains(".")) {//need an alias
+                            final String alias = property.substring(0, property.indexOf("."));
+                            cl.withAlias(alias, alias);
+                        }
+                        if (field2.getSearcher() == null) {
+                            disjunction.add(Restrictions.like(property, query, MatchMode.ANYWHERE));
+                        } else {
+                            try {
+                                final DescribedCriterion dc = field2.getSearcher().build(field2, searcherParameters);
+                                cl.getAliases().addAll(dc.getAliases());
+                                disjunction.add(dc.getCriterion());
+                            } catch (Exception e) {
+                                //We ignore any errors avoiding the filter
+                            }
+                        }
                     }
                 }
                 restrictions.add(disjunction);
             }
         }
-        final List list = entity.getDao(getContext().getEntityContext()).list(new DAOListConfiguration((page - 1) * ps, ps).withRestrictions(restrictions));
+        final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
         r.setMore(list.size() == ps);
         r.setResults(new ArrayList<ObjectConverterDataItem>());
         for (Object object : list) {
@@ -172,11 +204,15 @@ public class ListController extends BaseController {
             @RequestParam String fieldId,
             HttpServletRequest request) throws PMException {
         final Field field = entity.getFieldById(fieldId);
+        String params = null;
         if (field.getSearcher() != null) {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
-            getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
+            if (build != null) {
+                getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
+                params = PAGE1;
+            }
         }
-        return buildRedirect(entity, null, OP_LIST, null);
+        return buildRedirect(entity, null, OP_LIST, params);
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
@@ -187,11 +223,15 @@ public class ListController extends BaseController {
             @RequestParam String fieldId,
             HttpServletRequest request) throws PMException {
         final Field field = entity.getFieldById(fieldId);
+        String params = null;
         if (field.getSearcher() != null) {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
-            getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
+            if (build != null) {
+                getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
+                params = PAGE1;
+            }
         }
-        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, params);
     }
 
     @RequestMapping(value = "/jpm/{entity}/removeSearch")
@@ -199,7 +239,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return buildRedirect(entity, null, OP_LIST, null);
+        return buildRedirect(entity, null, OP_LIST, PAGE1);
     }
 
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeSearch")
@@ -209,7 +249,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, PAGE1);
     }
 
     @RequestMapping(value = "/jpm/{entity}/sort")

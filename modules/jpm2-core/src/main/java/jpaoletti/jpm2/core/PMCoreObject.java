@@ -1,7 +1,7 @@
 package jpaoletti.jpm2.core;
 
-import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import java.io.Serializable;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.PMCoreConstants;
 import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -20,9 +20,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     @Autowired
-    private MessageSource messageSource;
-    @Autowired
-    PresentationManager jpm;
+    private PresentationManager jpm;
     private Boolean debug;
 
     /**
@@ -64,11 +62,7 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
     }
 
     public MessageSource getMessageSource() {
-        return messageSource;
-    }
-
-    public void setMessageSource(MessageSource messageSource) {
-        this.messageSource = messageSource;
+        return getJpm().getMessageSource();
     }
 
     public String getMessage(String key, Object... params) {

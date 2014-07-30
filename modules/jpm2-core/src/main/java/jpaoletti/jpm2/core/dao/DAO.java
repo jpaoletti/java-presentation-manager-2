@@ -2,11 +2,12 @@ package jpaoletti.jpm2.core.dao;
 
 import java.io.Serializable;
 import java.util.List;
-import org.hibernate.criterion.Criterion;
 
 /**
  *
  * @author jpaoletti
+ * @param <T>
+ * @param <ID>
  */
 public interface DAO<T, ID extends Serializable> {
 
@@ -23,4 +24,6 @@ public interface DAO<T, ID extends Serializable> {
     public void save(Object object);
 
     public void update(final Object object);
+
+    public void detach(Object object);
 }

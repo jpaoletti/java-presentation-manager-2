@@ -18,6 +18,7 @@ import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
 /**
  *
@@ -41,7 +42,6 @@ public class PresentationManager {
     private Map<String, Entity> entities;
     @Autowired(required = false)
     private List<Entity> entityList;
-    //private Map<Object, Monitor> monitors;
     private List<ClassConverter> classConverters;
     private final Map<String, PMSession> sessions = new HashMap<>();
 
@@ -276,5 +276,9 @@ public class PresentationManager {
 
     public void setEntityList(List<Entity> entityList) {
         this.entityList = entityList;
+    }
+
+    public MessageSource getMessageSource() {
+        return (MessageSource) JPMUtils.getApplicationContext().getBean("messageSource");
     }
 }

@@ -68,8 +68,14 @@ public class JPMServiceBase {
     }
 
     public void preExecute(Operation operation, Object object) throws PMException {
-        if (operation.getValidator() != null) {
-            operation.getValidator().validate(object);
+        if (operation.getValidator() != null && object != null) {
+            try {
+                operation.getValidator().validate(object);
+            } catch (ValidationException ve) {
+                getContext().getEntity().getDao().detach(object); //Avoid flush of changes
+                ve.setValidatedObject(object);
+                throw ve;
+            }
         }
         if (operation.getContext() != null) {
             operation.getContext().preExecute(object);

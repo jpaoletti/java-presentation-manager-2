@@ -1,10 +1,13 @@
 package jpaoletti.jpm2.core.search;
 
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
+import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Field;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.sql.JoinType;
 
 /**
  *
@@ -20,15 +23,15 @@ public interface Searcher {
 
         private Message description;
         private Criterion criterion;
-        private Map<String, String> aliases;
+        private Set<DAOListConfiguration.DAOListConfigurationAlias> aliases;
 
         public DescribedCriterion(Message description, Criterion criterion) {
             this.description = description;
             this.criterion = criterion;
-            this.aliases = new HashMap<>();
+            this.aliases = new LinkedHashSet<>();
         }
 
-        public DescribedCriterion(Message description, Criterion criterion, Map<String, String> aliases) {
+        public DescribedCriterion(Message description, Criterion criterion, Set<DAOListConfiguration.DAOListConfigurationAlias> aliases) {
             this.description = description;
             this.criterion = criterion;
             this.aliases = aliases;
@@ -50,16 +53,17 @@ public interface Searcher {
             this.criterion = criterion;
         }
 
-        public Map<String, String> getAliases() {
+        public Set<DAOListConfiguration.DAOListConfigurationAlias> getAliases() {
             return aliases;
         }
 
-        public void setAliases(Map<String, String> aliases) {
-            this.aliases = aliases;
+        public DescribedCriterion addAlias(String a1, String a2) {
+            getAliases().add(new DAOListConfiguration.DAOListConfigurationAlias(a1, a2));
+            return this;
         }
 
-        public DescribedCriterion addAlias(String a1, String a2) {
-            getAliases().put(a1, a2);
+        public DescribedCriterion addAlias(String a1, String a2, JoinType jt) {
+            getAliases().add(new DAOListConfiguration.DAOListConfigurationAlias(a1, a2, jt));
             return this;
         }
     }
