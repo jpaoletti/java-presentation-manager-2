@@ -87,8 +87,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final String instanceId = instance.getIobject().getId();
         final Object object = entity.getDao(context).get(instanceId);
         instance.getIobject().setObject(object);
-        processFields(entity, operation, object, instance, parameters);
         try {
+            processFields(entity, operation, object, instance, parameters);
             preExecute(operation, object);
             entity.getDao(context).update(object);
             postExecute(operation, object);
