@@ -20,8 +20,8 @@ import org.hibernate.criterion.Restrictions;
 public class SearchCriteria implements Serializable {
 
     private Criterion criterion; //Global criteria search, Something like Restrictions.and(... , ...)
-    private List<SearchCriteriaField> definitions; //Individual criterias
-    private Set<DAOListConfiguration.DAOListConfigurationAlias> aliases;
+    private final List<SearchCriteriaField> definitions; //Individual criterias
+    private final Set<DAOListConfiguration.DAOListConfigurationAlias> aliases;
 
     public SearchCriteria() {
         this.definitions = new ArrayList<>();
