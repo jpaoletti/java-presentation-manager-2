@@ -12,6 +12,12 @@ public interface OperationCondition {
 
     /**
      * object is posible to be null.
+     *
+     * @param instance
+     * @param operation
+     * @param displayAt
+     * @return
+     * @throws jpaoletti.jpm2.core.PMException
      */
     public boolean check(final EntityInstance instance, final Operation operation, final String displayAt) throws PMException;
 }
