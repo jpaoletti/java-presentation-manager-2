@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.model;
 
 import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.security.SecurityUtils;
 
@@ -17,6 +18,7 @@ public class FieldConfig extends PMCoreObject {
     private String operations;
     private String auth;
     private Converter converter;
+    private FieldConfigCondition condtion;
     private FieldValidator validator;
     private List<FieldValidator> validators;
 
@@ -74,9 +76,13 @@ public class FieldConfig extends PMCoreObject {
         this.converter = converter;
     }
 
-    boolean match(Operation operation) {
+    boolean match(EntityInstance instance, Operation operation) throws PMException {
         if (operation != null) {
-            return includes(operation.getId()) && (getAuth() == null || SecurityUtils.userHasRole(getAuth()));
+            final boolean prevalidation = includes(operation.getId()) && (getAuth() == null || SecurityUtils.userHasRole(getAuth()));
+            if (prevalidation && getCondtion() != null && instance != null) {
+                return getCondtion().check(instance, operation);
+            }
+            return prevalidation;
         } else {
             return false;
         }
@@ -97,4 +103,13 @@ public class FieldConfig extends PMCoreObject {
     public void setValidators(List<FieldValidator> validators) {
         this.validators = validators;
     }
+
+    public FieldConfigCondition getCondtion() {
+        return condtion;
+    }
+
+    public void setCondtion(FieldConfigCondition condtion) {
+        this.condtion = condtion;
+    }
+
 }

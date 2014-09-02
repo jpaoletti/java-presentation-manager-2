@@ -48,7 +48,8 @@ public class EditController extends BaseController {
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.POST)
     public ModelAndView editCommit(@PathVariable String instanceId, @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         try {
-            final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext());
+            final IdentifiedObject iobject = initItemControllerOperation(instanceId);
+            final EntityInstance instance = new EntityInstance(iobject, getContext());
             getContext().setEntityInstance(instance);
             getJpm().getService().update(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instance, getRequest().getParameterMap());
             if (repeat) {

@@ -92,7 +92,7 @@ public class EntityInstance {
         final Entity entity = contextualEntity.getEntity();
         for (Field field : entity.getOrderedFields()) {
             if (field.shouldDisplay(ctx.getOperation().getId())) {
-                final Converter converter = field.getConverter(ctx.getOperation());
+                final Converter converter = field.getConverter(this, ctx.getOperation());
                 if (converter != null) {
                     try {
                         values.put(field.getId(), converter.visualize(
@@ -171,5 +171,9 @@ public class EntityInstance {
 
     public void setHighlight(String highlight) {
         this.highlight = highlight;
+    }
+
+    public void setFields(List<Field> fields) {
+        this.fields = fields;
     }
 }

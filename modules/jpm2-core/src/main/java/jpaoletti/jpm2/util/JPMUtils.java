@@ -6,6 +6,8 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.jboss.logging.Logger;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -153,5 +155,13 @@ public class JPMUtils implements ApplicationContextAware {
                     .getImplementation();
         }
         return entity;
+    }
+
+    public static <T> T getTargetObject(Object proxy, Class<T> targetClass) throws Exception {
+        if (AopUtils.isJdkDynamicProxy(proxy)) {
+            return (T) ((Advised) proxy).getTargetSource().getTarget();
+        } else {
+            return (T) proxy;
+        }
     }
 }

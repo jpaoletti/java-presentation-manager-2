@@ -65,7 +65,7 @@ public final class ShowController extends BaseController {
         final String[] fs = fields.split("[,]");
         for (String fid : fs) {
             final Field field = getContext().getEntity().getFieldById(fid);
-            final Converter converter = field.getConverter(getContext().getOperation());
+            final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());
             if (converter != null) {
                 try {
                     values.put(field.getTitle(getContext().getEntity()),

@@ -37,9 +37,9 @@ public class JPMServiceBase {
             final Object newValue = param == null ? null : (param.length == 1 ? param[0] : param);
             final Field field = entity.getFieldById(entry.getKey());
             try {
-                final Converter converter = field.getConverter(operation);
+                final Converter converter = field.getConverter(entityInstance, operation);
                 final Object convertedValue = converter.build(getContext().getContextualEntity(), field, object, newValue);
-                final List<FieldValidator> validators = field.getValidators(operation);
+                final List<FieldValidator> validators = field.getValidators(entityInstance, operation);
                 boolean set = true;
                 for (FieldValidator fieldValidator : validators) {
                     final Message msg = fieldValidator.validate(object, convertedValue);

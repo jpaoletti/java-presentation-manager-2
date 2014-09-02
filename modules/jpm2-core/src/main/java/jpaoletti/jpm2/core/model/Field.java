@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import jpaoletti.jpm2.core.PMCoreObject;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.search.Searcher;
@@ -231,18 +232,18 @@ public class Field extends PMCoreObject {
         this.defaultConverter = defaultConverter;
     }
 
-    public Converter getConverter(Operation operation) {
+    public Converter getConverter(EntityInstance instance, Operation operation) throws PMException {
         for (FieldConfig fieldConfig : getConfigs()) {
-            if (fieldConfig.match(operation)) {
+            if (fieldConfig.match(instance, operation)) {
                 return fieldConfig.getConverter();
             }
         }
         return null;
     }
 
-    public List<FieldValidator> getValidators(Operation operation) {
+    public List<FieldValidator> getValidators(EntityInstance instance, Operation operation) throws PMException {
         for (FieldConfig fieldConfig : getConfigs()) {
-            if (fieldConfig.match(operation)) {
+            if (fieldConfig.match(instance, operation)) {
                 if (fieldConfig.getValidators() == null || fieldConfig.getValidators().isEmpty()) {
                     if (fieldConfig.getValidator() == null) {
                         return Collections.EMPTY_LIST;

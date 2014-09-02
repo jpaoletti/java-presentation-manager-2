@@ -16,7 +16,7 @@ public class EntityInstanceOwner {
     public EntityInstanceOwner(Entity entity, IdentifiedObject iobject) throws ConfigurationException {
         this.entity = entity;
         this.iobject = iobject;
-        if (entity.isWeak()) {
+        if (entity.isWeak() && iobject != null) {
             final Entity superOwnerEntity = entity.getOwner().getOwner();
             final Object superOwnerobject = JPMUtils.get(iobject.getObject(), entity.getOwner().getLocalProperty());
             final String superOwnerId = String.valueOf(superOwnerEntity.getDao().getId(superOwnerobject));
