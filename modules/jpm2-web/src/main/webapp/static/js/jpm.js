@@ -2,6 +2,19 @@ String.prototype.trim = function() {
     return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
 };
 
+
+function supports_html5_storage() {
+    try {
+        return 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+        return false;
+    }
+}
+
+function getLocalStorage() {
+    return window['localStorage'];
+}
+
 var wrapToString = function() {
     $(".to-string").each(function() {
         var v = $(this).html();
@@ -179,14 +192,19 @@ var initPage = function() {
         $('.tip-top').tooltip({placement: 'top'});
         $('.tip-bottom').tooltip({placement: 'bottom'});
 
-        $("#userNavRecent");
-        {
+        if (currentUser && currentUser !== '') {
+            $("#userNavRecent");
             var url = $(location).attr('href');
             if (!url.match(/#$/)) {
-                var cookieName = "jpm_recent";
-                var _recentArray = $.cookie(cookieName)
+                var name = "jpm_recent_" + currentUser;
+                var name2 = "jpm_lastUser";
+                if ($.cookie(name2) !== currentUser) {
+                    $.cookie(name2, currentUser);
+                    $.cookie(name, "", {path: '/'});
+                }
+                var _recentArray = $.cookie(name);
                 var recentArray = new Array();
-                if (typeof _recentArray !== "undefined") {
+                if (typeof _recentArray !== "undefined" && _recentArray !== "") {
                     recentArray = $.parseJSON(_recentArray);
                 }
                 var array = Array.prototype.slice.call(recentArray);
@@ -197,7 +215,7 @@ var initPage = function() {
                 title = title.substring(title.indexOf("- ") + 1);
                 array.push({'url': url, 'title': title});
                 var finalArray = uniqBy(array, JSON.stringify);
-                $.cookie(cookieName, JSON.stringify(finalArray), {path: '/'});
+                $.cookie(name, JSON.stringify(finalArray), {path: '/'});
                 $.each(finalArray, function(i, item) {
                     $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>" + item.title + "</a></li>")
                 });

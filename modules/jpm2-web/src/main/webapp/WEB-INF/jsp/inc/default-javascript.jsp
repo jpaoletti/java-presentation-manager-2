@@ -20,6 +20,7 @@
 <script type="text/javascript" src="${cp}static/js/jquery.jpanelmenu.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
         var contextPath = "${cp}";
+        var currentUser = "${(user.getClass().name ne 'java.lang.String')?user.username:''}";
         var contextualEntity = "${contextualEntity}";
         //This initialize the internationalized javascript messages
         var messages = new Array();
