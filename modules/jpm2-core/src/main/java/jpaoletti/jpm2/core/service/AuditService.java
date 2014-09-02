@@ -17,6 +17,8 @@ public interface AuditService {
 
     public void register(Entity entity, Operation operation, IdentifiedObject iobject);
 
+    public AuditRecord buildRecord(Entity entity, Operation operation, IdentifiedObject iobject, String observations);
+
     public List<AuditRecord> getItemRecords(Entity entity, String instanceId);
 
     public List<AuditRecord> getGeneralRecords(Entity entity);

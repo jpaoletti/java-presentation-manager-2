@@ -33,42 +33,46 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
 
     @Override
     public void register(Entity entity, Operation operation, IdentifiedObject iobject, String observations) {
-        if (entity != null && !entity.isAuditable()) {
-            return;
-        }
-        if (operation != null && !operation.isAuditable()) {
-            return;
-        }
         try {
-            final AuditRecord record = new AuditRecord();
-            record.setDatetime(new Date());
-            if (SecurityUtils.getAuthentication() != null && SecurityUtils.getAuthentication().getPrincipal() != null) {
-                record.setUsername((SecurityUtils.getUserDetails()).getUsername());
-            }
-            if (entity != null) {
-                record.setEntity(entity.getAuditId());
-                if (iobject != null) {
-                    record.setItem(iobject.getId());
-                }
-            }
-
-            if (operation != null) {
-                record.setOperation(operation.getId());
-            }
-
-            if (observations != null && !observations.equals("")) {
-                record.setObservations(observations);
-            } else {
-                if (iobject != null) {
-                    record.setObservations(String.valueOf(iobject.getObject()));
-                }
-            }
-            if (getSessionFactory() != null) {
+            final AuditRecord record = buildRecord(entity, operation, iobject, observations);
+            if (getSessionFactory() != null && record != null) {
                 getSessionFactory().getCurrentSession().save(record);
             }
         } catch (Exception ex) {
             JPMUtils.getLogger().error(ex);
         }
+    }
+
+    @Override
+    public AuditRecord buildRecord(Entity entity, Operation operation, IdentifiedObject iobject, String observations) {
+        if (entity != null && !entity.isAuditable()) {
+            return null;
+        }
+        if (operation != null && !operation.isAuditable()) {
+            return null;
+        }
+        final AuditRecord record = new AuditRecord();
+        record.setDatetime(new Date());
+        if (SecurityUtils.getAuthentication() != null && SecurityUtils.getAuthentication().getPrincipal() != null) {
+            record.setUsername((SecurityUtils.getUserDetails()).getUsername());
+        }
+        if (entity != null) {
+            record.setEntity(entity.getAuditId());
+            if (iobject != null) {
+                record.setItem(iobject.getId());
+            }
+        }
+        if (operation != null) {
+            record.setOperation(operation.getId());
+        }
+        if (observations != null && !observations.equals("")) {
+            record.setObservations(observations);
+        } else {
+            if (iobject != null) {
+                record.setObservations(String.valueOf(iobject.getObject()));
+            }
+        }
+        return record;
     }
 
     @Override
