@@ -14,7 +14,7 @@ public class SessionEntityData implements Serializable {
     private Entity entity;
     private Integer page;
     private Integer pageSize;
-    private SearchCriteria searchCriteria;
+    private final SearchCriteria searchCriteria;
     private ListSort sort;
 
     public SessionEntityData(Entity entity) throws PMException {
