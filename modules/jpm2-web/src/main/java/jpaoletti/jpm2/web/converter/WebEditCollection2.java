@@ -20,7 +20,7 @@ public class WebEditCollection2 extends WebEditObject {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
-        final String res = "@page:collection-converter2.jsp"
+        final String res = getBaseJsp()
                 + "?entityId=" + getEntity().getId()
                 + "&textField=" + getTextField()
                 + "&filter=" + ((getFilter() != null) ? getFilter().getId() : "")
@@ -35,6 +35,10 @@ public class WebEditCollection2 extends WebEditObject {
             }
             return res + "&value=" + sb.toString().substring(0, sb.toString().length() - 1);
         }
+    }
+
+    protected String getBaseJsp() {
+        return "@page:collection-converter2.jsp";
     }
 
     @Override
