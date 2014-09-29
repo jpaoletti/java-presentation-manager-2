@@ -8,7 +8,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="${cp}index">${jpm.title}</a>
+            <a class="navbar-brand" href="${cp}index"><span class="glyphicon glyphicon-home"></span> <span class="hidden-sm">${jpm.title}</span></a>
         </div>
         <div class="collapse navbar-collapse">
             <%@include file="menu/top-menu.jsp" %>
