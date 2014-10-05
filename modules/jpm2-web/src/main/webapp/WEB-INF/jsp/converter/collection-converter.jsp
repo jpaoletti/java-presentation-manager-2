@@ -11,10 +11,11 @@
             placeholder: "...",
             minimumInputLength: ${param.minSearch},
             ajax: {
-                url: "${cp}jpm/${param.entityId}.json",
+                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}",
                 dataType: 'json',
                 data: function(term, page) {
                     return {
+                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").select2("val")'):'""'},
                         textField: "${param.textField}",
                         query: term, // search term
                         pageSize: ${param.pageSize},
