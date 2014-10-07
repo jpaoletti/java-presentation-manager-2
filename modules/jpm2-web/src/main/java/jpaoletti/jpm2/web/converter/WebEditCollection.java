@@ -22,8 +22,8 @@ public class WebEditCollection extends WebEditObject {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
         final String res = "@page:collection-converter.jsp"
                 + "?entityId=" + getEntity().getId()
-                + "&related=" + getRelated()
-                + "&filter=" + getFilter().getId()
+                + ((getRelated() != null) ? "&related=" + getRelated() : "")
+                + ((getFilter() != null) ? "&filter=" + getFilter().getId() : "")
                 + "&textField=" + getTextField()
                 + "&pageSize=" + getPageSize()
                 + "&minSearch=" + getMinSearch();
