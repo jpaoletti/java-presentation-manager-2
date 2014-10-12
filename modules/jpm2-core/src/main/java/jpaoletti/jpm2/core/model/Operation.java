@@ -86,7 +86,8 @@ public class Operation extends PMCoreObject {
      * @return true if this operation is visible in the other
      */
     public boolean isDisplayed(String other) {
-        return (getDisplay() == null || getDisplay().compareTo("all") == 0 || getDisplay().indexOf(other) != -1);
+        return ((getDisplay() == null || getDisplay().contains("all") || getDisplay().contains(other)))
+                && (!getDisplay().contains("!" + other)); //new, this is for ignoring operations, like "all !add" means 'all' but not 'add'
     }
 
     /**
