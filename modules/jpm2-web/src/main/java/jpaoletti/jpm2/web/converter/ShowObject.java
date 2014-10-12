@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.converter;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import jpaoletti.jpm2.core.JPMContext;
+import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ShowObject extends Converter {
 
     private Entity entity;
+    private String entityContext;
     private String fields;
     private String operation;
     private String operationAuth;
@@ -54,12 +56,13 @@ public class ShowObject extends Converter {
                     try {
                         final Operation op = getEntity().getOperation(getOperation());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
+                        final String entityId = getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                         switch (op.getScope()) {
                             case ITEM:
-                                operationLink = "jpm/" + getEntity().getId() + "/" + localId + "/" + getOperation();
+                                operationLink = "jpm/" + entityId + "/" + localId + "/" + getOperation();
                                 break;
                             default:
-                                operationLink = "jpm/" + getEntity().getId() + "/" + getOperation();
+                                operationLink = "jpm/" + entityId + "/" + getOperation();
                                 break;
                         }
                     } catch (NotAuthorizedException | OperationNotFoundException ex) {
@@ -158,5 +161,13 @@ public class ShowObject extends Converter {
 
     public void setOperationAuth(String operationAuth) {
         this.operationAuth = operationAuth;
+    }
+
+    public String getEntityContext() {
+        return entityContext;
+    }
+
+    public void setEntityContext(String entityContext) {
+        this.entityContext = entityContext;
     }
 }
