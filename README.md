@@ -17,6 +17,7 @@ THIS IS A WORK IN PROGRESS PROJECT.
 * <a href='http://blueimp.github.io/jQuery-File-Upload/'>jQuery File Upload</a>
 * <a href='https://github.com/carhartl/jquery-cookie'>jQuery Cookie</a>
 * <a href='http://www.decorplanit.com/plugin/'>autoNumeric</a>
+* <a href='https://github.com/igorescobar/jQuery-Mask-Plugin'>jQuery Mask Plugin v1.7.7</a>
 
 ## Functionalities
 
