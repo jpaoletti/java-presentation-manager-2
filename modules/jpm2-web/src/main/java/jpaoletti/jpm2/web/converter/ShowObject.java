@@ -126,14 +126,14 @@ public class ShowObject extends Converter {
         String finalValue;
         if (getTextField() != null) {
             if (!getTextField().contains("{")) {
-                final Field field = getEntity().getFieldById(getTextField());
+                final Field field = getEntity().getFieldById(getTextField(), getContext().getEntityContext());
                 return String.valueOf(JPMUtils.get(value, field.getProperty()));
             } else {
                 final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 finalValue = textField;
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field);
+                    final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
                     finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(value, field2.getProperty())));
                 }
             }

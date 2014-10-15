@@ -40,14 +40,14 @@ public final class ShowController extends BaseController {
         final Object object = iobject.getObject();
         if (textField != null) {
             if (!textField.contains("{")) {
-                final Field field = entity.getFieldById(textField);
+                final Field field = entity.getFieldById(textField, getContext().getEntityContext());
                 return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
             } else {
                 final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 String finalValue = textField;
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""));
+                    final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""), getContext().getEntityContext());
                     finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
                 }
                 return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), finalValue);
@@ -64,7 +64,7 @@ public final class ShowController extends BaseController {
         final Map<String, Object> values = new LinkedHashMap<>();
         final String[] fs = fields.split("[,]");
         for (String fid : fs) {
-            final Field field = getContext().getEntity().getFieldById(fid);
+            final Field field = getContext().getEntity().getFieldById(fid, getContext().getEntityContext());
             final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());
             if (converter != null) {
                 try {

@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import java.util.List;
 import java.util.Objects;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.dao.DAO;
@@ -16,6 +17,7 @@ public class EntityContext extends PMCoreObject {
     private DAO dao;
     private String home;
     private String auth;
+    private List<Field> fields; //specific for this context
 
     public String getId() {
         return id;
@@ -82,4 +84,11 @@ public class EntityContext extends PMCoreObject {
         return Objects.equals(this.id, other.id);
     }
 
+    public List<Field> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<Field> fields) {
+        this.fields = fields;
+    }
 }

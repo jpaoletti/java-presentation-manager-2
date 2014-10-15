@@ -90,7 +90,7 @@ public class EntityInstance {
         fields = new ArrayList<>();
         operations = new ArrayList<>();
         final Entity entity = contextualEntity.getEntity();
-        for (Field field : entity.getOrderedFields()) {
+        for (Field field : entity.getOrderedFields(contextualEntity.getContext())) {
             if (field.shouldDisplay(ctx.getOperation().getId())) {
                 final Converter converter = field.getConverter(this, ctx.getOperation());
                 if (converter != null) {

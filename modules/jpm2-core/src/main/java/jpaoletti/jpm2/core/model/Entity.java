@@ -64,7 +64,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      *
      * @return The list
      */
-    public List<Field> getAllFields() {
+    public List<Field> getAllFields(String context) {
         final List<Field> r = new ArrayList<>();
         final List<String> ids = new ArrayList<>();
         if (getFields() != null) {
@@ -74,7 +74,15 @@ public class Entity extends PMCoreObject implements BeanNameAware {
             }
         }
         if (getParent() != null) {
-            for (Field field : getParent().getAllFields()) {
+            for (Field field : getParent().getAllFields(context)) {
+                if (!ids.contains(field.getId())) {
+                    r.add(field);
+                }
+            }
+        }
+        final EntityContext ctx = getContext(context);
+        if (ctx != null && ctx.getFields() != null && !ctx.getFields().isEmpty()) {
+            for (Field field : ctx.getFields()) {
                 if (!ids.contains(field.getId())) {
                     r.add(field);
                 }
@@ -91,8 +99,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @throws jpaoletti.jpm2.core.exception.FieldNotFoundException when the
      * field was not found for this entity
      */
-    public Field getFieldById(String id) throws FieldNotFoundException {
-        final Field res = getFieldsbyid().get(id);
+    public Field getFieldById(String id, String context) throws FieldNotFoundException {
+        final Field res = getFieldsbyid(context).get(id);
         if (res == null) {
             throw new FieldNotFoundException(getId(), id);
         }
@@ -105,10 +113,10 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return The mapped field list
      *
      */
-    private Map<String, Field> getFieldsbyid() {
+    private Map<String, Field> getFieldsbyid(String context) {
         if (fieldsbyid == null) {
             fieldsbyid = new HashMap<>();
-            for (Field f : getAllFields()) {
+            for (Field f : getAllFields(context)) {
                 fieldsbyid.put(f.getId(), f);
             }
         }
@@ -121,17 +129,17 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * @return fields ordered
      *
      */
-    public List<Field> getOrderedFields() {
+    public List<Field> getOrderedFields(String context) {
         try {
             if (isOrdered()) {
-                ArrayList<Field> r = new ArrayList<>(getAllFields());
+                final ArrayList<Field> r = new ArrayList<>(getAllFields(context));
                 Collections.sort(r, new FieldComparator(getOrder()));
                 return r;
             }
         } catch (Exception e) {
             JPMUtils.getLogger().error(e);
         }
-        return getAllFields();
+        return getAllFields(context);
     }
 
     /**

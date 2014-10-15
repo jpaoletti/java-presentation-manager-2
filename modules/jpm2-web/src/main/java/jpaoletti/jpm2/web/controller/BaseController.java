@@ -61,7 +61,7 @@ public class BaseController {
     public SessionEntityData getSessionEntityData(Entity entity) throws PMException {
         final Object sed = getSession().getAttribute(entity.getId());
         if (sed == null) {
-            final SessionEntityData sessionEntityData = new SessionEntityData(entity);
+            final SessionEntityData sessionEntityData = new SessionEntityData(entity, getContext().getEntityContext());
             getSession().setAttribute(entity.getId(), sessionEntityData);
         }
         return (SessionEntityData) getSession().getAttribute(entity.getId());

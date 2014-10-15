@@ -69,7 +69,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         }
         final List list = dao.list(configuration);
         pl.getContents().load(list, entity, operation);
-        for (Field field : entity.getEntity().getOrderedFields()) {
+        for (Field field : entity.getEntity().getOrderedFields(entity.getContext())) {
             if (field.getSearcher() != null) {
                 try {
                     field.checkAuthorization();

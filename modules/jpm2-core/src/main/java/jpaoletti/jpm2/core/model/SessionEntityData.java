@@ -17,13 +17,13 @@ public class SessionEntityData implements Serializable {
     private final SearchCriteria searchCriteria;
     private ListSort sort;
 
-    public SessionEntityData(Entity entity) throws PMException {
+    public SessionEntityData(Entity entity, String context) throws PMException {
         this.entity = entity;
         this.pageSize = entity.getPageSize();
         this.searchCriteria = new SearchCriteria();
         if (entity.getDefaultSearchs() != null) {
             for (SearchDefinition sd : entity.getDefaultSearchs()) {
-                final Field field = entity.getFieldById(sd.getFieldId());
+                final Field field = entity.getFieldById(sd.getFieldId(), context);
                 if (field == null) {
                     throw new PMException(MessageFactory.error("jpm.field.not.found", sd.getFieldId()));
                 }
@@ -33,7 +33,7 @@ public class SessionEntityData implements Serializable {
         }
         this.sort = new ListSort();
         if (entity.getDefaultSortField() != null) {
-            this.sort.set(entity.getFieldById(entity.getDefaultSortField()));
+            this.sort.set(entity.getFieldById(entity.getDefaultSortField(), context));
             if (entity.getDefaultSortDirection() != null) {
                 this.sort.setDirection(entity.getDefaultSortDirection());
             }

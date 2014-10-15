@@ -84,7 +84,7 @@ public class ListController extends BaseController {
             //Field can be a conbintaion of fields like "[{code}] {description}"
             //Old style is supported if there is no { in the textField
             if (!textField.contains("{")) {
-                final Field field = entity.getFieldById(textField);
+                final Field field = entity.getFieldById(textField, getContext().getEntityContext());
                 if (field.getSearcher() == null) {
                     restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
                 } else {
@@ -103,7 +103,7 @@ public class ListController extends BaseController {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
                     //Starting with !, properties are ignored
                     if (!_display_field.startsWith("!")) {
-                        final Field field2 = entity.getFieldById(_display_field);
+                        final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
                         final String property = field2.getProperty();
                         if (property.contains(".")) {//need an alias
                             final String alias = property.substring(0, property.indexOf("."));
@@ -203,7 +203,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String fieldId,
             HttpServletRequest request) throws PMException {
-        final Field field = entity.getFieldById(fieldId);
+        final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
@@ -222,7 +222,7 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String fieldId,
             HttpServletRequest request) throws PMException {
-        final Field field = entity.getFieldById(fieldId);
+        final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
             final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
@@ -254,7 +254,7 @@ public class ListController extends BaseController {
 
     @RequestMapping(value = "/jpm/{entity}/sort")
     public String sort(@PathVariable Entity entity, @RequestParam String fieldId) throws PMException {
-        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
+        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId, getContext().getEntityContext()));
         return buildRedirect(entity, null, OP_LIST, null);
     }
 
@@ -264,7 +264,7 @@ public class ListController extends BaseController {
             @PathVariable String ownerId,
             @PathVariable Entity entity,
             @RequestParam String fieldId) throws PMException {
-        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId));
+        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId, getContext().getEntityContext()));
         return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
     }
 
@@ -291,7 +291,7 @@ public class ListController extends BaseController {
 
     protected void getObjectDisplay(final ObjectConverterData r, Entity entity, Object object, boolean useToString, String textField) throws ConfigurationException {
         if (!textField.contains("{")) {
-            final Field field = entity.getFieldById(textField);
+            final Field field = entity.getFieldById(textField, getContext().getEntityContext());
             r.getResults().add(new ObjectConverterDataItem(
                     entity.getDao(getContext().getEntityContext()).getId(object).toString(),
                     (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
@@ -300,7 +300,7 @@ public class ListController extends BaseController {
             String finalValue = textField;
             while (matcher.find()) {
                 final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""));
+                final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""), getContext().getEntityContext());
                 finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
             }
             r.getResults().add(new ObjectConverterDataItem(

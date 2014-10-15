@@ -35,7 +35,7 @@ public class JPMServiceBase {
         for (Map.Entry<String, Object> entry : entityInstance.getValues().entrySet()) {
             final String[] param = parameters.get("field_" + entry.getKey());
             final Object newValue = param == null ? null : (param.length == 1 ? param[0] : param);
-            final Field field = entity.getFieldById(entry.getKey());
+            final Field field = entity.getFieldById(entry.getKey(), getContext().getEntityContext());
             try {
                 final Converter converter = field.getConverter(entityInstance, operation);
                 final Object convertedValue = converter.build(getContext().getContextualEntity(), field, object, newValue);
