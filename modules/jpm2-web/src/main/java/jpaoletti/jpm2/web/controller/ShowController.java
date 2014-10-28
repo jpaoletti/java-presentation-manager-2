@@ -38,6 +38,9 @@ public final class ShowController extends BaseController {
             @RequestParam(required = false) String textField) throws PMException {
         final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), instanceId);
         final Object object = iobject.getObject();
+        if (object == null) {
+            return new ObjectConverterDataItem("", "");
+        }
         if (textField != null) {
             if (!textField.contains("{")) {
                 final Field field = entity.getFieldById(textField, getContext().getEntityContext());
