@@ -22,7 +22,7 @@
                     <a
                         class="btn btn-xs btn-default confirm-${o.confirm} weak-operation" 
                         title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                        href="${cp}jpm/${contextualEntity}/${item.id}/${o.id}">
+                        href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
                         <i class="glyphicon jpmicon-${o.id}"></i>
                     </a>
                 </c:forEach>

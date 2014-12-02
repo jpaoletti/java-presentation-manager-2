@@ -98,7 +98,7 @@
                                         <a
                                             class="btn btn-xs btn-default confirm-${o.confirm}" 
                                             title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                            href="${cp}jpm/${contextualEntity}/${item.id}/${o.id}">
+                                            href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
                                             <span class="glyphicon jpmicon-${o.id}"></span>
                                         </a>
                                     </c:forEach>
@@ -113,7 +113,7 @@
                                                 <li>
                                                     <a
                                                         class="confirm-${o.confirm}" 
-                                                        href="${cp}jpm/${contextualEntity}/${item.id}/${o.id}">
+                                                        href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
                                                         <span class="glyphicon jpmicon-${o.id}"></span> <spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />
                                                     </a>
                                                 </li>

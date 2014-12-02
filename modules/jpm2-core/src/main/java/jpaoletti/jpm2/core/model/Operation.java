@@ -19,6 +19,7 @@ public class Operation extends PMCoreObject {
 
     //The operation Id. Must be unique and only one word
     private String id;
+    private String operation;
     //Determine if the operation is enabled or not.
     private boolean enabled;
     private OperationScope scope;
@@ -328,10 +329,7 @@ public class Operation extends PMCoreObject {
             return false;
         }
         final Operation other = (Operation) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
     public boolean isRepeatable() {
@@ -340,5 +338,16 @@ public class Operation extends PMCoreObject {
 
     public void setRepeatable(boolean repeatable) {
         this.repeatable = repeatable;
+    }
+
+    public String getOperation() {
+        if (operation == null) {
+            return getId();
+        }
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 }
