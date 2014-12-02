@@ -98,7 +98,9 @@ public class DAOListConfiguration {
     }
 
     public DAOListConfiguration withAlias(String key, String value) {
-        getAliases().add(new DAOListConfigurationAlias(key, value));
+        if (!containsAlias(key)) {
+            getAliases().add(new DAOListConfigurationAlias(key, value));
+        }
         return this;
     }
 
