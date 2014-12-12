@@ -42,8 +42,8 @@
                 return "Môžete zvoliť najviac "+limit+" položiek";
             }
         },
-        formatLoadMore: function (pageNumber) { return "Načítavajú sa ďalšie výsledky…"; },
-        formatSearching: function () { return "Vyhľadávanie…"; }
+        formatLoadMore: function (pageNumber) { return "Načítavajú sa ďalšie výsledky..."; },
+        formatSearching: function () { return "Vyhľadávanie..."; }
     };
 
 	$.extend($.fn.select2.defaults, $.fn.select2.locales['sk']);

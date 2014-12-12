@@ -12,8 +12,8 @@
         formatInputTooShort: function (input, min) { var n = min - input.length; return n + " simvol daxil edin"; },
         formatInputTooLong: function (input, max) { var n = input.length - max; return n + " simvol silin"; },
         formatSelectionTooBig: function (limit) { return "Sadəcə " + limit + " element seçə bilərsiniz"; },
-        formatLoadMore: function (pageNumber) { return "Daha çox nəticə yüklənir…"; },
-        formatSearching: function () { return "Axtarılır…"; }
+        formatLoadMore: function (pageNumber) { return "Daha çox nəticə yüklənir..."; },
+        formatSearching: function () { return "Axtarılır..."; }
     };
 
     $.extend($.fn.select2.defaults, $.fn.select2.locales['az']);

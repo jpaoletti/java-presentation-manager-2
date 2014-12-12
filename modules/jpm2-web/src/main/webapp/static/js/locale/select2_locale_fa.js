@@ -13,8 +13,8 @@
         formatInputTooShort: function (input, min) { var n = min - input.length; return "لطفاً " + n + " نویسه بیشتر وارد نمایید"; },
         formatInputTooLong: function (input, max) { var n = input.length - max; return "لطفاً " + n + " نویسه را حذف کنید."; },
         formatSelectionTooBig: function (limit) { return "شما فقط می‌توانید " + limit + " مورد را انتخاب کنید"; },
-        formatLoadMore: function (pageNumber) { return "در حال بارگیری موارد بیشتر…"; },
-        formatSearching: function () { return "در حال جستجو…"; }
+        formatLoadMore: function (pageNumber) { return "در حال بارگیری موارد بیشتر..."; },
+        formatSearching: function () { return "در حال جستجو..."; }
     };
 
     $.extend($.fn.select2.defaults, $.fn.select2.locales['fa']);

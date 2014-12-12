@@ -23,10 +23,10 @@
             return "Możesz zaznaczyć najwyżej" + character(limit, "element", "y");
         },
         formatLoadMore: function(pageNumber) {
-            return "Ładowanie wyników…";
+            return "Ładowanie wyników...";
         },
         formatSearching: function() {
-            return "Szukanie…";
+            return "Szukanie...";
         }
     };
 
