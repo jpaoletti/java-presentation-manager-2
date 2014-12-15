@@ -80,6 +80,9 @@ public class JPMTestWeak implements Serializable {
 
     @Override
     public String toString() {
+        if (getId() == null) {
+            return "...";
+        }
         return getText();
     }
 

@@ -46,17 +46,18 @@ public class EditController extends BaseController {
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.POST)
-    public ModelAndView editCommit(@PathVariable String instanceId, @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+    @ResponseBody
+    public JPMPostResponse editCommit(@PathVariable String instanceId, @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         try {
             final IdentifiedObject iobject = initItemControllerOperation(instanceId);
             final EntityInstance instance = new EntityInstance(iobject, getContext());
             getContext().setEntityInstance(instance);
             getJpm().getService().update(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instance, getRequest().getParameterMap());
             if (repeat) {
-                return new ModelAndView(buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeat=true"));
+                return new JPMPostResponse(true, buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeat=true"));
             } else {
                 //BUG follows list in weak not working
-                return next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW);
+                return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW).getViewName());
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
@@ -64,7 +65,7 @@ public class EditController extends BaseController {
             }
             final IdentifiedObject iobject = new IdentifiedObject(instanceId, e.getValidatedObject());
             getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
-            return new ModelAndView("jpm-" + OP_EDIT);
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
     }
 

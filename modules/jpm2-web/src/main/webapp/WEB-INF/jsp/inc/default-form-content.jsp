@@ -7,7 +7,7 @@
                 <label class="col-lg-4 control-label" for="f_${value.key}">
                     <jpm:field-title entity="${entity}" fieldId="${value.key}" />
                 </label>
-                <div class="col-lg-8">
+                <div class="col-lg-8 converted-field-container">
                     <c:set var="convertedValue" value="${value.value}"/>
                     <c:if test="${fn:startsWith(convertedValue, '@page:')}">
                         <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
@@ -46,7 +46,7 @@
                                             <label class="col-lg-4 control-label" for="f_${field}">
                                                 <jpm:field-title entity="${entity}" fieldId="${field}" />
                                             </label>
-                                            <div class="col-lg-8">
+                                            <div class="col-lg-8  converted-field-container">
                                                 <c:set var="convertedValue" value="${instance.values[field]}"/>
                                                 <c:set var="field" value="${field}" scope="request" />
                                                 <c:if test="${fn:startsWith(convertedValue, '@page:')}">

@@ -120,6 +120,9 @@ public class JPMTest implements Serializable {
 
     @Override
     public String toString() {
+        if (getId() == null) {
+            return "...";
+        }
         return "[" + getId() + "] " + getString();
     }
 

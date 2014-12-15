@@ -157,6 +157,7 @@ function initFunctions() {
         try {
             this();
         } catch (e) {
+            console.log(e);
             alert("Error: " + e);
         }
     });
@@ -168,7 +169,7 @@ var uniqBy = function(ary, key) {
         var k = key(elem);
         return (seen[k] === 1) ? 0 : seen[k] = 1;
     });
-}
+};
 
 var initPage = function() {
     try {
@@ -247,5 +248,25 @@ var initPage = function() {
         $("#loading-div").fadeOut();
     }
 };
+
+function jpmBlock() {
+    $.blockUI({
+        css: {
+            border: 'none',
+            padding: '15px',
+            backgroundColor: 'none',
+            opacity: .6
+        },
+        overlayCSS: {
+            backgroundColor: '#000',
+            opacity: .6
+        },
+        message: '<img style="width: 150px; height: 150px;" src="' + contextPath + 'static/img/main_loading.gif" />'
+    });
+}
+
+function jpmUnBlock() {
+    $.unblockUI();
+}
 
 $(window).load(initPage);

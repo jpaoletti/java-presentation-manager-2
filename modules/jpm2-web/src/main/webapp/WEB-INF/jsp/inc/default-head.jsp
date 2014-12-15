@@ -14,4 +14,5 @@
 </c:if>
 <script type='text/javascript' src="${cp}static/js/jquery-2.0.3.min.js?v=${jpm.appversion}" ></script>
 <script type='text/javascript' src="${cp}static/js/jpm-head.js?v=${jpm.appversion}" ></script>
+<script type='text/javascript' src="${cp}static/js/jquery.blockUI.js?v=${jpm.appversion}" ></script>
 <link rel="shortcut icon" href="${cp}static/favicon.ico">

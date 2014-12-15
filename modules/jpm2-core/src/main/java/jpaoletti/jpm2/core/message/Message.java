@@ -1,6 +1,9 @@
 package jpaoletti.jpm2.core.message;
 
 import java.io.Serializable;
+import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * This class represents any message that system want to send to the user. It
@@ -64,5 +67,13 @@ public class Message implements Serializable {
         } else {
             return "";
         }
+    }
+
+    public String getText() {
+        return getMessageSource().getMessage(getKey(), getArgs(), LocaleContextHolder.getLocale());
+    }
+
+    private MessageSource getMessageSource() {
+        return (MessageSource) JPMUtils.getApplicationContext().getBean("messageSource");
     }
 }

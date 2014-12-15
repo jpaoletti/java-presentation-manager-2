@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -77,7 +78,8 @@ public class AddController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.POST)
-    public ModelAndView addCommit(@RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+    @ResponseBody
+    public JPMPostResponse addCommit(@RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         try {
@@ -85,9 +87,9 @@ public class AddController extends BaseController {
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
-                return new ModelAndView(buildRedirect(entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
+                return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
             } else {
-                return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
+                return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName());
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
@@ -95,7 +97,8 @@ public class AddController extends BaseController {
             }
             final Object object = e.getValidatedObject();
             getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
-            return new ModelAndView("jpm-" + EditController.OP_EDIT);
+
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         } catch (Exception e) {
             JPMUtils.getLogger().error("Unexpected error in add commit", e);
             throw e;
@@ -112,7 +115,8 @@ public class AddController extends BaseController {
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.POST)
-    public ModelAndView addWeakCommit(@PathVariable Entity owner, @PathVariable String ownerId,
+    @ResponseBody
+    public JPMPostResponse addWeakCommit(@PathVariable Entity owner, @PathVariable String ownerId,
             @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
@@ -122,9 +126,9 @@ public class AddController extends BaseController {
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
-                return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
+                return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
             } else {
-                return next(entity, operation, newObject.getId(), ShowController.OP_SHOW);
+                return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName());
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
@@ -135,7 +139,7 @@ public class AddController extends BaseController {
             if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
                 getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner(getContext().getEntityContext()).getOwner(), new IdentifiedObject(ownerId)));
             }
-            return new ModelAndView("jpm-" + EditController.OP_EDIT);
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
     }
 }
