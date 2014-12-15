@@ -12,8 +12,8 @@
         formatInputTooShort: function (input, min) { return "Unesite još" + character(min - input.length); },
         formatInputTooLong: function (input, max) { return "Unesite" + character(input.length - max) + " manje"; },
         formatSelectionTooBig: function (limit) { return "Maksimalan broj odabranih stavki je " + limit; },
-        formatLoadMore: function (pageNumber) { return "Učitavanje rezultata…"; },
-        formatSearching: function () { return "Pretraga…"; }
+        formatLoadMore: function (pageNumber) { return "Učitavanje rezultata..."; },
+        formatSearching: function () { return "Pretraga..."; }
     };
 
     $.extend($.fn.select2.defaults, $.fn.select2.locales['hr']);
