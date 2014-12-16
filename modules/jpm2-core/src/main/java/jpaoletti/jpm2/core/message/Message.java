@@ -70,7 +70,11 @@ public class Message implements Serializable {
     }
 
     public String getText() {
-        return getMessageSource().getMessage(getKey(), getArgs(), LocaleContextHolder.getLocale());
+        try {
+            return getMessageSource().getMessage(getKey(), getArgs(), LocaleContextHolder.getLocale());
+        } catch (Exception e) {
+            return getKey();
+        }
     }
 
     private MessageSource getMessageSource() {

@@ -66,6 +66,11 @@ public class EditController extends BaseController {
             final IdentifiedObject iobject = new IdentifiedObject(instanceId, e.getValidatedObject());
             getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (PMException e) {
+            if (e.getMsg() != null) {
+                getContext().getEntityMessages().add(e.getMsg());
+            }
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
     }
 

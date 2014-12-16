@@ -51,41 +51,10 @@
     </jpm:jpm-body>
     <script type="text/javascript" src="${cp}static/js/jquery.form.min.js"></script>
     <script type="text/javascript">
-        jpmLoad(function() {
+        var _msgClose = '<spring:message code="jpm.list.modalsearch.close" text="Close" />';
+        jpmLoad(function () {
             wrapToString();
-            $('#jpmForm').ajaxForm({
-                dataType: 'json',
-                beforeSubmit: function() {
-                    jpmBlock();
-                },
-                success: function(data) {
-                    console.log(data);
-                    if (data.ok) {
-                        document.location = data.next;
-                    } else {
-                        $(".form-group").removeClass("has-error");
-                        $(".jpm-validator-text").remove();
-                        //Entity
-                        $.each(data.messages, function(m) {
-                            console.log(m);
-                        });
-                        //field
-                        $.each(data.fieldMessages, function(fieldId, msgs) {
-                            $.each(msgs, function(i, item) {
-                                $("#control-group-" + fieldId)
-                                        .addClass("has-error")
-                                        .find(".converted-field-container")
-                                        .append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
-                            });
-                        });
-                        jpmUnBlock();
-                    }
-                },
-                error: function() {
-                    alert("Unexpected error!");
-                    jpmUnblock();
-                }
-            });
+            buildAjaxJpmForm(_msgClose);
         });
     </script>
 </html>

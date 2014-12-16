@@ -99,6 +99,11 @@ public class AddController extends BaseController {
             getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
 
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (PMException e) {
+            if (e.getMsg() != null) {
+                getContext().getEntityMessages().add(e.getMsg());
+            }
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         } catch (Exception e) {
             JPMUtils.getLogger().error("Unexpected error in add commit", e);
             throw e;
@@ -138,6 +143,11 @@ public class AddController extends BaseController {
             getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
             if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
                 getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner(getContext().getEntityContext()).getOwner(), new IdentifiedObject(ownerId)));
+            }
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (PMException e) {
+            if (e.getMsg() != null) {
+                getContext().getEntityMessages().add(e.getMsg());
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
