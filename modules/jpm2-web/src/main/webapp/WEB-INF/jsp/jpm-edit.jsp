@@ -38,7 +38,7 @@
                                     </div>
                                     <c:if test="${operation.repeatable}">
                                         <div class="col-lg-11">
-                                            <input class="repeat" type="checkbox" value="true" name="repeat" ${not empty param.repeat?'checked':''} /> <spring:message code="jpm.operation.repeat.${operation.id}" text="?" />
+                                            <input class="repeat" type="checkbox" value="true" name="repeat" ${not empty param.repeated?'checked':''} /> <spring:message code="jpm.operation.repeat.${operation.id}" text="?" />
                                         </div>
                                     </c:if>
                                 </div>

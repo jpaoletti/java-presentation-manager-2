@@ -54,7 +54,7 @@ public class EditController extends BaseController {
             getContext().setEntityInstance(instance);
             getJpm().getService().update(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instance, getRequest().getParameterMap());
             if (repeat) {
-                return new JPMPostResponse(true, buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeat=true"));
+                return new JPMPostResponse(true, buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeated=true"));
             } else {
                 //BUG follows list in weak not working
                 return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW).getViewName());

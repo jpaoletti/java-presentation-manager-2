@@ -87,7 +87,7 @@ public class AddController extends BaseController {
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
-                return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
+                return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()));
             } else {
                 return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName());
             }
@@ -131,7 +131,7 @@ public class AddController extends BaseController {
             getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
-                return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeat=true&lastId=" + newObject.getId()));
+                return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()));
             } else {
                 return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName());
             }
