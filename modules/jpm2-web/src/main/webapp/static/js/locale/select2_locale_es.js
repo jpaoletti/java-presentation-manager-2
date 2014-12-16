@@ -10,7 +10,7 @@
         formatInputTooShort: function (input, min) { var n = min - input.length; return "Por favor, introduzca al menos" + n + " car" + (n === 1? "acter" : "acteres"); },
         formatInputTooLong: function (input, max) { var n = input.length - max; return "Por favor, elimine " + n + " car" + (n === 1? "acter" : "acteres"); },
         formatSelectionTooBig: function (limit) { return "Solamente puede seleccionar " + limit + " elemento" + (limit === 1 ? "" : "s"); },
-        formatLoadMore: function (pageNumber) { return "Cargando más resultados..."; },
+        formatLoadMore: function (pageNumber) { return "Cargando resultados..."; },
         formatSearching: function () { return "Buscando..."; },
         formatAjaxError: function() { return "La carga ha fallado"; }
     };
