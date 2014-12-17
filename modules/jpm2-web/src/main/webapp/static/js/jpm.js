@@ -232,7 +232,7 @@ var initPage = function () {
             var iconT = $(this).attr("data-true-icon");
             var iconF = $(this).attr("data-false-icon");
             $.ajax({
-                url: contextPath + "jpm/" + entity + "/" + instanceId + "/iledit?name=" + field + "&value=" + ((icon === iconT) ? "" : "1"),
+                url: getContextPath() + "jpm/" + entity + "/" + instanceId + "/iledit?name=" + field + "&value=" + ((icon === iconT) ? "" : "1"),
                 type: "POST",
                 success: function () {
                     if (icon === iconT) {
@@ -261,7 +261,7 @@ function jpmBlock() {
             backgroundColor: '#000',
             opacity: .6
         },
-        message: '<img style="width: 150px; height: 150px;" src="' + contextPath + 'static/img/main_loading.gif" />'
+        message: '<img style="width: 150px; height: 150px;" src="' + getContextPath() + 'static/img/main_loading.gif" />'
     });
 }
 
@@ -278,7 +278,25 @@ function buildAjaxJpmForm(msgClose) {
         success: function (data) {
             console.log(data);
             if (data.ok) {
-                document.location = contextPath + data.next;
+                if (data.messages.length > 0) {
+                    var $message = '<div><ul>';
+                    $.each(data.messages, function (m, text) {
+                        $message = "<li>" + text.text + "</li>";
+                    });
+                    $message = $message + "</ul></div>";
+                    BootstrapDialog.show({
+                        title: "",
+                        message: $($message),
+                        type: BootstrapDialog.TYPE_SUCCESS,
+                        onshown: function (dialogRef) {
+                            setTimeout(function () {
+                                dialogRef.close();
+                                document.location = getContextPath() + data.next;
+                            }, 2000);
+                        }
+                    });
+                }
+
             } else {
                 $(".form-group").removeClass("has-error");
                 $(".jpm-validator-text").remove();

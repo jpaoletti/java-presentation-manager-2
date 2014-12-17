@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
@@ -54,10 +55,10 @@ public class EditController extends BaseController {
             getContext().setEntityInstance(instance);
             getJpm().getService().update(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instance, getRequest().getParameterMap());
             if (repeat) {
-                return new JPMPostResponse(true, buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeated=true"));
+                return new JPMPostResponse(true, buildRedirect(null, null, getContext().getEntity(), instanceId, OP_EDIT, "repeated=true"), MessageFactory.success("jpm.updated.success"));
             } else {
                 //BUG follows list in weak not working
-                return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW).getViewName());
+                return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), instanceId, ShowController.OP_SHOW).getViewName(), MessageFactory.success("jpm.updated.success"));
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {

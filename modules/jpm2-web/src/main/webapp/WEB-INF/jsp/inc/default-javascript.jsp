@@ -7,9 +7,11 @@
         </p>
     </div>
     <script type="text/javascript">
-        jpmLoad(function() {
+        jpmLoad(function () {
             $('#globalMessage').toggleClass('in');
-            setTimeout(function() {$('#globalMessage').removeClass('in');}, 3000);
+            setTimeout(function () {
+                $('#globalMessage').removeClass('in');
+            }, 3000);
         });
     </script>
 </c:if>
@@ -29,12 +31,15 @@
         messages["jpm.modal.confirm.cancel"] = "<spring:message code='jpm.modal.confirm.cancel' text='Cancel' />";
         messages["jpm.modal.confirm.submit"] = "<spring:message code='jpm.modal.confirm.submit' text='Ok' />";
         messages["jpm.modal.confirm.text"] = "<spring:message code='jpm.modal.confirm.text' text='Are you sure you want to continue?' />";
+        function getContextPath() {
+            return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "${cp}";
+        }
 </script>
 <script type="text/javascript" src="${cp}static/js/jquery.cookie.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/jpm.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/custom.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
-        jpmLoad(function() {
+        jpmLoad(function () {
             $("#menu-${fn:replace(contextualEntity,'!', '-')}").addClass("active");
         });
 </script>
