@@ -1,4 +1,4 @@
-String.prototype.trim = function () {
+String.prototype.trim = function() {
     return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
 };
 
@@ -15,23 +15,23 @@ function getLocalStorage() {
     return window['localStorage'];
 }
 
-var wrapToString = function () {
-    $(".to-string").each(function () {
+var wrapToString = function() {
+    $(".to-string").each(function() {
         var v = $(this).html();
         $(this).html("<input disabled class='form-control' type='text' value='" + v + "' style='text-align:" + $(this).attr("data-align") + "' />");
     });
 };
 
-var delay = (function () {
+var delay = (function() {
     var timer = 0;
-    return function (callback, ms) {
+    return function(callback, ms) {
         clearTimeout(timer);
         timer = setTimeout(callback, ms);
     };
 })();
 
 function initConfirm() {
-    $("body").on("click", ".confirm-true", function (e) {
+    $("body").on("click", ".confirm-true", function(e) {
         $("#confirmModal").remove();
         e.preventDefault();
         var x = $("<div class='modal fade' id='confirmModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>"
@@ -58,7 +58,7 @@ function initWindowsResize() {
         menu: '#sidebar',
         trigger: '#menu-trigger'
     });
-    $(window).resize(function () {
+    $(window).resize(function() {
         if ($(window).width() > 480 && $(window).width() < 769) {
             ul2.css({'display': 'none'});
             ul.css({'display': 'block'});
@@ -74,7 +74,7 @@ function initWindowsResize() {
             if ($(window).scrollTop() > 35) {
                 $('body').addClass('fixed');
             }
-            $(window).scroll(function () {
+            $(window).scroll(function() {
                 if ($(window).scrollTop() > 35) {
                     $('body').addClass('fixed');
                 } else {
@@ -95,7 +95,7 @@ function initWindowsResize() {
         if ($(window).scrollTop() > 35) {
             $('body').addClass('fixed');
         }
-        $(window).scroll(function () {
+        $(window).scroll(function() {
             if ($(window).scrollTop() > 35) {
                 $('body').addClass('fixed');
             } else {
@@ -115,7 +115,7 @@ function initWindowsResize() {
 }
 
 function initMenu() {
-    $('li.submenu > a').click(function (e) {
+    $('li.submenu > a').click(function(e) {
         e.preventDefault();
         var submenu = $(this).siblings('ul');
         var li = $(this).parents('li');
@@ -148,12 +148,12 @@ function initMenu() {
     });
 }
 
-$(window).unload(function () {
+$(window).unload(function() {
     $("#loading-div").fadeIn();
 });
 
 function initFunctions() {
-    $.each(PM_onLoadFunctions, function () {
+    $.each(PM_onLoadFunctions, function() {
         try {
             this();
         } catch (e) {
@@ -163,21 +163,21 @@ function initFunctions() {
     });
 }
 
-var uniqBy = function (ary, key) {
+var uniqBy = function(ary, key) {
     var seen = {};
-    return ary.filter(function (elem) {
+    return ary.filter(function(elem) {
         var k = key(elem);
         return (seen[k] === 1) ? 0 : seen[k] = 1;
     });
 };
 
-var initPage = function () {
+var initPage = function() {
     try {
         //Clean empty help-blocks
         $(".help-block:empty").remove();
         $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
-        $(".sortable").click(function () {
+        $(".sortable").click(function() {
             window.location = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field");
         });
         initConfirm();
@@ -217,13 +217,13 @@ var initPage = function () {
                 array.push({'url': url, 'title': title});
                 var finalArray = uniqBy(array, JSON.stringify);
                 $.cookie(name, JSON.stringify(finalArray), {path: '/'});
-                $.each(finalArray, function (i, item) {
+                $.each(finalArray, function(i, item) {
                     $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>" + item.title + "</a></li>")
                 });
             }
         }
 
-        $("body").on("click", ".inline-boolean", function () {
+        $("body").on("click", ".inline-boolean", function() {
             var instanceId = $(this).attr("data-id");
             var field = $(this).attr("data-field-name");
             var entity = $(this).attr("data-entity-id");
@@ -234,7 +234,7 @@ var initPage = function () {
             $.ajax({
                 url: getContextPath() + "jpm/" + entity + "/" + instanceId + "/iledit?name=" + field + "&value=" + ((icon === iconT) ? "" : "1"),
                 type: "POST",
-                success: function () {
+                success: function() {
                     if (icon === iconT) {
                         i.removeClass(iconT).addClass(iconF);
                     } else {
@@ -272,15 +272,15 @@ function jpmUnBlock() {
 function buildAjaxJpmForm(msgClose) {
     $('#jpmForm').ajaxForm({
         dataType: 'json',
-        beforeSubmit: function () {
+        beforeSubmit: function() {
             jpmBlock();
         },
-        success: function (data) {
+        success: function(data) {
             console.log(data);
             if (data.ok) {
                 if (data.messages.length > 0) {
                     var $message = '<div><ul>';
-                    $.each(data.messages, function (m, text) {
+                    $.each(data.messages, function(m, text) {
                         $message = "<li>" + text.text + "</li>";
                     });
                     $message = $message + "</ul></div>";
@@ -288,22 +288,21 @@ function buildAjaxJpmForm(msgClose) {
                         title: "",
                         message: $($message),
                         type: BootstrapDialog.TYPE_SUCCESS,
-                        onshown: function (dialogRef) {
-                            setTimeout(function () {
-                                dialogRef.close();
-                                document.location = getContextPath() + data.next;
-                            }, 2000);
+                        onshown: function(dialogRef) {
+
                         }
                     });
                 }
-
+                setTimeout(function() {
+                    document.location = getContextPath() + data.next;
+                }, 1000);
             } else {
                 $(".form-group").removeClass("has-error");
                 $(".jpm-validator-text").remove();
                 //Entity
                 if (data.messages.length > 0) {
                     var $message = '<div><ul>';
-                    $.each(data.messages, function (m, text) {
+                    $.each(data.messages, function(m, text) {
                         $message = "<li>" + text.text + "</li>";
                     });
                     $message = $message + "</ul></div>";
@@ -313,7 +312,7 @@ function buildAjaxJpmForm(msgClose) {
                         type: BootstrapDialog.TYPE_DANGER,
                         buttons: [{
                                 label: msgClose,
-                                action: function (dialogRef) {
+                                action: function(dialogRef) {
                                     dialogRef.close();
                                     jpmUnBlock();
                                 }
@@ -321,17 +320,17 @@ function buildAjaxJpmForm(msgClose) {
                     });
                 }
                 //field
-                $.each(data.fieldMessages, function (fieldId, msgs) {
+                $.each(data.fieldMessages, function(fieldId, msgs) {
                     var controlGroup = $("#control-group-" + fieldId);
                     controlGroup.addClass("has-error");
-                    $.each(msgs, function (i, item) {
+                    $.each(msgs, function(i, item) {
                         controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
                     });
                 });
                 jpmUnBlock();
             }
         },
-        error: function (data) {
+        error: function(data) {
             alert("Unexpected error! " + data);
             console.log(data);
             jpmUnBlock();
