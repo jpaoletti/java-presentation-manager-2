@@ -31,22 +31,13 @@ var delay = (function() {
 })();
 
 function initConfirm() {
-    $("body").on("click", ".confirm-true", function(e) {
-        $("#confirmModal").remove();
+    $("body").on("click", ".confirm-true", function (e) {
         e.preventDefault();
-        var x = $("<div class='modal fade' id='confirmModal' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>"
-                + "<div class='modal-dialog'><div class='modal-content'><div class='modal-header'>"
-                + "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>"
-                + "<h4 class='modal-title'>" + messages["jpm.modal.confirm.title"] + "</h4>"
-                + "</div>"
-                + "<div class='modal-body'>" + messages["jpm.modal.confirm.text"] + "</div>"
-                + "<div class='modal-footer'>"
-                + "<button type='button' class='btn btn-default' data-dismiss='modal' >" + messages["jpm.modal.confirm.cancel"] + "</button>"
-                + "<a class='btn btn-primary' href='" + $(this).attr("href") + "' >" + messages["jpm.modal.confirm.submit"] + "</button>"
-                + "</div></div></div></div>"
-                );
-        x.appendTo("body");
-        x.modal("show");
+        BootstrapDialog.confirm(messages["jpm.modal.confirm.text"], function (result) {
+            if (result) {
+                document.location = $(this).attr("href");
+            }
+        });
     });
 }
 
@@ -171,8 +162,10 @@ var uniqBy = function(ary, key) {
     });
 };
 
-var initPage = function() {
+var initPage = function () {
     try {
+        BootstrapDialog.DEFAULT_TEXTS['OK'] = messages["jpm.modal.confirm.submit"];
+        BootstrapDialog.DEFAULT_TEXTS['CANCEL'] = messages["jpm.modal.confirm.cancel"];
         //Clean empty help-blocks
         $(".help-block:empty").remove();
         $(".panel-body:not(:has(div))").parent(".panel").parent().remove();

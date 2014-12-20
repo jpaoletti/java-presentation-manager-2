@@ -1163,7 +1163,7 @@
      */
     BootstrapDialog.confirm = function(message, callback) {
         return new BootstrapDialog({
-            title: 'Confirmation',
+            title: messages["jpm.modal.confirm.title"],
             message: message,
             closable: false,
             data: {
