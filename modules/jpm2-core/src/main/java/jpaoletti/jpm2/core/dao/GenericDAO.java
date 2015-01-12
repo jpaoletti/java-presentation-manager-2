@@ -51,6 +51,15 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     }
 
     @Override
+    public T find(DAOListConfiguration configuration) {
+        final List<T> list = list(configuration);
+        if (list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+    @Override
     public void update(final Object object) {
         getSession().update(object);
     }

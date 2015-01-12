@@ -17,6 +17,14 @@ public interface DAO<T, ID extends Serializable> {
 
     public T get(String id);
 
+    /**
+     * Search for one item matching the configuration
+     *
+     * @param configuration search configuration
+     * @return the first item matching the configuration
+     */
+    public T find(DAOListConfiguration configuration);
+
     public ID getId(Object object);
 
     public List<T> list(DAOListConfiguration configuration);
