@@ -31,6 +31,7 @@
         messages["jpm.modal.confirm.cancel"] = "<spring:message code='jpm.modal.confirm.cancel' text='Cancel' />";
         messages["jpm.modal.confirm.submit"] = "<spring:message code='jpm.modal.confirm.submit' text='Ok' />";
         messages["jpm.modal.confirm.text"] = "<spring:message code='jpm.modal.confirm.text' text='Are you sure you want to continue?' />";
+        messages["jpm.modal.confirm.close"] = "<spring:message code='jpm.modal.confirm.close' text='Close' />";
         function getContextPath() {
             return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "${cp}";
         }

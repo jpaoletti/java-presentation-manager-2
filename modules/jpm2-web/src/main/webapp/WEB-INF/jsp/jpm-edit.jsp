@@ -51,10 +51,9 @@
     </jpm:jpm-body>
     <script type="text/javascript" src="${cp}static/js/jquery.form.min.js"></script>
     <script type="text/javascript">
-        var _msgClose = '<spring:message code="jpm.list.modalsearch.close" text="Close" />';
         jpmLoad(function () {
             wrapToString();
-            buildAjaxJpmForm(_msgClose);
+            buildAjaxJpmForm();
         });
     </script>
 </html>

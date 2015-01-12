@@ -263,71 +263,92 @@ function jpmUnBlock() {
     $.unblockUI();
 }
 
-function buildAjaxJpmForm(msgClose) {
-    $('#jpmForm').ajaxForm({
+function buildAjaxJpmForm(formId, callback) {
+    if (!formId)
+        formId = "jpmForm";
+    $('#' + formId).ajaxForm({
         dataType: 'json',
         beforeSubmit: function () {
             jpmBlock();
         },
         success: function (data) {
-            console.log(data);
-            if (data.ok) {
-                if (data.messages.length > 0) {
-                    var $message = '<div><ul>';
-                    $.each(data.messages, function (m, text) {
-                        $message = "<li>" + text.text + "</li>";
-                    });
-                    $message = $message + "</ul></div>";
-                    BootstrapDialog.show({
-                        title: "",
-                        message: $($message),
-                        type: BootstrapDialog.TYPE_SUCCESS,
-                        onshown: function (dialogRef) {
-
-                        }
-                    });
+            if (callback) {
+                try {
+                    callback(data);
+                } finally {
+                    jpmUnBlock();
                 }
-                setTimeout(function () {
-                    document.location = getContextPath() + data.next;
-                }, 1000);
             } else {
-                $(".form-group").removeClass("has-error");
-                $(".jpm-validator-text").remove();
-                //Entity
-                if (data.messages.length > 0) {
-                    var $message = '<div><ul>';
-                    $.each(data.messages, function (m, text) {
-                        $message = "<li>" + text.text + "</li>";
+                if (data.ok) {
+                    if (data.messages.length > 0) {
+                        var $message = '<div><ul>';
+                        $.each(data.messages, function (m, text) {
+                            $message = "<li>" + text.text + "</li>";
+                        });
+                        $message = $message + "</ul></div>";
+                        BootstrapDialog.show({
+                            title: "",
+                            message: $($message),
+                            type: BootstrapDialog.TYPE_SUCCESS,
+                            onshown: function (dialogRef) {
+
+                            }
+                        });
+                    }
+                    if (data.next && data.next !== "") {
+                        setTimeout(function () {
+                            document.location = getContextPath() + data.next;
+                        }, 1000);
+                    }
+                } else {
+                    $(".form-group").removeClass("has-error");
+                    $(".jpm-validator-text").remove();
+                    //Entity
+                    if (data.messages.length > 0) {
+                        var $message = '<div><ul>';
+                        $.each(data.messages, function (m, text) {
+                            $message = "<li>" + text.text + "</li>";
+                        });
+                        $message = $message + "</ul></div>";
+                        BootstrapDialog.show({
+                            title: "",
+                            message: $($message),
+                            type: BootstrapDialog.TYPE_DANGER,
+                            buttons: [{
+                                    label: messages["jpm.modal.confirm.close"],
+                                    action: function (dialogRef) {
+                                        dialogRef.close();
+                                        jpmUnBlock();
+                                    }
+                                }]
+                        });
+                    }
+                    //field
+                    $.each(data.fieldMessages, function (fieldId, msgs) {
+                        var controlGroup = $("#control-group-" + fieldId);
+                        controlGroup.addClass("has-error");
+                        $.each(msgs, function (i, item) {
+                            controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
+                        });
                     });
-                    $message = $message + "</ul></div>";
-                    BootstrapDialog.show({
-                        title: "",
-                        message: $($message),
-                        type: BootstrapDialog.TYPE_DANGER,
-                        buttons: [{
-                                label: msgClose,
-                                action: function (dialogRef) {
-                                    dialogRef.close();
-                                    jpmUnBlock();
-                                }
-                            }]
-                    });
+                    jpmUnBlock();
                 }
-                //field
-                $.each(data.fieldMessages, function (fieldId, msgs) {
-                    var controlGroup = $("#control-group-" + fieldId);
-                    controlGroup.addClass("has-error");
-                    $.each(msgs, function (i, item) {
-                        controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
-                    });
-                });
-                jpmUnBlock();
             }
         },
         error: function (data) {
-            alert("Unexpected error! " + data);
             console.log(data);
-            jpmUnBlock();
+            BootstrapDialog.show({
+                title: "",
+                message: "Unexpected error!",
+                type: BootstrapDialog.TYPE_DANGER,
+                buttons: [{
+                        label: messages["jpm.modal.confirm.close"],
+                        action: function (dialogRef) {
+                            dialogRef.close();
+                            jpmUnBlock();
+                        }
+                    }]
+            });
         }
     });
 }
