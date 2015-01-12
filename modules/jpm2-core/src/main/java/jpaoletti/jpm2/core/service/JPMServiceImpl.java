@@ -16,6 +16,7 @@ import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +54,13 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             configuration.getAliases().addAll(sessionEntityData.getSearchCriteria().getAliases());
         }
         if (sessionEntityData.getSort().isSorted()) {
-            configuration.withOrder(sessionEntityData.getSort().getOrder());
+            final Order order = sessionEntityData.getSort().getOrder();
+            final String property = order.getPropertyName();
+            if (property.contains(".")) { //need alias
+                final String alias = property.substring(0, property.indexOf("."));
+                configuration.withAlias(alias, alias);
+            }
+            configuration.withOrder(order);
         }
         final DAO dao = entity.getDao();
         if (entity.getEntity().isPaginable()) {
