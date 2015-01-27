@@ -52,7 +52,11 @@ public class SearchCriteria implements Serializable {
     }
 
     public void removeDefinition(Integer i) {
-        getDefinitions().remove(i.intValue());
+        try {
+            getDefinitions().remove(i.intValue());
+        } catch (Exception e) {
+            //just in case
+        }
         //Resets criterion
         this.criterion = null;
         for (SearchCriteriaField d : getDefinitions()) {
