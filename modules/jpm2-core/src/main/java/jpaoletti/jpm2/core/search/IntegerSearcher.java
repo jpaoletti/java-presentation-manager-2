@@ -20,34 +20,46 @@ public class IntegerSearcher implements Searcher {
 
     @Override
     public DescribedCriterion build(Field field, Map<String, String[]> parameters) {
-        final Object value = getValue(parameters);
-        final String operator = parameters.get("operator")[0];
-        switch (operator) {
-            case "ne":
-                return SearcherHelper.addAliases(new DescribedCriterion(
-                        MessageFactory.info(DESCRIPTION_KEY, "!=", String.valueOf(value)),
-                        Restrictions.ne(field.getProperty(), value)), field);
-            case ">":
-                return SearcherHelper.addAliases(new DescribedCriterion(
-                        MessageFactory.info(DESCRIPTION_KEY, ">", String.valueOf(value)),
-                        Restrictions.gt(field.getProperty(), value)), field);
-            case ">=":
-                return SearcherHelper.addAliases(new DescribedCriterion(
-                        MessageFactory.info(DESCRIPTION_KEY, ">=", String.valueOf(value)),
-                        Restrictions.ge(field.getProperty(), value)), field);
-            case "<":
-                return SearcherHelper.addAliases(new DescribedCriterion(
-                        MessageFactory.info(DESCRIPTION_KEY, "<", String.valueOf(value)),
-                        Restrictions.lt(field.getProperty(), value)), field);
-            case "<=":
-                return SearcherHelper.addAliases(new DescribedCriterion(
-                        MessageFactory.info(DESCRIPTION_KEY, "<=", String.valueOf(value)),
-                        Restrictions.le(field.getProperty(), value)), field);
-            default:
-                return SearcherHelper.addAliases(new DescribedCriterion(
-                        MessageFactory.info(DESCRIPTION_KEY, "=", String.valueOf(value)),
-                        Restrictions.eq(field.getProperty(), value)), field);
+        try {
+            final Object value = getValue(parameters);
+            final String operator = parameters.get("operator")[0];
+            switch (operator) {
+                case "ne":
+                    return SearcherHelper.addAliases(new DescribedCriterion(
+                            MessageFactory.info(getDescriptionKey(), "!=", String.valueOf(value)),
+                            Restrictions.ne(getProperty(field), value)), field);
+                case ">":
+                    return SearcherHelper.addAliases(new DescribedCriterion(
+                            MessageFactory.info(getDescriptionKey(), ">", String.valueOf(value)),
+                            Restrictions.gt(getProperty(field), value)), field);
+                case ">=":
+                    return SearcherHelper.addAliases(new DescribedCriterion(
+                            MessageFactory.info(getDescriptionKey(), ">=", String.valueOf(value)),
+                            Restrictions.ge(getProperty(field), value)), field);
+                case "<":
+                    return SearcherHelper.addAliases(new DescribedCriterion(
+                            MessageFactory.info(getDescriptionKey(), "<", String.valueOf(value)),
+                            Restrictions.lt(getProperty(field), value)), field);
+                case "<=":
+                    return SearcherHelper.addAliases(new DescribedCriterion(
+                            MessageFactory.info(getDescriptionKey(), "<=", String.valueOf(value)),
+                            Restrictions.le(getProperty(field), value)), field);
+                default:
+                    return SearcherHelper.addAliases(new DescribedCriterion(
+                            MessageFactory.info(getDescriptionKey(), "=", String.valueOf(value)),
+                            Restrictions.eq(getProperty(field), value)), field);
+            }
+        } catch (NumberFormatException e) {
+            return null;
         }
+    }
+
+    protected String getDescriptionKey() {
+        return DESCRIPTION_KEY;
+    }
+
+    protected String getProperty(Field field) {
+        return field.getProperty();
     }
 
     protected Object getValue(Map<String, String[]> parameters) throws NumberFormatException {
