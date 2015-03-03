@@ -72,7 +72,7 @@ public class ListController extends BaseController {
             if (lfilter instanceof RelatedListFilter) {
                 ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
             }
-            final Criterion c = lfilter.getListFilter(entity, getSessionEntityData(entity), ownerId);
+            final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), ownerId);
             if (c != null) {
                 restrictions.add(c);
             }
