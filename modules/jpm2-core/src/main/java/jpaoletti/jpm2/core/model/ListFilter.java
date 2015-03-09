@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import org.hibernate.criterion.Criterion;
 
 /**
@@ -18,10 +19,11 @@ public interface ListFilter {
     public String getId();
 
     /**
+     * @param dcl Dao configuration list being configured
      * @param entity
      * @param sessionData
      * @param ownerId
      * @return the filter object
      */
-    public Criterion getListFilter(Entity entity, SessionEntityData sessionData, String ownerId);
+    public Criterion getListFilter(final DAOListConfiguration dlc, Entity entity, SessionEntityData sessionData, String ownerId);
 }
