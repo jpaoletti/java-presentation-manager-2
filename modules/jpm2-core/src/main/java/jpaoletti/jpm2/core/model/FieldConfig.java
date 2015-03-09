@@ -18,7 +18,7 @@ public class FieldConfig extends PMCoreObject {
     private String operations;
     private String auth;
     private Converter converter;
-    private FieldConfigCondition condtion;
+    private FieldConfigCondition condition;
     private FieldValidator validator;
     private List<FieldValidator> validators;
 
@@ -79,8 +79,8 @@ public class FieldConfig extends PMCoreObject {
     boolean match(EntityInstance instance, Operation operation) throws PMException {
         if (operation != null) {
             final boolean prevalidation = includes(operation.getId()) && (getAuth() == null || SecurityUtils.userHasRole(getAuth()));
-            if (prevalidation && getCondtion() != null && instance != null) {
-                return getCondtion().check(instance, operation);
+            if (prevalidation && getCondition() != null && instance != null) {
+                return getCondition().check(instance, operation);
             }
             return prevalidation;
         } else {
@@ -104,12 +104,12 @@ public class FieldConfig extends PMCoreObject {
         this.validators = validators;
     }
 
-    public FieldConfigCondition getCondtion() {
-        return condtion;
+    public FieldConfigCondition getCondition() {
+        return condition;
     }
 
-    public void setCondtion(FieldConfigCondition condtion) {
-        this.condtion = condtion;
+    public void setCondition(FieldConfigCondition condition) {
+        this.condition = condition;
     }
 
 }
