@@ -20,7 +20,8 @@ public class ShowLinkObject extends ShowObject {
         final Object value = getValue(object, field);
 
         final String res = "@page:link-object-converter.jsp"
-                + "?entityId=" + getEntity().getId()
+                + "?extraClass=" + getExtraClass(contextualEntity, field, object, instanceId)
+                + "&entityId=" + getEntity().getId()
                 + ((getCtx() != null) ? "&ctx=" + getCtx() : "")
                 + (object != null ? "&objectId=" + getEntity().getDao(getCtx()).getId(value) : "");
         if (value == null) {
@@ -44,4 +45,10 @@ public class ShowLinkObject extends ShowObject {
     public void setCtx(String ctx) {
         this.ctx = ctx;
     }
+
+    //overrideable
+    public String getExtraClass(ContextualEntity contextualEntity, Field field, Object object, String instanceId) {
+        return "";
+    }
+
 }
