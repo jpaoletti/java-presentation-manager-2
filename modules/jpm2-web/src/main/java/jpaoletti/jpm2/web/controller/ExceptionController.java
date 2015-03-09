@@ -22,9 +22,12 @@ public class ExceptionController {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ModelAndView handleTypeMismatchException(MissingServletRequestParameterException ex, HttpServletRequest req, HttpServletResponse resp) {
-        JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
-        JPMUtils.getLogger().warn("Invalid name is: " + ex.getParameterName());
-        JPMUtils.getLogger().warn("Required type is: " + ex.getParameterType());
+        try {
+            JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
+            JPMUtils.getLogger().warn("Invalid name is: " + ex.getParameterName());
+            JPMUtils.getLogger().warn("Required type is: " + ex.getParameterType());
+        } catch (Exception e) {
+        }
         return null;
     }
 
