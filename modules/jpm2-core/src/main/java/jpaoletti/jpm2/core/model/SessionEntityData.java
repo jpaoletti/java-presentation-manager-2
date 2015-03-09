@@ -28,7 +28,9 @@ public class SessionEntityData implements Serializable {
                     throw new PMException(MessageFactory.error("jpm.field.not.found", sd.getFieldId()));
                 }
                 final Searcher.DescribedCriterion build = field.getSearcher().build(field, sd.getParameters());
-                searchCriteria.addDefinition(sd.getFieldId(), build);
+                if (build != null) {
+                    searchCriteria.addDefinition(sd.getFieldId(), build);
+                }
             }
         }
         this.sort = new ListSort();
