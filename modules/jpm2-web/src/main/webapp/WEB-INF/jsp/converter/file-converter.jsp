@@ -1,10 +1,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div id="file-converter-container-${field}">
-    <button type="button" class="btn btn-default btn-sm fileinput-button pull-left">
-        <i class="glyphicon glyphicon-upload"></i>
+    <span type="button" class="btn btn-default btn-sm fileinput-button pull-left">
+        <span class="glyphicon glyphicon-upload"></span>
         <input name="file" id="field_${field}"  type="file" data-url="${cp}jpm/uploadFileConverter" ${param.multiple?'multiple=""':''} />
-    </button>
+    </span>
     <input name="field_${field}" type="hidden" value="@current:" />
     <div id="progress_${field}" class="progress file-converter-progress"><div class="progress-bar"></div></div>
         <c:if test="${param.delete}">
