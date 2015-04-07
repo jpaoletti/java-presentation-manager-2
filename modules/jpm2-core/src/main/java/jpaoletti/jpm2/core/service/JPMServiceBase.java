@@ -18,6 +18,8 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  *
@@ -93,6 +95,14 @@ public class JPMServiceBase {
             messages.put(field.getId(), new ArrayList<Message>());
         }
         messages.get(field.getId()).add(msg);
+    }
+
+    public String getMessage(String key, Object... params) {
+        try {
+            return getJpm().getMessageSource().getMessage(key, params, LocaleContextHolder.getLocale());
+        } catch (NoSuchMessageException e) {
+            return key;
+        }
     }
 
     public JPMContext getContext() {
