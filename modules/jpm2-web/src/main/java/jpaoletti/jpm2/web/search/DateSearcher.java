@@ -7,6 +7,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.search.Searcher;
+import jpaoletti.jpm2.core.search.SearcherHelper;
 import jpaoletti.jpm2.util.JPMUtils;
 import static jpaoletti.jpm2.web.converter.WebEditDate.RFC3339;
 import org.hibernate.criterion.Restrictions;
@@ -31,32 +32,40 @@ public class DateSearcher implements Searcher {
             final Date value = getValue(parameters);
             final SimpleDateFormat sdf = new SimpleDateFormat(getFormat());
             final String operator = parameters.get("operator")[0];
+            DescribedCriterion describedCriterion = null;
             switch (operator) {
                 case "ne":
-                    return new DescribedCriterion(
+                    describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "!=", sdf.format(value)),
                             Restrictions.ne(field.getProperty(), value));
+                    break;
                 case ">":
-                    return new DescribedCriterion(
+                    describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, ">", sdf.format(value)),
                             Restrictions.gt(field.getProperty(), value));
+                    break;
                 case ">=":
-                    return new DescribedCriterion(
+                    describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, ">=", sdf.format(value)),
                             Restrictions.ge(field.getProperty(), value));
+                    break;
                 case "<":
-                    return new DescribedCriterion(
+                    describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "<", sdf.format(value)),
                             Restrictions.lt(field.getProperty(), value));
+                    break;
                 case "<=":
-                    return new DescribedCriterion(
+                    describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "<=", sdf.format(value)),
                             Restrictions.le(field.getProperty(), value));
+                    break;
                 default:
-                    return new DescribedCriterion(
+                    describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "=", sdf.format(value)),
                             Restrictions.eq(field.getProperty(), value));
+                    break;
             }
+            return SearcherHelper.addAliases(describedCriterion, field);
         } catch (ParseException ex) {
             JPMUtils.getLogger().error("Error on DateSearcher", ex);
             return null;
