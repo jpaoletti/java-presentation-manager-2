@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.web.controller;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
@@ -7,6 +9,7 @@ import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -61,6 +64,14 @@ public class ExceptionController {
     public ModelAndView handlePMException(PMException ex) {
         final ModelAndView mav = new ModelAndView("exception");
         mav.addObject("message", ex.getMsg());
+        return mav;
+    }
+
+    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, MySQLNonTransientConnectionException.class, DataIntegrityViolationException.class})
+    public ModelAndView handleSQLConstraintException(Exception ex) {
+        final ModelAndView mav = new ModelAndView("exception");
+        mav.addObject("message", MessageFactory.error("jpm.constraint.exception"));
+        JPMUtils.getLogger().fatal("Constraint Exception", ex);
         return mav;
     }
 }
