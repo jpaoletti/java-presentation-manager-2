@@ -86,7 +86,7 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript" src="${cp}static/js/pwdwidget.js"></script>
+        <script type="text/javascript" src="${cp}static/js/pwdwidget.js?v=${jpm.appversion}"></script>
         <script type="text/javascript">
             jpmLoad(function() {
                 var pwdwidget = new PasswordWidget('thepwddivnewpass', 'newpass');

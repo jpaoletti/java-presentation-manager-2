@@ -15,9 +15,9 @@
         <span class="file-converter-text"><spring:message code="jpm.converter.file.null.file.text" text="-" /></span>
     </c:if>
 </div>
-<script src="${cp}static/js/jquery.fileupload/jquery.ui.widget.js"></script>
-<script src="${cp}static/js/jquery.fileupload/jquery.iframe-transport.js"></script>
-<script src="${cp}static/js/jquery.fileupload/jquery.fileupload.js"></script>
+<script src="${cp}static/js/jquery.fileupload/jquery.ui.widget.js?v=${jpm.appversion}"></script>
+<script src="${cp}static/js/jquery.fileupload/jquery.iframe-transport.js?v=${jpm.appversion}"></script>
+<script src="${cp}static/js/jquery.fileupload/jquery.fileupload.js?v=${jpm.appversion}"></script>
 <script>
     jpmLoad(function() {
         if (!$("link[href='${cp}static/css/jquery.fileupload-ui.css']").length) {
