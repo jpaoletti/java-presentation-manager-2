@@ -80,7 +80,7 @@ public class BaseController {
      * @throws jpaoletti.jpm2.core.exception.NotAuthorizedException
      */
     protected String toList(final EntityInstance instance, Entity entity) throws NotAuthorizedException {
-        if (instance.getOwner() != null) {
+        if (instance != null && instance.getOwner() != null) {
             return buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, ListController.OP_LIST, null);
         } else {
             return buildRedirect(entity, null, ListController.OP_LIST, null);
