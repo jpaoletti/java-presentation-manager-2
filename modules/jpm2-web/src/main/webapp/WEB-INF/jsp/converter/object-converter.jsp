@@ -18,6 +18,7 @@
                         relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").select2("val")'):'""'},
                         textField: "${param.textField}",
                         query: term, // search term
+                        sortBy: '${param.sortBy}',
                         pageSize: ${param.pageSize},
                         page: page
                     };

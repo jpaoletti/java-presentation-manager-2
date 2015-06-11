@@ -27,6 +27,7 @@ import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,6 +59,7 @@ public class ListController extends BaseController {
             @RequestParam(required = false, defaultValue = "false") boolean useToString,
             @RequestParam(required = false) String relatedValue,
             @RequestParam(required = false) String ownerId,
+            @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String filter,
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -123,6 +125,13 @@ public class ListController extends BaseController {
                     }
                 }
                 restrictions.add(disjunction);
+            }
+        }
+        if (sortBy != null && !sortBy.equals("")) {
+            if (sortBy.startsWith("-")) {
+                cl.withOrder(Order.desc(sortBy.substring(1)));
+            } else {
+                cl.withOrder(Order.asc(sortBy));
             }
         }
         final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
