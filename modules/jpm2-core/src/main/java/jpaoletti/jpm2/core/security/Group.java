@@ -69,4 +69,13 @@ public class Group implements Serializable {
             return getName();
         }
     }
+
+    public boolean hasRole(String role) {
+        for (Authority authority : getAuthorities()) {
+            if (authority.getAuthority().equalsIgnoreCase(role)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
