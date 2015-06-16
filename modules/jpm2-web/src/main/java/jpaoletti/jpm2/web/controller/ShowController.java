@@ -1,8 +1,10 @@
 package jpaoletti.jpm2.web.controller;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
+import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
@@ -84,5 +86,20 @@ public final class ShowController extends BaseController {
     public ModelAndView show(@PathVariable String instanceId) throws PMException {
         initItemControllerOperation(instanceId);
         return new ModelAndView("jpm-" + OP_SHOW);
+    }
+
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/download/{fieldId}")
+    public void downloadFileConverter(HttpServletResponse response,
+            @PathVariable String instanceId,
+            @PathVariable String fieldId,
+            @RequestParam(required = false) String contentType,
+            @RequestParam(required = false) String prefix,
+            @RequestParam(required = false) String sufix
+    ) throws IOException, PMException {
+        getContext().setOperation(getContext().getEntity().getOperation(OP_SHOW));
+        final IdentifiedObject iobject = initItemControllerOperation(instanceId);
+        response.setContentType(contentType);
+        response.addHeader("Content-Disposition", "attachment;filename=" + prefix + "." + iobject.getId() + sufix);
+        response.getOutputStream().write((byte[]) JPMUtils.get(iobject.getObject(), getContext().getEntity().getFieldById(fieldId, getContext().getEntityContext()).getProperty()));
     }
 }

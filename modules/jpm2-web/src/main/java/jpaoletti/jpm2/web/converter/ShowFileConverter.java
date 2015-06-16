@@ -12,11 +12,21 @@ import jpaoletti.jpm2.core.model.Field;
  */
 public class ShowFileConverter extends Converter {
 
+    private String contentType = "";
+    private String prefix;
+    private String sufix;
     private String measure = "k";
+    private boolean downloadable = false;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final byte[] value = (byte[]) getValue(object, field);
+        final String page = "@page:show-file-converter.jsp"
+                + "?contentType=" + getContentType()
+                + "&instanceId=" + instanceId
+                + "&downloadable=" + isDownloadable()
+                + "&prefix=" + (getPrefix() == null ? contextualEntity.getEntity().getId() : getPrefix())
+                + "&sufix=" + (getSufix() == null ? ".dat" : getSufix());
         if (value != null && value.length > 0) {
             String len;
             switch (getMeasure().charAt(0)) {
@@ -31,10 +41,18 @@ public class ShowFileConverter extends Converter {
                 default:
                     len = (value.length / 1024) + "Kb";
             }
-            return "@page:show-file-converter.jsp?len=" + len;
+            return page + "&len=" + len;
         } else {
-            return "@page:show-file-converter.jsp?";
+            return page;
         }
+    }
+
+    public String getSufix() {
+        return sufix;
+    }
+
+    public void setSufix(String sufix) {
+        this.sufix = sufix;
     }
 
     public String getMeasure() {
@@ -43,5 +61,29 @@ public class ShowFileConverter extends Converter {
 
     public void setMeasure(String measure) {
         this.measure = measure;
+    }
+
+    public boolean isDownloadable() {
+        return downloadable;
+    }
+
+    public void setDownloadable(boolean downloadable) {
+        this.downloadable = downloadable;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }
