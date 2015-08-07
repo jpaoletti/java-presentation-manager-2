@@ -196,6 +196,7 @@ var initPage = function () {
                 if ($.cookie(name2) !== currentUser) {
                     $.cookie(name2, currentUser);
                     $.cookie(name, "", {path: '/'});
+                    $.removeCookie(name, {path: '/'});
                 }
                 var _recentArray = $.cookie(name);
                 var recentArray = new Array();
@@ -263,12 +264,17 @@ function jpmUnBlock() {
     $.unblockUI();
 }
 
-function buildAjaxJpmForm(formId, callback) {
+function buildAjaxJpmForm(formId, callback, beforeSubmit) {
     if (!formId)
         formId = "jpmForm";
     $('#' + formId).ajaxForm({
         dataType: 'json',
         beforeSubmit: function () {
+            if (beforeSubmit) {
+                if (!beforeSubmit()) {
+                    return false;
+                }
+            }
             jpmBlock();
         },
         success: function (data) {
