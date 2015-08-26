@@ -19,7 +19,15 @@ public class Message implements Serializable {
 
     private MessageType type;
     private String key;
+    private String text;
     private String[] args;
+
+    public Message(MessageType type, String key, String[] args) {
+        this.type = type;
+        this.key = key;
+        this.args = args;
+        build();
+    }
 
     public boolean isError() {
         return getType().equals(MessageType.ERROR);
@@ -69,12 +77,21 @@ public class Message implements Serializable {
         }
     }
 
-    public String getText() {
+    public final void build() {
         try {
-            return getMessageSource().getMessage(getKey(), getArgs(), LocaleContextHolder.getLocale());
+            this.text = getMessageSource().getMessage(getKey(), getArgs(), LocaleContextHolder.getLocale());
         } catch (Exception e) {
-            return getKey();
+            this.text = getKey();
         }
+
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     private MessageSource getMessageSource() {

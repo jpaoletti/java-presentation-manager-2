@@ -55,11 +55,7 @@ public class MessageFactory {
     }
 
     private static Message message(MessageType type, String key, String... args) {
-        final Message message = new Message();
-        message.setType(type);
-        message.setKey(key);
-        message.setArgs(args);
-        return message;
+        return new Message(type, key, args);
     }
 
 }

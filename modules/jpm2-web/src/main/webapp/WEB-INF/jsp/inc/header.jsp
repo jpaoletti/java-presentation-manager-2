@@ -18,7 +18,7 @@
                     <ul class="dropdown-menu"></ul>
                 </li>
                 <li><a id="userProfileLink" title="" href="${cp}jpm/user/${user.username}/profile"><span class="glyphicon glyphicon-cog"></span> <span class="text"><spring:message code="jpm.login.profile" text="Logout" /></span></a></li>
-                <li><a id="logoutLink" title="" href="${cp}j_spring_security_logout"><span class="glyphicon glyphicon-share-alt"></span> <span class="text"><spring:message code="jpm.login.logout" text="Logout" /></span></a></li>
+                <li><a id="logoutLink" title="" href="${cp}logout"><span class="glyphicon glyphicon-share-alt"></span> <span class="text"><spring:message code="jpm.login.logout" text="Logout" /></span></a></li>
             </ul>
         </div>
     </div>

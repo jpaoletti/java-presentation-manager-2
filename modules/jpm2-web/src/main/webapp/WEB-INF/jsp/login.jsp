@@ -10,21 +10,21 @@
             <img src="<c:url value='/static/img/login.png'/>" alt="Login" />
         </div>
         <div id="loginbox">
-            <form id="loginform" action="j_spring_security_check" method="POST">
+            <form id="loginform" action="login" method="POST">
                 <h4><spring:message code="jpm.login.title" text="Enter username and password to continue." /></h4><hr/><br/>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                    <input class="form-control" id="j_username" name="j_username" type="text" placeholder="<spring:message code="jpm.login.username" text="Username" />" />
+                    <input class="form-control" id="j_username" name="username" type="text" placeholder="<spring:message code="jpm.login.username" text="Username" />" />
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    <input class="form-control" type="password" name="j_password" placeholder="<spring:message code="jpm.login.password" text="Password" />" />
+                    <input class="form-control" type="password" name="password" placeholder="<spring:message code="jpm.login.password" text="Password" />" />
                 </div>
                 <hr />
                 <div class="form-actions">
                     <div class="pull-left">
                         <label>
-                            <input type='checkbox' name='_spring_security_remember_me' /> <spring:message code="jpm.login.rememberme" text="Remember Me" />
+                            <input type='checkbox' name='remember-me' /> <spring:message code="jpm.login.rememberme" text="Remember Me" />
                         </label>
                     </div>
                     <div class="pull-right">
