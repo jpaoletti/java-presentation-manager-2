@@ -30,17 +30,22 @@ public class AddController extends BaseController {
      * GET method prepares form.
      *
      * @param lastId Id of the latest added instance. Just for repeated
+     * @param close closes the page after adding succesful
      *
      * @return model and view
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
-    public ModelAndView addPrepare(@RequestParam(required = false) String lastId) throws PMException {
+    public ModelAndView addPrepare(
+            @RequestParam(required = false) String lastId, 
+            @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
         //If there is a "lastId" , the object values are used as defaults
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
         getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
-        return new ModelAndView("jpm-" + EditController.OP_EDIT);
+        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
+        mav.addObject("close", close);
+        return mav;
     }
 
     /**

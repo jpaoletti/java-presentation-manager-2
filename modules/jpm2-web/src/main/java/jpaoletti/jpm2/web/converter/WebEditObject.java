@@ -24,12 +24,14 @@ public class WebEditObject extends Converter {
     private String related;
     private String sortBy; //field id
     private boolean readonly;
+    private boolean addable;
 
     public WebEditObject() {
         this.pageSize = 10;
         this.minSearch = 0;
         this.placeHolder = "...";
         this.readonly = false;
+        this.addable = false;
     }
 
     @Override
@@ -41,6 +43,7 @@ public class WebEditObject extends Converter {
         sb.append("&pageSize=").append(getPageSize());
         sb.append("&minSearch=").append(getMinSearch());
         sb.append("&readonly=").append(isReadonly());
+        sb.append("&addable=").append(isAddable());
         sb.append("&sortBy=").append(getSortBy() == null ? "" : getSortBy());
         if (value != null) {
             sb.append("&value=").append(getEntity().getDao().getId(value));
@@ -137,5 +140,13 @@ public class WebEditObject extends Converter {
 
     public void setSortBy(String sortBy) {
         this.sortBy = sortBy;
+    }
+
+    public boolean isAddable() {
+        return addable;
+    }
+
+    public void setAddable(boolean addable) {
+        this.addable = addable;
     }
 }

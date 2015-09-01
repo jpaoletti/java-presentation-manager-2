@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <input name="field_${field}" id="field_${field}" value="${param.value}" class="objectConverterInput form-control" />
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/locale/select2_locale_${locale.language}.js?v=${jpm.appversion}"></script>
@@ -42,3 +43,10 @@
         }).select2("readonly", ${param.readonly});
     });
 </script>
+<c:if test="${param.addable}">
+    <script type="text/javascript">
+        jpmLoad(function() {
+            $("#control-group-${field} label").append("<a href='${cp}jpm/${param.entityId}/add?close=true' target='_blank'>[<span class='glyphicon glyphicon-plus'></span>]</a>");
+        });
+    </script>
+</c:if>

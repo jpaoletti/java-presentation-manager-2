@@ -56,4 +56,24 @@
             buildAjaxJpmForm();
         });
     </script>
+    <c:if test="${not close}">
+        <script type="text/javascript">
+            jpmLoad(function () {
+                buildAjaxJpmForm();
+            });
+        </script>
+    </c:if>
+    <c:if test="${close}">
+        <script type="text/javascript">
+            jpmLoad(function () {
+                buildAjaxJpmForm("jpmForm", function(data){
+                    data.next=null;
+                    processFormResponse(data);
+                    setTimeout(function(){
+                        window.close();
+                    }, 2000);
+                });
+            });
+        </script>
+    </c:if>
 </html>

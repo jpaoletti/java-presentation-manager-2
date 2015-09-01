@@ -264,6 +264,63 @@ function jpmUnBlock() {
     $.unblockUI();
 }
 
+var processFormResponse = function (data) {
+    if (data.ok) {
+        if (data.messages.length > 0) {
+            var $message = '<div><ul>';
+            $.each(data.messages, function (m, text) {
+                $message = "<li>" + text.text + "</li>";
+            });
+            $message = $message + "</ul></div>";
+            BootstrapDialog.show({
+                title: "",
+                message: $($message),
+                type: BootstrapDialog.TYPE_SUCCESS,
+                onshown: function (dialogRef) {
+
+                }
+            });
+        }
+        if (data.next && data.next !== "") {
+            setTimeout(function () {
+                document.location = getContextPath() + data.next;
+            }, 1000);
+        }
+    } else {
+        $(".form-group").removeClass("has-error");
+        $(".jpm-validator-text").remove();
+        //Entity
+        if (data.messages.length > 0) {
+            var $message = '<div><ul>';
+            $.each(data.messages, function (m, text) {
+                $message = "<li>" + text.text + "</li>";
+            });
+            $message = $message + "</ul></div>";
+            BootstrapDialog.show({
+                title: "",
+                message: $($message),
+                type: BootstrapDialog.TYPE_DANGER,
+                buttons: [{
+                        label: messages["jpm.modal.confirm.close"],
+                        action: function (dialogRef) {
+                            dialogRef.close();
+                            jpmUnBlock();
+                        }
+                    }]
+            });
+        }
+        //field
+        $.each(data.fieldMessages, function (fieldId, msgs) {
+            var controlGroup = $("#control-group-" + fieldId);
+            controlGroup.addClass("has-error");
+            $.each(msgs, function (i, item) {
+                controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
+            });
+        });
+        jpmUnBlock();
+    }
+}
+
 function buildAjaxJpmForm(formId, callback, beforeSubmit) {
     if (!formId)
         formId = "jpmForm";
@@ -285,60 +342,7 @@ function buildAjaxJpmForm(formId, callback, beforeSubmit) {
                     jpmUnBlock();
                 }
             } else {
-                if (data.ok) {
-                    if (data.messages.length > 0) {
-                        var $message = '<div><ul>';
-                        $.each(data.messages, function (m, text) {
-                            $message = "<li>" + text.text + "</li>";
-                        });
-                        $message = $message + "</ul></div>";
-                        BootstrapDialog.show({
-                            title: "",
-                            message: $($message),
-                            type: BootstrapDialog.TYPE_SUCCESS,
-                            onshown: function (dialogRef) {
-
-                            }
-                        });
-                    }
-                    if (data.next && data.next !== "") {
-                        setTimeout(function () {
-                            document.location = getContextPath() + data.next;
-                        }, 1000);
-                    }
-                } else {
-                    $(".form-group").removeClass("has-error");
-                    $(".jpm-validator-text").remove();
-                    //Entity
-                    if (data.messages.length > 0) {
-                        var $message = '<div><ul>';
-                        $.each(data.messages, function (m, text) {
-                            $message = "<li>" + text.text + "</li>";
-                        });
-                        $message = $message + "</ul></div>";
-                        BootstrapDialog.show({
-                            title: "",
-                            message: $($message),
-                            type: BootstrapDialog.TYPE_DANGER,
-                            buttons: [{
-                                    label: messages["jpm.modal.confirm.close"],
-                                    action: function (dialogRef) {
-                                        dialogRef.close();
-                                        jpmUnBlock();
-                                    }
-                                }]
-                        });
-                    }
-                    //field
-                    $.each(data.fieldMessages, function (fieldId, msgs) {
-                        var controlGroup = $("#control-group-" + fieldId);
-                        controlGroup.addClass("has-error");
-                        $.each(msgs, function (i, item) {
-                            controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
-                        });
-                    });
-                    jpmUnBlock();
-                }
+                processFormResponse(data);
             }
         },
         error: function (data) {
