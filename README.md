@@ -7,8 +7,9 @@ THIS IS A WORK IN PROGRESS PROJECT.
 
 ## Frameworks and libraries
 
-* Spring 3
-* Spring 3 MVC
+* Spring 4.2
+* Spring 4.2 MVC
+* Spring 4.0 Security
 * Hibernate 4 + JPA + DAO
 * Boostrap 3
 * jQuery 2
