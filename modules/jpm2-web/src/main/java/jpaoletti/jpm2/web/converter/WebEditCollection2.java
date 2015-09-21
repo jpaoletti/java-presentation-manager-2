@@ -23,6 +23,7 @@ public class WebEditCollection2 extends WebEditObject {
         final String res = getBaseJsp()
                 + "?entityId=" + getEntity().getId()
                 + "&textField=" + getTextField()
+                + "&related=" + getRelated()
                 + "&filter=" + ((getFilter() != null) ? getFilter().getId() : "")
                 + "&pageSize=" + getPageSize()
                 + "&minSearch=" + getMinSearch();
