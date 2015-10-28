@@ -41,6 +41,9 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
         if (!getEncoder().matches(current, user.getPassword())) {
             throw new NotAuthorizedException();
         }
+        if (newpass == null || "".equals(newpass.trim())) {
+            throw new PMException("jpm.profile.newpass.invalid");
+        }
         user.setPassword(BCrypt.hashpw(newpass, BCrypt.gensalt()));
         preExecute(operation, user);
         entity.getDao(context).update(user);
