@@ -52,15 +52,15 @@
                             <table class="table table-compact table-bordered">
                                 <thead>
                                     <tr>
-                                        <th style="width: 1px;"><spring:message code="jpm.security.home.authority" text="Authority"/></th>
-                                        <th><spring:message code="jpm.security.home.authorityDesc" text="Description"/></th>
+                                        <th style="width: 1px;"><spring:message code="jpm.security.authority" text="Authority"/></th>
+                                        <th><spring:message code="jpm.security.authorityDesc" text="Description"/></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach var="a" items="${authorities}">
                                         <tr>
                                             <td>${a}</td>
-                                            <td><spring:message code="jpm.security.home.authority.${a}" text="-"/></td>
+                                            <td><spring:message code="jpm.security.authority.${a}" text="-"/></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>

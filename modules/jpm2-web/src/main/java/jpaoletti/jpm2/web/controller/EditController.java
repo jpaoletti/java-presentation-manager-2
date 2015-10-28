@@ -82,7 +82,7 @@ public class EditController extends BaseController {
             @PathVariable String instanceId,
             @RequestParam() String name,
             @RequestParam() String value) throws PMException {
-        final Operation operation = entity.getOperation(OP_EDIT);
+        final Operation operation = entity.getOperation(OP_EDIT, getContext().getContext());
         getContext().set(entity, operation);
         try {
             final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext());

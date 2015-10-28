@@ -89,6 +89,7 @@
                     <property name="id" value="delete" />
                     <property name="confirm" value="true" />
                     <property name="display" value="edit show list" />
+                    <property name="useFields" value="false" />
                     <property name="condition">
                         <bean class="jpaoletti.jpm2.core.test.DeleteTestCondition" />
                     </property>
@@ -328,6 +329,7 @@
                     <property name="id" value="delete" />
                     <property name="confirm" value="true" />
                     <property name="display" value="show list" />
+                    <property name="useFields" value="false" />
                 </bean>
             </list>
         </property>

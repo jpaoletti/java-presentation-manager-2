@@ -440,18 +440,19 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * operation was found, OperationNotFoundException is trhown.
      *
      * @param id The id
+     * @param context
      * @return The operation
      * @throws jpaoletti.jpm2.core.exception.OperationNotFoundException when
      * operation does not exists for this entity.
      * @throws jpaoletti.jpm2.core.exception.NotAuthorizedException when the
      * operation exists but the user has no permission to access it.
      */
-    public Operation getOperation(String id) throws OperationNotFoundException, NotAuthorizedException {
+    public Operation getOperation(String id, EntityContext context) throws OperationNotFoundException, NotAuthorizedException {
         boolean notAuthorized = false;
         for (Operation oper : getAllOperations()) {
             if (oper.getId().compareTo(id) == 0) {
                 try {
-                    oper.checkAuthorization();
+                    oper.checkAuthorization(this, context);
                     return oper;
                 } catch (NotAuthorizedException e) {
                     notAuthorized = true;
@@ -474,7 +475,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                 if (op.isDisplayed(operation.getId()) && op.isEnabled() && !op.equals(operation)) {
                     //User has role
                     try {
-                        op.checkAuthorization();
+                        op.checkAuthorization(this, getContext(context));
                         //Conditions are ok
                         if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
                             //Scope is adecuate
@@ -596,7 +597,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public boolean isContainingListOperation() {
         try {
-            return getOperation("list") != null;
+            return getOperation("list", null) != null; //cant use context here
         } catch (OperationNotFoundException | NotAuthorizedException ex) {
             return false;
         }
@@ -619,5 +620,9 @@ public class Entity extends PMCoreObject implements BeanNameAware {
             }
         }
         return null;
+    }
+
+    public String getAuthKey(EntityContext context) {
+        return "jpm.auth.entity." + getId() + (context == null ? "" : "." + context.getId());
     }
 }

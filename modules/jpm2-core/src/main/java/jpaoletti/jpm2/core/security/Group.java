@@ -3,15 +3,16 @@ package jpaoletti.jpm2.core.security;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * User group. Just for CRUD operations.
@@ -27,11 +28,11 @@ public class Group implements Serializable {
     private Long id;
     @Column(name = "group_name")
     private String name;
-    @ManyToMany
-    @JoinTable(name = "group_authorities", joinColumns
-            = @JoinColumn(name = "group_id"), inverseJoinColumns
-            = @JoinColumn(name = "authority"))
-    private List<Authority> authorities;
+    // Using generics in place of a targetClass
+    @ElementCollection
+    @CollectionTable(name = "group_authorities", joinColumns = @JoinColumn(name = "group_id"))
+    @Column(name = "authority")
+    private List<String> authorities;
 
     public Group() {
         this.authorities = new ArrayList<>();
@@ -53,11 +54,11 @@ public class Group implements Serializable {
         this.name = name;
     }
 
-    public List<Authority> getAuthorities() {
+    public List<String> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(List<Authority> authorities) {
+    public void setAuthorities(List<String> authorities) {
         this.authorities = authorities;
     }
 
@@ -71,11 +72,15 @@ public class Group implements Serializable {
     }
 
     public boolean hasRole(String role) {
-        for (Authority authority : getAuthorities()) {
-            if (authority.getAuthority().equalsIgnoreCase(role)) {
-                return true;
-            }
-        }
-        return false;
+        return getAuthorities().contains(role);
     }
+
+    public List<Authority> getGrantedAuthority() {
+        List<Authority> res = new ArrayList<>();
+        for (String authority : getAuthorities()) {
+            res.add(new Authority(authority));
+        }
+        return res;
+    }
+
 }

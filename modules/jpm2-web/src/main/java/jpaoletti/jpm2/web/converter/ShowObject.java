@@ -54,7 +54,7 @@ public class ShowObject extends Converter {
                 String operationTitle = "";
                 if (getOperation() != null && (getOperationAuth() == null || SecurityUtils.userHasRole(getOperationAuth()))) {
                     try {
-                        final Operation op = getEntity().getOperation(getOperation());
+                        final Operation op = getEntity().getOperation(getOperation(), getContext().getContext());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
                         final String entityId = getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                         switch (op.getScope()) {

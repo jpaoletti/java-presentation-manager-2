@@ -1,4 +1,4 @@
-<c:set var="entityName" value="${entity.title}" />
+<c:catch var="exception"><c:set var="entityName" value="${entity.title}" /></c:catch>
 <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" text=""/>
 <title>${jpm.title} ${not empty homeTitle?'- '.concat(homeTitle):''} ${not empty operationName?'- '.concat(operationName):''} ${instance.iobject.object}</title>
 <meta charset="utf-8">

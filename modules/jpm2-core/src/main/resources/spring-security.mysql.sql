@@ -19,7 +19,7 @@ create table group_authorities (
   constraint fk_group_authorities_group foreign key(group_id) references groups(id));
 
 ALTER TABLE `group_authorities` ADD INDEX (  `authority` );
-ALTER TABLE  `group_authorities` ADD FOREIGN KEY (  `authority` ) REFERENCES `authorities` (`authority`) ON DELETE CASCADE ON UPDATE CASCADE ;
+ALTER TABLE  `group_authorities` ADD PRIMARY KEY (  `group_id` ,  `authority` ) ;
 
 create table group_members (
   id bigint(20) NOT NULL primary key AUTO_INCREMENT,
@@ -39,3 +39,5 @@ INSERT INTO `authorities` VALUES ('ROLE_ADMIN'), ('ROLE_USER'), ('ROLE_DEVELOPER
 INSERT INTO `group_authorities` (`group_id`, `authority`) VALUES ('1', 'ROLE_ADMIN'), ('1', 'ROLE_USER'), ('1', 'ROLE_USERADMIN'), ('2', 'ROLE_USER');
 INSERT INTO `users` (`username`, `password`, `enabled`) VALUES ('admin', '$2a$12$zofXZl6UI.uTuqBSyKwvvOh2Qbx5vjGkgGv8MeH9/6TBPncRK2RHq', '1'); -- admin / test
 INSERT INTO `group_members` (`username`, `group_id`) VALUES ('admin', '1');
+
+INSERT INTO `authorities` (`authority`) VALUES ('SPECIAL');

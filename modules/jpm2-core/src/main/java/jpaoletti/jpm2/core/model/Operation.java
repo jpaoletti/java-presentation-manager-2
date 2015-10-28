@@ -3,6 +3,8 @@ package jpaoletti.jpm2.core.model;
 import java.util.Objects;
 import java.util.Properties;
 import jpaoletti.jpm2.core.PMCoreObject;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.security.SecurityUtils;
 
 /**
  * An Operation is any action that can be applied to an Entity or to an Entity
@@ -16,6 +18,8 @@ import jpaoletti.jpm2.core.PMCoreObject;
  *
  */
 public class Operation extends PMCoreObject {
+
+    public static final String ROLE_SPECIAL = "SPECIAL";
 
     //The operation Id. Must be unique and only one word
     private String id;
@@ -51,6 +55,7 @@ public class Operation extends PMCoreObject {
     private boolean auditable; //Default: true, if navigable, impacts on NavigationList
     private String auth; //Needed authority to access any operation on this entity
     private boolean repeatable;
+    private boolean useFields;
 
     public Operation() {
         this.enabled = true;
@@ -62,6 +67,19 @@ public class Operation extends PMCoreObject {
         this.navigable = true;
         this.auditable = true;
         this.repeatable = false;
+        this.useFields = true;
+    }
+
+    public void checkAuthorization(Entity entity, EntityContext context) throws NotAuthorizedException {
+        if (getAuth() != null) {
+            checkAuthorization();
+        } else {
+            if (!SecurityUtils.userHasRole(ROLE_SPECIAL)) {//if user is "special" then we ignore the new auth system
+                if (!SecurityUtils.userHasRole(getAuthKey(entity, context))) {
+                    throw new NotAuthorizedException();
+                }
+            }
+        }
     }
 
     public OperationCondition getCondition() {
@@ -228,6 +246,7 @@ public class Operation extends PMCoreObject {
 
     /**
      * Returns the internationalized operation title
+     * @return 
      */
     public String getTitle() {
         return "jpm.operation." + getId();
@@ -349,5 +368,18 @@ public class Operation extends PMCoreObject {
 
     public void setOperation(String operation) {
         this.operation = operation;
+    }
+
+    public boolean isUseFields() {
+        return useFields;
+    }
+
+    public void setUseFields(boolean useFields) {
+        this.useFields = useFields;
+    }
+
+    public String getAuthKey(Entity entity, EntityContext context) {
+        final String eid = entity.getId() + (context == null ? "" : "." + context.getId());
+        return String.format("jpm.auth.operation.%s.%s", eid, getId());
     }
 }

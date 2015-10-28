@@ -7,6 +7,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityContext;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
@@ -127,6 +128,11 @@ public class JPMContextImpl implements JPMContext {
     @Override
     public ContextualEntity getContextualEntity() {
         return new ContextualEntity(getEntity(), getEntityContext());
+    }
+
+    @Override
+    public EntityContext getContext() {
+        return getEntity().getContext(getEntityContext());
     }
 
 }

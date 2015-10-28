@@ -196,8 +196,8 @@ public class ListController extends BaseController {
 
         final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak);
 
-        final Operation operation = getOperation(weak);
-        getContext().set(entity, getOperation(entity));
+        final Operation operation = weak.getOperation(OP_LIST, null); //fixme
+        getContext().set(entity, entity.getOperation(OP_LIST, getContext().getContext())); //fixme
         getContext().setEntityContext(centity.getContext());
         getContext().setEntityInstance(new EntityInstance(getContext()));
         getContext().set(weak, operation);
@@ -319,6 +319,6 @@ public class ListController extends BaseController {
     }
 
     protected Operation getOperation(Entity entity) throws OperationNotFoundException, NotAuthorizedException {
-        return entity.getOperation(OP_LIST);
+        return entity.getOperation(OP_LIST, null); //mmmh
     }
 }

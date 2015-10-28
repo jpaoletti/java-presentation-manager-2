@@ -5,6 +5,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityContext;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
@@ -55,4 +56,6 @@ public interface JPMContext {
     public String getEntityContext();
 
     public ContextualEntity getContextualEntity();
+
+    public EntityContext getContext();
 }

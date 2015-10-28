@@ -22,6 +22,7 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
     @Autowired
     private PresentationManager jpm;
     private Boolean debug;
+    private boolean authorizable = true;
 
     /**
      * Display a debug information on PM log if debug flag is active
@@ -79,5 +80,13 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     public void setJpm(PresentationManager jpm) {
         this.jpm = jpm;
+    }
+
+    public boolean isAuthorizable() {
+        return authorizable;
+    }
+
+    public void setAuthorizable(boolean authorizable) {
+        this.authorizable = authorizable;
     }
 }

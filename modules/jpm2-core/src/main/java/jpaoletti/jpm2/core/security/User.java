@@ -95,7 +95,7 @@ public class User implements Serializable, UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         final List<GrantedAuthority> res = new ArrayList<>();
         for (Group group : getGroups()) {
-            res.addAll(group.getAuthorities());
+            res.addAll(group.getGrantedAuthority());
         }
         return res;
     }

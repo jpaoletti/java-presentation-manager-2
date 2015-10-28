@@ -330,4 +330,9 @@ public class Field extends PMCoreObject {
     public String getAuth() {
         return this.auth;
     }
+
+    public String getAuthKey(Entity entity, EntityContext context, Operation operation) {
+        final String eid = entity.getId() + (context == null ? "" : "." + context.getId());
+        return String.format("jpm.auth.field.%s.%s.%s", eid, operation.getId(), getId());
+    }
 }

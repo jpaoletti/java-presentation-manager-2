@@ -96,7 +96,7 @@ public final class ShowController extends BaseController {
             @RequestParam(required = false) String prefix,
             @RequestParam(required = false) String sufix
     ) throws IOException, PMException {
-        getContext().setOperation(getContext().getEntity().getOperation(OP_SHOW));
+        getContext().setOperation(getContext().getEntity().getOperation(OP_SHOW, getContext().getContext()));
         final IdentifiedObject iobject = initItemControllerOperation(instanceId);
         response.setContentType(contentType);
         response.addHeader("Content-Disposition", "attachment;filename=" + prefix + "." + iobject.getId() + sufix);
