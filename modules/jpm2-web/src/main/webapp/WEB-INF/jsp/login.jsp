@@ -40,10 +40,10 @@
             <div class="alert alert-danger pagination-centered">${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</div>
         </c:if>
         <script type="text/javascript">
-            jpmLoad(function() {
+            jpmLoad(function () {
                 $("#j_username").focus();
-                $("#loginform").on("submit", function(){
-                    if($("#j_username").val().trim()===""){
+                $("#loginform").on("submit", function () {
+                    if ($("#j_username").val().trim() === "") {
                         $("#j_username").focus();
                         return false;
                     }
