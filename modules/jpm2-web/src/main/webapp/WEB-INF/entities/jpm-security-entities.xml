@@ -4,7 +4,7 @@
     <bean id="jpm-dao-auth" class="jpaoletti.jpm2.core.dao.AuthorityDAO" >
         <property name="transformer" ref="transformer-str" />
     </bean>
-    <bean id="jpm-dao-user" class="ar.com.sigea.dao.UsuarioDAO" >
+    <bean id="jpm-dao-user" class="jpaoletti.jpm2.core.dao.UserDAO" >
         <property name="transformer" ref="transformer-str" />
     </bean>
     <bean id="jpm-dao-group" class="jpaoletti.jpm2.core.dao.GroupDAO" >
@@ -41,21 +41,21 @@
     </bean>
 
     <bean id="jpm-entity-user" class="jpaoletti.jpm2.core.model.Entity" >
-        <property name="clazz" value="ar.com.sigea.model.Usuario" />
+        <property name="clazz" value="jpaoletti.jpm2.core.security.User" />
         <property name="dao" ref="jpm-dao-user" />
         <property name="home" value="security" />
-        <property name="pageSize" value="500" /> <!-- TURBIO -->
+        <property name="pageSize" value="500" />
         <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
-                <ref bean="default-list-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="navigable" value="true" />
+                </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="show" />
                     <property name="display" value="edit list resetPassword" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="actualizarPerfil" />
-                    <property name="display" value="-" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
@@ -64,8 +64,10 @@
                         <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" />
                     </property>
                 </bean>
-                <ref bean="default-generalAudit-operation" />
-                <ref bean="default-edit-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="show list resetPassword" />
+                </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="resetPassword" />
                     <property name="confirm" value="true" />
@@ -95,7 +97,7 @@
                                 <property name="operations" value="add"/>
                                 <property name="validators">
                                     <list>
-                                        <ref bean="not-null-validator" />
+                                        <ref bean="jpm-validator-notNull" />
                                         <bean class="jpaoletti.jpm2.core.validator.StringMin">
                                             <property name="min" value="1" />
                                         </bean>
@@ -105,18 +107,6 @@
                             </bean>
                         </list>
                     </property>
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Field">
-                    <property name="id" value="nombre" />
-                    <property name="width" value="150px" />
-                    <property name="searcher" ref="jpm-searcher-string" />
-                    <property name="configs" ref="editable-string-config" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Field">
-                    <property name="id" value="mail" />
-                    <property name="width" value="150px" />
-                    <property name="searcher" ref="jpm-searcher-string" />
-                    <property name="configs" ref="editable-string-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="password" />
@@ -130,17 +120,6 @@
                             </bean>
                         </list>
                     </property>
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Field">
-                    <property name="id" value="perfil" />
-                    <property name="width" value="130px" />
-                    <property name="searcher" ref="enumSearcher" />
-                    <property name="configs" ref="default-enum-config" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Field">
-                    <property name="id" value="sector" />
-                    <property name="width" value="130px" />
-                    <property name="configs" ref="select-sector" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="enabled" />
@@ -169,35 +148,11 @@
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="add edit"/>
-                                <property name="validator" ref="not-empty-validator" />
+                                <property name="validator" ref="jpm-validator-notEmpty" />
                                 <property name="converter">
                                     <bean class="jpaoletti.jpm2.web.converter.WebEditCollection">
                                         <property name="entity" ref="jpm-entity-group" />
                                         <property name="textField" value="name" />
-                                    </bean>
-                                </property>
-                            </bean>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Field">
-                    <property name="id" value="distritos" />
-                    <property name="configs">
-                        <list>
-                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="list"/>
-                                <property name="converter" ref="jpm-converter-show"/>
-                            </bean>
-                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="show"/>
-                                <property name="converter" ref="jpm-converter-show-collection"/>
-                            </bean>
-                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="add edit"/>
-                                <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.WebEditCollection2">
-                                        <property name="entity" ref="distrito" />
-                                        <property name="textField" value="nombre" />
                                     </bean>
                                 </property>
                             </bean>
@@ -215,6 +170,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="profile" />
                     <property name="display" value="none" />
+                    <property name="authorizable" value="false" />
                 </bean>
             </list>
         </property>
