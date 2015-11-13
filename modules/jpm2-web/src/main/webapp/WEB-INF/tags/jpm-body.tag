@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@attribute name = "showMenu" required="false" type="java.lang.Boolean" %>
 <%@attribute name = "showHeader" required="false" type="java.lang.Boolean" %>
-<body>
+<body lang="${locale.language}">
     <div id="wrap">
         <c:if test="${(empty showHeader) or showHeader}">
             <%@include file="../jsp/inc/header.jsp" %>
