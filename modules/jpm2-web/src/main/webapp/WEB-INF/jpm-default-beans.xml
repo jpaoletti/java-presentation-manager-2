@@ -13,6 +13,7 @@
 
     <!-- VALIDATORS -->
     <bean id="jpm-validator-notNull" class="jpaoletti.jpm2.core.validator.NotNull" />
+    <bean id="jpm-validator-notEmpty" class="jpaoletti.jpm2.core.validator.NotEmpty" />
 
     <!-- SEARCHERS -->
     <bean id="jpm-searcher-int" class="jpaoletti.jpm2.core.search.IntegerSearcher" />
