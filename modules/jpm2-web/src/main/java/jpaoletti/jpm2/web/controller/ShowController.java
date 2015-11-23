@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -38,28 +39,13 @@ public final class ShowController extends BaseController {
             @PathVariable Entity entity,
             @PathVariable String instanceId,
             @RequestParam(required = false) String textField) throws PMException {
-        final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), instanceId);
+        final String entityContext = getContext().getEntityContext();
+        final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
         final Object object = iobject.getObject();
         if (object == null) {
             return new ObjectConverterDataItem("", "");
         }
-        if (textField != null) {
-            if (!textField.contains("{")) {
-                final Field field = entity.getFieldById(textField, getContext().getEntityContext());
-                return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), JPMUtils.get(object, field.getProperty()).toString());
-            } else {
-                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-                String finalValue = textField;
-                while (matcher.find()) {
-                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""), getContext().getEntityContext());
-                    finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
-                }
-                return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), finalValue);
-            }
-        } else {
-            return new ObjectConverterDataItem(entity.getDao(getContext().getEntityContext()).getId(object).toString(), object.toString());
-        }
+        return ObjectConverterData.buildDataObject(textField, entity, entityContext, instanceId, object);
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", method = RequestMethod.GET, headers = "Accept=application/json")

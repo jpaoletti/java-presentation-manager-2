@@ -23,6 +23,7 @@
 <script type='text/javascript' src="${cp}static/js/bootstrap-dialog.js?v=${jpm.appversion}" ></script>
 <script type="text/javascript">
         var contextPath = "${cp}";
+        var localeLanguage = "${locale.language}";
         var currentUser = "${(user.getClass().name ne 'java.lang.String')?user.username:''}";
         var contextualEntity = "${contextualEntity}";
         //This initialize the internationalized javascript messages

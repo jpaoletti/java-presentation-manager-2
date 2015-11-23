@@ -238,6 +238,10 @@ var initPage = function () {
                 }
             });
         });
+        if ($.fn.select2) {
+            $("<script type=text/javascript' src='" + getContextPath() + "static/js/locale/select2/" + localeLanguage + ".js'></script>").appendTo("head");
+            $("<link href='" + getContextPath() + "static/css/select2.css' rel='stylesheet'>").appendTo("head");
+        }
         initFunctions();
     } finally {
         $("#loading-div").fadeOut();

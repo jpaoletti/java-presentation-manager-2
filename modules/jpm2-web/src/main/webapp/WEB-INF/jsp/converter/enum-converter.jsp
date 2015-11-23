@@ -6,15 +6,13 @@
     </c:forEach>
 </select>
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
-<script type="text/javascript" src="${cp}static/js/locale/select2_locale_${locale.language}.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
-    jpmLoad(function() {
-        if (!$("link[href='${cp}static/css/select2.css']").length) {
-            $('<link href="${cp}static/css/select2.css" rel="stylesheet">').appendTo("head");
-        }
+    jpmLoad(function () {
         $("#field_${field}").val("${param.value}").select2({
-            placeholder: "...", allowClear: true,
-            width: 'copy', dropdownCssClass: "bigdrop",
+            placeholder: "...",
+            allowClear: true,
+            width: 'copy',
+            dropdownCssClass: "bigdrop"
         });
     });
 </script>

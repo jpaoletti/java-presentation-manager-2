@@ -8,6 +8,7 @@ import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
+import jpaoletti.jpm2.web.ObjectConverterData;
 
 /**
  *
@@ -46,7 +47,9 @@ public class WebEditObject extends Converter {
         sb.append("&addable=").append(isAddable());
         sb.append("&sortBy=").append(getSortBy() == null ? "" : getSortBy());
         if (value != null) {
-            sb.append("&value=").append(getEntity().getDao().getId(value));
+            final ObjectConverterData.ObjectConverterDataItem data = ObjectConverterData.buildDataObject(getTextField(), getEntity(), null, getEntity().getDao().getId(value).toString(), value);
+            sb.append("&value=").append(data.getId());
+            sb.append("&valueText=").append(data.getText());
         }
         if (getFilter() != null) {
             sb.append("&filter=").append(getFilter().getId());

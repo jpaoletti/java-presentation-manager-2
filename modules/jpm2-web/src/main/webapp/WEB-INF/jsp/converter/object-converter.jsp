@@ -1,51 +1,53 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<input name="field_${field}" id="field_${field}" value="${param.value}" class="objectConverterInput form-control" />
+<select name="field_${field}" id="field_${field}" class="objectConverterInput form-control">
+    <c:if test="${not empty param.value}">
+        <option value="${param.value}">${param.valueText}</option>
+    </c:if>
+</select>
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
-<script type="text/javascript" src="${cp}static/js/locale/select2_locale_${locale.language}.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
-    jpmLoad(function() {
-        if (!$("link[href='${cp}static/css/select2.css']").length) {
-            $('<link href="${cp}static/css/select2.css" rel="stylesheet">').appendTo("head");
-        }
+    jpmLoad(function () {
         $("#field_${field}").select2({
-            placeholder: "${param.placeHolder}", allowClear: true,
-            width: 'copy', dropdownCssClass: "bigdrop",
+            placeholder: "${param.placeHolder}",
+            allowClear: true,
+            width: 'copy',
+            dropdownCssClass: "bigdrop",
             minimumInputLength: ${param.minSearch},
             ajax: {
                 url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
-                dataType: 'json',
-                data: function(term, page) {
-                    return {
-                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").select2("val")'):'""'},
-                        textField: "${param.textField}",
-                        query: term, // search term
-                        sortBy: '${param.sortBy}',
-                        pageSize: ${param.pageSize},
-                        page: page
-                    };
-                },
-                results: function(data, page) {return data;}
-            },
-            initSelection: function(element, callback) {
-                var id = $(element).val();
-                if (id !== "") {
-                    $.ajax("${cp}jpm/${param.entityId}/" + id + ".json", {
-                        data: { textField: "${param.textField}"},
-                        dataType: "json"
-                    }).done(function(data) {
-                        callback(data);
+                                dataType: 'json',
+                                data: function (params) {
+                                    return {
+                                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
+                                        textField: "${param.textField}",
+                                        query: params.term, // search term
+                                        sortBy: '${param.sortBy}',
+                                        pageSize: ${param.pageSize},
+                                        page: params.page
+                                    };
+                                },
+                                results: function (data, page) {
+                                    return data;
+                                }
+                            },
+                            processResults: function (data, params) {
+                                params.page = params.page || 1;
+                                return {
+                                    results: data.items,
+                                    pagination: {
+                                        more: (params.page * ${param.pageSize}) < data.total_count
+                                    }
+                                };
+                            },
+                            escapeMarkup: function (m) {
+                                return m;
+                            }
+                        }).prop("disabled", ${param.readonly});
                     });
-                }
-            },
-            formatResult: function(data) {return data.text;},
-            formatSelection: function(data) {return data.text;},
-            escapeMarkup: function(m) {return m;}
-        }).select2("readonly", ${param.readonly});
-    });
 </script>
 <c:if test="${param.addable}">
     <script type="text/javascript">
-        jpmLoad(function() {
+        jpmLoad(function () {
             $("#control-group-${field} label").append("<a href='${cp}jpm/${param.entityId}/add?close=true' target='_blank'>[<span class='glyphicon glyphicon-plus'></span>]</a>");
         });
     </script>
