@@ -204,6 +204,7 @@ public class ListController extends BaseController {
         getContext().setEntityContext(cweak.getContext());
         mav.addObject("paginatedList", weakList);
         mav.addObject("showOperations", showOperations);
+        mav.addObject("compactOperations", operation.isCompact());
         return mav;
     }
 
@@ -285,7 +286,7 @@ public class ListController extends BaseController {
                 getContext().getOperation(),
                 getSessionEntityData(entity), page, pageSize, owner, ownerId);
         mav.addObject("paginatedList", paginatedList);
-        mav.addObject("compactOperations", Boolean.valueOf(getContext().getOperation().getProperty("compactOperations", "false")));
+        mav.addObject("compactOperations", getContext().getOperation().isCompact());
         mav.addObject("sessionEntityData", getSessionEntityData(entity));
         return mav;
     }
