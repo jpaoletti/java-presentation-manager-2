@@ -5,7 +5,10 @@ import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityContext;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.controller.ListController;
 
 /**
  *
@@ -36,6 +39,13 @@ public class WeakConverter extends Converter {
         res.append("&btnText=").append(getBtnText());
         res.append("&btnIcon=").append(getBtnIcon());
         res.append("&weakId=").append(getEntity().getId());
+        final EntityContext weakEntityContext = getEntity().getContext(getContext());
+        try {
+            res.append("&weakAuth=").append(getEntity().getOperation(ListController.OP_LIST, weakEntityContext).getAuthKey(getEntity(), weakEntityContext));
+        } catch (Exception ex) {
+            JPMUtils.getLogger().error(ex);
+            throw new ConverterException("unexpected.exception");
+        }
         res.append("&ownerId=").append(instanceId);
         res.append("&showOperations=").append(isShowOperations());
         if (getContext() != null) {
