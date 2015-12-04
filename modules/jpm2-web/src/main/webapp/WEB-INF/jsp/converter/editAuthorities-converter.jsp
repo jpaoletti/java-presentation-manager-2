@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div id="${field}CollectionContainer">
     <c:if test="${not param.readonly}">
-        <input type="text" id="plugins4_q" value="" class="input" >
+        <input type="text" id="${field}CollectionContainerSearchInput" value="" class="input" >
     </c:if>
     <input type="hidden" name="field_${field}" id="field_${field}" value="" />
     <div id="editAuthTree"></div>
@@ -29,7 +29,7 @@
                     if (!readonly || ($.inArray(item.id, ids) >= 0)) {
                         special.children.push({
                             'id': item.id,
-                            'text': sec_i18n('jpm.security.authority.' + item.id) + "<span class='authKey'> ["+item.id+"]</span>",
+                            'text': sec_i18n('jpm.security.authority.' + item.id) + "<span class='authKey'> [" + item.id + "]</span>",
                             'icon': "glyphicon glyphicon-chevron-right",
                             'state': {selected: !readonly && $.inArray(item.id, ids) >= 0}
                         });
@@ -45,7 +45,7 @@
                         $.each(data.entities, function (i, item) {
                             var e = {
                                 'id': item.key,
-                                'text': item.name + "<span class='authKey'> ["+item.key+"]</span>",
+                                'text': item.name + "<span class='authKey'> [" + item.key + "]</span>",
                                 children: [],
                                 state: {'opened': true},
                                 'icon': "glyphicon glyphicon-flag"
@@ -53,7 +53,7 @@
                             $.each(item.operations, function (i, oper) {
                                 var o = {
                                     'id': oper.key,
-                                    'text': oper.name + "<span class='authKey'> ["+oper.key+"]</span>",
+                                    'text': oper.name + "<span class='authKey'> [" + oper.key + "]</span>",
                                     children: oper.fields.length > 0 ? [] : null,
                                     state: {'opened': false, selected: !readonly && $.inArray(oper.key, ids) >= 0},
                                     'icon': "glyphicon jpmicon-" + oper.id
@@ -62,7 +62,7 @@
                                     $.each(oper.fields, function (i, field) {
                                         var f = {
                                             'id': field.key,
-                                            'text': field.name + "<span class='authKey'> ["+field.key+"]</span>",
+                                            'text': field.name + "<span class='authKey'> [" + field.key + "]</span>",
                                             'icon': "glyphicon glyphicon-chevron-right",
                                             'state': {selected: !readonly && $.inArray(field.key, ids) >= 0}
                                         };
@@ -106,15 +106,21 @@
                         });
                         $('#field_${field}').val(selectedElmsIds.join(","));
                     });
-                    $('#plugins4_q').keyup(function () {
+                    $('#${field}CollectionContainerSearchInput').keyup(function (e) {
                         if (to) {
                             clearTimeout(to);
                         }
                         to = setTimeout(function () {
-                            var v = $('#plugins4_q').val();
+                            var v = $('#${field}CollectionContainerSearchInput').val();
                             $('#editAuthTree').jstree(true).search(v);
                         }, 250);
+                        e.preventDefault();
                     });
                 });
+            });
+            $("#${field}CollectionContainerSearchInput").keypress(function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                }
             });
 </script>
