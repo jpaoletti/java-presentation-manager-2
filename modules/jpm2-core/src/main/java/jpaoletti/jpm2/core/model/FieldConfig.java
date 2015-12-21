@@ -35,16 +35,20 @@ public class FieldConfig extends PMCoreObject {
         if (getOperations() == null) {
             return true;
         }
-        if (getOperations().equalsIgnoreCase(ALL)) {
-            return true;
-        }
         final String[] split = getOperations().split("[ ]");
+        boolean all = false;
         for (String string : split) {
+            if (string.equals("!" + operationId)) {
+                return false;
+            }
             if (string.equalsIgnoreCase(operationId)) {
                 return true;
             }
+            if (string.equalsIgnoreCase(ALL)) {
+                all = true;
+            }
         }
-        return false;
+        return all;
     }
 
     public String getOperations() {
