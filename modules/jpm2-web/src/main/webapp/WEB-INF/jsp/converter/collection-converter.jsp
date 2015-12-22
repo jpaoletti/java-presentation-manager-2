@@ -8,7 +8,7 @@
 <script type="text/javascript">
     jpmLoad(function () {
         $("#field_${field}").select2({
-            allowDuplicates: ${param.allowDuplicates},
+            //allowDuplicates: ${param.allowDuplicates},
             placeholder: "...",
             minimumInputLength: ${param.minSearch},
             dropdownCssClass: "bigdrop",
