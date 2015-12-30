@@ -50,7 +50,7 @@ public class WebEditCollection2 extends WebEditObject {
             try {
                 final Collection<Object> c = (Collection<Object>) getValue(object, field);
                 c.clear();
-                final String[] split = ((newValue instanceof String) ? (new String[]{newValue.toString()}) : (String[]) newValue);
+                final String[] split = splitValues(newValue);
                 for (String s : split) {
                     c.add(getEntity().getDao().get(s));
                 }
@@ -60,5 +60,9 @@ public class WebEditCollection2 extends WebEditObject {
                 throw new ConverterException("error.converting.collection");
             }
         }
+    }
+
+    protected String[] splitValues(Object newValue) {
+        return (newValue instanceof String) ? (new String[]{newValue.toString()}) : (String[]) newValue;
     }
 }
