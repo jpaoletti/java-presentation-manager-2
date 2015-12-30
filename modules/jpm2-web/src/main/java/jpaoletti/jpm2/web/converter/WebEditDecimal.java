@@ -19,6 +19,8 @@ public class WebEditDecimal extends WebToString {
     private String format = "#0.00";
     private Character decimalSeparator = '.';
     private Character groupingSeparator = ',';
+    private String min = "0.00";
+    private String max = "999999999.99";
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -57,7 +59,7 @@ public class WebEditDecimal extends WebToString {
     }
 
     public String getOptions() {
-        return String.format("{aSep: '%s', aDec: '%s'}", getGroupingSeparator(), getDecimalSeparator());
+        return String.format("{aSep: '%s', aDec: '%s', vMin: '%s', vMax: '%s'}", getGroupingSeparator(), getDecimalSeparator(), getMin().toString(), getMax().toString());
     }
 
     public Character getDecimalSeparator() {
@@ -76,4 +78,19 @@ public class WebEditDecimal extends WebToString {
         this.groupingSeparator = groupingSeparator;
     }
 
+    public String getMin() {
+        return min;
+    }
+
+    public void setMin(String min) {
+        this.min = min;
+    }
+
+    public String getMax() {
+        return max;
+    }
+
+    public void setMax(String max) {
+        this.max = max;
+    }
 }
