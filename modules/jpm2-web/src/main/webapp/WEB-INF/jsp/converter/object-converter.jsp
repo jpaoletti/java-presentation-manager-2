@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<select name="field_${field}" id="field_${field}" class="objectConverterInput form-control">
+<select name="field_${field}" id="field_${field}" class="objectConverterInput form-control" data-entity="${param.entityId}" data-textField="${param.textField}">
     <c:if test="${not empty param.value}">
         <option value="${param.value}">${param.valueText}</option>
     </c:if>
