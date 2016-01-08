@@ -15,35 +15,29 @@
             minimumInputLength: ${param.minSearch},
             ajax: {
                 url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
-                                dataType: 'json',
-                                data: function (params) {
-                                    return {
-                                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
-                                        textField: "${param.textField}",
-                                        query: params.term, // search term
-                                        sortBy: '${param.sortBy}',
-                                        pageSize: ${param.pageSize},
-                                        page: params.page
-                                    };
-                                },
-                                results: function (data, page) {
-                                    return data;
-                                }
-                            },
-                            processResults: function (data, params) {
-                                params.page = params.page || 1;
-                                return {
-                                    results: data.items,
-                                    pagination: {
-                                        more: (params.page * ${param.pageSize}) < data.total_count
-                                    }
-                                };
-                            },
-                            escapeMarkup: function (m) {
-                                return m;
-                            }
-                        }).prop("disabled", ${param.readonly});
-                    });
+                dataType: 'json',
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.more
+                        }
+                    };
+                },
+                data: function (params) {
+                    return {
+                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
+                        textField: "${param.textField}",
+                        query: params.term, // search term
+                        sortBy: '${param.sortBy}',
+                        pageSize: ${param.pageSize},
+                        page: params.page
+                    };
+                }
+            }
+        }).prop("disabled", ${param.readonly});
+    });
 </script>
 <c:if test="${param.addable}">
     <script type="text/javascript">
