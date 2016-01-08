@@ -7,36 +7,20 @@
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
-        $("#field_${field}").select2({
+        $("#field_${field}").buildJpmSelect2({
+            entity: "${param.entityId}",
+            textField: "${param.textField}",
             placeholder: "${param.placeHolder}",
-            allowClear: true,
-            width: 'copy',
-            dropdownCssClass: "bigdrop",
-            minimumInputLength: ${param.minSearch},
-            ajax: {
-                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
-                dataType: 'json',
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.results,
-                        pagination: {
-                            more: data.more
-                        }
-                    };
-                },
-                data: function (params) {
-                    return {
-                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
-                        textField: "${param.textField}",
-                        query: params.term, // search term
-                        sortBy: '${param.sortBy}',
-                        pageSize: ${param.pageSize},
-                        page: params.page
-                    };
-                }
-            }
-        }).prop("disabled", ${param.readonly});
+            minSearch:${param.minSearch},
+            filter: "${param.filter}",
+            ownerId: "${not empty owner?ownerId:''}",
+            related: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('")'):'null'},
+            sortBy: "${param.sortBy}",
+            pageSize:${param.pageSize}
+        });
+        if (${param.readonly}) {
+            $("#field_${field}").disableSelect2();
+        }
     });
 </script>
 <c:if test="${param.addable}">

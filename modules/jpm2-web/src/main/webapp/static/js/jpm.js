@@ -257,6 +257,56 @@ var initPage = function () {
                         select.select2("enable", true);
                         $("#select2Disabled_" + n).remove();
                     });
+                },
+                /*
+                 How to use (those are the defaults) : 
+
+                 $("#select2ID").buildJpmSelect2({
+                    entity: "<REQUIRED>",
+                    textField: "<REQUIRED>",
+                    placeholder: "...",
+                    minSearch: 0,
+                    filter: "",
+                    ownerId: "",
+                    related: null, (use another select2 object here)
+                    sortBy: "",
+                    pageSize: 10
+                 });
+                */
+                buildJpmSelect2: function (params) {
+                    return this.each(function () {
+                        select = $(this);
+                        select.select2({
+                            placeholder: params.placeHolder || "...",
+                            allowClear: true,
+                            width: 'copy',
+                            dropdownCssClass: "bigdrop",
+                            minimumInputLength: params.minSearch || 0,
+                            ajax: {
+                                url: getContextPath() + "jpm/" + params.entity + ".json?filter=" + (params.filter || "") + "&ownerId=" + (params.ownerId || ""),
+                                dataType: 'json',
+                                processResults: function (data, params) {
+                                    params.page = params.page || 1;
+                                    return {
+                                        results: data.results,
+                                        pagination: {
+                                            more: data.more
+                                        }
+                                    };
+                                },
+                                data: function (p) {
+                                    return {
+                                        relatedValue: (params.related) ? params.related.val() : "",
+                                        textField: params.textField || "",
+                                        query: p.term,
+                                        sortBy: params.sortBy || "",
+                                        pageSize: params.pageSize || 10,
+                                        page: p.page
+                                    };
+                                }
+                            }
+                        });
+                    });
                 }
             });
         }
