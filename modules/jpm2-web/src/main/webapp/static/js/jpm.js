@@ -241,6 +241,24 @@ var initPage = function () {
         if ($.fn.select2) {
             $("<script type=text/javascript' src='" + getContextPath() + "static/js/locale/select2/" + localeLanguage + ".js'></script>").appendTo("head");
             $("<link href='" + getContextPath() + "static/css/select2.css' rel='stylesheet'>").appendTo("head");
+            jQuery.fn.extend({
+                disableSelect2: function () {
+                    return this.each(function () {
+                        select = $(this);
+                        var n = select.attr("name");
+                        select.select2("enable", false);
+                        select.parents("form").append("<input type='hidden' name='" + n + "' id='select2Disabled_" + n + "' value='" + select.val() + "'/>");
+                    });
+                },
+                enableSelect2: function () {
+                    return this.each(function () {
+                        select = $(this);
+                        var n = select.attr("name");
+                        select.select2("enable", true);
+                        $("#select2Disabled_" + n).remove();
+                    });
+                }
+            });
         }
         initFunctions();
     } finally {
@@ -372,7 +390,7 @@ function setEntityVal(select, id, callback) {
         select.append("<option value=" + id + ">" + data.text + "</option>");
         select.val(id).trigger("change");
         if (callback) {
-            callback(data);
+            callback(select, data);
         }
     });
     return select;
