@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.web.ObjectConverterData;
+import org.apache.taglibs.standard.tag.common.core.Util;
 
 /**
  *
@@ -49,7 +50,7 @@ public class WebEditObject extends Converter {
         if (value != null) {
             final ObjectConverterData.ObjectConverterDataItem data = ObjectConverterData.buildDataObject(getTextField(), getEntity(), null, getEntity().getDao().getId(value).toString(), value);
             sb.append("&value=").append(data.getId());
-            sb.append("&valueText=").append(data.getText());
+            sb.append("&valueText=").append(Util.URLEncode(data.getText(), "UTF-8"));
         }
         if (getFilter() != null) {
             sb.append("&filter=").append(getFilter().getId());
