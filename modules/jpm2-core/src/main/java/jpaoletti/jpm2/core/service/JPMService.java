@@ -25,18 +25,45 @@ public interface JPMService {
     @Transactional(rollbackFor = Exception.class)
     public IdentifiedObject update(Entity entity, String context, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
 
+    /**
+     * Deletes an object of this entity identified by instanceId
+     *
+     * @param entity the entity: /someEntity/
+     * @param context entity context: /someEntity!somecontext/
+     * @param operation the operation, usually "show" :
+     * /someEntity!somecontext/.../theoperation
+     * @param instanceId the instance id:
+     * /someEntity!somecontext/instanceId/theoperation
+     * @return The deleted object
+     * @throws PMException
+     */
     @Transactional(rollbackFor = Exception.class)
     public IdentifiedObject delete(Entity entity, String context, Operation operation, String instanceId) throws PMException;
 
     /**
      * Retrieve an object of this entity, caring about the operation being
      * executed.
+     *
+     * @param entity the entity: /someEntity/
+     * @param context entity context: /someEntity!somecontext/
+     * @param operation the operation, usually "show" :
+     * /someEntity!somecontext/.../theoperation
+     * @param instanceId the instance id:
+     * /someEntity!somecontext/instanceId/theoperation
+     * @return The object and its identification
+     * @throws PMException
      */
     public IdentifiedObject get(Entity entity, String context, Operation operation, String instanceId) throws PMException;
 
     /**
      * Retrieve an object of this entity, without caring about the operation
      * being executed.
+     *
+     * @param entity the entity: /someEntity/
+     * @param context entity context: /someEntity!somecontext/
+     * @param instanceId the instance id: /someEntity!somecontext/instanceId
+     * @return The object and its identification
+     * @throws PMException
      */
     public IdentifiedObject get(Entity entity, String context, String instanceId) throws PMException;
 

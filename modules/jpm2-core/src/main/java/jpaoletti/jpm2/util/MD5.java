@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.core;
+package jpaoletti.jpm2.util;
 
 /**
  * A Java implementation of the RSA Data Security, Inc. MD5 Message

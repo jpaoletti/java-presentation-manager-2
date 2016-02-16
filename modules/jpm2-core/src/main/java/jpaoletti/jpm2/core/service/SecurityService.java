@@ -15,6 +15,7 @@ public interface SecurityService {
     /**
      *
      * @param entity User entity
+     * @param context
      * @param operation resetPassword operation
      * @param instanceId username
      * @return New password
