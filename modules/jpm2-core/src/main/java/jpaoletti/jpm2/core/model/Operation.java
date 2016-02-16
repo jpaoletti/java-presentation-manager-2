@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Properties;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 
 /**
  * An Operation is any action that can be applied to an Entity or to an Entity
@@ -72,12 +71,10 @@ public class Operation extends PMCoreObject {
 
     public void checkAuthorization(Entity entity, EntityContext context) throws NotAuthorizedException {
         if (getAuth() != null) {
-            checkAuthorization();
-        } else {
-            if (!SecurityUtils.userHasRole(ROLE_SPECIAL)) {//if user is "special" then we ignore the new auth system
-                if (!SecurityUtils.userHasRole(getAuthKey(entity, context))) {
-                    throw new NotAuthorizedException();
-                }
+            checkAuthorization();//getAuthorizationService().getCurrentUsername();
+        } else if (!getAuthorizationService().userHasRole(ROLE_SPECIAL)) {//if user is "special" then we ignore the new auth system
+            if (!getAuthorizationService().userHasRole(getAuthKey(entity, context))) {
+                throw new NotAuthorizedException();
             }
         }
     }
@@ -246,7 +243,8 @@ public class Operation extends PMCoreObject {
 
     /**
      * Returns the internationalized operation title
-     * @return 
+     *
+     * @return
      */
     public String getTitle() {
         return "jpm.operation." + getId();

@@ -17,6 +17,7 @@ import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationScope;
 import jpaoletti.jpm2.core.model.SessionEntityData;
+import jpaoletti.jpm2.core.service.AuthorizationService;
 import jpaoletti.jpm2.core.service.JPMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -40,6 +41,8 @@ public class BaseController {
     private JPMContext context;
     @Autowired
     private PresentationManager jpm;
+    @Autowired
+    private AuthorizationService authorizationService;
     @Autowired
     private MessageSource messageSource;
     //Messages TO-DO
@@ -141,12 +144,10 @@ public class BaseController {
         final EntityInstance instance = getContext().getEntityInstance();
         if (OperationScope.ITEM.equals(nextOp.getScope())) {
             return new ModelAndView(buildRedirect(entity, instanceId, nextOpId, null));
+        } else if (instance != null && instance.getOwner() != null) {
+            return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, nextOp.getId(), null));
         } else {
-            if (instance != null && instance.getOwner() != null) {
-                return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, nextOp.getId(), null));
-            } else {
-                return new ModelAndView(buildRedirect(entity, null, nextOp.getId(), null));
-            }
+            return new ModelAndView(buildRedirect(entity, null, nextOp.getId(), null));
         }
     }
 
@@ -200,5 +201,13 @@ public class BaseController {
             sb.append("?").append(parameters);
         }
         return sb.toString();
+    }
+
+    public AuthorizationService getAuthorizationService() {
+        return authorizationService;
+    }
+
+    public void setAuthorizationService(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
     }
 }

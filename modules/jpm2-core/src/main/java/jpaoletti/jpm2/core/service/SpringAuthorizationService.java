@@ -1,4 +1,4 @@
-package jpaoletti.jpm2.core.security;
+package jpaoletti.jpm2.core.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,9 +10,16 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  * @author jpaoletti
  */
-public class SecurityUtils {
+public class SpringAuthorizationService implements AuthorizationService {
 
-    public static boolean userHasRole(String roles) {
+    /**
+     *
+     * @param roles comma separated string with roles
+     * @return true if roles is null, false if no user is loged, true if the
+     * loged user has any of this roles
+     */
+    @Override
+    public boolean userHasRole(String roles) {
         if (roles == null) {
             return true;
         }
@@ -31,7 +38,20 @@ public class SecurityUtils {
         return false;
     }
 
-    public static Authentication getAuthentication() {
+    /**
+     *
+     * @return the logged username or null if there is none
+     */
+    @Override
+    public String getCurrentUsername() {
+        try {
+            return getUserDetails().getUsername();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    protected Authentication getAuthentication() {
         final SecurityContext context = SecurityContextHolder.getContext();
         if (context == null) {
             return null;
@@ -39,8 +59,8 @@ public class SecurityUtils {
         return context.getAuthentication();
     }
 
-    public static UserDetails getUserDetails() {
-        return (UserDetails) SecurityUtils.getAuthentication().getPrincipal();
+    protected UserDetails getUserDetails() {
+        return (UserDetails) getAuthentication().getPrincipal();
     }
 
 }

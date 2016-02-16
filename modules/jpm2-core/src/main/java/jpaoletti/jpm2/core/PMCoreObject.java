@@ -3,7 +3,7 @@ package jpaoletti.jpm2.core;
 import java.io.Serializable;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.PMCoreConstants;
-import jpaoletti.jpm2.core.security.SecurityUtils;
+import jpaoletti.jpm2.core.service.AuthorizationService;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -21,6 +21,10 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     @Autowired
     private PresentationManager jpm;
+
+    @Autowired
+    private AuthorizationService authorizationService;
+
     private Boolean debug;
     private boolean authorizable = true;
 
@@ -53,7 +57,7 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
     }
 
     public void checkAuthorization() throws NotAuthorizedException {
-        if (getAuth() != null && !SecurityUtils.userHasRole(getAuth())) {
+        if (getAuth() != null && !getAuthorizationService().userHasRole(getAuth())) {
             throw new NotAuthorizedException();
         }
     }
@@ -88,5 +92,13 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     public void setAuthorizable(boolean authorizable) {
         this.authorizable = authorizable;
+    }
+
+    public AuthorizationService getAuthorizationService() {
+        return authorizationService;
+    }
+
+    public void setAuthorizationService(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
     }
 }

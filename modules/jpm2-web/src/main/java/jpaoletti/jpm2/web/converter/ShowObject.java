@@ -15,7 +15,6 @@ import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,7 +51,7 @@ public class ShowObject extends Converter {
                 final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
                 String operationLink = "";
                 String operationTitle = "";
-                if (getOperation() != null && (getOperationAuth() == null || SecurityUtils.userHasRole(getOperationAuth()))) {
+                if (getOperation() != null && (getOperationAuth() == null || getAuthorizationService().userHasRole(getOperationAuth()))) {
                     try {
                         final Operation op = getEntity().getOperation(getOperation(), getContext().getContext());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));

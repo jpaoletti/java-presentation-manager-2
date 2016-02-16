@@ -29,8 +29,12 @@ public class JPMServiceBase {
 
     @Autowired
     private JPMContext context;
+
     @Autowired
     private PresentationManager jpm;
+
+    @Autowired
+    private AuthorizationService authorizationService;
 
     protected void processFields(Entity entity, Operation operation, Object object, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         preConversion(operation, object);
@@ -119,5 +123,13 @@ public class JPMServiceBase {
 
     public void setJpm(PresentationManager jpm) {
         this.jpm = jpm;
+    }
+
+    public AuthorizationService getAuthorizationService() {
+        return authorizationService;
+    }
+
+    public void setAuthorizationService(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
     }
 }

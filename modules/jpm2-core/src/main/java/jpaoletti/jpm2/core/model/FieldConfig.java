@@ -4,7 +4,6 @@ import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 
 /**
  * A field configuration item for one or more operations. Works also as a
@@ -82,7 +81,7 @@ public class FieldConfig extends PMCoreObject {
 
     boolean match(EntityInstance instance, Operation operation) throws PMException {
         if (operation != null) {
-            final boolean prevalidation = includes(operation.getId()) && (getAuth() == null || SecurityUtils.userHasRole(getAuth()));
+            final boolean prevalidation = includes(operation.getId()) && (getAuth() == null || getAuthorizationService().userHasRole(getAuth()));
             if (prevalidation && getCondition() != null && instance != null) {
                 return getCondition().check(instance, operation);
             }

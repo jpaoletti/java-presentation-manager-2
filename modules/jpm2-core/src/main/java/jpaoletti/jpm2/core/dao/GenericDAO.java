@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.dao;
 import java.io.Serializable;
 import java.util.List;
 import jpaoletti.jpm2.core.idtransformer.IdTransformer;
+import jpaoletti.jpm2.core.service.AuthorizationService;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -26,6 +27,10 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
+
+    @Autowired
+    private AuthorizationService authorizationService;
+
     private Class<T> persistentClass;
     protected Class<ID> idClass;
     private IdTransformer<ID> transformer;
@@ -156,5 +161,13 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     @Override
     public void detach(Object object) {
         getSession().evict(object);
+    }
+
+    public AuthorizationService getAuthorizationService() {
+        return authorizationService;
+    }
+
+    public void setAuthorizationService(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
     }
 }

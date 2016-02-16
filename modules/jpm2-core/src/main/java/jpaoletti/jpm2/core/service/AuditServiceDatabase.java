@@ -9,7 +9,6 @@ import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
-import jpaoletti.jpm2.core.security.SecurityUtils;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -28,6 +27,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     @Autowired(required = false)
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
+
     @Autowired(required = false)
     private AuditDAO dao;
 
@@ -53,8 +53,8 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
         }
         final AuditRecord record = new AuditRecord();
         record.setDatetime(new Date());
-        if (SecurityUtils.getAuthentication() != null && SecurityUtils.getAuthentication().getPrincipal() != null) {
-            record.setUsername((SecurityUtils.getUserDetails()).getUsername());
+        if (getAuthorizationService().getCurrentUsername() != null) {
+            record.setUsername(getAuthorizationService().getCurrentUsername());
         }
         if (entity != null) {
             record.setEntity(entity.getAuditId());
@@ -67,10 +67,8 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
         }
         if (observations != null && !observations.equals("")) {
             record.setObservations(observations);
-        } else {
-            if (iobject != null) {
-                record.setObservations(String.valueOf(iobject.getObject()));
-            }
+        } else if (iobject != null) {
+            record.setObservations(String.valueOf(iobject.getObject()));
         }
         return record;
     }

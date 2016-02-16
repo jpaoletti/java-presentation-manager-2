@@ -4,6 +4,7 @@
 	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
     <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.BCrypt"/>
+    <beans:bean id="authorizationService" class="jpaoletti.jpm2.core.service.SpringAuthorizationService"/>
     
     <http auto-config='true' disable-url-rewriting="false">
         <headers disabled="true"/>
@@ -11,6 +12,7 @@
         <intercept-url pattern="/login" access="permitAll" />
         <intercept-url pattern="/static/**" access="permitAll" />
         <intercept-url pattern="/favicon.ico" access="permitAll" />
+        <intercept-url pattern="/rjpm/**" access="permitAll" /> <!-- REST -->
         <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
         <form-login login-page="/login" authentication-failure-url="/login?error=1" default-target-url="/index" />
         <logout logout-success-url="/index" delete-cookies="JSESSIONID" />
@@ -25,8 +27,8 @@
         <beans:property name="enableGroups" value="true"/>
         <beans:property name="enableAuthorities" value="false"/>
     </beans:bean>
-
-    <authentication-manager>
+    
+    <authentication-manager alias="authenticationManager">
         <authentication-provider user-service-ref="userDetailsService">
             <password-encoder ref="encoder" />
         </authentication-provider>
