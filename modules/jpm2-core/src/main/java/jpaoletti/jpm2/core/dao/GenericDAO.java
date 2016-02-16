@@ -91,15 +91,17 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     @Override
     public List<T> list(DAOListConfiguration configuration) {
         final Criteria c = getBaseCriteria(configuration);
-        if (configuration.getMax() != null) {
-            c.setMaxResults(configuration.getMax());
-        }
-        if (configuration.getFrom() != null) {
-            c.setFirstResult(configuration.getFrom());
-        }
-        if (!configuration.getOrders().isEmpty()) {
-            for (Order order : configuration.getOrders()) {
-                c.addOrder(order);
+        if (configuration != null) {
+            if (configuration.getMax() != null) {
+                c.setMaxResults(configuration.getMax());
+            }
+            if (configuration.getFrom() != null) {
+                c.setFirstResult(configuration.getFrom());
+            }
+            if (!configuration.getOrders().isEmpty()) {
+                for (Order order : configuration.getOrders()) {
+                    c.addOrder(order);
+                }
             }
         }
         return c.list();
@@ -108,16 +110,18 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     protected Criteria getBaseCriteria(DAOListConfiguration configuration) {
         Criteria c = getSession().createCriteria(getPersistentClass());
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-        for (DAOListConfiguration.DAOListConfigurationAlias alias : configuration.getAliases()) {
-            if (alias.getJoinType() != null) {
-                c = c.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
-            } else {
-                c = c.createAlias(alias.getProperty(), alias.getAlias());
+        if (configuration != null) {
+            for (DAOListConfiguration.DAOListConfigurationAlias alias : configuration.getAliases()) {
+                if (alias.getJoinType() != null) {
+                    c = c.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
+                } else {
+                    c = c.createAlias(alias.getProperty(), alias.getAlias());
+                }
             }
-        }
-        for (Criterion criterion : configuration.getRestrictions()) {
-            if (criterion != null) {
-                c.add(criterion);
+            for (Criterion criterion : configuration.getRestrictions()) {
+                if (criterion != null) {
+                    c.add(criterion);
+                }
             }
         }
         return c;
