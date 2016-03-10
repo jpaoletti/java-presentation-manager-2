@@ -21,7 +21,7 @@ public class JPMPostResponse {
 
     public JPMPostResponse(boolean ok, String next, Message... messages) {
         this.ok = ok;
-        this.next = next.replaceAll("redirect:", "");
+        this.next = next != null ? next.replaceAll("redirect:", "") : null;
         this.messages.addAll(Arrays.asList(messages));
     }
 
