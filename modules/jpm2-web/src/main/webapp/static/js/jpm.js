@@ -344,13 +344,21 @@ var processFormResponse = function (data) {
                 $message = "<li>" + text.text + "</li>";
             });
             $message = $message + "</ul></div>";
+            var okbuttons = [];
+            if (!data.next || data.next === "") {
+                okbuttons.push({
+                    label: messages["jpm.modal.confirm.close"],
+                    action: function (dialogRef) {
+                        dialogRef.close();
+                        jpmUnBlock();
+                    }}
+                );
+            }
             BootstrapDialog.show({
                 title: "",
                 message: $($message),
                 type: BootstrapDialog.TYPE_SUCCESS,
-                onshown: function (dialogRef) {
-
-                }
+                buttons: okbuttons
             });
         }
         if (data.next && data.next !== "") {
