@@ -11,6 +11,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
+import jpaoletti.jpm2.core.model.ListSort;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
@@ -30,7 +31,13 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak) throws PMException {
         final Object owner = entity.getDao().get(instanceId);
-        final List list = weak.getDao().list(new DAOListConfiguration(Restrictions.eq(weak.getOwner().getLocalProperty(), owner)));
+        final DAOListConfiguration cfg = new DAOListConfiguration(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+        if (weak.getEntity().getDefaultSortField() != null) {
+            final Field sortField = weak.getEntity().getFieldById(weak.getEntity().getDefaultSortField(), weak.getContext());
+            final ListSort sort = new ListSort(sortField, weak.getEntity().getDefaultSortDirection());
+            cfg.withOrder(sort.getOrder());
+        }
+        final List list = weak.getDao().list(cfg);
         final PaginatedList pl = new PaginatedList();
         getContext().setEntity(entity.getEntity());
         pl.setTotal((long) list.size());

@@ -18,7 +18,9 @@ public class ListSort {
 
     public ListSort(Field field, SortDirection direction) {
         this.field = field;
-        this.direction = direction;
+        if (direction != null) {
+            this.direction = direction;
+        }
     }
 
     public Order getOrder() {
