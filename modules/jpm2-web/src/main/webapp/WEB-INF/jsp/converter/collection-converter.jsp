@@ -25,7 +25,7 @@
                 };
             },
             ajax: {
-                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}",
+                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
                                 dataType: 'json',
                                 data: function (params) {
                                     return {
