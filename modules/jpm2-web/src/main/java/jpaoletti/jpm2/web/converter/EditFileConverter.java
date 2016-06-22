@@ -6,9 +6,11 @@ import java.io.IOException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  *
@@ -18,6 +20,7 @@ public class EditFileConverter extends Converter {
 
     private String measure = "k";
     private String accept = "'@'"; // /(\.|\/)(gif|jpe?g|png)$/i
+    private String filenameField = null;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -62,7 +65,13 @@ public class EditFileConverter extends Converter {
 
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             fileInputStream.read(bFile);
+            if (getFilenameField() != null) {
+                final Field f = contextualEntity.getEntity().getFieldById(getFilenameField(), contextualEntity.getContext());
+                JPMUtils.set(object, f.getProperty(), file.getName());
+            }
         } catch (IOException ex) {
+            throw new ConverterException("jpm.error.uploading.file");
+        } catch (FieldNotFoundException ex) {
             throw new ConverterException("jpm.error.uploading.file");
         }
         return bFile;
@@ -82,5 +91,13 @@ public class EditFileConverter extends Converter {
 
     public void setAccept(String accept) {
         this.accept = accept;
+    }
+
+    public String getFilenameField() {
+        return filenameField;
+    }
+
+    public void setFilenameField(String filenameField) {
+        this.filenameField = filenameField;
     }
 }

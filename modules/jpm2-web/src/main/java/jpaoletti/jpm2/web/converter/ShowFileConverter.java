@@ -5,6 +5,7 @@ import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  *
@@ -17,16 +18,23 @@ public class ShowFileConverter extends Converter {
     private String sufix;
     private String measure = "k";
     private boolean downloadable = false;
+    private String filenameField = null;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final byte[] value = (byte[]) getValue(object, field);
-        final String page = "@page:show-file-converter.jsp"
+        String page = "@page:show-file-converter.jsp"
                 + "?contentType=" + getContentType()
                 + "&instanceId=" + instanceId
-                + "&downloadable=" + isDownloadable()
-                + "&prefix=" + (getPrefix() == null ? contextualEntity.getEntity().getId() : getPrefix())
-                + "&sufix=" + (getSufix() == null ? ".dat" : getSufix());
+                + "&downloadable=" + isDownloadable();
+        if (getFilenameField() != null) {
+            final Field f = contextualEntity.getEntity().getFieldById(getFilenameField(), contextualEntity.getContext());
+            page = page + "prefix=" + JPMUtils.get(object, f.getProperty()) + "sufix=";
+        } else {
+            page = page
+                    + "&prefix=" + (getPrefix() == null ? contextualEntity.getEntity().getId() : getPrefix())
+                    + "&sufix=" + (getSufix() == null ? ".dat" : getSufix());
+        }
         if (value != null && value.length > 0) {
             String len;
             switch (getMeasure().charAt(0)) {
@@ -85,5 +93,13 @@ public class ShowFileConverter extends Converter {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getFilenameField() {
+        return filenameField;
+    }
+
+    public void setFilenameField(String filenameField) {
+        this.filenameField = filenameField;
     }
 }
