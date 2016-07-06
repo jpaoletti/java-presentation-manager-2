@@ -6,6 +6,7 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityContext;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -68,6 +69,7 @@ public class SecurityController extends BaseController {
         getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
         if (current != null) {
             getSecurityService().changePassword(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId, current, newpass);
+            getContext().setGlobalMessage(MessageFactory.success("jpm.changePassword.success"));
         }
         return new ModelAndView("jpm-" + OP_PROFILE);
     }
