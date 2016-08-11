@@ -28,6 +28,11 @@ public class SearchCriteria implements Serializable {
         this.aliases = new LinkedHashSet<>();
     }
 
+    public void clear() {
+        getDefinitions().clear();
+        getAliases().clear();
+    }
+
     public Criterion getCriterion() {
         return criterion;
     }
