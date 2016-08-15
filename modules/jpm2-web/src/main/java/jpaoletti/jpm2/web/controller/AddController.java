@@ -37,10 +37,14 @@ public class AddController extends BaseController {
      */
     @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
     public ModelAndView addPrepare(
-            @RequestParam(required = false) String lastId, 
+            @RequestParam(required = false) String lastId,
             @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
         //If there is a "lastId" , the object values are used as defaults
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
+        final Operation operation = getContext().getOperation();
+        if (operation.getContext() != null) {
+            operation.getContext().preConversion(object);
+        }
         getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
