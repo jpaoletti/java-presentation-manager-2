@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.service;
 
+import java.io.Serializable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -10,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  *
  * @author jpaoletti
  */
-public class SpringAuthorizationService implements AuthorizationService {
+public class SpringAuthorizationService implements AuthorizationService, Serializable {
 
     /**
      *
