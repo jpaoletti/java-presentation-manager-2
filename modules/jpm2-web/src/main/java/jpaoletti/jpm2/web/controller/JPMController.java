@@ -34,6 +34,7 @@ public class JPMController extends BaseController {
         final Path tmpDir = Files.createTempDirectory("jpm");
         final String tmpFileName = tmpDir + File.separator + file.getOriginalFilename();
         final File tmpFile = new File(tmpFileName);
+        tmpFile.deleteOnExit();
         file.transferTo(tmpFile);
         final UploadFileResults res = new UploadFileResults();
         res.getFiles().add(new UploadFileResult(tmpFileName, file.getContentType(), tmpFile.length()));
