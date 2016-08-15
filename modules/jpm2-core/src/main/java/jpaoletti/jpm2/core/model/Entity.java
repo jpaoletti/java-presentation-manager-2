@@ -476,10 +476,10 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                     //User has role
                     try {
                         op.checkAuthorization(this, getContext(context));
-                        //Conditions are ok
-                        if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
-                            //Scope is adecuate
-                            if (scope.equals(op.getScope())) {
+                        //Scope is adecuate
+                        if (scope.equals(op.getScope())) {
+                            //Conditions are ok
+                            if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
                                 //the we add the operation to list.
                                 //TODO CHECK CONTEXT
                                 r.add(op);

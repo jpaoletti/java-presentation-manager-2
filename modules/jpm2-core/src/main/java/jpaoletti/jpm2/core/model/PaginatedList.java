@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This list represents a list with a paged representation.
@@ -68,7 +69,7 @@ public class PaginatedList {
      */
     public void setPageSize(Integer pageSize) {
         if (pageSize != null) {
-            if (pageSize != getPageSize()) {
+            if (!Objects.equals(pageSize, getPageSize())) {
                 this.page = 1;
             }
             this.pageSize = pageSize;
