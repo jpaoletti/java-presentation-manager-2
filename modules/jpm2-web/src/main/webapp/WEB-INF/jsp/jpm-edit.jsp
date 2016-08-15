@@ -53,7 +53,6 @@
     <script type="text/javascript">
         jpmLoad(function () {
             wrapToString();
-            buildAjaxJpmForm();
         });
     </script>
     <c:if test="${not close}">
