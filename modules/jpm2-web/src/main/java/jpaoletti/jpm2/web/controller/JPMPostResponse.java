@@ -18,6 +18,7 @@ public class JPMPostResponse {
     private final List<Message> messages = new ArrayList<>();
     private final Map<String, List<Message>> fieldMessages = new LinkedHashMap<>();
     private final String next;
+    private Long messageDelay = 1000L;
 
     public JPMPostResponse(boolean ok, String next, Message... messages) {
         this.ok = ok;
@@ -52,6 +53,14 @@ public class JPMPostResponse {
 
     public List<Message> getMessages() {
         return messages;
+    }
+
+    public Long getMessageDelay() {
+        return messageDelay;
+    }
+
+    public void setMessageDelay(Long messageDelay) {
+        this.messageDelay = messageDelay;
     }
 
 }

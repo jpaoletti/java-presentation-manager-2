@@ -364,7 +364,7 @@ var processFormResponse = function (data) {
         if (data.next && data.next !== "") {
             setTimeout(function () {
                 document.location = getContextPath() + data.next;
-            }, 1000);
+            }, data.messageDelay);
         }
     } else {
         $(".form-group").removeClass("has-error");
