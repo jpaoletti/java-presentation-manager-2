@@ -71,12 +71,14 @@ public class ListController extends BaseController {
         final List<Criterion> restrictions = new ArrayList<>();
         if (filter != null && !"".equals(filter)) {
             final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
-            if (lfilter instanceof RelatedListFilter) {
-                ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
-            }
-            final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), ownerId);
-            if (c != null) {
-                restrictions.add(c);
+            synchronized (lfilter) {
+                if (lfilter instanceof RelatedListFilter) {
+                    ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
+                }
+                final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), ownerId);
+                if (c != null) {
+                    restrictions.add(c);
+                }
             }
         }
         if (!"".equals(query)) {
@@ -92,7 +94,9 @@ public class ListController extends BaseController {
                 } else {
                     try {
                         final DescribedCriterion dc = field.getSearcher().build(field, searcherParameters);
-                        cl.getAliases().addAll(dc.getAliases());
+                        for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
+                            cl.withAlias(alias.getProperty(), alias.getAlias());
+                        }
                         restrictions.add(dc.getCriterion());
                     } catch (Exception e) {
                         //We ignore any errors avoiding the filter
@@ -116,7 +120,9 @@ public class ListController extends BaseController {
                         } else {
                             try {
                                 final DescribedCriterion dc = field2.getSearcher().build(field2, searcherParameters);
-                                cl.getAliases().addAll(dc.getAliases());
+                                for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
+                                    cl.withAlias(alias.getProperty(), alias.getAlias());
+                                }
                                 disjunction.add(dc.getCriterion());
                             } catch (Exception e) {
                                 //We ignore any errors avoiding the filter
@@ -158,7 +164,7 @@ public class ListController extends BaseController {
     public ModelAndView list(
             @PathVariable String owner,
             @PathVariable String ownerId,
-            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false) Integer pageSize) throws PMException {
         final Entity entity = getContext().getEntity();
         if (!entity.isWeak(getContext().getEntityContext())) {

@@ -12,14 +12,14 @@
             <div class="row">
                 <c:catch var="e">
                     <c:if test="${(empty showMenu) or showMenu}">
-                        <div class="col-md-2">
+                        <div class="col-md-2 hidden-xs hidden-sm">
                             <div class="bs-sidebar hidden-print affix">
                                 <jsp:include page="../jsp/inc/menu/${currentHome}-menu.jsp" />
                             </div>
                         </div>
                     </c:if>
                 </c:catch>
-                <div class="${(((empty showMenu) or showMenu) and empty e)?'col-md-10':'col-md-12'}">
+                <div class="${(((empty showMenu) or showMenu) and empty e)?'col-md-10 col-xs-12 col-sm-12':'col-md-12'}">
                     <jsp:doBody />
                 </div>
             </div>

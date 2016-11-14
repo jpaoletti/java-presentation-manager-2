@@ -29,7 +29,7 @@ public class ShowFileConverter extends Converter {
                 + "&downloadable=" + isDownloadable();
         if (getFilenameField() != null) {
             final Field f = contextualEntity.getEntity().getFieldById(getFilenameField(), contextualEntity.getContext());
-            page = page + "prefix=" + JPMUtils.get(object, f.getProperty()) + "sufix=";
+            page = page + "&prefix=" + JPMUtils.get(object, f.getProperty()) + "&sufix=";
         } else {
             page = page
                     + "&prefix=" + (getPrefix() == null ? contextualEntity.getEntity().getId() : getPrefix())
