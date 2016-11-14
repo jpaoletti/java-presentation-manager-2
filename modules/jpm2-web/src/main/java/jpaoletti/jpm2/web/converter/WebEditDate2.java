@@ -16,7 +16,8 @@ import org.joda.time.DateTime;
  */
 public class WebEditDate2 extends WebToString {
 
-    private String format = "yyyy-MM-dd";
+    private String format = "yyyy-MM-dd HH:mm:ss";
+    private String jsFormat = "YYYY-MM-DD HH:mm:ss";
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -26,7 +27,7 @@ public class WebEditDate2 extends WebToString {
             final DateTime dt = new DateTime(date);
             value = dt.toString(getFormat());
         }
-        return "@page:date2-converter.jsp?value=" + value + "&format=" + getFormat();
+        return "@page:date2-converter.jsp?value=" + value + "&format=" + getJsFormat();
     }
 
     @Override
@@ -49,5 +50,13 @@ public class WebEditDate2 extends WebToString {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public String getJsFormat() {
+        return jsFormat;
+    }
+
+    public void setJsFormat(String jsFormat) {
+        this.jsFormat = jsFormat;
     }
 }
