@@ -37,13 +37,17 @@ public class EditController extends BaseController {
      * GET method prepares form.
      *
      * @param instanceId
+     * @param close closes the page after adding succesful
      * @return model and view
      * @throws PMException
      */
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.GET)
-    public ModelAndView editPrepare(@PathVariable String instanceId) throws PMException {
+    public ModelAndView editPrepare(@PathVariable String instanceId,
+            @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
         initItemControllerOperation(instanceId);
-        return new ModelAndView("jpm-" + OP_EDIT);
+        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
+        mav.addObject("close", close);
+        return mav;
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_EDIT + "}", method = RequestMethod.POST)
