@@ -27,3 +27,16 @@ THIS IS A WORK IN PROGRESS PROJECT.
 * Session management (spring ?)
 * Security & Authorization (spring security 3)
 
+
+## Notes ##
+
+
+### Operation over entities with multiple contexts
+
+If an entity has multiple contexts, operations should be mapped like this:
+
+@RequestMapping(value = {"/jpm/{entity:someEntity}/{instanceId}/{operationId:someOp}", "/jpm/{entity:someEntity!.*}/{instanceId}/{operationId:someOp}"})
+...
+
+This will ensure that all the context has the operation available.
+
