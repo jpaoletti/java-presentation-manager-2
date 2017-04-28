@@ -59,6 +59,7 @@ public class EditFileConverter extends Converter {
         }
         final File file = new File(String.valueOf(newValue)); //Tmp path
         if (!file.exists()) {
+            JPMUtils.getLogger().error("File not exists in file converter");
             throw new ConverterException("jpm.error.uploading.file");
         }
         byte[] bFile = new byte[(int) file.length()];
@@ -70,8 +71,10 @@ public class EditFileConverter extends Converter {
                 JPMUtils.set(object, f.getProperty(), file.getName());
             }
         } catch (IOException ex) {
+            JPMUtils.getLogger().error("IOException in file converter ", ex);
             throw new ConverterException("jpm.error.uploading.file");
         } catch (FieldNotFoundException ex) {
+            JPMUtils.getLogger().error("FieldNotFoundException in file converter ", ex);
             throw new ConverterException("jpm.error.uploading.file");
         }
         return bFile;

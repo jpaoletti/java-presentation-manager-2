@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.converter;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityContext;
@@ -42,8 +43,10 @@ public class WeakConverter extends Converter {
         final EntityContext weakEntityContext = getEntity().getContext(getContext());
         try {
             res.append("&weakAuth=").append(getEntity().getOperation(ListController.OP_LIST, weakEntityContext).getAuthKey(getEntity(), weakEntityContext));
+        } catch (NotAuthorizedException ex) {
+            res.append("&weakAuth=").append(ex.getMsg().getText());
         } catch (Exception ex) {
-            JPMUtils.getLogger().error(ex);
+            JPMUtils.getLogger().error("Error in weak converter: " + getEntity(), ex);
             throw new ConverterException("unexpected.exception");
         }
         res.append("&ownerId=").append(instanceId);

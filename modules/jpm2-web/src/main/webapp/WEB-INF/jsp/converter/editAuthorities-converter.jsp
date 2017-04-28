@@ -87,10 +87,7 @@
                             search_leaves_only: false
                         },
                         checkbox: {
-                            whole_node: false,
-                            keep_selected_style: false,
-                            real_checkboxes: true,
-                            real_checkboxes_names: 'field_${field}'
+                            keep_selected_style: false
                         },
                         "core": {
                             "multiple": true,

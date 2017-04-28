@@ -65,12 +65,14 @@
     <c:if test="${close}">
         <script type="text/javascript">
             jpmLoad(function () {
-                buildAjaxJpmForm("jpmForm", function(data){
-                    data.next=null;
+                buildAjaxJpmForm("jpmForm", function (data) {
+                    data.next = null;
                     processFormResponse(data);
-                    setTimeout(function(){
-                        window.close();
-                    }, 2000);
+                    if (data.ok) {
+                        setTimeout(function () {
+                            window.close();
+                        }, 2000);
+                    }
                 });
             });
         </script>
