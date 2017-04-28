@@ -58,7 +58,7 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     public void checkAuthorization() throws NotAuthorizedException {
         if (getAuth() != null && !getAuthorizationService().userHasRole(getAuth())) {
-            throw new NotAuthorizedException();
+            throw new NotAuthorizedException(getAuth());
         }
     }
 

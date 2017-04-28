@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.web.controller;
 
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import org.hibernate.criterion.Restrictions;
@@ -19,7 +20,7 @@ public class IndexController extends BaseController {
     private WebApplicationContext ctx;
 
     @RequestMapping(value = {"", "/", "/index", "/home"})
-    public ModelAndView index() {
+    public ModelAndView index() throws PMException {
         setCurrentHome("index");
         return new ModelAndView("index");
     }

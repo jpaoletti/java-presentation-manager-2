@@ -448,22 +448,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * operation exists but the user has no permission to access it.
      */
     public Operation getOperation(String id, EntityContext context) throws OperationNotFoundException, NotAuthorizedException {
-        boolean notAuthorized = false;
         for (Operation oper : getAllOperations()) {
             if (oper.getId().compareTo(id) == 0) {
-                try {
-                    oper.checkAuthorization(this, context);
-                    return oper;
-                } catch (NotAuthorizedException e) {
-                    notAuthorized = true;
-                }
+                oper.checkAuthorization(this, context);
+                return oper;
             }
         }
-        if (notAuthorized) {
-            throw new NotAuthorizedException();
-        } else {
-            throw new OperationNotFoundException(getId(), id);
-        }
+        throw new OperationNotFoundException(getId(), id);
     }
 
     public List<Operation> getOperationsFor(EntityInstance instance, String context, Operation operation, OperationScope scope) throws PMException {

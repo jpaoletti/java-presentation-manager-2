@@ -72,9 +72,11 @@ public class Operation extends PMCoreObject {
     public void checkAuthorization(Entity entity, EntityContext context) throws NotAuthorizedException {
         if (getAuth() != null) {
             checkAuthorization();//getAuthorizationService().getCurrentUsername();
-        } else if (!getAuthorizationService().userHasRole(ROLE_SPECIAL)) {//if user is "special" then we ignore the new auth system
-            if (!getAuthorizationService().userHasRole(getAuthKey(entity, context))) {
-                throw new NotAuthorizedException();
+        } else if (!getAuthorizationService().userHasRole(ROLE_SPECIAL)) {
+            final String authKey = getAuthKey(entity, context);
+            //if user is "special" then we ignore the new auth system
+            if (!getAuthorizationService().userHasRole(authKey)) {
+                throw new NotAuthorizedException(authKey);
             }
         }
     }
