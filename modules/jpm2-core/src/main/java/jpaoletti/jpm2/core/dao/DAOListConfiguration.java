@@ -19,7 +19,6 @@ public class DAOListConfiguration {
 
     private Integer from;
     private Integer max;
-    private Order order;
     private List<Criterion> restrictions;
     private List<Order> orders;
     private Set<DAOListConfigurationAlias> aliases;
@@ -114,6 +113,11 @@ public class DAOListConfiguration {
         return this;
     }
 
+    public DAOListConfiguration withRestriction(Criterion restriction) {
+        getRestrictions().add(restriction);
+        return this;
+    }
+
     public final DAOListConfiguration withOrder(Order order) {
         getOrders().add(order);
         return this;
@@ -139,6 +143,22 @@ public class DAOListConfiguration {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public DAOListConfiguration clone() {
+        final DAOListConfiguration c = new DAOListConfiguration();
+        c.setFrom(getFrom());
+        c.setMax(getMax());
+        for (Criterion restriction : restrictions) {
+            c.withRestriction(restriction);
+        }
+        for (DAOListConfigurationAlias alias : aliases) {
+            c.withAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
+        }
+        for (Order o : getOrders()) {
+            c.withOrder(o);
+        }
+        return c;
     }
 
     public static class DAOListConfigurationAlias {
