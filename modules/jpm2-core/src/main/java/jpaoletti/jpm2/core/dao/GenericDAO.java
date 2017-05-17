@@ -112,7 +112,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         return c.list();
     }
 
-    protected Criteria getBaseCriteria(DAOListConfiguration configuration) {
+    public Criteria getBaseCriteria(DAOListConfiguration configuration) {
         Criteria c = getSession().createCriteria(getPersistentClass());
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         if (configuration != null) {
