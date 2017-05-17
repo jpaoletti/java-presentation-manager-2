@@ -7,9 +7,13 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.BCrypt;
+import jpaoletti.jpm2.core.security.Group;
 import jpaoletti.jpm2.core.security.User;
+import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -17,10 +21,27 @@ import org.springframework.transaction.annotation.Transactional;
  * @author jpaoletti
  */
 @Transactional
-public class SecurityServiceImpl extends JPMServiceBase implements SecurityService {
+public class SecurityServiceImpl extends JPMServiceBase implements SecurityService, UserDetailsService {
 
     @Autowired
     private BCrypt encoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String string) throws UsernameNotFoundException {
+        try {
+            final User user = (User) getJpm().getEntity("jpm-entity-user").getDao().get(string);
+            if (user == null) {
+                throw new UsernameNotFoundException("user.not.found");
+            }
+            for (Group group : user.getGroups()) {
+                user.getAuthorities().addAll(group.getGrantedAuthority());
+            }
+            return user;
+        } catch (Exception ex) {
+            JPMUtils.getLogger().error("Error on loadUserByUsernam", ex);
+            throw new UsernameNotFoundException("user.not.found");
+        }
+    }
 
     @Override
     public UserDetails resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException {

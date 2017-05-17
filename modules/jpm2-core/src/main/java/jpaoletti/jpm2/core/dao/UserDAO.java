@@ -1,15 +1,15 @@
 package jpaoletti.jpm2.core.dao;
 
-import jpaoletti.jpm2.core.security.User;
+import jpaoletti.jpm2.core.security.JpmUser;
 
 /**
  *
  * @author jpaoletti
  */
-public class UserDAO extends GenericDAO<User, String> {
+public class UserDAO extends GenericDAO<JpmUser, String> {
 
     @Override
     public String getId(Object object) {
-        return ((User) object).getUsername();
+        return ((JpmUser) object).getUsername();
     }
 }

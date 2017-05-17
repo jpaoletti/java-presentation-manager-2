@@ -1,8 +1,16 @@
-create table users(
-      username varchar(50) not null primary key,
-      password varchar(250) not null,
-      enabled boolean not null
-);
+CREATE TABLE IF NOT EXISTS `users` (
+  `username` varchar(255) NOT NULL,
+  `account_non_expired` char(1) DEFAULT 'Y',
+  `account_non_locked` char(1) DEFAULT 'Y',
+  `credentials_non_expired` char(1) DEFAULT 'Y',
+  `enabled` char(1) NOT NULL,
+  `mail` varchar(255) DEFAULT NULL,
+  `name` varchar(2000) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `login_attemps` int(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 create table authorities(
       authority varchar(50) not null primary key
@@ -35,7 +43,18 @@ create table persistent_logins (
 );
 
 INSERT INTO `groups` (`id`, `group_name`) VALUES (NULL, 'Administrators'), (NULL, 'Users');
-INSERT INTO `users` (`username`, `password`, `enabled`) VALUES ('admin', '$2a$12$zofXZl6UI.uTuqBSyKwvvOh2Qbx5vjGkgGv8MeH9/6TBPncRK2RHq', '1'); -- admin / test
+INSERT INTO `users` VALUES ('admin', 'Y', 'Y', 'Y', 'Y', '', 'Administrator', '$2a$12$zofXZl6UI.uTuqBSyKwvvOh2Qbx5vjGkgGv8MeH9/6TBPncRK2RHq', 0); -- admin / test
 INSERT INTO `group_members` (`username`, `group_id`) VALUES ('admin', '1');
 
-INSERT INTO `authorities` (`authority`) VALUES ('SPECIAL');
+INSERT INTO group_authorities (group_id, authority) VALUES
+(1, 'jpm.auth.operation.jpm-entity-group.add'),
+(1, 'jpm.auth.operation.jpm-entity-group.delete'),
+(1, 'jpm.auth.operation.jpm-entity-group.edit'),
+(1, 'jpm.auth.operation.jpm-entity-group.list'),
+(1, 'jpm.auth.operation.jpm-entity-group.show'),
+(1, 'jpm.auth.operation.jpm-entity-user.add'),
+(1, 'jpm.auth.operation.jpm-entity-user.delete'),
+(1, 'jpm.auth.operation.jpm-entity-user.edit'),
+(1, 'jpm.auth.operation.jpm-entity-user.list'),
+(1, 'jpm.auth.operation.jpm-entity-user.resetPassword'),
+(1, 'jpm.auth.operation.jpm-entity-user.show');

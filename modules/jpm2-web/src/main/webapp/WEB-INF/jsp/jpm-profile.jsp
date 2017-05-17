@@ -27,27 +27,27 @@
                                             </h3>
                                         </div>
                                         <div class="panel-body">
-                                            <form class="form-horizontal" role="form" action="#">
+                                            <form class="form-horizontal" role="form" action="${cp}jpm/user/${user.username}/updateProfile">
                                                 <fieldset>
-                                                    <%-- <img src="${user.gravatar}?d=mm&s=100" alt="gravatar" /><br/>--%>
                                                     <div class="control-group">
                                                         <label class="control-label" for="input01"><spring:message text="Username" code="jpm.profile.username" /></label>
                                                         <div class="controls">
                                                             <input type="text" class="form-control" value="${user.username}" disabled="disabled"/>
                                                         </div>
                                                     </div>
-                                                    <%-- <div class="control-group">
+                                                    <div class="control-group">
                                                         <label class="control-label" for="name"><spring:message text="?" code="profile.edit.name" /></label>
                                                         <div class="controls">
-                                                            <input type="text" name="name" value="${user.name}" />
+                                                            <input type="text" class="form-control" name="nombre" value="${user.name}" />
                                                         </div>
                                                     </div>
                                                     <div class="control-group">
-                                                        <label class="control-label" for="email"><spring:message text="?" code="profile.edit.mail"/></label>
+                                                        <label class="control-label" for="email"><spring:message text="?" code="profile.edit.mail" /></label>
                                                         <div class="controls">
-                                                            <input type="text" name="email" value="${user.email}" placeholder="<spring:message text="?" code="profile.edit.mail"/>" />
+                                                            <input type="text" class="form-control" name="mail" value="${user.mail}" />
                                                         </div>
-                                                    </div>--%>
+                                                    </div><br/>
+                                                    <button type="submit" class="btn btn-primary"><spring:message code="jpm.form.submit" text="Submit" /></button>
                                                 </fieldset>
                                             </form>
                                         </div>
@@ -86,9 +86,9 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript" src="${cp}static/js/pwdwidget.js?v=${jpm.appversion}"></script>
+        <script type="text/javascript" src="${cp}static/js/pwdwidget.js"></script>
         <script type="text/javascript">
-            jpmLoad(function() {
+            jpmLoad(function () {
                 var pwdwidget = new PasswordWidget('thepwddivnewpass', 'newpass');
                 pwdwidget.txtShow = "<spring:message code='jpm.converter.password_converter.show' />";
                 pwdwidget.txtMask = "<spring:message code='jpm.converter.password_converter.mask' />";

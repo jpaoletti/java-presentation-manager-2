@@ -32,6 +32,7 @@ public class PresentationManager {
     private AuditService auditService;
     private JPMService service;
     private CustomLoader customLoader;
+    private Integer maxLoginAttemps = 0; //max number of attemps before locking user. 0 is disabled
 
     @Autowired(required = false)
     private Map<String, Entity> entities;
@@ -199,5 +200,13 @@ public class PresentationManager {
 
     public MessageSource getMessageSource() {
         return (MessageSource) JPMUtils.getApplicationContext().getBean("messageSource");
+    }
+
+    public Integer getMaxLoginAttemps() {
+        return maxLoginAttemps;
+    }
+
+    public void setMaxLoginAttemps(Integer maxLoginAttemps) {
+        this.maxLoginAttemps = maxLoginAttemps;
     }
 }

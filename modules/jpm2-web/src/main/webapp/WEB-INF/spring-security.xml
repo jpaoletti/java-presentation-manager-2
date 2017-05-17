@@ -4,6 +4,7 @@
 	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
     <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.BCrypt"/>
+    <beans:bean id="userDetailsService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
     <beans:bean id="authorizationService" class="jpaoletti.jpm2.core.service.SpringAuthorizationService"/>
     
     <http auto-config='true' disable-url-rewriting="false">
@@ -19,15 +20,11 @@
         <session-management>
             <!--<concurrency-control max-sessions="1" />--> <!-- This limits the number of logins the same user may have-->
         </session-management>
-        <remember-me data-source-ref="dataSource"/>
+        <remember-me data-source-ref="dataSource" user-service-ref="userDetailsService" remember-me-cookie="SPRING_SECURITY_REMEMBER_ME_COOKIE" 
+                     token-validity-seconds="5184000"
+        /><!-- 24hs -->
     </http>
 
-    <beans:bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
-        <beans:property name="dataSource" ref="dataSource"/>
-        <beans:property name="enableGroups" value="true"/>
-        <beans:property name="enableAuthorities" value="false"/>
-    </beans:bean>
-    
     <authentication-manager alias="authenticationManager">
         <authentication-provider user-service-ref="userDetailsService">
             <password-encoder ref="encoder" />
