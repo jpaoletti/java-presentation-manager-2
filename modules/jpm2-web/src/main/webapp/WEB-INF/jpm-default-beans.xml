@@ -159,4 +159,5 @@
             </property>
         </bean>
     </util:list>
+    <import resource="jpm-default-beans-operations.xml" />
 </beans>

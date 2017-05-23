@@ -20,7 +20,7 @@
             </c:if>
         </c:if>
         <li>
-            <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show">
+            <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show.exec">
                 <span class="glyphicon jpmicon-show"></span> <spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> 
                 ${instance.owner.iobject.object}
             </a>
@@ -28,20 +28,24 @@
     </c:if>
     <c:if test="${operation.id ne 'list' and entity.containingListOperation}">
         <li>
-            <c:if test="${not empty owner}">
-                <!-- BUG NEED OWNER CONTEXT --> 
-                <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/list">
-                    <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
-                </a>
-            </c:if>
-            <c:if test="${empty owner}">
-                <a href="${cp}jpm/${contextualEntity}/list">
-                    <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
-                </a>
-            </c:if>
+        <c:if test="${not empty owner}">
+            <!-- BUG NEED OWNER CONTEXT --> 
+            <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/list">
+                <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
+            </a>
+        </c:if>
+        <c:if test="${empty owner}">
+            <a href="${cp}jpm/${contextualEntity}/list">
+                <span class="glyphicon jpmicon-list"></span> <spring:message code="jpm.operation.list" text="List" arguments="${entity.title}" />
+            </a>
+        </c:if>
         </li>
     </c:if>
     <li class="active">
         <a href="#"><span class="glyphicon jpmicon-${operation.id}"></span> ${operationName} ${instance.iobject.object}</a> 
     </li>
 </ol>
+<div class="asynchronicProgress hide" id="asynchronicProgress">
+    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" ></div><br/>
+    <div id="asynchronicProgress_status" class="asynchronicProgressStatus"></div>
+</div>

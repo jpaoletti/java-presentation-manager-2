@@ -20,12 +20,7 @@
             <div class="btn-group nowrap">
                 <c:if test="${not compactOperations}">
                     <c:forEach items="${item.operations}" var="o">
-                        <a
-                            class="btn btn-xs btn-default confirm-${o.confirm}" 
-                            title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                            href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
-                            <span class="glyphicon jpmicon-${o.id}"></span>
-                        </a>
+                        <jpm:operation-link operation="${o}" clazz="btn btn-xs btn-default" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="false" />
                     </c:forEach>
                 </c:if>
 
@@ -37,11 +32,7 @@
                         <ul class="dropdown-menu" role="menu">
                             <c:forEach items="${item.operations}" var="o">
                                 <li>
-                                    <a
-                                        class="confirm-${o.confirm}" 
-                                        href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
-                                        <span class="glyphicon jpmicon-${o.id}"></span> <spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />
-                                    </a>
+                                    <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" />
                                 </li>
                             </c:forEach>
                         </ul>

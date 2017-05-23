@@ -1,9 +1,14 @@
 package jpaoletti.jpm2.web.converter;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.Operation;
 
 /**
  * Shows a link that uses the jSON show to get some extra info. Use only with
@@ -29,10 +34,11 @@ public class ShowLinkObject extends ShowObject {
         } else {
             try {
                 final String finalValue = getFinalValue(value);
+                final Operation op = getEntity().getOperation(getOperation(), getContext().getContext());
                 return res
                         + "&value=" + finalValue
-                        + "&operationId=" + getOperation();
-            } catch (ConfigurationException ex) {
+                        + "&operationId=" + op.getPathId();
+            } catch (ConfigurationException | NotAuthorizedException ex) {
                 throw new ConverterException(ex.getMessage());
             }
         }

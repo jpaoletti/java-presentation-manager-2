@@ -56,6 +56,9 @@ public class Operation extends PMCoreObject {
     private boolean repeatable;
     private boolean useFields;
 
+    private OperationExecutor executor = null;
+    private boolean synchronic;
+
     public Operation() {
         this.enabled = true;
         this.showTitle = true;
@@ -67,6 +70,11 @@ public class Operation extends PMCoreObject {
         this.auditable = true;
         this.repeatable = false;
         this.useFields = true;
+        this.synchronic = true;
+    }
+
+    public String getPathId() {
+        return getId() + (getExecutor() == null ? "" : ".exec");
     }
 
     public void checkAuthorization(Entity entity, EntityContext context) throws NotAuthorizedException {
@@ -381,5 +389,21 @@ public class Operation extends PMCoreObject {
     public String getAuthKey(Entity entity, EntityContext context) {
         final String eid = entity.getId() + (context == null ? "" : "." + context.getId());
         return String.format("jpm.auth.operation.%s.%s", eid, getId());
+    }
+
+    public OperationExecutor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(OperationExecutor executor) {
+        this.executor = executor;
+    }
+
+    public boolean isSynchronic() {
+        return synchronic;
+    }
+
+    public void setSynchronic(boolean synchronic) {
+        this.synchronic = synchronic;
     }
 }

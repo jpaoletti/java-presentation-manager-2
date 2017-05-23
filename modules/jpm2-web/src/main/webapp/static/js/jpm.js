@@ -454,4 +454,29 @@ function setEntityVal(select, id, callback) {
     return select;
 }
 
+function asynchronicOperationProgress(id) {
+    $.getScript(getContextPath() + "static/js/sockjs.min.js", function (data, textStatus, jqxhr) {
+        $.getScript(getContextPath() + "static/js/stomp.min.js", function (data, textStatus, jqxhr) {
+            var socket = new SockJS(getContextPath() + 'jpm-websocket');
+            var stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, function (frame) {
+                stompClient.subscribe('/asynchronicOperationExecutor/progress/' + id, function (s) {
+                    $(".asynchronic").addClass('disabled');
+                    var id = "#asynchronicProgress";
+                    var r = JSON.parse(s.body);
+                    $(id).removeClass("hide").show();
+                    $(id + " > .progress-bar").css("width", (Math.round(r.percent * 100) / 100) + "%");
+                    $(id + "_status").text((Math.round(r.percent * 100) / 100) + "% (" + r.status + ")");
+                });
+                stompClient.subscribe('/asynchronicOperationExecutor/done/' + id, function (s) {
+                    $("#asynchronicProgress").hide();
+                    $(".asynchronic").removeClass('disabled');
+                });
+                stompClient.send("/jpm/asynchronicOperationExecutorProgress", {}, JSON.stringify({'id': id}));
+            });
+        });
+    });
+}
+
 $(window).load(initPage);

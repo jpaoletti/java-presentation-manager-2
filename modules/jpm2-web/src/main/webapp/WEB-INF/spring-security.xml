@@ -1,6 +1,11 @@
-<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/security"
-             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+<beans:beans 
+    xmlns:websocket="http://www.springframework.org/schema/websocket"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
     <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.BCrypt"/>
@@ -14,6 +19,7 @@
         <intercept-url pattern="/static/**" access="permitAll" />
         <intercept-url pattern="/favicon.ico" access="permitAll" />
         <intercept-url pattern="/rjpm/**" access="permitAll" /> <!-- REST -->
+        <intercept-url pattern="/jpm-websocket/**" access="permitAll" /> <!-- WEBSOCKET -->
         <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
         <form-login login-page="/login" authentication-failure-url="/login?error=1" default-target-url="/index" />
         <logout logout-success-url="/index" delete-cookies="JSESSIONID" />
@@ -32,4 +38,15 @@
     </authentication-manager>
     <global-method-security pre-post-annotations="enabled" />
     <beans:bean class="jpaoletti.jpm2.web.DefaultRolesPrefixPostProcessor"/>
+    
+    <websocket:message-broker application-destination-prefix="/jpm" >
+        <websocket:stomp-endpoint path="/jpm-websocket">
+            <websocket:handshake-interceptors>
+                <beans:bean class="org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor"/>
+            </websocket:handshake-interceptors>
+            <websocket:sockjs/>
+        </websocket:stomp-endpoint>
+        <websocket:simple-broker prefix="/asynchronicOperationExecutor"/>
+    </websocket:message-broker>
+
 </beans:beans>

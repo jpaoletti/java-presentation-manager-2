@@ -58,10 +58,10 @@ public class ShowObject extends Converter {
                         final String entityId = getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                         switch (op.getScope()) {
                             case ITEM:
-                                operationLink = "jpm/" + entityId + "/" + localId + "/" + getOperation();
+                                operationLink = "jpm/" + entityId + "/" + localId + "/" + op.getPathId();
                                 break;
                             default:
-                                operationLink = "jpm/" + entityId + "/" + getOperation();
+                                operationLink = "jpm/" + entityId + "/" + op.getPathId();
                                 break;
                         }
                     } catch (NotAuthorizedException | OperationNotFoundException ex) {

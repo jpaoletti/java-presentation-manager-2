@@ -71,25 +71,27 @@
                     <property name="scope" value="SELECTED" />
                     <property name="confirm" value="true" />
                     <property name="display" value="list" />
+                    <property name="synchronic" value="false" />
+                    <property name="executor" ref="operationExecutorDelete" />
                 </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="show" />
-                    <property name="display" value="edit list itemAudit" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="edit" />
-                    <property name="repeatable" value="true" />
-                    <property name="display" value="show list" />
-                </bean>
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="itemAudit" />
                     <property name="display" value="show list" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="longTest" />
+                    <property name="display" value="show list" />
+                    <property name="synchronic" value="false" />
+                    <property name="executor" ref="operationExecutorLongTest" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="delete" />
                     <property name="confirm" value="true" />
                     <property name="display" value="edit show list" />
                     <property name="useFields" value="false" />
+                    <property name="executor" ref="operationExecutorDelete" />
                     <property name="condition">
                         <bean class="jpaoletti.jpm2.core.test.DeleteTestCondition" />
                     </property>
@@ -321,15 +323,19 @@
                     <property name="repeatable" value="true" />
                     <property name="follows" value="list" />
                 </bean>
+                <ref bean="default-show-operation" />
+                <ref bean="default-delete-operation" />
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="edit" />
                     <property name="display" value="none" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="delete" />
+                    <property name="id" value="deleteSelected" />
+                    <property name="scope" value="SELECTED" />
                     <property name="confirm" value="true" />
-                    <property name="display" value="show list" />
-                    <property name="useFields" value="false" />
+                    <property name="display" value="list" />
+                    <property name="synchronic" value="false" />
+                    <property name="executor" ref="operationExecutorDelete" />
                 </bean>
             </list>
         </property>

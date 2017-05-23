@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <!-- DEFAULT OPERATIONS BEANS --> 
+    <bean id="compact-list-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="list" />
+        <property name="scope" value="GENERAL" />
+        <property name="display" value="all" />
+        <property name="compact" value="true" />
+    </bean>
+    <bean id="default-list-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="list" />
+        <property name="scope" value="GENERAL" />
+        <property name="display" value="all" />
+    </bean>
+    <bean id="default-show-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="show" />
+        <property name="display" value="all !add" />
+        <property name="executor" ref="operationExecutorSimple" />
+    </bean>
+    <bean id="default-add-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="add" />
+        <property name="display" value="all" />
+        <property name="scope" value="GENERAL" />
+    </bean>
+    <bean id="repeatable-add-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="add" />
+        <property name="repeatable" value="true" />
+        <property name="display" value="all" />
+        <property name="scope" value="GENERAL" />
+    </bean>
+    <bean id="default-edit-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="edit" />
+        <property name="display" value="show list" />
+        <property name="repeatable" value="true" />
+        <property name="executor" ref="operationExecutorEdit" />
+    </bean>
+    <bean id="default-delete-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="delete" />
+        <property name="confirm" value="true" />
+        <property name="display" value="edit show list" />
+        <property name="executor" ref="operationExecutorDelete" />
+    </bean>
+    <bean id="default-generalAudit-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="generalAudit" />
+        <property name="scope" value="GENERAL" />
+        <property name="display" value="show list itemAudit" />
+    </bean>
+    <bean id="default-deleteSelected-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="deleteSelected" />
+        <property name="scope" value="SELECTED" />
+        <property name="confirm" value="true" />
+        <property name="display" value="list" />
+        <property name="executor" ref="operationExecutorDelete" />
+    </bean>
+    <bean id="default-itemAudit-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="itemAudit" />
+        <property name="display" value="show list" />
+    </bean>
+</beans>

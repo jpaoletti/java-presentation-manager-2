@@ -69,7 +69,7 @@ public class JPMIterceptor implements HandlerInterceptor {
                     if (operation != null) {
                         mav.addObject("operation", operation);
                         mav.addObject("generalOperations", entity.getOperationsFor(instance, ctx.getEntityContext(), operation, OperationScope.GENERAL));
-                        mav.addObject("selectedOperations", entity.getOperationsFor(instance, ctx.getEntityContext(), operation, OperationScope.SELECTED));
+                        mav.addObject("selectedOperations", entity.getOperationsFor(instance, ctx.getEntityContext(), operation, OperationScope.SELECTED, OperationScope.GROUPED));
                     }
                     if (instance != null) {
                         if (instance.getIobject() != null) {

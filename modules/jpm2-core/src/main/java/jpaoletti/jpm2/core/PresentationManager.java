@@ -1,25 +1,35 @@
 package jpaoletti.jpm2.core;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.stream.Collectors;
 import jpaoletti.jpm2.core.exception.EntityNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.model.AsynchronicOperationExecutor;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.model.OperationExecutor;
 import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 
 /**
  *
  * @author jpaoletti
  */
-public class PresentationManager {
+public class PresentationManager implements Observer {
 
     public static final String CONTEXT_SPLIT_STR = "[!]";
     public static final String CONTEXT_SEPARATOR = "!";
@@ -39,6 +49,12 @@ public class PresentationManager {
 
     @Autowired(required = false)
     private List<Entity> entityList;
+
+    private final Map<String, AsynchronicOperationExecutor> asynchronicOperationExecutors = new LinkedHashMap<>();
+
+    @Autowired
+    @Qualifier("sessionFactory")
+    private SessionFactory sessionFactory;
 
     public PresentationManager() {
         this.title = "JPM2";
@@ -182,6 +198,58 @@ public class PresentationManager {
         }
     }
 
+    public synchronized boolean registerAsynchronicExecutor(JPMContext ctx, OperationExecutor executor, List<EntityInstance> instances, Map parameters) {
+        final JPMContext newCtx = new JPMContextImpl(ctx.getEntity(), ctx.getEntityContext(), ctx.getOperation());
+        for (EntityInstance instance : instances) {
+            if (asynchronicOperationExecutors.containsKey(getKey(newCtx, instance))) {
+                return false;
+            }
+        }
+        for (EntityInstance instance : instances) {
+            if (asynchronicOperationExecutors.containsKey(getKey(newCtx, instance))) {
+                return false;
+            }
+        }
+        switch (ctx.getOperation().getScope()) {
+            //All instances in the same 
+            case GROUPED: {
+                final String id = StringUtils.join(instances.stream().map(i -> getKey(newCtx, i)).collect(Collectors.toList()), ",");
+                final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(id, executor, instances, parameters, sessionFactory, newCtx);
+                asynchronicOperationExecutor.addObserver(this);
+                for (EntityInstance instance : instances) {
+                    asynchronicOperationExecutors.put(getKey(newCtx, instance), asynchronicOperationExecutor);
+                }
+                new Thread(asynchronicOperationExecutor).start();
+                return true;
+            }
+            //One for each instance
+            case SELECTED: {
+                for (EntityInstance instance : instances) {
+                    final String key = getKey(newCtx, instance);
+                    final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
+                    asynchronicOperationExecutor.addObserver(this);
+                    asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
+                    new Thread(asynchronicOperationExecutor).start();
+                }
+                return true;
+            }
+            //just one
+            case ITEM: {
+                final String key = getKey(newCtx, instances.get(0));
+                final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
+                asynchronicOperationExecutor.addObserver(this);
+                asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
+                new Thread(asynchronicOperationExecutor).start();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected static String getKey(final JPMContext newCtx, EntityInstance instance) {
+        return newCtx.getContextualEntity().toString() + "#" + instance.getId();
+    }
+
     public JPMService getService() {
         return service;
     }
@@ -208,5 +276,27 @@ public class PresentationManager {
 
     public void setMaxLoginAttemps(Integer maxLoginAttemps) {
         this.maxLoginAttemps = maxLoginAttemps;
+    }
+
+    public synchronized AsynchronicOperationExecutor getAsynchronicOperationExecutor(String id) {
+        return asynchronicOperationExecutors.get(id);
+    }
+
+    @Override
+    public synchronized void update(Observable o, Object arg) {
+        if (o instanceof AsynchronicOperationExecutor) {
+            final Boolean ended = (Boolean) arg;
+            if (ended) {
+                final AsynchronicOperationExecutor t = (AsynchronicOperationExecutor) o;
+                if (t.getId().contains(",")) {
+                    for (String id : t.getId().split(",")) {
+                        asynchronicOperationExecutors.remove(id);
+                    }
+                } else {
+                    asynchronicOperationExecutors.remove(t.getId());
+                }
+            } else {
+            }
+        }
     }
 }

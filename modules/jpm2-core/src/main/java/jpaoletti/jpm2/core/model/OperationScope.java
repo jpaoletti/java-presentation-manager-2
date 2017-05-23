@@ -2,12 +2,15 @@ package jpaoletti.jpm2.core.model;
 
 /**
  * Operation scopes
- * 
+ *
  * @author jpaoletti
  */
 public enum OperationScope {
 
-    GENERAL("general"), ITEM("item"), SELECTED("selected");
+    GENERAL("general"),
+    ITEM("item"),
+    SELECTED("selected"), // a group of selected instances executed individually
+    GROUPED("grouped"); //a group of selected instances executed together
     private String name;
 
     private OperationScope(String name) {

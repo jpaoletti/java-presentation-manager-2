@@ -28,14 +28,8 @@
         </property>
         <property name="operations" >
             <list>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="list" />
-                    <property name="scope" value="GENERAL" />
-                    <property name="navigable" value="true" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="show" />
-                </bean>
+                <ref bean="default-list-operation" />
+                <ref bean="default-show-operation" />
             </list>
         </property>
     </bean>
@@ -48,15 +42,7 @@
         <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="list" />
-                    <property name="scope" value="GENERAL" />
-                    <property name="navigable" value="true" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="show" />
-                    <property name="display" value="edit list resetPassword" />
-                </bean>
+                <ref bean="default-list-operation" />
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="add" />
                     <property name="scope" value="GENERAL" />
@@ -64,21 +50,14 @@
                         <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" />
                     </property>
                 </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="edit" />
-                    <property name="display" value="show list resetPassword" />
-                </bean>
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="resetPassword" />
                     <property name="confirm" value="true" />
                     <property name="display" value="show list" />
                 </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="delete" />
-                    <property name="confirm" value="true" />
-                    <property name="display" value="edit show list" />
-                    <property name="useFields" value="false" />
-                </bean>
+                <ref bean="default-delete-operation" />
             </list>
         </property>
         <property name="fields" >
@@ -182,29 +161,11 @@
         <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="list" />
-                    <property name="scope" value="GENERAL" />
-                    <property name="navigable" value="true" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="show" />
-                    <property name="display" value="edit list" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="add" />
-                    <property name="scope" value="GENERAL" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="edit" />
-                    <property name="display" value="show list" />
-                </bean>
-                <bean class="jpaoletti.jpm2.core.model.Operation">
-                    <property name="id" value="delete" />
-                    <property name="confirm" value="true" />
-                    <property name="display" value="edit show list" />
-                    <property name="useFields" value="false" />
-                </bean>
+                <ref bean="default-list-operation" />
+                <ref bean="default-add-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+                <ref bean="default-delete-operation" />
             </list>
         </property>
         <property name="fields" >

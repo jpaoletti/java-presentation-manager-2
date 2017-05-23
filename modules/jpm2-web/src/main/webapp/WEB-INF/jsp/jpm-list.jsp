@@ -89,54 +89,45 @@
                             <c:forEach items="${paginatedList.contents}" var="item">
                                 <tr data-id="${item.id}" class="instance-row ${item.highlight}">
                                     <th class="operation-list" style="width: ${(not compactOperations)?(fn:length(item.operations) * 30 + 25):((empty selectedOperations)?40:70)}px">
-                            <div class="btn-group nowrap">
-                                <c:if test="${not empty selectedOperations}">
-                                    <input type="checkbox" class="pull-left selectable" data-id="${item.id}" />
-                                </c:if>
-                                <c:if test="${not compactOperations}">
-                                    <c:forEach items="${item.operations}" var="o">
-                                        <a
-                                            class="btn btn-xs btn-default confirm-${o.confirm}" 
-                                            title="<spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />"
-                                            href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
-                                            <span class="glyphicon jpmicon-${o.id}"></span>
-                                        </a>
+                                        <div class="btn-group nowrap">
+                                            <c:if test="${not empty selectedOperations}">
+                                                <input type="checkbox" class="pull-left selectable" data-id="${item.id}" />
+                                            </c:if>
+                                            <c:if test="${not compactOperations}">
+                                                <c:forEach items="${item.operations}" var="o">
+                                                    <jpm:operation-link operation="${o}" clazz="btn btn-xs btn-default" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
+                                                </c:forEach>
+                                            </c:if>
+                                            <c:if test="${compactOperations}">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn  btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
+                                                        <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu">
+                                                        <c:forEach items="${item.operations}" var="o">
+                                                            <li>
+                                                                <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" />
+                                                            </li>
+                                                        </c:forEach>
+                                                    </ul>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                    </th>
+                                    <c:forEach items="${item.values}" var="v">
+                                        <td data-field="${v.key}">
+                                            <c:set var="convertedValue" value="${v.value}"/>
+                                            <c:set var="field" value="${v.key}" scope="request" />
+                                            <c:if test="${fn:startsWith(convertedValue, '@page:')}">
+                                                <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
+                                            </c:if>
+                                            <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
+                                                ${convertedValue}
+                                            </c:if>
+                                        </td>
                                     </c:forEach>
-                                </c:if>
-                                <c:if test="${compactOperations}">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn  btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
-                                            <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <c:forEach items="${item.operations}" var="o">
-                                                <li>
-                                                    <a
-                                                        class="confirm-${o.confirm}" 
-                                                        href="${cp}jpm/${contextualEntity}/${item.id}/${o.operation}">
-                                                        <span class="glyphicon jpmicon-${o.id}"></span> <spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />
-                                                    </a>
-                                                </li>
-                                            </c:forEach>
-                                        </ul>
-                                    </div>
-                                </c:if>
-                            </div>
-                            </th>
-                            <c:forEach items="${item.values}" var="v">
-                                <td data-field="${v.key}">
-                                    <c:set var="convertedValue" value="${v.value}"/>
-                                    <c:set var="field" value="${v.key}" scope="request" />
-                                    <c:if test="${fn:startsWith(convertedValue, '@page:')}">
-                                        <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
-                                    </c:if>
-                                    <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
-                                        ${convertedValue}
-                                    </c:if>
-                                </td>
+                                </tr>
                             </c:forEach>
-                            </tr>
-                        </c:forEach>
                         </tbody>
                         <c:if test="${not empty selectedOperations}">
                             <tfoot>
@@ -144,11 +135,7 @@
                                     <td colspan="100">
                                         <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="pull-left" />
                                         <c:forEach var="o" items="${selectedOperations}">
-                                            <button class="btn btn-xs btn-default selected-operation" type="button" 
-                                                    data-entity="${entity.id}" data-operation="${o.id}" data-confirm="${o.confirm}">
-                                                <i class="glyphicon jpmicon-${o.id}"></i>
-                                                <spring:message code="${o.title}" text="${o.title}" arguments="${entityName}" />
-                                            </button>
+                                            <jpm:operation-link operation="${o}" clazz="btn btn-xs btn-default selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
                                         </c:forEach>
                                     </td>
                                 </tr>
@@ -213,34 +200,35 @@
         function openSearchModal(field) {
             $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
             $("#addSearchForm [name='fieldId']").val(field);
-            $("#searchModal").modal("show").on("shown.bs.modal", function() {
+            $("#searchModal").modal("show").on("shown.bs.modal", function () {
                 $("#searchModal .modal-body").find("input").focus();
             });
         }
         var sorting = false;
-        jpmLoad(function() {
-            $(".inline-edit").each(function() {
+        jpmLoad(function () {
+            $(".inline-edit").each(function () {
                 $(this).editable({
                     url: '${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit',
                     send: "always",
                     emptytext: "-"
                 });
             });
-            $("#select_unselect_all").on("click", function() {
+            $("#select_unselect_all").on("click", function () {
                 if ($(this).is(":checked")) {
                     $(".selectable").prop("checked", true);
                 } else {
                     $(".selectable").prop("checked", false);
                 }
             });
-            $(".selected-operation").on("click", function() {
-                var instanceIds = $.map($('.selectable:checked'), function(n, i) {
+            $(".selected-operation").on("click", function (e) {
+                e.preventDefault();
+                var instanceIds = $.map($('.selectable:checked'), function (n, i) {
                     return $(n).attr("data-id");
                 }).join(',');
                 if (instanceIds !== "") {
                     var btn = $(this);
                     var confirm = btn.attr("data-confirm") === "true";
-                    var link = "${cp}jpm/" + btn.attr("data-entity") + "${entityContext}/" + instanceIds + "/" + btn.attr("data-operation");
+                    var link = $(this).attr("href").replace("@@", instanceIds);
                     if (confirm) {
                         //We simulate a link
                         var a = $("<a href='" + link + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
@@ -260,7 +248,7 @@
             //</c:if><c:if test="${not empty f.width}">
             $("td[data-field='${f.id}'], th[data-field='${f.id}']").css("width", "${f.width}");
             //</c:if></c:forEach>
-            $(document).on("keypress", function(e) {
+            $(document).on("keypress", function (e) {
                 if ($(e.target).closest("input")[0]) {
                     return;
                 }
@@ -271,12 +259,12 @@
                     $('#help-btn').popover('toggle');
                 } else
                 if (e.which === parseInt("<spring:message code='jpm.list.shortcut.sort' text='115' />")) { //sort 's'
-                    $(".sortable").each(function(i, v) {
+                    $(".sortable").each(function (i, v) {
                         var sortable = $(this);
                         var idx = sortable.attr("data-index") + ". ";
                         if (sortable.html().substring(0, idx.length) !== idx) {
                             sortable.prepend(idx);
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 sortable.html(sortable.html().substring(idx.length));
                                 sorting = false;
                             }, 3000);
@@ -290,7 +278,7 @@
                 }
 
             });
-            $("#search-dropdown").on("keypress", function(e) {
+            $("#search-dropdown").on("keypress", function (e) {
                 if (e.which > 48 && e.which <= 57) { // 1 - 9
                     openSearchModal($("#search-link-" + (e.which - 48)).attr("data-field"));
                 }

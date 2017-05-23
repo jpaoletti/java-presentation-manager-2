@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -457,7 +458,8 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         throw new OperationNotFoundException(getId(), id);
     }
 
-    public List<Operation> getOperationsFor(EntityInstance instance, String context, Operation operation, OperationScope scope) throws PMException {
+    public List<Operation> getOperationsFor(EntityInstance instance, String context, Operation operation, OperationScope... scopes) throws PMException {
+        final List<OperationScope> _scopes = Arrays.asList(scopes);
         final List<Operation> r = new ArrayList<>();
         if (operation != null) {
             //IF
@@ -468,7 +470,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
                     try {
                         op.checkAuthorization(this, getContext(context));
                         //Scope is adecuate
-                        if (scope.equals(op.getScope())) {
+                        if (_scopes.contains(op.getScope())) {
                             //Conditions are ok
                             if (op.getCondition() == null || op.getCondition().check(instance, op, operation.getId())) {
                                 //the we add the operation to list.

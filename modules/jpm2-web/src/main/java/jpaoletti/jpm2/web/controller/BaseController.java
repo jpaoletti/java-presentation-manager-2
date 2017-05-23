@@ -90,6 +90,20 @@ public class BaseController {
         }
     }
 
+    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) throws OperationNotFoundException, NotAuthorizedException {
+        final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
+        final Operation nextOp = entity.getOperation(nextOpId, getContext().getContext());
+        final EntityInstance instance = getContext().getEntityInstance();
+        final String nexOpPath = nextOp.getPathId();
+        if (OperationScope.ITEM.equals(nextOp.getScope())) {
+            return new ModelAndView(buildRedirect(entity, instanceId, nexOpPath, null));
+        } else if (instance != null && instance.getOwner() != null) {
+            return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, nexOpPath, null));
+        } else {
+            return new ModelAndView(buildRedirect(entity, null, nexOpPath, null));
+        }
+    }
+
     public HttpSession getSession() {
         return session;
     }
@@ -136,19 +150,6 @@ public class BaseController {
 
     public void setMessageSource(MessageSource messageSource) {
         this.messageSource = messageSource;
-    }
-
-    protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) throws OperationNotFoundException, NotAuthorizedException {
-        final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
-        final Operation nextOp = entity.getOperation(nextOpId, getContext().getContext());
-        final EntityInstance instance = getContext().getEntityInstance();
-        if (OperationScope.ITEM.equals(nextOp.getScope())) {
-            return new ModelAndView(buildRedirect(entity, instanceId, nextOpId, null));
-        } else if (instance != null && instance.getOwner() != null) {
-            return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, nextOp.getId(), null));
-        } else {
-            return new ModelAndView(buildRedirect(entity, null, nextOp.getId(), null));
-        }
     }
 
     protected JPMService getService() {

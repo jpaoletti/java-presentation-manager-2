@@ -47,7 +47,7 @@ public class AddController extends BaseController {
         }
         getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
-        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
+        final ModelAndView mav = new ModelAndView("op-edit");
         mav.addObject("close", close);
         return mav;
     }
@@ -74,7 +74,7 @@ public class AddController extends BaseController {
         if (iobjectOwner != null) {
             getContext().getEntityInstance().setOwner(new EntityInstanceOwner(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), iobjectOwner));
         }
-        final ModelAndView mav = new ModelAndView("jpm-" + EditController.OP_EDIT);
+        final ModelAndView mav = new ModelAndView("op-edit");
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return mav;
     }

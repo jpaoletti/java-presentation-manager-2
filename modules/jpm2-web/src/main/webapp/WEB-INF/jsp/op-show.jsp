@@ -30,13 +30,14 @@
     </jpm:jpm-body>
     <script type='text/javascript' src="${cp}static/js/bootstrap-editable.min.js?v=${jpm.appversion}" ></script>
     <script type="text/javascript">
-        jpmLoad(function() {
+        jpmLoad(function () {
             wrapToString();
             $(".inline-edit").editable({
                 url: '${cp}jpm/${contextualEntity}/${instance.id}/iledit',
                 send: "always",
                 emptytext: "-"
             });
+            asynchronicOperationProgress("${contextualEntity}#${instance.id}");
         });
     </script>
 </html>

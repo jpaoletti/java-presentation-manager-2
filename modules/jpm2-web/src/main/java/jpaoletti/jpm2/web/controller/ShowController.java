@@ -65,12 +65,6 @@ public final class ShowController extends BaseController {
         return values;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}", method = RequestMethod.GET)
-    public ModelAndView show(@PathVariable String instanceId) throws PMException {
-        initItemControllerOperation(instanceId);
-        return new ModelAndView("jpm-" + OP_SHOW);
-    }
-
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/download/{fieldId}")
     public void downloadFileConverter(HttpServletResponse response,
             @PathVariable String instanceId,
