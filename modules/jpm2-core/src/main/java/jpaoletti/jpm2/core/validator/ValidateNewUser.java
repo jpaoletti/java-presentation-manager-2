@@ -20,6 +20,9 @@ public class ValidateNewUser extends PMCoreObject implements OperationValidator 
             if (getJpm().getEntity("jpm-entity-user").getDao().get(user.getUsername()) != null) {
                 throw new ValidationException(MessageFactory.error("jpm.validator.userexists", user.getUsername()));
             }
+            if (user.getUsername().contains(" ")) {
+                throw new ValidationException(MessageFactory.error("jpm.validator.userwithspaces", user.getUsername()));
+            }
         } catch (EntityNotFoundException ex) {
             throw new ValidationException(MessageFactory.error(ex.getMessage()));
         }
