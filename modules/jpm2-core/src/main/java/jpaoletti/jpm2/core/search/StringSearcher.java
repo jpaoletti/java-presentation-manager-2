@@ -24,7 +24,7 @@ public class StringSearcher implements Searcher {
         DescribedCriterion describedCriterion;
         switch (operator) {
             case "li":
-                describedCriterion = new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.like", value), Restrictions.like(field.getProperty(), value, MatchMode.ANYWHERE));
+                describedCriterion = new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.like", value), Restrictions.ilike(field.getProperty(), value, MatchMode.ANYWHERE));
                 break;
             case "null":
                 describedCriterion = new DescribedCriterion(MessageFactory.info("jpm.searcher.stringSearcher.null"), Restrictions.isNull(field.getProperty()));
