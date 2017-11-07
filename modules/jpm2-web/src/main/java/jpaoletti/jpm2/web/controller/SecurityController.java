@@ -10,7 +10,6 @@ import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityContext;
 import jpaoletti.jpm2.core.model.EntityInstance;
-import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.security.Group;
@@ -55,7 +54,7 @@ public class SecurityController extends BaseController {
         return new ModelAndView("jpm-" + OP_RESET_PASSWORD);
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}")
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}", method = RequestMethod.GET)
     public ModelAndView profile(
             @PathVariable String instanceId,
             @RequestParam(required = false) String current,
@@ -72,6 +71,33 @@ public class SecurityController extends BaseController {
             getContext().setGlobalMessage(MessageFactory.success("jpm.changePassword.success"));
         }
         return new ModelAndView("jpm-" + OP_PROFILE);
+    }
+
+    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}", method = RequestMethod.POST)
+    @ResponseBody
+    public JPMPostResponse profilePost(
+            @PathVariable String instanceId,
+            @RequestParam(required = true) String current,
+            @RequestParam(required = true) String newpass) {
+        try {
+            final Entity entity = getContext().getEntity();
+            final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId);
+            final UserDetails user = (UserDetails) iobject.getObject();
+            if (!getUserDetails().getUsername().equals(user.getUsername())) {
+                throw new NotAuthorizedException();
+            }
+            getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
+            getSecurityService().changePassword(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId, current, newpass);
+            return new JPMPostResponse(true, "/index", MessageFactory.success("jpm.changePassword.success"));
+        } catch (NotAuthorizedException e) {
+            getContext().getEntityMessages().add(MessageFactory.error("jpm.access.denied"));
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (PMException e) {
+            if (e.getMsg() != null) {
+                getContext().getEntityMessages().add(e.getMsg());
+            }
+            return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        }
     }
 
     @RequestMapping(value = "/jpm/security/i18n.js")

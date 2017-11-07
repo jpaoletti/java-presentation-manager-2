@@ -19,12 +19,14 @@
                 </li>
             </c:if>
         </c:if>
-        <li>
-            <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show.exec">
-                <span class="glyphicon jpmicon-show"></span> <spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> 
-                ${instance.owner.iobject.object}
-            </a>
-        </li>
+        <security:authorize access="hasRole('jpm.auth.operation.${owner.id}.show')">
+            <li>
+                <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show.exec">
+                    <span class="glyphicon jpmicon-show"></span> <spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> 
+                    ${instance.owner.iobject.object}
+                </a>
+            </li>
+        </security:authorize>
     </c:if>
     <c:if test="${operation.id ne 'list' and entity.containingListOperation}">
         <li>

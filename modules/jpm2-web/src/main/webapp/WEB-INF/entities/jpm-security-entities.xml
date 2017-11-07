@@ -39,7 +39,6 @@
         <property name="dao" ref="jpm-dao-user" />
         <property name="home" value="security" />
         <property name="pageSize" value="500" />
-        <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
                 <ref bean="default-list-operation" />
@@ -158,7 +157,6 @@
         <property name="clazz" value="jpaoletti.jpm2.core.security.Group" />
         <property name="dao" ref="jpm-dao-group" />
         <property name="home" value="security" />
-        <property name="auth" value="ROLE_USERADMIN" />
         <property name="operations" >
             <list>
                 <ref bean="default-list-operation" />

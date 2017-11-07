@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import jpaoletti.jpm2.core.JPMContext;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -26,7 +26,7 @@ public class AsynchronicOperationExecutor extends Observable implements Runnable
     private final JPMContext ctx;
     private final Progress progress = new Progress();
 
-    public AsynchronicOperationExecutor(String id, OperationExecutor executor, List<EntityInstance> instances, Map parameters, SessionFactory sessionFactory, JPMContext ctx) {
+    public AsynchronicOperationExecutor(String id, OperationExecutor executor, List<EntityInstance> instances, Map parameters, SessionFactory sessionFactory, JPMContext ctx) throws PMException {
         this.id = id;
         this.executor = executor;
         this.instances = instances;
@@ -98,6 +98,26 @@ public class AsynchronicOperationExecutor extends Observable implements Runnable
 
     public Progress getProgress() {
         return progress;
+    }
+
+    @Override
+    public void inc() {
+        getProgress().inc();
+    }
+
+    @Override
+    public void setMaxProgress(Long maxProgress) {
+        progress.setMaxProgress(maxProgress);
+    }
+
+    @Override
+    public void setCurrentProgress(Long currentProgress) {
+        progress.setCurrentProgress(currentProgress);
+    }
+
+    @Override
+    public void setStatus(String status) {
+        progress.setStatus(status);
     }
 
 }

@@ -10,7 +10,7 @@ import jpaoletti.jpm2.core.PMException;
 public interface FieldConfigCondition {
 
     /**
-     * object is posible to be null.
+     * Instance is posible to be null in general operations
      *
      * @param instance
      * @param operation

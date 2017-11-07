@@ -32,7 +32,7 @@ public class OperationExecutorLongTest implements OperationExecutor {
     }
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map<String, String[]> parameters, Progress progress) throws PMException {
+    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
         progress.setCurrentProgress(1L);
         progress.setMaxProgress(100L);
         for (int i = 1; i <= 100; i++) {
@@ -70,6 +70,11 @@ public class OperationExecutorLongTest implements OperationExecutor {
 
     public void setJpm(PresentationManager jpm) {
         this.jpm = jpm;
+    }
+
+    @Override
+    public Map preExecute(JPMContext ctx, List<EntityInstance> instances, Map parameters) throws PMException {
+        return parameters;
     }
 
 }

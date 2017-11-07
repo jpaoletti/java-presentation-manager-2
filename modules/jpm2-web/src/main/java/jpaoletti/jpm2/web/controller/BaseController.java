@@ -62,12 +62,13 @@ public class BaseController {
     }
 
     public SessionEntityData getSessionEntityData(Entity entity) throws PMException {
-        final Object sed = getSession().getAttribute(entity.getId());
+        final String key = "jpm_sed_" + entity.getId();
+        final Object sed = getSession().getAttribute(key);
         if (sed == null) {
             final SessionEntityData sessionEntityData = new SessionEntityData(entity, getContext().getEntityContext());
-            getSession().setAttribute(entity.getId(), sessionEntityData);
+            getSession().setAttribute(key, sessionEntityData);
         }
-        return (SessionEntityData) getSession().getAttribute(entity.getId());
+        return (SessionEntityData) getSession().getAttribute(key);
     }
 
     public void setCurrentHome(String newHome) {
@@ -101,6 +102,19 @@ public class BaseController {
             return new ModelAndView(buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, nexOpPath, null));
         } else {
             return new ModelAndView(buildRedirect(entity, null, nexOpPath, null));
+        }
+    }
+
+    protected ModelAndView next(Entity entity, Operation operation, Entity owner, String ownerId, String defaultOp) throws OperationNotFoundException, NotAuthorizedException {
+        final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
+        final Operation nextOp = entity.getOperation(nextOpId, getContext().getContext());
+        final EntityInstance instance = getContext().getEntityInstance();
+        final String nexOpPath = nextOp.getPathId();
+        switch (nextOp.getScope()) {
+            case ITEM:
+                return new ModelAndView(buildRedirect(owner, ownerId, entity, instance == null ? null : instance.getId(), nexOpPath, null));
+            default:
+                return new ModelAndView(buildRedirect(owner, ownerId, entity, null, nexOpPath, null));
         }
     }
 

@@ -73,6 +73,11 @@ public class Operation extends PMCoreObject {
         this.synchronic = true;
     }
 
+    public Operation(String opId) {
+        this();
+        this.operation = opId;
+    }
+
     public String getPathId() {
         return getId() + (getExecutor() == null ? "" : ".exec");
     }

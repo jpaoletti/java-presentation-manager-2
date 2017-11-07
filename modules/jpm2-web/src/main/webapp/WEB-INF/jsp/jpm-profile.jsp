@@ -62,7 +62,7 @@
                                             </h3>
                                         </div>
                                         <div class="panel-body">
-                                            <form class="form-horizontal" role="form" action="" method="POST">
+                                            <form class="form-horizontal" role="form" action="" id="jpmForm" method="POST">
                                                 <div class="control-group">
                                                     <label class="control-label"><spring:message text="current Password" code="jpm.profile.chpass.current" /></label>
                                                     <div class="controls">
@@ -87,8 +87,10 @@
             </div>
         </div>
         <script type="text/javascript" src="${cp}static/js/pwdwidget.js"></script>
+        <script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
         <script type="text/javascript">
             jpmLoad(function () {
+                buildAjaxJpmForm();
                 var pwdwidget = new PasswordWidget('thepwddivnewpass', 'newpass');
                 pwdwidget.txtShow = "<spring:message code='jpm.converter.password_converter.show' />";
                 pwdwidget.txtMask = "<spring:message code='jpm.converter.password_converter.mask' />";

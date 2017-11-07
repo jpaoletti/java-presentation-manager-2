@@ -169,7 +169,7 @@ var initPage = function () {
         BootstrapDialog.DEFAULT_TEXTS['CANCEL'] = messages["jpm.modal.confirm.cancel"];
         //Clean empty help-blocks
         $(".help-block:empty").remove();
-        $(".panel-body:not(:has(div))").parent(".panel").parent().remove();
+        $(".panel-body:not(:has(*))").parent(".panel").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
         $(".sortable").click(function () {
             window.location = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field");
@@ -470,6 +470,18 @@ function asynchronicOperationProgress(id) {
                     $(id + "_status").text((Math.round(r.percent * 100) / 100) + "% (" + r.status + ")");
                 });
                 stompClient.subscribe('/asynchronicOperationExecutor/done/' + id, function (s) {
+                    var status = JSON.parse(s.body).status;
+                    if (status !== '') {
+                        BootstrapDialog.show({
+                            title: "",
+                            message: status,
+                            type: BootstrapDialog.TYPE_SUCCESS,
+                            buttons: []
+                        });
+                        setTimeout(function () {
+                            document.location.reload();
+                        }, 2000);
+                    }
                     $("#asynchronicProgress").hide();
                     $(".asynchronic").removeClass('disabled');
                 });

@@ -16,7 +16,18 @@ public interface OperationExecutor {
 
     public Map<String, Object> prepare(List<EntityInstance> instances) throws PMException;
 
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map<String, String[]> parameters, Progress progress) throws PMException;
+    /**
+     * Preprocess de parameter map in case we need synchronic processing
+     *
+     * @param ctx
+     * @param instances
+     * @param parameters
+     * @return
+     * @throws PMException
+     */
+    public Map preExecute(JPMContext ctx, List<EntityInstance> instances, Map parameters) throws PMException;
+
+    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException;
 
     public String getDefaultNextOperationId();
 

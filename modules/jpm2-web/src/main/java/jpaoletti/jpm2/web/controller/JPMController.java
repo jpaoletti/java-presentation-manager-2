@@ -6,7 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +45,18 @@ public class JPMController extends BaseController {
         final UploadFileResults res = new UploadFileResults();
         res.getFiles().add(new UploadFileResult(tmpFileName, file.getContentType(), tmpFile.length()));
         return res;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/static/img/{entity}-{field}-{id}.png", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] showImageConverter(@PathVariable String entity, @PathVariable String field, @PathVariable String id, HttpServletResponse response) {
+        try {
+            final Entity e = getJpm().getEntity(entity);
+            final Field f = e.getFieldById(field, "");
+            return (byte[]) JPMUtils.get(e.getDao().get(id), f.getProperty());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static class UploadFileResult {

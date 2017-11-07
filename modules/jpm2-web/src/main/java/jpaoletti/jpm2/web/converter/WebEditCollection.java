@@ -21,6 +21,8 @@ public class WebEditCollection extends WebEditObject {
     @Autowired
     private HttpServletRequest request;
 
+    private boolean allowDuplicates = false;
+
     public WebEditCollection() {
         super();
     }
@@ -34,6 +36,7 @@ public class WebEditCollection extends WebEditObject {
                 + ((getFilter() != null) ? "&filter=" + getFilter().getId() : "")
                 + "&textField=" + getTextField()
                 + "&pageSize=" + getPageSize()
+                + "&allowDuplicates=" + isAllowDuplicates()
                 + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
             request.removeAttribute("values_" + field.getId());
@@ -71,5 +74,13 @@ public class WebEditCollection extends WebEditObject {
                 return null;
             }
         }
+    }
+
+    public boolean isAllowDuplicates() {
+        return allowDuplicates;
+    }
+
+    public void setAllowDuplicates(boolean allowDuplicates) {
+        this.allowDuplicates = allowDuplicates;
     }
 }

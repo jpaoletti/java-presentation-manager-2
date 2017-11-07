@@ -82,7 +82,7 @@ public class FieldConfig extends PMCoreObject {
     boolean match(EntityInstance instance, Operation operation) throws PMException {
         if (operation != null) {
             final boolean prevalidation = includes(operation.getId()) && (getAuth() == null || getAuthorizationService().userHasRole(getAuth()));
-            if (prevalidation && getCondition() != null && instance != null) {
+            if (prevalidation && getCondition() != null) {
                 return getCondition().check(instance, operation);
             }
             return prevalidation;

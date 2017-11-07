@@ -28,7 +28,7 @@ public class OperationExecutorEdit implements OperationExecutor {
     }
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map<String, String[]> parameters, Progress progress) throws PMException {
+    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
         for (EntityInstance instance : instances) {
             getJpm().getService().update(
                     ctx.getEntity(),
@@ -48,6 +48,11 @@ public class OperationExecutorEdit implements OperationExecutor {
     @Override
     public boolean immediateExecute() {
         return false;
+    }
+
+    @Override
+    public Map preExecute(JPMContext ctx, List<EntityInstance> instances, Map parameters) throws PMException {
+        return parameters;
     }
 
     public PresentationManager getJpm() {

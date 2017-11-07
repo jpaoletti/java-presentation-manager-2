@@ -14,13 +14,18 @@ public class Progress extends Observable implements Progresable {
     private String error; //TODO
     private Double lastPercent = 0d;
 
+    @Override
     public void inc() {
         currentProgress++;
         if (getPercent() > lastPercent) {
             lastPercent = getPercent();
-            setChanged();
-            notifyObservers();
+            forceNotify();
         }
+    }
+
+    public void forceNotify() {
+        setChanged();
+        notifyObservers();
     }
 
     @Override
@@ -37,10 +42,10 @@ public class Progress extends Observable implements Progresable {
         return maxProgress;
     }
 
+    @Override
     public void setMaxProgress(Long maxProgress) {
         this.maxProgress = maxProgress;
-        setChanged();
-        notifyObservers();
+        forceNotify();
     }
 
     @Override
@@ -48,11 +53,11 @@ public class Progress extends Observable implements Progresable {
         return currentProgress;
     }
 
+    @Override
     public void setCurrentProgress(Long currentProgress) {
         this.currentProgress = currentProgress;
         this.lastPercent = 0d;
-        setChanged();
-        notifyObservers();
+        forceNotify();
     }
 
     @Override
@@ -60,6 +65,7 @@ public class Progress extends Observable implements Progresable {
         return status;
     }
 
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }

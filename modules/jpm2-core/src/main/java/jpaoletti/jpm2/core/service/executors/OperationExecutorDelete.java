@@ -28,7 +28,7 @@ public class OperationExecutorDelete implements OperationExecutor {
     }
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map<String, String[]> parameters, Progress progress) throws PMException {
+    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
         progress.setCurrentProgress(1L);
         progress.setMaxProgress((long) instances.size());
         for (EntityInstance instance : instances) {
@@ -45,6 +45,11 @@ public class OperationExecutorDelete implements OperationExecutor {
     @Override
     public boolean immediateExecute() {
         return true;
+    }
+
+    @Override
+    public Map preExecute(JPMContext ctx, List<EntityInstance> instances, Map parameters) throws PMException {
+        return parameters;
     }
 
     public PresentationManager getJpm() {

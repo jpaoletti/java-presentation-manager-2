@@ -19,6 +19,7 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class EntityInstance {
 
+    private ContextualEntity contextualEntity;
     private IdentifiedObject iobject;
     private EntityInstanceOwner owner;
     private List<Operation> operations; //Individual operations
@@ -39,6 +40,7 @@ public class EntityInstance {
         this.values = new LinkedHashMap<>();
         this.fields = fields;
         this.highlight = "";
+        contextualEntity = ctx.getContextualEntity();
         final Object object = (iobject != null) ? iobject.getObject() : null;
         final Entity entity = ctx.getEntity();
         if (object != null) {
@@ -77,7 +79,6 @@ public class EntityInstance {
      *
      * @param contextualEntity
      *
-     * @param entity
      * @param iobject
      * @param ctx
      * @throws jpaoletti.jpm2.core.PMException
@@ -89,6 +90,7 @@ public class EntityInstance {
         values = new LinkedHashMap<>();
         fields = new ArrayList<>();
         operations = new ArrayList<>();
+        this.contextualEntity = contextualEntity;
         final Entity entity = contextualEntity.getEntity();
         for (Field field : entity.getOrderedFields(contextualEntity.getContext())) {
             if (field.shouldDisplay(ctx.getOperation().getId())) {
@@ -141,8 +143,11 @@ public class EntityInstance {
     }
 
     public String getOwnerId() throws NotAuthorizedException {
-        if (getOwner().getIobject() == null) {
+        if (getOwner().getIobject() == null && (contextualEntity == null || contextualEntity.getOwner() == null || !contextualEntity.getOwner().isOptional())) {
             throw new NotAuthorizedException();
+        }
+        if (getOwner().getIobject() == null) {
+            return "";
         }
         return getOwner().getIobject().getId();
     }

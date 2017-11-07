@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ import org.springframework.context.MessageSource;
  *
  * @author jpaoletti
  */
-public class PresentationManager implements Observer {
+public class PresentationManager implements Observer, Serializable {
 
     public static final String CONTEXT_SPLIT_STR = "[!]";
     public static final String CONTEXT_SEPARATOR = "!";
@@ -198,7 +199,7 @@ public class PresentationManager implements Observer {
         }
     }
 
-    public synchronized boolean registerAsynchronicExecutor(JPMContext ctx, OperationExecutor executor, List<EntityInstance> instances, Map parameters) {
+    public synchronized boolean registerAsynchronicExecutor(JPMContext ctx, OperationExecutor executor, List<EntityInstance> instances, Map parameters) throws PMException {
         final JPMContext newCtx = new JPMContextImpl(ctx.getEntity(), ctx.getEntityContext(), ctx.getOperation());
         for (EntityInstance instance : instances) {
             if (asynchronicOperationExecutors.containsKey(getKey(newCtx, instance))) {

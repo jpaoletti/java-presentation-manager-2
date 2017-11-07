@@ -90,7 +90,7 @@ public class ListController extends BaseController {
             if (!textField.contains("{")) {
                 final Field field = entity.getFieldById(textField, getContext().getEntityContext());
                 if (field.getSearcher() == null) {
-                    restrictions.add(Restrictions.like(field.getProperty(), query, MatchMode.ANYWHERE));
+                    restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
                 } else {
                     try {
                         final DescribedCriterion dc = field.getSearcher().build(field, searcherParameters);
@@ -116,7 +116,7 @@ public class ListController extends BaseController {
                             cl.withAlias(alias, alias);
                         }
                         if (field2.getSearcher() == null) {
-                            disjunction.add(Restrictions.like(property, query, MatchMode.ANYWHERE));
+                            disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
                         } else {
                             try {
                                 final DescribedCriterion dc = field2.getSearcher().build(field2, searcherParameters);
