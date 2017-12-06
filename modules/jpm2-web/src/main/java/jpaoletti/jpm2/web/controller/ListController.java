@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
@@ -22,8 +23,10 @@ import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.RelatedListFilter;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.util.JPMUtils;
+import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
@@ -328,4 +331,27 @@ public class ListController extends BaseController {
     protected Operation getOperation(Entity entity) throws OperationNotFoundException, NotAuthorizedException {
         return entity.getOperation(OP_LIST, null); //mmmh
     }
+
+    @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:toExcel}"})
+    public void xlsGenerico(@PathVariable String owner, @PathVariable String ownerId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        final Entity entity = getContext().getEntity();
+        if (!entity.isWeak(getContext().getEntityContext())) {
+            throw new NotAuthorizedException();
+        }
+        final ContextualEntity cowner = getJpm().getContextualEntity(owner);
+        final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), cowner, ownerId);
+        response.setContentType("application/vnd.ms-excel");
+        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getTitle() + ".xls");
+        response.getOutputStream().write(xlsTobytes(wb));
+    }
+
+    @RequestMapping(value = {"/jpm/{entity}/{operationId:toExcel}"})
+    public void xlsGenerico(HttpServletResponse response) throws Exception {
+        final Entity entity = getContext().getEntity();
+        final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), null, null);
+        response.setContentType("application/vnd.ms-excel");
+        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getTitle() + ".xls");
+        response.getOutputStream().write(xlsTobytes(wb));
+    }
+
 }

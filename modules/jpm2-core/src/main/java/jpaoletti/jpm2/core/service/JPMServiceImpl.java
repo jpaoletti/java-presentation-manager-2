@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.core.service;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
@@ -9,6 +11,7 @@ import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.EntityInstanceList;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.ListSort;
@@ -16,9 +19,17 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.util.JPMUtils;
+import static jpaoletti.jpm2.util.XlsUtils.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -112,6 +123,57 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             entity.getDao(context).detach(object);
             throw e;
         }
+    }
+
+    @Override
+    public Workbook toExcel(Entity entity, SessionEntityData sed, ContextualEntity owner, String ownerId) throws PMException {
+        final Workbook wb = new HSSFWorkbook();
+        final Integer page = sed.getPage();
+        final Integer pageSize = sed.getPageSize();
+        final PaginatedList paginatedList = getJpm().getService().getPaginatedList(getContext().getContextualEntity(), getContext().getOperation(), sed, 1, Integer.MAX_VALUE, owner, ownerId);
+        sed.setPageSize(pageSize);
+        sed.setPage(page);
+        final EntityInstanceList list = paginatedList.getContents();
+        if (list == null || list.isEmpty()) {
+            throw new PMException("jpm.toExcel.noData");
+        }
+        final Sheet sheet = xlsNewPage(wb, new XlsFormatoTitulo(
+                getMessage("jpm.toExcel.pageName", null, LocaleContextHolder.getLocale()),
+                getMessage("jpm.toExcel.pageTitle", entity.getTitle().toUpperCase(), LocaleContextHolder.getLocale())
+        ));
+        sheet.createFreezePane(0, 3);
+        final CellStyle bold = xlsBoldStyle(wb);
+        final CellStyle xlsDateStyle = xlsDateStyle(wb);
+        final CellStyle xlsAmountStyle = xlsAmountStyle(wb);
+        final Row headerRow = sheet.createRow(2);
+        int i = 0;
+        for (Field field : paginatedList.getFields()) {
+            final Cell cell = headerRow.createCell(i++);
+            cell.setCellStyle(bold);
+            cell.setCellValue(replaceHtmlCodeAccents(field.getTitle(entity)));
+        }
+        int r = 3;
+        for (EntityInstance entityInstance : list) {
+            final Row row = sheet.createRow(r++);
+            i = 0;
+            for (Map.Entry<String, Object> v : entityInstance.getValues().entrySet()) {
+                final Object convertedValue = v.getValue();
+                if (convertedValue == null) {
+                    row.createCell(i++).setCellValue("");
+                } else if (convertedValue instanceof String) {
+                    row.createCell(i++).setCellValue((String) convertedValue);
+                } else if (convertedValue instanceof Date) {
+                    xlsCellWithStyle(row.createCell(i++), xlsDateStyle).setCellValue((Date) convertedValue);
+                } else if (convertedValue instanceof Boolean) {
+                    row.createCell(i++).setCellValue((Boolean) convertedValue);
+                } else if (convertedValue instanceof BigDecimal) {
+                    xlsCellWithStyle(row.createCell(i++), xlsAmountStyle).setCellValue(((BigDecimal) convertedValue).doubleValue());
+                } else {
+                    row.createCell(i++).setCellValue(convertedValue.toString());
+                }
+            }
+        }
+        return xlsStrechColumns(wb);
     }
 
     @Override

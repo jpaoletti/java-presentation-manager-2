@@ -52,6 +52,12 @@
     <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
         <property name="format" value="dd/MM/yyyy HH:mm:ss"/>
     </bean>
+    <bean id="xls-config" class="jpaoletti.jpm2.core.model.FieldConfig">
+        <property name="operations" value="toExcel"/>
+        <property name="converter">
+            <ref bean="plainConverter" />
+        </property>
+    </bean>
 
     <!-- DEFAULT CONFIG LISTS-->
     <util:list id="default-id-field-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
@@ -59,6 +65,7 @@
             <property name="operations" value="list show edit"/>
             <property name="converter" ref="jpm-converter-show"/>
         </bean>
+        <ref bean="xls-config" />
     </util:list>
 
     <util:list id="default-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
@@ -70,6 +77,7 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-string"/>
         </bean>
+        <ref bean="xls-config" />
     </util:list>
     <util:list id="default-long-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -80,6 +88,8 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-long"/>
         </bean>
+        <ref bean="xls-config" />
+
     </util:list>
     <util:list id="editable-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -90,6 +100,8 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-string"/>
         </bean>
+        <ref bean="xls-config" />
+
     </util:list>
 
     <util:list id="default-bigstring-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
@@ -112,6 +124,8 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-int"/>
         </bean>
+        <ref bean="xls-config" />
+
     </util:list>
 
     <util:list id="default-date-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
@@ -123,6 +137,8 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-date"/>
         </bean>
+        <ref bean="xls-config" />
+
     </util:list>
 
     <util:list id="default-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
@@ -134,6 +150,8 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
+        <ref bean="xls-config" />
+
     </util:list>
     <util:list id="inline-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -146,6 +164,8 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
+        <ref bean="xls-config" />
+
     </util:list>
     <util:list id="default-enum-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -158,6 +178,7 @@
                 <bean class="jpaoletti.jpm2.web.converter.EnumConverter" />
             </property>
         </bean>
+        <ref bean="xls-config" />
     </util:list>
     <import resource="jpm-default-beans-operations.xml" />
 </beans>

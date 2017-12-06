@@ -96,7 +96,7 @@ public class JPMServiceBase {
 
     protected void addFieldMsg(Map<String, List<Message>> messages, Field field, Message msg) {
         if (!messages.containsKey(field.getId())) {
-            messages.put(field.getId(), new ArrayList<Message>());
+            messages.put(field.getId(), new ArrayList<>());
         }
         messages.get(field.getId()).add(msg);
     }

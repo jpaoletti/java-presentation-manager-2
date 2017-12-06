@@ -61,4 +61,9 @@
         <property name="id" value="itemAudit" />
         <property name="display" value="show list" />
     </bean>
+    <bean id="default-toExcel-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="toExcel" />
+        <property name="display" value="show list" />
+        <property name="scope" value="GENERAL" />
+    </bean>
 </beans>
