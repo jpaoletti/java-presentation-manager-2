@@ -52,6 +52,7 @@
     <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
         <property name="format" value="dd/MM/yyyy HH:mm:ss"/>
     </bean>
+    <bean id="jpm-converter-show-html" class="jpaoletti.jpm2.web.converter.ShowHtml" />
     <bean id="xls-config" class="jpaoletti.jpm2.core.model.FieldConfig">
         <property name="operations" value="toExcel"/>
         <property name="converter">
@@ -179,6 +180,12 @@
             </property>
         </bean>
         <ref bean="xls-config" />
+    </util:list>
+    <util:list id="default-html-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="show"/>
+            <property name="converter" ref="jpm-converter-show-html" />
+        </bean>
     </util:list>
     <import resource="jpm-default-beans-operations.xml" />
 </beans>
