@@ -14,6 +14,8 @@
     href="${cp}jpm/${contextualEntity}/${not empty instanceId?instanceId.concat('/'):''}${operation.pathId}">
     <span class="glyphicon jpmicon-${operation.id}"></span>
     <c:if test="${not empty title and title}">
-        <spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />
+        <span class="hidden-sm hidden-xs">
+            <spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />
+        </span>
     </c:if>
 </a>

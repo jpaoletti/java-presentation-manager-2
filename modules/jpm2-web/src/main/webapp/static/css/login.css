@@ -1,7 +1,7 @@
 body, #footer {
-	background-color: #444444;
-	background-image: -webkit-gradient(linear, 0 0%, 0 100%, from(#555555), to(#111111));
-	background-image: -webkit-linear-gradient(top, #555555 0%, #111111 100%);
+    background-color: #444444;
+    background-image: -webkit-gradient(linear, 0 0%, 0 100%, from(#555555), to(#111111));
+    background-image: -webkit-linear-gradient(top, #555555 0%, #111111 100%);
     background-image: -moz-linear-gradient(top, #555555 0%, #111111 100%);
     background-image: -ms-linear-gradient(top, #555555 0%, #111111 100%);
     background-image: -o-linear-gradient(top, #555555 0%, #111111 100%);
@@ -25,7 +25,7 @@ body, #footer {
 }
 #loginbox {
     height: 230px;
-	background: #ffffff;
+    background: #ffffff;
     box-shadow: 0 0 4px #000000;
     border-radius: 7px;
     overflow: hidden !important;
@@ -34,11 +34,11 @@ body, #footer {
 }
 
 #loginbox form {
-	width:100%;
-	height:100%;
-	position:absolute;
-	top:0;
-	left:0;
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0;
+    left:0;
 }
 #loginbox p {
     margin-top: 15px;
@@ -46,23 +46,23 @@ body, #footer {
 }
 
 #loginbox .form-actions {
-	padding: 14px 20px 15px;
+    padding: 14px 20px 15px;
     border-radius: 0 0 30px 30px;
 }
 #loginbox .form-actions .pull-left {
-	margin-top:-1px;
+    margin-top:-1px;
     text-align: left;
 }
 #loginbox .form-actions .pull-right {
     margin-top: 2px;
 }
 #loginbox form#loginform {
-	z-index: 200;
+    z-index: 200;
 }
 
 #loginbox form#recoverform {
-	z-index: 100;
-	opacity: 0;
+    z-index: 100;
+    opacity: 0;
     display:none;
 }
 #loginbox form#registerform {
@@ -77,7 +77,7 @@ body, #footer {
 }*/
 
 #loginbox form#recoverform .control-group {
-	margin: 23px 0;
+    margin: 23px 0;
 }
 
 .input-group {

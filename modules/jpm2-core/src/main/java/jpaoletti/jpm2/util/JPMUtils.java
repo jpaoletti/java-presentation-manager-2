@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.util;
 
+import java.util.Map;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -102,12 +103,17 @@ public class JPMUtils implements ApplicationContextAware {
      * @param obj The object
      * @param propertyName The property
      * @return The value of the property of the object
+     * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      *
      */
     public static Object get(Object obj, String propertyName) throws ConfigurationException {
         try {
             if (obj != null && propertyName != null) {
-                return PropertyUtils.getNestedProperty(obj, propertyName);
+                if (obj instanceof Map) {
+                    return ((Map) obj).get(propertyName);
+                } else {
+                    return PropertyUtils.getNestedProperty(obj, propertyName);
+                }
             }
         } catch (NullPointerException | NestedNullException e) {
         } catch (NoSuchMethodException e) {

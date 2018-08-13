@@ -145,7 +145,7 @@ public class ListController extends BaseController {
         }
         final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
         r.setMore(list.size() == ps);
-        r.setResults(new ArrayList<ObjectConverterDataItem>());
+        r.setResults(new ArrayList<>());
         for (Object object : list) {
             getObjectDisplay(r, entity, object, useToString, textField);
         }
@@ -333,7 +333,7 @@ public class ListController extends BaseController {
     }
 
     @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:toExcel}"})
-    public void xlsGenerico(@PathVariable String owner, @PathVariable String ownerId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void toExcel(@PathVariable String owner, @PathVariable String ownerId, HttpServletRequest request, HttpServletResponse response) throws Exception {
         final Entity entity = getContext().getEntity();
         if (!entity.isWeak(getContext().getEntityContext())) {
             throw new NotAuthorizedException();
@@ -346,7 +346,7 @@ public class ListController extends BaseController {
     }
 
     @RequestMapping(value = {"/jpm/{entity}/{operationId:toExcel}"})
-    public void xlsGenerico(HttpServletResponse response) throws Exception {
+    public void toExcel(HttpServletResponse response) throws Exception {
         final Entity entity = getContext().getEntity();
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), null, null);
         response.setContentType("application/vnd.ms-excel");

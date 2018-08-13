@@ -48,7 +48,7 @@ public class EntityInstance {
                 final Object ownerobject = JPMUtils.get(object, entity.getOwner(ctx.getEntityContext()).getLocalProperty());
                 configureOwner(entity, ctx.getEntityContext(), ownerobject);
             }
-            configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
+            //configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
         }
         configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
     }

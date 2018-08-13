@@ -66,7 +66,7 @@ public class Group implements Serializable {
         if (getId() == null) {
             return "...";
         } else {
-            return getName();
+            return getName() == null ? "" : getName();
         }
     }
 

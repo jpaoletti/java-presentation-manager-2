@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAO;
@@ -617,5 +618,9 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public String getAuthKey(EntityContext context) {
         return "jpm.auth.entity." + getId() + (context == null ? "" : "." + context.getId());
+    }
+
+    public List<Field> getFieldsByOperation(String id) {
+        return getFields().stream().filter(f -> f.shouldDisplay(id)).collect(Collectors.toList());
     }
 }

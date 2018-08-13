@@ -855,9 +855,9 @@
     background-position: 0 -120px;
   }
   .jstree-default-responsive .jstree-anchor {
-    font-weight: bold;
+    /*font-weight: bold;*/
     font-size: 1.1em;
-    text-shadow: 1px 1px white;
+    /*text-shadow: 1px 1px white;*/
   }
   .jstree-default-responsive > .jstree-striped {
     background: transparent;

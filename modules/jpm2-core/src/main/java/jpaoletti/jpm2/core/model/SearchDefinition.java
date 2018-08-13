@@ -18,6 +18,10 @@ public class SearchDefinition {
 
     /**
      * Single param constructor
+     *
+     * @param fieldId
+     * @param paramName
+     * @param paramValue
      */
     public SearchDefinition(String fieldId, String paramName, String paramValue) {
         this.fieldId = fieldId;
