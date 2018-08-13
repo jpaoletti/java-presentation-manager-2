@@ -8,6 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.AsynchronicOperationExecutor;
@@ -41,6 +42,7 @@ public class ExecutorsController extends BaseController implements Observer {
     public static final String HTTP_SERVLET_REQUEST = "HTTP_SERVLET_REQUEST";
     public static final String OWNER_ENTITY = "OWNER_ENTITY";
     public static final String OWNER_ID = "OWNER_ID";
+    public static final String LAST_ACCESSED = "LAST_ACCESSED_";
 
     @Autowired
     private SimpMessagingTemplate template;
@@ -143,10 +145,17 @@ public class ExecutorsController extends BaseController implements Observer {
             initItemControllerOperation(instanceId);
             instances.add(getContext().getEntityInstance());
         }
+        setLastAccessed(request, getContext(), instanceIds);
         final Map<String, Object> preparation = getExecutor().prepare(instances);
         if (getExecutor().immediateExecute()) {
-            executorsCommit(request, instanceIds, false);
-            getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+            final JPMPostResponse response = executorsCommit(request, instanceIds, false);
+            if (response.isOk()) {
+                getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+            } else if (response.getMessages().isEmpty()) {
+                getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".error"));
+            } else {
+                getContext().setGlobalMessage(response.getMessages().get(0));
+            }
             return next(getContext().getEntity(), getContext().getOperation(), StringUtils.join(instanceIds, ","), getExecutor().getDefaultNextOperationId());
         } else {
             final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
@@ -169,6 +178,7 @@ public class ExecutorsController extends BaseController implements Observer {
                 initItemControllerOperation(instanceId);
                 instances.add(getContext().getEntityInstance());
             }
+            setLastAccessed(request, getContext(), instanceIds);
             final Map parameterMap = new LinkedHashMap(request.getParameterMap());
             parameterMap.put(HTTP_SERVLET_REQUEST, request);
             final Map parameters = getExecutor().preExecute(getContext(), instances, parameterMap);
@@ -204,6 +214,14 @@ public class ExecutorsController extends BaseController implements Observer {
             getContext().getEntityMessages().add(MessageFactory.error(e.getMessage()));
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
+    }
+
+    protected void setLastAccessed(HttpServletRequest request, JPMContext ctx, List<String> instanceIds) {
+        request.getSession().setAttribute(LAST_ACCESSED + ctx.getContextualEntity().toString(), StringUtils.join(instanceIds, "|"));
+    }
+
+    public static String getLastAccessed(HttpServletRequest request, String contextualEntity) {
+        return (String) request.getSession().getAttribute(LAST_ACCESSED + contextualEntity);
     }
 
     @MessageMapping("/asynchronicOperationExecutorProgress")
