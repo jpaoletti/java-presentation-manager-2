@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="">
 <meta name="author" content="">
 <c:if test="${jpm.cssMode=='css'}">
@@ -16,3 +18,5 @@
 <script type='text/javascript' src="${cp}static/js/jpm-head.js?v=${jpm.appversion}" ></script>
 <script type='text/javascript' src="${cp}static/js/jquery.blockUI.js?v=${jpm.appversion}" ></script>
 <link rel="shortcut icon" href="${cp}static/favicon.ico">
+<link rel="icon" type="image/png" sizes="150x150" href="${cp}static/favicon.png">
+<link rel="apple-touch-icon" sizes="150x150" href="${cp}static/favicon.png">

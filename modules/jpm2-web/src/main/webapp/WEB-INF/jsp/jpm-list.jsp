@@ -16,7 +16,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading operation-list">
                         <div class="row">
-                            <div class="col-lg-9">
+                            <div class="col-lg-9 col-xs-6">
                                 <div class="btn-group">
                                     <button id="search-dropdown" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
                                         <spring:message code="jpm.list.search" text="Search" /> <span class="caret"></span>
@@ -50,15 +50,18 @@
                                 </div>
                             </div>
                             <c:if test="${entity.paginable}">
-                                <div class="col-lg-3">
+                                <div class="col-lg-3 col-xs-6">
                                     <form action="" class="form-inline pull-right" role="form">
                                         <input type="hidden" name="entityId" value="${entityId}" />
                                         <input type="hidden" name="page" value="${paginatedList.page}" />
                                         <div class="form-group">
-                                            <label><spring:message code="jpm.list.pagesize" text="Page Size" /></label>
-                                            <input class="form-control page-size input-sm" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" style="width:60px;" />
+                                            <label class="sr-only" for="pageSize"><spring:message code="jpm.list.pagesize" text="Page Size" /></label>
+                                            <div class="input-group">
+                                                <div class="input-group-addon"><spring:message code="jpm.list.pagesize" text="Page Size" /></div>
+                                                <input class="form-control page-size input-sm" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" style="width:60px;" />
+                                                <div class="input-group-addon" id="pageSizeSubmit"><span class="glyphicon glyphicon-arrow-right"></span></div>
+                                            </div>
                                         </div>
-                                        <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-arrow-right"></span></button>
                                     </form>
                                 </div>
                             </c:if>
@@ -73,10 +76,13 @@
                                     </c:if>
                                     <a href="javascript:;" id="help-btn" data-toggle="popover" data-html="true"><i class="glyphicon glyphicon-cog"></i></a>
                                 </th>
+                                <th id='operation-column-header-info' class="visible-xs">
+                                    <spring:message code="jpm.list.information" text="jpm.list.information" />
+                                </th>
                                 <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
                                     <th data-field="${field.id}" data-entity="${contextualEntity}" data-index='${st.index+1}'
                                         data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
-                                        class="nowrap ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
+                                        class="nowrap hidden-xs ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                         <c:if test="${field.sortable}">
                                             <span class="sort-icon glyphicon ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt'):'glyphicon-sort'} pull-right"></span>
                                         </c:if>
@@ -114,8 +120,29 @@
                                             </c:if>
                                         </div>
                                     </th>
+                                    <td class="visible-xs">
+                                        <table class="table table-condensed borderless">
+                                            <tbody>
+                                                <c:forEach items="${item.values}" var="v">
+                                                    <c:set var="convertedValue" value="${v.value}"/>
+                                                    <c:set var="field" value="${v.key}" scope="request" />
+                                                    <tr>
+                                                        <th><jpm:field-title entity="${entity}" fieldId="${field}" /></th>
+                                                        <td>
+                                                            <c:if test="${fn:startsWith(convertedValue, '@page:')}">
+                                                                <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
+                                                            </c:if>
+                                                            <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
+                                                                ${convertedValue}
+                                                            </c:if>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </td>
                                     <c:forEach items="${item.values}" var="v">
-                                        <td data-field="${v.key}">
+                                        <td data-field="${v.key}" class="hidden-xs">
                                             <c:set var="convertedValue" value="${v.value}"/>
                                             <c:set var="field" value="${v.key}" scope="request" />
                                             <c:if test="${fn:startsWith(convertedValue, '@page:')}">
@@ -206,6 +233,9 @@
         }
         var sorting = false;
         jpmLoad(function () {
+            $("#pageSizeSubmit").on("click", function () {
+                $(this).parents("form").submit();
+            });
             $(".inline-edit").each(function () {
                 $(this).editable({
                     url: '${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit',
