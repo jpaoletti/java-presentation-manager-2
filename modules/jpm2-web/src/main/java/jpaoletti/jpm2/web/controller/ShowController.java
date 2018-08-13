@@ -47,20 +47,24 @@ public final class ShowController extends BaseController {
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", method = RequestMethod.GET, headers = "Accept=application/json")
     @ResponseBody
-    public Map<String, Object> showJSON(@PathVariable String instanceId, @RequestParam(required = false) String fields) throws PMException {
-        final Object object = getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId).getObject();
+    public Map<String, Object> showJSON(@PathVariable String instanceId, @RequestParam(required = false) String fields) {
         final Map<String, Object> values = new LinkedHashMap<>();
-        final String[] fs = fields.split("[,]");
-        for (String fid : fs) {
-            final Field field = getContext().getEntity().getFieldById(fid, getContext().getEntityContext());
-            final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());
-            if (converter != null) {
-                try {
-                    values.put(field.getTitle(getContext().getEntity()),
-                            converter.visualize(getContext().getContextualEntity(), field, object, instanceId));
-                } catch (IgnoreConvertionException ex) {
+        try {
+            final Object object = getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId).getObject();
+            final String[] fs = fields.split("[,]");
+            for (String fid : fs) {
+                final Field field = getContext().getEntity().getFieldById(fid, getContext().getEntityContext());
+                final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());
+                if (converter != null) {
+                    try {
+                        values.put(field.getTitle(getContext().getEntity()),
+                                converter.visualize(getContext().getContextualEntity(), field, object, instanceId));
+                    } catch (IgnoreConvertionException ex) {
+                    }
                 }
             }
+        } catch (PMException e) {
+            values.put("ERROR", e.getMessage());
         }
         return values;
     }
