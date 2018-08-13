@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -21,6 +22,7 @@ public class WebEditDecimal extends WebToString {
     private Character groupingSeparator = ',';
     private String min = "0.00";
     private String max = "999999999.99";
+    private String moreOptions = "";
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -59,7 +61,7 @@ public class WebEditDecimal extends WebToString {
     }
 
     public String getOptions() {
-        return String.format("{aSep: '%s', aDec: '%s', vMin: '%s', vMax: '%s'}", getGroupingSeparator(), getDecimalSeparator(), getMin().toString(), getMax().toString());
+        return String.format("{aSep: '%s', aDec: '%s', vMin: '%s', vMax: '%s' %s}", getGroupingSeparator(), getDecimalSeparator(), getMin(), getMax(), StringUtils.isEmpty(getMoreOptions()) ? "" : "," + getMoreOptions());
     }
 
     public Character getDecimalSeparator() {
@@ -92,5 +94,13 @@ public class WebEditDecimal extends WebToString {
 
     public void setMax(String max) {
         this.max = max;
+    }
+
+    public String getMoreOptions() {
+        return moreOptions;
+    }
+
+    public void setMoreOptions(String moreOptions) {
+        this.moreOptions = moreOptions;
     }
 }
