@@ -191,13 +191,7 @@ var initPage = function () {
             $("#userNavRecent");
             var url = $(location).attr('href');
             if (!url.match(/#$/)) {
-                var name = "jpm_recent_" + currentUser;
-                var name2 = "jpm_lastUser";
-                if ($.cookie(name2) !== currentUser) {
-                    $.cookie(name2, currentUser);
-                    $.cookie(name, "", {path: '/'});
-                    $.removeCookie(name, {path: '/'});
-                }
+                var name = "JPM_RECENT";
                 var _recentArray = $.cookie(name);
                 var recentArray = new Array();
                 if (typeof _recentArray !== "undefined" && _recentArray !== "") {
