@@ -22,7 +22,7 @@
         <intercept-url pattern="/jpm-websocket/**" access="permitAll" /> <!-- WEBSOCKET -->
         <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
         <form-login login-page="/login" authentication-failure-url="/login?error=1" default-target-url="/index" />
-        <logout logout-success-url="/index" delete-cookies="JSESSIONID" />
+        <logout logout-success-url="/login" delete-cookies="JSESSIONID,JPM_RECENT" invalidate-session="true" />
         <session-management>
             <!--<concurrency-control max-sessions="1" />--> <!-- This limits the number of logins the same user may have-->
         </session-management>

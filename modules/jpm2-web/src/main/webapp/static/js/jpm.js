@@ -491,4 +491,14 @@ function asynchronicOperationProgress(id) {
     });
 }
 
+function load_script(url) {
+    let scripts = Array.from(document.querySelectorAll('script')).map(scr => scr.src).filter(s => s.endsWith(url));
+    if (scripts.length > 0) {
+        let script = document.createElement('script');
+        script.src = url;
+        script.type = "text/javascript";
+        document.getElementsByTagName('head')[0].appendChild(script);
+    }
+}
+
 $(window).load(initPage);

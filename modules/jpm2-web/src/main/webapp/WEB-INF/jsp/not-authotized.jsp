@@ -8,7 +8,7 @@
         <div id="content-header" class="page-header"></div>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 center" style="text-align: center;"  id="access-denied-container">
+                <div class="col-lg-12 center" style="text-align: center;"  id="access-denied-container">
                     <img alt="Access Denied" src="${cp}static/img/denied.png" id="access-denied" />
                     <h1><spring:message code="jpm.access.denied" text="Access Denied" /></h1>
                 </div>

@@ -8,7 +8,7 @@
         <div id="content-header" class="page-header"></div>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 center" style="text-align: center;">
+                <div class="col-lg-12 center" style="text-align: center;">
                     <img alt="" src="${cp}static/img/notimplemented.png" id="not-implemented" />
                     <h1><spring:message code="jpm.not.implemented" text="Not implemented" /></h1>
                 </div>

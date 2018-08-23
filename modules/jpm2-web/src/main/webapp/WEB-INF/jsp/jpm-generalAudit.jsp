@@ -13,8 +13,8 @@
         <%@include file="inc/default-breadcrumb.jsp" %>
         <div class="container-fluid">
             <div class="row"><br/>
-                <div class="col-12 center">
-                    <div class="col-12">
+                <div class="col-lg-12 center">
+                    <div class="col-lg-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <%@include file="inc/item-operations.jsp" %>
