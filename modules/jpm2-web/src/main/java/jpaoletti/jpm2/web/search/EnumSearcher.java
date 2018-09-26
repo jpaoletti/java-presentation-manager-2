@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.web.search;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -27,13 +29,17 @@ public class EnumSearcher implements Searcher {
 
     @Override
     public String visualization(Field field) {
-        final Class enumClass = getEnumClass(field);
-        final List<String> options = new ArrayList<>();
-        for (Object option : EnumSet.allOf(enumClass)) {
-            options.add(((Enum) option).name() + "@" + String.valueOf(option));
+        try {
+            final Class enumClass = getEnumClass(field);
+            final List<String> options = new ArrayList<>();
+            for (Object option : EnumSet.allOf(enumClass)) {
+                options.add(((Enum) option).name() + "@" + String.valueOf(option));
+            }
+            final StringBuilder sb = new StringBuilder("@page:enum-searcher.jsp?options=" + URLEncoder.encode(StringUtils.join(options, ","), "UTF-8"));
+            return sb.toString();
+        } catch (UnsupportedEncodingException ex) {
+            return "";
         }
-        final StringBuilder sb = new StringBuilder("@page:enum-searcher.jsp?options=" + StringUtils.join(options, ","));
-        return sb.toString();
     }
 
     @Override
