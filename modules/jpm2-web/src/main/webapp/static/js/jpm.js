@@ -42,72 +42,8 @@ function initConfirm() {
     });
 }
 
-function initWindowsResize() {
-    var ul = $('#sidebar > ul');
-    var ul2 = $('#sidebar li.open ul');
-    // === jPanelMenu === //
-    var jPanel = $.jPanelMenu({
-        menu: '#sidebar',
-        trigger: '#menu-trigger'
-    });
-    $(window).resize(function () {
-        if ($(window).width() > 480 && $(window).width() < 769) {
-            ul2.css({'display': 'none'});
-            ul.css({'display': 'block'});
-        }
-
-        if ($(window).width() <= 480) {
-            ul.css({'display': 'none'});
-            ul2.css({'display': 'block'});
-            if (!$('html').hasClass('jPanelMenu')) {
-                jPanel.on();
-            }
-
-            if ($(window).scrollTop() > 35) {
-                $('body').addClass('fixed');
-            }
-            $(window).scroll(function () {
-                if ($(window).scrollTop() > 35) {
-                    $('body').addClass('fixed');
-                } else {
-                    $('body').removeClass('fixed');
-                }
-            });
-        } else {
-            jPanel.off();
-        }
-        if ($(window).width() > 768) {
-            ul.css({'display': 'block'});
-            ul2.css({'display': 'block'});
-            $('#user-nav > ul').css({width: 'auto', margin: '0'});
-        }
-    });
-
-    if ($(window).width() <= 480) {
-        if ($(window).scrollTop() > 35) {
-            $('body').addClass('fixed');
-        }
-        $(window).scroll(function () {
-            if ($(window).scrollTop() > 35) {
-                $('body').addClass('fixed');
-            } else {
-                $('body').removeClass('fixed');
-            }
-        });
-        jPanel.on();
-    }
-
-    if ($(window).width() > 480) {
-        ul.css({'display': 'block'});
-        jPanel.off();
-    }
-    if ($(window).width() > 480 && $(window).width() < 769) {
-        ul2.css({'display': 'none'});
-    }
-}
-
 function initMenu() {
-    $('li.submenu > a').click(function (e) {
+    $('li.submenu > a').on("click", function (e) {
         e.preventDefault();
         var submenu = $(this).siblings('ul');
         var li = $(this).parents('li');
@@ -140,7 +76,7 @@ function initMenu() {
     });
 }
 
-$(window).unload(function () {
+$(window).on("unload", function () {
     $("#loading-div").fadeIn();
 });
 
@@ -171,12 +107,10 @@ var initPage = function () {
         $(".help-block:empty").remove();
         $(".panel-body:not(:has(*))").parent(".panel").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
-        $(".sortable").click(function () {
+        $(".sortable").on("click", function () {
             window.location = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field");
         });
         initConfirm();
-        //Init Menu
-        initWindowsResize();
         // === Sidebar navigation === //
         initMenu();
 
@@ -188,14 +122,81 @@ var initPage = function () {
         $('.tip-bottom').tooltip({placement: 'bottom'});
 
         if (currentUser && currentUser !== '') {
-            $("#userNavRecent");
+            //Favorite navbar
+            $("#addFavoriteLi").show();
+            $("#removeFavoriteLi").hide();
+            $.getJSON(getContextPath() + "jpm/favorites", function (data) {
+                $.each(data, function (i, item) {
+                    if (item.link === document.location.href) {
+                        $("#addFavoriteLi").hide();
+                        $("#removeFavoriteLi").show();
+                        $("#userNavFavorite").find(".dropdown-menu").append("<li class='active'><a title='' href='" + item.link + "' data-id='fav" + item.id + "'>" + item.title + "</a></li>");
+                    } else {
+                        $("#userNavFavorite").find(".dropdown-menu").append("<li><a title='' href='" + item.link + "' data-id='fav" + item.id + "'>" + item.title + "</a></li>");
+                    }
+                });
+            });
+            $("body").on("click", "#removeFavoriteLink", function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    dataType: 'text',
+                    url: getContextPath() + "jpm/removeFavorite?url=" + document.location.href,
+                    success: function (data) {
+                        document.location.reload();
+                    }
+                });
+            });
+            $("body").on("click", "#addFavoriteLink", function (e) {
+                e.preventDefault();
+                var $textAndPic = $('<div></div>');
+                var html = "";
+                html = html + '  <div class="form-group" id="note-group">';
+                html = html + '    <label for="title">' + messages["jpm.addfavorite.popupTitle"] + '</label>';
+                html = html + '    <input type="text" name="title" class="form-control" id="title" placeholder="...">';
+                html = html + '  </div>';
+                $textAndPic.append(html);
+
+                BootstrapDialog.show({
+                    title: messages["jpm.usernav.addfavorite"],
+                    message: $textAndPic,
+                    buttons: [{
+                            label: messages["jpm.modal.confirm.submit"],
+                            cssClass: 'btn-success',
+                            action: function (dialogRef) {
+                                if ($("#note").val() === "") {
+                                    $("#note-group").addClass("has-error");
+                                    $("#note").trigger('focus');
+                                } else {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: getContextPath() + "jpm/addFavorite?url=" + document.location.href + "&title=" + $("#title").val(),
+                                        success: function (data) {
+                                            document.location.reload();
+                                        }
+                                    });
+                                }
+                            }
+                        }, {
+                            label: messages["jpm.modal.confirm.cancel"],
+                            action: function (dialogRef) {
+                                dialogRef.close();
+                            }
+                        }],
+                    onshown: function (dialogRef) {
+                        $("#title").trigger('focus');
+                    }
+                });
+            });
+
+            //Recent navbar
             var url = $(location).attr('href');
             if (!url.match(/#$/)) {
                 var name = "JPM_RECENT";
                 var _recentArray = $.cookie(name);
                 var recentArray = new Array();
                 if (typeof _recentArray !== "undefined" && _recentArray !== "") {
-                    recentArray = $.parseJSON(_recentArray);
+                    recentArray = JSON.parse(_recentArray);
                 }
                 var array = Array.prototype.slice.call(recentArray);
                 if (array.length >= 10) {
@@ -207,7 +208,7 @@ var initPage = function () {
                 var finalArray = uniqBy(array, JSON.stringify);
                 $.cookie(name, JSON.stringify(finalArray), {path: '/'});
                 $.each(finalArray, function (i, item) {
-                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>" + item.title + "</a></li>")
+                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>" + item.title + "</a></li>");
                 });
             }
         }
@@ -254,19 +255,19 @@ var initPage = function () {
                 },
                 /*
                  How to use (those are the defaults) : 
-
+                 
                  $("#select2ID").buildJpmSelect2({
-                    entity: "<REQUIRED>",
-                    textField: "<REQUIRED>",
-                    placeholder: "...",
-                    minSearch: 0,
-                    filter: "",
-                    ownerId: "",
-                    related: null, (use another select2 object here)
-                    sortBy: "",
-                    pageSize: 10
+                 entity: "<REQUIRED>",
+                 textField: "<REQUIRED>",
+                 placeholder: "...",
+                 minSearch: 0,
+                 filter: "",
+                 ownerId: "",
+                 related: null, (use another select2 object here)
+                 sortBy: "",
+                 pageSize: 10
                  });
-                */
+                 */
                 buildJpmSelect2: function (params) {
                     return this.each(function () {
                         select = $(this);
@@ -400,9 +401,9 @@ function buildAjaxJpmForm(formId, callback, beforeSubmit) {
         formId = "jpmForm";
     $('#' + formId).ajaxForm({
         dataType: 'json',
-        beforeSubmit: function () {
+        beforeSubmit: function (arr, $form, options) {
             if (beforeSubmit) {
-                if (!beforeSubmit()) {
+                if (!beforeSubmit(arr, $form, options)) {
                     return false;
                 }
             }
@@ -485,14 +486,4 @@ function asynchronicOperationProgress(id) {
     });
 }
 
-function load_script(url) {
-    let scripts = Array.from(document.querySelectorAll('script')).map(scr => scr.src).filter(s => s.endsWith(url));
-    if (scripts.length > 0) {
-        let script = document.createElement('script');
-        script.src = url;
-        script.type = "text/javascript";
-        document.getElementsByTagName('head')[0].appendChild(script);
-    }
-}
-
-$(window).load(initPage);
+$(window).on("load", initPage);

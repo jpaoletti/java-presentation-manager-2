@@ -11,7 +11,7 @@
             $('#globalMessage').toggleClass('in');
             setTimeout(function () {
                 $('#globalMessage').removeClass('in');
-            }, 3000);
+            }, 5000);
         });
     </script>
 </c:if>
@@ -19,7 +19,6 @@
     <script type="text/javascript" src="${cp}static/js/less-1.4.1.min.js?v=${jpm.appversion}"></script>
 </c:if>
 <script type="text/javascript" src="${cp}static/js/bootstrap.min.js?v=${jpm.appversion}"></script>
-<script type="text/javascript" src="${cp}static/js/jquery.jpanelmenu.min.js?v=${jpm.appversion}"></script>
 <script type='text/javascript' src="${cp}static/js/bootstrap-dialog.js?v=${jpm.appversion}" ></script>
 <script type="text/javascript">
         var contextPath = "${cp}";
@@ -33,6 +32,8 @@
         messages["jpm.modal.confirm.submit"] = "<spring:message code='jpm.modal.confirm.submit' text='Ok' />";
         messages["jpm.modal.confirm.text"] = "<spring:message code='jpm.modal.confirm.text' text='Are you sure you want to continue?' />";
         messages["jpm.modal.confirm.close"] = "<spring:message code='jpm.modal.confirm.close' text='Close' />";
+        messages["jpm.usernav.addfavorite"] = "<spring:message code='jpm.usernav.addfavorite' text='' />";
+        messages["jpm.addfavorite.popupTitle"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
         function getContextPath() {
             return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "${cp}";
         }

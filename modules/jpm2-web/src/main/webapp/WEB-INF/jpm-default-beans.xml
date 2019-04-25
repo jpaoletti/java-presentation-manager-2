@@ -6,6 +6,10 @@
     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
     <bean class="jpaoletti.jpm2.core.dao.AuditDAO" />
+    <bean id="jpm-dao-favorite" class="jpaoletti.jpm2.core.dao.FavoriteDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
+
     <!-- ID TRANSFORMERS -->
     <bean id="transformer-str" class="jpaoletti.jpm2.core.idtransformer.Str" />
     <bean id="transformer-strToLong" class="jpaoletti.jpm2.core.idtransformer.StrToLong" />
