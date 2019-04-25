@@ -533,11 +533,15 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.defaultSearchs = defaultSearchs;
     }
 
-    public String getDefaultSortField() {
+    public String getDefaultSortField(String context) {
+        final EntityContext ctx = getContext(context);
+        if (ctx != null && ctx.getDefaultSortField() != null) {
+            return ctx.getDefaultSortField();
+        }
         if (defaultSortField != null) {
             return defaultSortField;
         } else if (getParent() != null) {
-            return getParent().getDefaultSortField();
+            return getParent().getDefaultSortField(context);
         } else {
             return null;
         }
@@ -547,11 +551,15 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         this.defaultSortField = defaultSortField;
     }
 
-    public ListSort.SortDirection getDefaultSortDirection() {
+    public ListSort.SortDirection getDefaultSortDirection(String context) {
+        final EntityContext ctx = getContext(context);
+        if (ctx != null && ctx.getDefaultSortDirection() != null) {
+            return ctx.getDefaultSortDirection();
+        }
         if (defaultSortDirection != null) {
             return defaultSortDirection;
         } else if (getParent() != null) {
-            return getParent().getDefaultSortDirection();
+            return getParent().getDefaultSortDirection(context);
         } else {
             return null;
         }

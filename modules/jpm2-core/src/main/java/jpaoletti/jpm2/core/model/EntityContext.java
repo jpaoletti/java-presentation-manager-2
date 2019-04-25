@@ -17,6 +17,8 @@ public class EntityContext extends PMCoreObject {
     private DAO dao;
     private String home;
     private String auth;
+    private String defaultSortField;
+    private ListSort.SortDirection defaultSortDirection;
     private List<Field> fields; //specific for this context
 
     public String getId() {
@@ -90,5 +92,21 @@ public class EntityContext extends PMCoreObject {
 
     public void setFields(List<Field> fields) {
         this.fields = fields;
+    }
+
+    public String getDefaultSortField() {
+        return defaultSortField;
+    }
+
+    public void setDefaultSortField(String defaultSortField) {
+        this.defaultSortField = defaultSortField;
+    }
+
+    public ListSort.SortDirection getDefaultSortDirection() {
+        return defaultSortDirection;
+    }
+
+    public void setDefaultSortDirection(ListSort.SortDirection defaultSortDirection) {
+        this.defaultSortDirection = defaultSortDirection;
     }
 }

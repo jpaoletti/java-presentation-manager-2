@@ -6,10 +6,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.UserFavorite;
+import jpaoletti.jpm2.core.service.FavoriteService;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +31,9 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class JPMController extends BaseController {
+
+    @Autowired
+    private FavoriteService favoriteService;
 
     @RequestMapping(value = "/jpm", method = RequestMethod.GET)
     public ModelAndView jpmStatus() {
@@ -45,6 +53,27 @@ public class JPMController extends BaseController {
         final UploadFileResults res = new UploadFileResults();
         res.getFiles().add(new UploadFileResult(tmpFileName, file.getContentType(), tmpFile.length()));
         return res;
+    }
+
+    @RequestMapping(value = "/jpm/addFavorite", method = RequestMethod.POST, headers = "Accept=application/json")
+    @ResponseBody
+    public UserFavorite addFavorite(@RequestParam String url, @RequestParam(required = false, defaultValue = "?") String title) throws IOException {
+        final UserFavorite res = favoriteService.addFavorite(getUserDetails().getUsername(), title, url);
+        getContext().setGlobalMessage(MessageFactory.success("jpm.removeFavorite.success"));
+        return res;
+    }
+
+    @RequestMapping(value = "/jpm/removeFavorite", method = RequestMethod.POST, headers = "Accept=application/json")
+    @ResponseBody
+    public String removeFavorite(@RequestParam String url) throws IOException {
+        favoriteService.removeFavorite(getUserDetails().getUsername(), url);
+        return url;
+    }
+
+    @RequestMapping(value = "/jpm/favorites", method = RequestMethod.GET, headers = "Accept=application/json")
+    @ResponseBody
+    public List<UserFavorite> getFavorites() throws IOException {
+        return favoriteService.getFavorites(getUserDetails().getUsername());
     }
 
     @ResponseBody
