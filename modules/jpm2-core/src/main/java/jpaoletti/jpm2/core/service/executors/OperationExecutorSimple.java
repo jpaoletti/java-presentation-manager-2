@@ -67,4 +67,11 @@ public class OperationExecutorSimple implements OperationExecutor {
         return parameters;
     }
 
+    public String getSimpleParameterValue(Map parameters, String name) {
+        try {
+            return ((String[]) parameters.get(name))[0];
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

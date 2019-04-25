@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  *
@@ -36,13 +36,17 @@ public final class ShowController extends BaseController {
             @PathVariable Entity entity,
             @PathVariable String instanceId,
             @RequestParam(required = false) String textField) throws PMException {
-        final String entityContext = getContext().getEntityContext();
-        final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
-        final Object object = iobject.getObject();
-        if (object == null) {
-            return new ObjectConverterDataItem("", "");
+        try {
+            final String entityContext = getContext().getEntityContext();
+            final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
+            final Object object = iobject.getObject();
+            if (object == null) {
+                return new ObjectConverterDataItem("", "");
+            }
+            return ObjectConverterData.buildDataObject(textField, entity, entityContext, instanceId, object);
+        } catch (Exception e) {
+            return new ObjectConverterDataItem("", e.getMessage());
         }
-        return ObjectConverterData.buildDataObject(textField, entity, entityContext, instanceId, object);
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", method = RequestMethod.GET, headers = "Accept=application/json")

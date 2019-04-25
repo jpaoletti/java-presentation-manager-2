@@ -75,11 +75,11 @@ public class Operation extends PMCoreObject {
 
     public Operation(String opId) {
         this();
-        this.operation = opId;
+        this.id = opId;
     }
 
     public String getPathId() {
-        return getId() + (getExecutor() == null ? "" : ".exec");
+        return getOperation() + (getExecutor() == null ? "" : ".exec");
     }
 
     public void checkAuthorization(Entity entity, EntityContext context) throws NotAuthorizedException {

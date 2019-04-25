@@ -43,9 +43,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak) throws PMException {
         final Object owner = entity.getDao().get(instanceId);
         final DAOListConfiguration cfg = new DAOListConfiguration(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
-        if (weak.getEntity().getDefaultSortField() != null) {
-            final Field sortField = weak.getEntity().getFieldById(weak.getEntity().getDefaultSortField(), weak.getContext());
-            final ListSort sort = new ListSort(sortField, weak.getEntity().getDefaultSortDirection());
+        if (weak.getEntity().getDefaultSortField(entity.getContext()) != null) {
+            final Field sortField = weak.getEntity().getFieldById(weak.getEntity().getDefaultSortField(entity.getContext()), weak.getContext());
+            final ListSort sort = new ListSort(sortField, weak.getEntity().getDefaultSortDirection(entity.getContext()));
             cfg.withOrder(sort.getOrder());
         }
         final List list = weak.getDao().list(cfg);
