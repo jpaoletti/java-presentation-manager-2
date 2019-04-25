@@ -119,14 +119,14 @@ function showpwdchars() {
         pwdtxt.value = pwdfield.value;
         pwdfield.style.display = 'none';
         pwdtxt.style.display = '';
-        pwdtxt.focus();
+        pwdtxt.trigger('focus');
     } else {
         this.showing_pwd = 1;
         innerText = this.txtShow;
         pwdfield.value = pwdtxt.value;
         pwdtxt.style.display = 'none';
         pwdfield.style.display = '';
-        pwdfield.focus();
+        pwdfield.trigger('focus');
 
     }
     this.show_anch_obj.innerHTML = innerText;

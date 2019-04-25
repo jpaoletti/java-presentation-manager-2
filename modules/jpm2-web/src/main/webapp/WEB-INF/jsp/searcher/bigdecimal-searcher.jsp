@@ -13,9 +13,10 @@
         <input class='form-control decimal' name='value' type='text' value="0" id="bigdecimal-searcher">
     </div>
 </div>
-<script type="text/javascript" src="${cp}static/js/autoNumeric.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" src="${cp}static/js/autoNumeric-4.x.x.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
+    var bigDecimalSearcher;
     jpmLoad(function() {
-        $('#bigdecimal-searcher').autoNumeric('init', ${param.options});
+        bigDecimalSearcher = new AutoNumeric('#bigdecimal-searcher', ${param.options});
     });
 </script>

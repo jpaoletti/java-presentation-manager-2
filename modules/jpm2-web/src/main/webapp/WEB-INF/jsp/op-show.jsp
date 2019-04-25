@@ -32,6 +32,7 @@
     <script type="text/javascript">
         jpmLoad(function () {
             wrapToString();
+            $.fn.editable.defaults.mode = 'inline';
             $(".inline-edit").editable({
                 url: '${cp}jpm/${contextualEntity}/${instance.id}/iledit',
                 send: "always",

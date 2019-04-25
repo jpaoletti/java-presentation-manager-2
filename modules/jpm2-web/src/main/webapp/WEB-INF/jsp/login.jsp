@@ -14,7 +14,7 @@
                 <h4><spring:message code="jpm.login.title" text="Enter username and password to continue." /></h4><hr/><br/>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                    <input class="form-control" id="j_username" name="username" type="text" placeholder="<spring:message code="jpm.login.username" text="Username" />" />
+                    <input class="form-control" id="j_username" name="username" type="text" placeholder="<spring:message code="jpm.login.username" text="Username" />" autocorrect="off" autocapitalize="off" spellcheck="false"/>
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
@@ -41,10 +41,10 @@
         </c:if>
         <script type="text/javascript">
             jpmLoad(function () {
-                $("#j_username").focus();
+                $("#j_username").trigger('focus');
                 $("#loginform").on("submit", function () {
                     if ($("#j_username").val().trim() === "") {
-                        $("#j_username").focus();
+                        $("#j_username").trigger('focus');
                         return false;
                     }
                 });

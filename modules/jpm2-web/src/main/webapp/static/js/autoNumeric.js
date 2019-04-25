@@ -41,7 +41,7 @@
     function getElementSelection(that) {
         var position = {};
         if (that.selectionStart === undefined) {
-            that.focus();
+            that.trigger('focus');
             var select = document.selection.createRange();
             position.length = select.text.length;
             select.moveStart('character', -that.value.length);
@@ -59,7 +59,7 @@
      */
     function setElementSelection(that, start, end) {
         if (that.selectionStart === undefined) {
-            that.focus();
+            that.trigger('focus');
             var r = that.createTextRange();
             r.collapse(true);
             r.moveEnd('character', end);

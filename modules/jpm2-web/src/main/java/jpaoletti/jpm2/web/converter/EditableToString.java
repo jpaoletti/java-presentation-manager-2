@@ -18,7 +18,7 @@ public class EditableToString extends WebToString {
         if (getAuthorizationService().userHasRole("jpm.auth.operation." + contextualEntity + ".edit")) {
             final String originalValue = (value == null) ? "" : value.toString();
             final String finalValue = (value == null) ? getNullValue() : getFinalValue(value, getProperties());
-            return "<a href='javascript:;' class='inline-edit' title='" + originalValue + "' data-name='" + field.getId() + "' data-type='text' data-align='" + field.getAlign() + "'>" + finalValue + "</a>";
+            return "<a href=\"javascript:;\" class=\"inline-edit\" title=\"" + originalValue + "\" data-name=\"" + field.getId() + "\" data-type=\"text\" data-align=\"" + field.getAlign() + "\">" + finalValue + "</a>";
         } else {
             return wrap(field, processed, value);
         }

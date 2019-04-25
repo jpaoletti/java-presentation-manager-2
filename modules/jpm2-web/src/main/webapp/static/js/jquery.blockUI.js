@@ -592,7 +592,7 @@
 				return;
 			var e = pageBlockEls[back===true ? pageBlockEls.length-1 : 0];
 			if (e)
-				e.focus();
+				e.trigger('focus');
 		}
 
 		function center(el, x, y) {

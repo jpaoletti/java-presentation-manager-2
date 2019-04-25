@@ -228,13 +228,13 @@
             $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
             $("#addSearchForm [name='fieldId']").val(field);
             $("#searchModal").modal("show").on("shown.bs.modal", function () {
-                $("#searchModal .modal-body").find("input").focus();
+                $("#searchModal .modal-body").find("input").trigger('focus');
             });
         }
         var sorting = false;
         jpmLoad(function () {
             $("#pageSizeSubmit").on("click", function () {
-                $(this).parents("form").submit();
+                $(this).parents("form").trigger('submit');
             });
             $(".inline-edit").each(function () {
                 $(this).editable({
@@ -283,7 +283,7 @@
                     return;
                 }
                 if (e.which === parseInt("<spring:message code='jpm.list.shortcut.search' text='102' />")) { //search 'f'
-                    $("#search-dropdown").dropdown('toggle').focus();
+                    $("#search-dropdown").dropdown('toggle').trigger('focus');
                 } else
                 if (e.which === parseInt("<spring:message code='jpm.list.shortcut.help' text='104' />")) { //sort 'h'
                     $('#help-btn').popover('toggle');
