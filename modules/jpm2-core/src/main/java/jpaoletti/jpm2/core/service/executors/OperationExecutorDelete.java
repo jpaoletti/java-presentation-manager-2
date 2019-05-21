@@ -1,15 +1,11 @@
 package jpaoletti.jpm2.core.service.executors;
 
 import jpaoletti.jpm2.core.model.Progress;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.model.EntityInstance;
-import jpaoletti.jpm2.core.model.OperationExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,15 +13,7 @@ import org.springframework.stereotype.Component;
  * @author jpaoletti
  */
 @Component
-public class OperationExecutorDelete implements OperationExecutor {
-
-    @Autowired
-    private PresentationManager jpm;
-
-    @Override
-    public Map<String, Object> prepare(List<EntityInstance> instances) throws PMException {
-        return new LinkedHashMap<>();
-    }
+public class OperationExecutorDelete extends OperationExecutorSimple {
 
     @Override
     public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
@@ -46,18 +34,4 @@ public class OperationExecutorDelete implements OperationExecutor {
     public boolean immediateExecute() {
         return true;
     }
-
-    @Override
-    public Map preExecute(JPMContext ctx, List<EntityInstance> instances, Map parameters) throws PMException {
-        return parameters;
-    }
-
-    public PresentationManager getJpm() {
-        return jpm;
-    }
-
-    public void setJpm(PresentationManager jpm) {
-        this.jpm = jpm;
-    }
-
 }

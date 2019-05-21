@@ -207,7 +207,7 @@ public class ExecutorsController extends BaseController implements Observer {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             } else {
-                e.printStackTrace();
+                JPMUtils.getLogger().error(e);
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         } catch (Exception e) {

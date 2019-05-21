@@ -47,8 +47,15 @@ public class Field extends PMCoreObject {
      */
     public Field() {
         super();
-        defaultValue = "";
+        this.defaultValue = "";
         this.sortable = true;
+    }
+
+    public Field(String id) {
+        super();
+        this.defaultValue = "";
+        this.sortable = true;
+        this.id = id;
     }
 
     /**
