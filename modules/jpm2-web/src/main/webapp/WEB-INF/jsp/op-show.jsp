@@ -28,15 +28,15 @@
             </div>
         </div>
     </jpm:jpm-body>
-    <script type='text/javascript' src="${cp}static/js/bootstrap-editable.min.js?v=${jpm.appversion}" ></script>
+    <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
     <script type="text/javascript">
         jpmLoad(function () {
             wrapToString();
-            $.fn.editable.defaults.mode = 'inline';
-            $(".inline-edit").editable({
-                url: '${cp}jpm/${contextualEntity}/${instance.id}/iledit',
-                send: "always",
-                emptytext: "-"
+            $(".inline-edit").editable('${cp}jpm/${contextualEntity}/${instance.id}/iledit', {
+                placeholder: "-",
+                submitdata:{
+                    name: $(this).attr("data-name")
+                }
             });
             asynchronicOperationProgress("${contextualEntity}#${instance.id}");
         });

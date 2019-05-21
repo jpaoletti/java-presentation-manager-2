@@ -4,7 +4,6 @@
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
-        <link href="${cp}static/css/bootstrap-editable.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
     </head>
     <c:set var="entityName" value="${entity.title}" />
     <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" text="Operation" />
@@ -222,7 +221,7 @@
             </c:forEach>
         </div>
     </jpm:jpm-body>
-    <script type='text/javascript' src="${cp}static/js/bootstrap-editable.min.js?v=${jpm.appversion}" ></script>
+    <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
     <script type="text/javascript">
         function openSearchModal(field) {
             $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
@@ -237,10 +236,11 @@
                 $(this).parents("form").trigger('submit');
             });
             $(".inline-edit").each(function () {
-                $(this).editable({
-                    url: '${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit',
-                    send: "always",
-                    emptytext: "-"
+                $(this).editable('${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit', {
+                    placeholder: "-",
+                    submitdata: {
+                        name: $(this).attr("data-name")
+                    }
                 });
             });
             $("#select_unselect_all").on("click", function () {

@@ -48,7 +48,7 @@ public class EditController extends BaseController {
             instance.getValues().clear();
             instance.getValues().put(name, tmp);
             getJpm().getService().update(entity, getContext().getEntityContext(), operation, instance, params);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(value, HttpStatus.OK);
         } catch (ValidationException e) {
             final StringBuilder sb = new StringBuilder();
             for (Map.Entry<String, List<Message>> entry : getContext().getFieldMessages().entrySet()) {
