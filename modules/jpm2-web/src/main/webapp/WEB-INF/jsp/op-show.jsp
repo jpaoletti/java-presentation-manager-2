@@ -3,7 +3,6 @@
 <html>
     <head>
         <%@include file="inc/default-head.jsp" %>
-        <link href="${cp}static/css/bootstrap-editable.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
     </head>
     <c:set var="entityName" value="${entity.title}" />
     <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" />
@@ -32,11 +31,13 @@
     <script type="text/javascript">
         jpmLoad(function () {
             wrapToString();
-            $(".inline-edit").editable('${cp}jpm/${contextualEntity}/${instance.id}/iledit', {
-                placeholder: "-",
-                submitdata:{
-                    name: $(this).attr("data-name")
-                }
+            $(".inline-edit").each(function () {
+                $(this).editable('${cp}jpm/${contextualEntity}/${instance.id}/iledit', {
+                    placeholder: "-",
+                    submitdata: {
+                        name: $(this).attr("data-name")
+                    }
+                });
             });
             asynchronicOperationProgress("${contextualEntity}#${instance.id}");
         });
