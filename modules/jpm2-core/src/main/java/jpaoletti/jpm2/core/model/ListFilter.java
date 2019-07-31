@@ -19,7 +19,7 @@ public interface ListFilter {
     public String getId();
 
     /**
-     * @param dcl Dao configuration list being configured
+     * @param dlc Dao configuration list being configured
      * @param entity
      * @param sessionData
      * @param ownerId
