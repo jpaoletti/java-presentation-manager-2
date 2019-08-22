@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.dao;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import jpaoletti.jpm2.core.idtransformer.IdTransformer;
 import jpaoletti.jpm2.core.service.AuthorizationService;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -11,6 +12,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.jodah.typetools.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
 
     @Override
     public T get(String id) {
+        if (id == null) {
+            return null;
+        }
         if (id.getClass().equals(idClass)) {
             return (T) getSession().get(getPersistentClass(), id);
         } else {
@@ -108,6 +113,13 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
                     c.addOrder(order);
                 }
             }
+            if (!configuration.getProperties().isEmpty()) {
+                final ProjectionList projectionList = Projections.projectionList();
+                for (Map.Entry<String, String> entry : configuration.getProperties().entrySet()) {
+                    projectionList.add(Projections.property(entry.getKey()), entry.getValue());
+                }
+                c.setProjection(projectionList);
+            }
         }
         return c.list();
     }
@@ -116,6 +128,12 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         Criteria c = getSession().createCriteria(getPersistentClass());
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         if (configuration != null) {
+            if (configuration.getMax() != null) {
+                c.setMaxResults(configuration.getMax());
+            }
+            if (configuration.getFrom() != null) {
+                c.setFirstResult(configuration.getFrom());
+            }
             for (DAOListConfiguration.DAOListConfigurationAlias alias : configuration.getAliases()) {
                 if (alias.getJoinType() != null) {
                     c = c.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
