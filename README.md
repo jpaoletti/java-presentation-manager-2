@@ -14,11 +14,13 @@ THIS IS A WORK IN PROGRESS PROJECT.
 * Boostrap 3
 * jQuery 2
 * Less
-* <a href='http://ivaynberg.github.io/select2/index.html'>Select2</a>
+* <a href='https://select2.org'>Select2</a>
 * <a href='http://blueimp.github.io/jQuery-File-Upload/'>jQuery File Upload</a>
 * <a href='https://github.com/carhartl/jquery-cookie'>jQuery Cookie</a>
-* <a href='http://www.decorplanit.com/plugin/'>autoNumeric</a>
+* <a href='http://autonumeric.org/'>AutoNumeric</a>
 * <a href='https://github.com/igorescobar/jQuery-Mask-Plugin'>jQuery Mask Plugin v1.7.7</a>
+* <a href='https://github.com/NicolasCARPi/jquery_jeditable'>jEditable </a>
+* Node js: 
 
 ## Functionalities
 

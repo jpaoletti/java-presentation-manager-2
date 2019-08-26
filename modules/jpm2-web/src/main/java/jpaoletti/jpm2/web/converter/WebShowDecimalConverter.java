@@ -16,8 +16,8 @@ public class WebShowDecimalConverter extends WebToString {
     private String format = "#0.00";
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final BigDecimal value = (BigDecimal) getValue(object, field);
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+        final BigDecimal value = (BigDecimal) object;
         if (value == null) {
             return wrap(field, process(""), value);
         } else {

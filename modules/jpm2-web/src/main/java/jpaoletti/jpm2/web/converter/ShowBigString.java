@@ -13,8 +13,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class ShowBigString extends Converter {
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final String value = (String) getValue(object, field);
-        return "<textarea class='form-control' disabled>" + (value != null ? value : "") + "</textarea>";
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+        return "<textarea class='form-control' disabled>" + (object != null ? object : "") + "</textarea>";
     }
 }

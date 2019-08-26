@@ -2,6 +2,15 @@ String.prototype.trim = function () {
     return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
 };
 
+(function ($) {
+    $.fn.uniqueId = function () {
+        this.each(function () {
+            $(this).attr("id", 'jpm-' + Math.random().toString(36).substr(2, 9));
+        });
+        return this;
+    };
+}(jQuery));
+
 
 function supports_html5_storage() {
     try {

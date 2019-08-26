@@ -98,7 +98,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             if (field.getSearcher() != null) {
                 try {
                     field.checkAuthorization();
-                    pl.getFieldSearchs().put(field, field.getSearcher().visualization(field));
+                    pl.getFieldSearchs().put(field, field.getSearcher().visualization(entity.getEntity(), field));
                 } catch (NotAuthorizedException e) {
                 }
             }

@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.core.model;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,7 +25,9 @@ public class SearchDefinition {
     public SearchDefinition(String fieldId, String paramName, String paramValue) {
         this.fieldId = fieldId;
         this.parameters = new LinkedHashMap<>();
-        this.parameters.put(paramName, (String[]) Arrays.asList(paramValue).toArray());
+        final String[] params = new String[1];
+        params[0] = paramValue;
+        this.parameters.put(paramName, params);
     }
 
     public SearchDefinition(String fieldId, Map<String, String[]> parameters) {

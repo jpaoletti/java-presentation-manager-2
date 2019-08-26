@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import jpaoletti.jpm2.core.message.MessageFactory;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.SearcherHelper;
@@ -22,12 +23,12 @@ public class DateSearcher implements Searcher {
     private String format = "yyyy-MM-dd";
 
     @Override
-    public String visualization(Field field) {
+    public String visualization(Entity entity, Field field) {
         return "@page:date-searcher.jsp?format=" + getFormat();
     }
 
     @Override
-    public DescribedCriterion build(Field field, Map<String, String[]> parameters) {
+    public DescribedCriterion build(Entity entity, Field field, Map<String, String[]> parameters) {
         try {
             final Date value = getValue(parameters);
             final SimpleDateFormat sdf = new SimpleDateFormat(getFormat());

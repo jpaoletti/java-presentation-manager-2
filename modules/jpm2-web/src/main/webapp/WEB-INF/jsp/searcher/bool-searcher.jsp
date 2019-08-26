@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col-lg-3">
         <label>
-            <input name='value' type='checkbox' value="0">
+            <input name='value' type='checkbox' value="0" class="form-control">
             <spring:message code="${param.label}" text="${param.label}" />
         </label>
     </div>

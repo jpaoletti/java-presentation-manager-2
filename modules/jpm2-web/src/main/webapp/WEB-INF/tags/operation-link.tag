@@ -1,4 +1,4 @@
-<%@tag description="Title for field" pageEncoding="UTF-8"%>
+<%@tag description="Title for field" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@attribute name = "operation"         required="true"  type="jpaoletti.jpm2.core.model.Operation" %>
@@ -9,7 +9,7 @@
 <%@attribute name = "title"             required="false" type="java.lang.Boolean" description="Show title " %>
 <a
     id="operation-${operation.id}"
-    class="${clazz} confirm-${operation.confirm} ${operation.synchronic?'synchronic':'asynchronic'}" 
+    class="${clazz} confirm-${operation.confirm} ${operation.synchronic?' synchronic':' asynchronic'}" 
     title="<spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />"
     href="${cp}jpm/${contextualEntity}/${not empty instanceId?instanceId.concat('/'):''}${operation.pathId}">
     <span class="glyphicon jpmicon-${operation.id}"></span>

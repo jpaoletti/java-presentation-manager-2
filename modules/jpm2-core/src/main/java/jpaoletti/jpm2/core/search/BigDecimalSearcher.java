@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.search;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ public class BigDecimalSearcher extends IntegerSearcher {
     private String max = "999999999.99";
 
     @Override
-    public String visualization(Field field) {
+    public String visualization(Entity entity, Field field) {
         return "@page:bigdecimal-searcher.jsp?options=" + getOptions();
     }
 

@@ -18,7 +18,6 @@ public class ShowImageConverter extends Converter {
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final byte[] value = (byte[]) getValue(object, field);
         String page = "@page:show-image-converter.jsp"
                 + "?contentType=" + getContentType()
                 + "&instanceId=" + instanceId

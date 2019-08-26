@@ -1,3 +1,4 @@
+<%@tag pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@attribute name = "paginatedList" required="true" type="jpaoletti.jpm2.core.model.PaginatedList" %>
 <%@attribute name="i" required="true" type="java.lang.Integer"%>

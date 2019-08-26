@@ -225,7 +225,7 @@ public class ListController extends BaseController {
         final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
-            final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
+            final DescribedCriterion build = field.getSearcher().build(entity, field, request.getParameterMap());
             if (build != null) {
                 getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
                 params = PAGE1;
@@ -244,7 +244,7 @@ public class ListController extends BaseController {
         final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
-            final DescribedCriterion build = field.getSearcher().build(field, request.getParameterMap());
+            final DescribedCriterion build = field.getSearcher().build(entity, field, request.getParameterMap());
             if (build != null) {
                 getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
                 params = PAGE1;

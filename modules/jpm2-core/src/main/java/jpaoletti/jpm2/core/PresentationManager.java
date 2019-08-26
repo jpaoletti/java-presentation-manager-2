@@ -14,6 +14,7 @@ import jpaoletti.jpm2.core.model.AsynchronicOperationExecutor;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.reports.EntityReport;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.OperationExecutor;
@@ -298,6 +299,14 @@ public class PresentationManager implements Observer, Serializable {
                 }
             } else {
             }
+        }
+    }
+
+    public EntityReport getReport(String reportId) {
+        try {
+            return (EntityReport) JPMUtils.getApplicationContext().getBean(reportId);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

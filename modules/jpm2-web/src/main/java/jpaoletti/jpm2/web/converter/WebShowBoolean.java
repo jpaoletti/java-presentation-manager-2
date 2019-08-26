@@ -12,9 +12,8 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebShowBoolean extends WebToString {
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Boolean value = (Boolean) getValue(object, field);
-        if (value == null || value) {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+        if (value == null || (Boolean) value) {
             return process("<span class=\"glyphicon glyphicon-ok\"></span>");
         } else {
             return process("<span class=\"glyphicon glyphicon-remove\"></span>");

@@ -7,6 +7,9 @@
     <li id="menu-jpm-entity-test">
         <a href="${cp}jpm/jpm-entity-test/list"><i class="glyphicon glyphicon-th-list"></i><spring:message code="jpm.entity.title.test" text="Test Entity" /></a>
     </li>
+    <li id="menu-testReport">
+        <a href="${cp}jpm/report/testReport"><i class="glyphicon glyphicon-book"></i><spring:message code="jpm.entity.title.testReport" text="Test Entity Report" /></a>
+    </li>
     <security:authorize access="hasRole('ROLE_USERADMIN')">
         <li id="menu-status"><a href="${cp}security"><i class="glyphicon glyphicon-user"></i> <span><spring:message code="jpm.menu.security" text="Security" /></span></a></li>
         <li class="submenu">

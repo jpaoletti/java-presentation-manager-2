@@ -14,16 +14,17 @@ import org.apache.commons.lang.StringUtils;
  */
 public class WebEditDecimal extends WebToString {
 
-    private Character decimalSeparator = '.';
-    private Character groupingSeparator = ',';
+    private String decimalSeparator = ".";
+    private String groupingSeparator = ",";
     private String min = "0.00";
     private String max = "999999999.99";
     private String moreOptions = "";
+    private boolean saveAsString = false;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final BigDecimal fieldValue = (BigDecimal) getValue(object, field);
-        final String value = (fieldValue == null) ? field.getDefaultValue() : fieldValue.toPlainString();
+        final Object fieldValue = (Object) getValue(object, field);
+        final String value = (fieldValue == null) ? field.getDefaultValue() : fieldValue.toString();
         return "@page:decimal-converter.jsp?value=" + value + "&options=" + getOptions();
     }
 
@@ -34,7 +35,7 @@ public class WebEditDecimal extends WebToString {
         } else {
             try {
                 final String val = (String) newValue;
-                return new BigDecimal(val);
+                return saveAsString ? val : new BigDecimal(val);
             } catch (NumberFormatException e) {
                 throw new ConverterException(MessageFactory.error("jpm.converter.error.invalid.decimal.format", newValue.toString()));
             }
@@ -45,19 +46,25 @@ public class WebEditDecimal extends WebToString {
         return String.format("{unformatOnSubmit: true, digitGroupSeparator: '%s', decimalCharacter: '%s', minimumValue: '%s', maximumValue: '%s' %s}", getGroupingSeparator(), getDecimalSeparator(), getMin(), getMax(), StringUtils.isEmpty(getMoreOptions()) ? "" : "," + getMoreOptions());
     }
 
-    public Character getDecimalSeparator() {
+    public String getDecimalSeparator() {
+        if (this.decimalSeparator == null) {
+            return "";
+        }
         return decimalSeparator;
     }
 
-    public void setDecimalSeparator(Character decimalSeparator) {
+    public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
     }
 
-    public Character getGroupingSeparator() {
+    public String getGroupingSeparator() {
+        if (this.groupingSeparator == null) {
+            return "";
+        }
         return groupingSeparator;
     }
 
-    public void setGroupingSeparator(Character groupingSeparator) {
+    public void setGroupingSeparator(String groupingSeparator) {
         this.groupingSeparator = groupingSeparator;
     }
 
@@ -83,5 +90,13 @@ public class WebEditDecimal extends WebToString {
 
     public void setMoreOptions(String moreOptions) {
         this.moreOptions = moreOptions;
+    }
+
+    public boolean isSaveAsString() {
+        return saveAsString;
+    }
+
+    public void setSaveAsString(boolean saveAsString) {
+        this.saveAsString = saveAsString;
     }
 }

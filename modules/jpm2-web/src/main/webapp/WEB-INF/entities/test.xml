@@ -370,4 +370,43 @@
             </list>
         </property>
     </bean>
+    <bean id="testReport" class="jpaoletti.jpm2.core.model.reports.EntityReport">
+        <property name="entity" ref="jpm-entity-test" />
+        <property name="descriptiveFields">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField">
+                    <property name="field" value="id" />
+                    <property name="converter" ref="jpm-converter-show" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField">
+                    <property name="field" value="string" />
+                    <property name="converter" ref="jpm-converter-show" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField">
+                    <property name="field" value="integer" />
+                    <property name="converter" ref="jpm-converter-show" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField">
+                    <property name="field" value="decimal" />
+                    <property name="converter" ref="jpm-converter-show-decimal" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField">
+                    <property name="field" value="date" />
+                    <property name="converter">
+                        <bean class="jpaoletti.jpm2.web.converter.WebShowDateTime">
+                            <property name="format" value="dd/MM/yyyy"/>
+                        </bean>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField">
+                    <property name="field" value="bool" />
+                    <property name="converter" ref="jpm-converter-show-bool" />
+                </bean>
+            </list>
+        </property>
+        <property name="filteringFields" value="id string integer decimal bool" />
+        <property name="groupableFields" value="string date bool" />
+        <property name="numericFields" value="integer decimal" />
+        <!-- TODO: add converters for numeric fields -->
+    </bean>
 </beans>

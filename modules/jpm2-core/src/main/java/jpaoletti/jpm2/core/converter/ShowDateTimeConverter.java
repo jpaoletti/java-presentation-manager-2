@@ -16,9 +16,8 @@ public class ShowDateTimeConverter extends ToStringConverter {
     private String format = "yyyy-MM-dd";
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Date value = (Date) getValue(object, field);
-        final DateTime dt = new DateTime(value);
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+        final DateTime dt = new DateTime((Date) value);
         return process(dt.toString(getFormat()));
     }
 

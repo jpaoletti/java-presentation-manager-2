@@ -13,8 +13,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebToString extends ToStringConverter {
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Object value = getValue(object, field);
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
         return wrap(field, process(value), value);
     }
 

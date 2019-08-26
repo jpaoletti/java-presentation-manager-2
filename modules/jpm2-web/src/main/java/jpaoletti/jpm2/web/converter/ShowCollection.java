@@ -14,8 +14,8 @@ import jpaoletti.jpm2.core.model.Field;
 public class ShowCollection extends Converter {
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+        final Collection<Object> value = (Collection<Object>) ((object == null) ? null : object);
         if (value == null || value.isEmpty()) {
             return "";
         } else {

@@ -76,7 +76,7 @@ public class JPMContextImpl implements JPMContext {
     @Override
     public void addFieldMsg(final Field field, Message message) {
         if (!getFieldMessages().containsKey(field.getId())) {
-            getFieldMessages().put(field.getId(), new ArrayList<Message>());
+            getFieldMessages().put(field.getId(), new ArrayList<>());
         }
         getFieldMessages().get(field.getId()).add(message);
     }

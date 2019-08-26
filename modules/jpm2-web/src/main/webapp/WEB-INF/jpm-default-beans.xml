@@ -9,6 +9,9 @@
     <bean id="jpm-dao-favorite" class="jpaoletti.jpm2.core.dao.FavoriteDAO" >
         <property name="transformer" ref="transformer-strToLong" />
     </bean>
+    <bean id="jpm-dao-entityReportUserSave" class="jpaoletti.jpm2.core.dao.EntityReportUserSaveDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
 
     <!-- ID TRANSFORMERS -->
     <bean id="transformer-str" class="jpaoletti.jpm2.core.idtransformer.Str" />
@@ -30,6 +33,9 @@
     <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-editable" class="jpaoletti.jpm2.web.converter.EditableToString" />
     <bean id="jpm-converter-editable-int" class="jpaoletti.jpm2.web.converter.WebILEditInteger" />
+    <bean id="jpm-converter-show-decimal" class="jpaoletti.jpm2.web.converter.WebShowDecimalConverter">
+        <property name="format" value="###,##0.00" />
+    </bean>
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
     <bean id="jpm-converter-show-bigstring" class="jpaoletti.jpm2.web.converter.ShowBigString" />
 

@@ -47,6 +47,9 @@ INSERT INTO `users` VALUES ('admin', 'Y', 'Y', 'Y', 'Y', '', 'Administrator', '$
 INSERT INTO `group_members` (`username`, `group_id`) VALUES ('admin', '1');
 
 INSERT INTO group_authorities (group_id, authority) VALUES
+(1, 'ROLE_USER'),
+(1, 'ROLE_USER_FAVORITE'),
+(1, 'ROLE_USER_RECENT'),
 (1, 'jpm.auth.operation.jpm-entity-group.add'),
 (1, 'jpm.auth.operation.jpm-entity-group.delete'),
 (1, 'jpm.auth.operation.jpm-entity-group.edit'),

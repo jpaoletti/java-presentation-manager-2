@@ -15,7 +15,7 @@ public class StringMin implements FieldValidator {
 
     @Override
     public Message validate(Object object, Object convertedValue) {
-        final String value = (String) convertedValue;
+        final String value = convertedValue == null ? null : convertedValue.toString();
         if (value == null || value.length() >= getMin()) {
             return null;
         } else {

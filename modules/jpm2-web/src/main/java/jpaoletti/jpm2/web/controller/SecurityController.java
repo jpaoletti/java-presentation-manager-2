@@ -70,7 +70,9 @@ public class SecurityController extends BaseController {
             getSecurityService().changePassword(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId, current, newpass);
             getContext().setGlobalMessage(MessageFactory.success("jpm.changePassword.success"));
         }
-        return new ModelAndView("jpm-" + OP_PROFILE);
+        final ModelAndView mav = new ModelAndView("jpm-" + OP_PROFILE);
+        mav.addObject("currentUser", iobject.getObject());
+        return mav;
     }
 
     @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}", method = RequestMethod.POST)

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.sql.JoinType;
@@ -15,9 +16,9 @@ import org.hibernate.sql.JoinType;
  */
 public interface Searcher {
 
-    public String visualization(Field field);
+    public String visualization(Entity entity, Field field);
 
-    public DescribedCriterion build(Field field, Map<String, String[]> parameters);
+    public DescribedCriterion build(Entity entity, Field field, Map<String, String[]> parameters);
 
     public class DescribedCriterion {
 

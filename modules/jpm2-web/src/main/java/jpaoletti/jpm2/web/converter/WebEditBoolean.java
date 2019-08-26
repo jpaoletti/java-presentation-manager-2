@@ -12,9 +12,8 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebEditBoolean extends WebToString {
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Boolean value = (Boolean) getValue(object, field);
-        return "<input name='field_" + field.getId() + "' type=\"checkbox\" " + ((value == null || value) ? "checked" : "") + "> ";
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+        return "<input name='field_" + field.getId() + "' type=\"checkbox\" " + ((value == null || (Boolean) value) ? "checked" : "") + "> ";
     }
 
     @Override

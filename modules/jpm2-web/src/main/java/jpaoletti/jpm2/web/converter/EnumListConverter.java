@@ -26,9 +26,9 @@ public class EnumListConverter extends WebToString {
     private Class clazz;
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
-            final Collection value = (Collection) ((object == null) ? null : getValue(object, field));
+            final Collection value = (Collection) ((object == null) ? null : object);
             final List<String> options = new ArrayList<>();
             for (Object option : EnumSet.allOf(getClazz())) {
                 options.add(((Enum) option).name() + "@" + String.valueOf(option) + "@" + (value != null && value.contains(option) ? "1" : "0"));

@@ -1,3 +1,4 @@
+<%@include file="../default-taglibs.jsp" %>
 <ul class="nav navbar-nav">
     <li class="active"><a href="#">Home</a></li>
     <li class="dropdown">

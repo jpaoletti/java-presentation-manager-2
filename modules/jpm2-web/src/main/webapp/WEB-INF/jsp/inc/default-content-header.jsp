@@ -1,5 +1,5 @@
 <div id="content-header" class="page-header">
-    <h1>${operationName}</h1>
+    <h1 class="hidden-xs">${operationName}</h1>
     <div class="btn-group">
         <c:forEach items="${generalOperations}" var="o">
             <c:if test="${empty owner}">
