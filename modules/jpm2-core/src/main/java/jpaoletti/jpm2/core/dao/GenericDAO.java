@@ -94,6 +94,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     @Override
     public Long count(DAOListConfiguration configuration) {
         final Criteria c = getBaseCriteria(configuration);
+        c.setFirstResult(0);
         c.setProjection(Projections.rowCount());
         return (Long) c.uniqueResult();
     }
