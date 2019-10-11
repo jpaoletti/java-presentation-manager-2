@@ -23,12 +23,14 @@
                         </ul>
                     </li>
                 </security:authorize>
+                <security:authorize access="hasAnyRole('ROLE_USER_RECENT')">
                 <li id="userNavRecent">
-                    <a id="userNavRecentLink"  href="#" data-toggle="dropdown" data-target="#userNavRecent" class="dropdown-toggle"><i class="glyphicon glyphicon-time"></i> <span class="text"><spring:message code="jpm.usernav.recent" text="Recent" /></span> <b class="caret"></b></a>
+                    <a id="userNavRecentLink"  href="#" data-toggle="dropdown" data-target="#userNavRecent" class="dropdown-toggle"><i class="glyphicon glyphicon-time"></i> <span class="text hidden-sm"><spring:message code="jpm.usernav.recent" text="Recent" /></span> <b class="caret"></b></a>
                     <ul class="dropdown-menu"></ul>
                 </li>
-                <li><a id="userProfileLink" title="" href="${cp}jpm/user/${user.username}/profile"><span class="glyphicon glyphicon-cog"></span> <span class="text"><spring:message code="jpm.login.profile" text="Logout" /></span></a></li>
-                <li><a id="logoutLink" title="" href="${cp}logout"><span class="glyphicon glyphicon-share-alt"></span> <span class="text"><spring:message code="jpm.login.logout" text="Logout" /></span></a></li>
+                </security:authorize>
+                <li><a id="userProfileLink" title="" href="${cp}jpm/user/${user.username}/profile"><span class="glyphicon glyphicon-cog"></span> <span class="text hidden-sm"><spring:message code="jpm.login.profile" text="Logout" /></span></a></li>
+                <li><a id="logoutLink" title="" href="${cp}logout"><span class="glyphicon glyphicon-share-alt"></span> <span class="text hidden-sm"><spring:message code="jpm.login.logout" text="Logout" /></span></a></li>
             </ul>
         </div>
     </div>
