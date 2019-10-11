@@ -1,15 +1,39 @@
 package jpaoletti.jpm2.web.controller;
 
 import com.google.gson.Gson;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.MessageFactory;
+import jpaoletti.jpm2.core.model.ContextualEntity;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.reports.EntityReport;
 import jpaoletti.jpm2.core.model.reports.EntityReportData;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.reports.EntityReportResult;
 import jpaoletti.jpm2.core.model.reports.EntityReportUserSave;
 import jpaoletti.jpm2.core.service.ReportService;
+import jpaoletti.jpm2.util.XlsUtils;
+import static jpaoletti.jpm2.util.XlsUtils.MIME_XLS;
+import static jpaoletti.jpm2.util.XlsUtils.xlsAmountStyle;
+import static jpaoletti.jpm2.util.XlsUtils.xlsCellWithStyle;
+import static jpaoletti.jpm2.util.XlsUtils.xlsDateStyle;
+import static jpaoletti.jpm2.util.XlsUtils.xlsNewPage;
+import static jpaoletti.jpm2.util.XlsUtils.xlsStrechColumns;
+import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,6 +107,19 @@ public class JPMReportController extends BaseController {
         mav.addObject("reportData", data);
         mav.addObject("result", reportService.getResult(report, data, true));
         return mav;
+    }
+
+    @RequestMapping(value = {"/jpm/report/{reportId}/xls"})
+    public void reportXls(@PathVariable String reportId, @RequestParam String reportData, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        final EntityReport report = getJpm().getReport(reportId);
+        if (report == null) {
+            throw new PMException(MessageFactory.error("report.not.found", reportId));
+        }
+        final EntityReportData data = new Gson().fromJson(reportData, EntityReportData.class);
+        final Workbook wb = reportService.getXls(report, data);
+        response.setContentType("application/vnd.ms-excel");
+        response.addHeader("Content-Disposition", "attachment;filename=" + getMessageSource().getMessage(report.getTitle(), null, "Generic Report", Locale.getDefault()) + ".xls");
+        response.getOutputStream().write(xlsTobytes(wb));
     }
 
     @RequestMapping(value = "/jpm/report/{reportId}/{savedReportId}/delete", method = RequestMethod.GET)
