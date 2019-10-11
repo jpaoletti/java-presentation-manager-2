@@ -10,10 +10,12 @@ public class EntityReportResult {
 
     private List mainData;
     private List<List> graphicData;
+    private List<String> visibleFields;
 
-    public EntityReportResult(List mainData, List<List> graphic) {
+    public EntityReportResult(List mainData, List<List> graphicData, List<String> visibleFields) {
         this.mainData = mainData;
-        this.graphicData = graphic;
+        this.graphicData = graphicData;
+        this.visibleFields = visibleFields;
     }
 
     public List getMainData() {
@@ -30,6 +32,14 @@ public class EntityReportResult {
 
     public void setGraphicData(List<List> graphicData) {
         this.graphicData = graphicData;
+    }
+
+    public List<String> getVisibleFields() {
+        return visibleFields;
+    }
+
+    public void setVisibleFields(List<String> visibleFields) {
+        this.visibleFields = visibleFields;
     }
 
 }
