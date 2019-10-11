@@ -3,7 +3,7 @@
 <div id="file-converter-container-${field}">
     <button type="button" class="btn btn-default btn-sm fileinput-button pull-left">
         <span class="glyphicon glyphicon-upload"></span>
-        <input name="file" id="field_${field}"  type="file" data-url="${cp}jpm/uploadFileConverter" ${param.multiple?'multiple=""':''} data-role="none"/>
+        <input name="file" id="field_${field}"  type="file" data-url="${cp}jpm/${param.postAction}" ${param.multiple?'multiple=""':''} data-role="none"/>
     </button>
     <input name="field_${field}" type="hidden" value="@current:" />
     <div id="progress_${field}" class="progress file-converter-progress"><div class="progress-bar"></div></div>

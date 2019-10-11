@@ -7,7 +7,6 @@
         <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
     </head>
     <c:set var="entityName" value="${entity.title}" />
-    <spring:message var="operationName" code="jpm." arguments="${entityName}" text="Profile" />
     <jpm:jpm-body showMenu="false">
         <h2><spring:message code="${report.title}" text="Generic Report" /></h2>
         <c:if test="${not empty userSave}"><h4><a class="btn btn-danger confirm-true" id="btnDeleteCurrent" href="${cp}jpm/report/${reportId}/${savedReportId}/delete" title="Delete"><span class="fa fa-trash-alt"></span></a> ${userSave.name}</h4></c:if>
@@ -142,7 +141,7 @@
                             <a href="#" id="saveReportBtn" data-toggle="modal" data-target="#saveReportModal"><spring:message code="jpm.reports.saveReport.btn" text="Save Report" /></a>
                         </li>
                         <li class="divider"></li>
-                        <c:forEach items="${savedReports}" var="fs" varStatus="st">
+                            <c:forEach items="${savedReports}" var="fs" varStatus="st">
                             <li role="presentation">
                                 <a role="menuitem" tabindex="-1" data-report='${fs.id}' href="${cp}jpm/report/${reportId}?savedReportId=${fs.id}" class="${fs.id == savedReportId?'selected-saved-report':''}">${fs.name}</span></a>
                             </li>
@@ -205,7 +204,6 @@
         </script>
     </c:if>
     <script type="text/javascript">
-
         var numericFields = [];
         <c:forEach items="${report.numericFieldList}" var="fs" varStatus="st">numericFields["${fs}"] = "<jpm:field-title entity="${report.entity}" fieldId="${fs}" showHelp="false" />";</c:forEach>
             jpmLoad(function () {
@@ -238,11 +236,25 @@
                     $("#htmlReportZone").html("<img src='${cp}static/img/loading.gif' />");
                     var data = buildReportData();
                     console.log(data);
-                    $.post(getContextPath() + "/jpm/report/${reportId}/html", {
+                    $.post("${cp}jpm/report/${reportId}/html", {
                         reportData: JSON.stringify(data)
                     }, function (result) {
                         $("#htmlReportZone").html(result);
                     });
+                });
+                $("#btnExcel").on("click", function () {
+                    var data = buildReportData();
+                    $("#htmlReportZone").html("<img src='${cp}static/img/loading.gif' />");
+
+                    var ifr = document.createElement("iframe");
+                    ifr.src = "${cp}jpm/report/${reportId}/xls?reportData=" + encodeURI(JSON.stringify(data));
+                    document.body.appendChild(ifr);
+                    var inter = window.setInterval(function () {
+                        if (ifr.contentWindow.document.readyState === "complete") {
+                            window.clearInterval(inter);
+                            $("#htmlReportZone").html("");
+                        }
+                    }, 1000);
                 });
                 $("body").on("click", ".closer", function () {
                     $(this).parent().remove();
