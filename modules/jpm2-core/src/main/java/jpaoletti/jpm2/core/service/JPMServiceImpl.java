@@ -137,7 +137,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (list == null || list.isEmpty()) {
             throw new PMException("jpm.toExcel.noData");
         }
-        final Sheet sheet = xlsNewPage(wb, new XlsFormatoTitulo(
+        final Sheet sheet = xlsNewPage(wb, new XlsFormatTitle(
                 getMessage("jpm.toExcel.pageName", null, LocaleContextHolder.getLocale()),
                 getMessage("jpm.toExcel.pageTitle", entity.getTitle().toUpperCase(), LocaleContextHolder.getLocale())
         ));

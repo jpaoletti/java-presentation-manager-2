@@ -53,10 +53,10 @@ public class XlsUtils {
         return res;
     }
 
-    public static Sheet xlsNewPage(final Workbook wb, XlsFormatoTitulo titleFormat) {
+    public static Sheet xlsNewPage(final Workbook wb, XlsFormatTitle titleFormat) {
         final List<String> columntitles = titleFormat.getTitulosColumnas();
         if (wb.getSheet(titleFormat.getTitulo()) != null) {
-            return xlsNewPage(wb, new XlsFormatoTitulo(
+            return xlsNewPage(wb, new XlsFormatTitle(
                     titleFormat.getTitulo() + ".",
                     titleFormat.getTituloInterno(),
                     titleFormat.getTitleColor(), columntitles));
@@ -183,29 +183,29 @@ public class XlsUtils {
         return cell;
     }
 
-    public static class XlsFormatoTitulo {
+    public static class XlsFormatTitle {
 
         private final String titulo;
         private final String tituloInterno;
         private final short titleColor;
         private final List<String> titulosColumnas = new ArrayList<>();
 
-        public XlsFormatoTitulo(String titulo, String tituloInterno, short titleColor, List<String> titulos) {
+        public XlsFormatTitle(String titulo, String tituloInterno, short titleColor, List<String> titulos) {
             this.titulo = titulo;
             this.titleColor = titleColor;
             this.tituloInterno = tituloInterno;
             this.titulosColumnas.addAll(titulos);
         }
 
-        public XlsFormatoTitulo(String titulo, String tituloInterno, List<String> titulos) {
+        public XlsFormatTitle(String titulo, String tituloInterno, List<String> titulos) {
             this(titulo, tituloInterno, HSSFColor.WHITE.index, titulos);
         }
 
-        public XlsFormatoTitulo(String titulo, String tituloInterno, String... titulos) {
+        public XlsFormatTitle(String titulo, String tituloInterno, String... titulos) {
             this(titulo, tituloInterno, Arrays.asList(titulos));
         }
 
-        public XlsFormatoTitulo(String titulo, String tituloInterno, short titleColor, String... titulos) {
+        public XlsFormatTitle(String titulo, String tituloInterno, short titleColor, String... titulos) {
             this(titulo, tituloInterno, titleColor, Arrays.asList(titulos));
         }
 
