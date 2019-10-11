@@ -27,7 +27,7 @@ public class LoginController extends BaseController {
     @RequestMapping(value = "/login")
     @Transactional
     public ModelAndView login(@RequestParam(value = "error", required = false) String error) {
-        final ModelAndView result = new ModelAndView("login");
+        final ModelAndView result = new ModelAndView(getSecurityService().getLoginPage());
         if (error != null) {
             result.addObject("error", error);
             getJpm().audit("Login error: " + error);

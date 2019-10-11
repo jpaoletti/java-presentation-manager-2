@@ -26,4 +26,6 @@ public interface SecurityService {
 
     @Transactional
     public void changePassword(Entity entity, String context, Operation operation, String instanceId, String current, String newpass) throws PMException;
+
+    public String getLoginPage();
 }

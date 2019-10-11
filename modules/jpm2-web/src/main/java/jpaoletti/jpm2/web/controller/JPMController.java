@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.message.MessageFactory;
@@ -52,6 +53,17 @@ public class JPMController extends BaseController {
         file.transferTo(tmpFile);
         final UploadFileResults res = new UploadFileResults();
         res.getFiles().add(new UploadFileResult(tmpFileName, file.getContentType(), tmpFile.length()));
+        return res;
+    }
+
+    @RequestMapping(value = "/jpm/uploadFileInMemoryConverter", method = RequestMethod.POST, headers = "Accept=application/json")
+    @ResponseBody
+    public UploadFileResults uploadFileInMemoryConverter(@RequestParam MultipartFile file) throws IOException {
+        final String sessionKey = UUID.randomUUID().toString();
+        getRequest().getSession().setAttribute(sessionKey, file.getBytes());
+        getRequest().getSession().setAttribute(sessionKey + "originalName", file.getOriginalFilename());
+        final UploadFileResults res = new UploadFileResults();
+        res.getFiles().add(new UploadFileResult(sessionKey, file.getContentType(), (long) file.getBytes().length));
         return res;
     }
 

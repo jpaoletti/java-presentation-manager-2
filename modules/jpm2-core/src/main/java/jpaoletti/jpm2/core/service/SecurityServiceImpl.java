@@ -79,4 +79,8 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
     public void setEncoder(BCrypt encoder) {
         this.encoder = encoder;
     }
+
+    public String getLoginPage() {
+        return "login";
+    }
 }
