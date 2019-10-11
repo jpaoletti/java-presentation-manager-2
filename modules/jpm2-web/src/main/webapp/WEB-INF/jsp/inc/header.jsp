@@ -15,7 +15,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
                     <li id="userNavFavorite">
-                        <a id="userNavFavoriteLink"  href="#" data-toggle="dropdown" data-target="#userNavFavorite" class="dropdown-toggle"><i class="glyphicon glyphicon-star"></i> <span class="text"><spring:message code="jpm.usernav.favorite" text="Favorites" /></span> <b class="caret"></b></a>
+                        <a id="userNavFavoriteLink"  href="#" data-toggle="dropdown" data-target="#userNavFavorite" class="dropdown-toggle"><i class="glyphicon glyphicon-star"></i> <span class="text hidden-sm"><spring:message code="jpm.usernav.favorite" text="Favorites" /></span> <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li id="addFavoriteLi"><a href="#" id="addFavoriteLink"><span class="glyphicon glyphicon-plus"></span> <spring:message code="jpm.usernav.addfavorite" text="Add to Favorites" /></a></li>
                             <li id="removeFavoriteLi"><a href="#" id="removeFavoriteLink"><span class="glyphicon glyphicon-minus"></span> <spring:message code="jpm.usernav.removefavorite" text="Remove from Favorites" /></a></li>
