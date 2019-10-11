@@ -223,13 +223,6 @@
     </jpm:jpm-body>
     <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
     <script type="text/javascript">
-        function openSearchModal(field) {
-            $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
-            $("#addSearchForm [name='fieldId']").val(field);
-            $("#searchModal").modal("show").on("shown.bs.modal", function () {
-                $("#searchModal .modal-body").find("input").trigger('focus');
-            });
-        }
         var sorting = false;
         jpmLoad(function () {
             $("#pageSizeSubmit").on("click", function () {

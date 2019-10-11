@@ -11,6 +11,13 @@ String.prototype.trim = function () {
     };
 }(jQuery));
 
+function openSearchModal(field) {
+    $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
+    $("#addSearchForm [name='fieldId']").val(field);
+    $("#searchModal").modal("show").on("shown.bs.modal", function () {
+        $("#searchModal .modal-body").find("input").trigger('focus');
+    });
+}
 
 function supports_html5_storage() {
     try {
@@ -403,7 +410,7 @@ var processFormResponse = function (data) {
         });
         jpmUnBlock();
     }
-}
+};
 
 function buildAjaxJpmForm(formId, callback, beforeSubmit) {
     if (!formId)
