@@ -45,7 +45,7 @@ public class EntityInstance {
         final Entity entity = ctx.getEntity();
         if (object != null) {
             if (entity.isWeak(ctx.getEntityContext())) {
-                final Object ownerobject = JPMUtils.get(object, entity.getOwner(ctx.getEntityContext()).getLocalProperty());
+                final Object ownerobject = entity.getOwner(ctx.getEntityContext()).getOwnerObject(ctx.getEntityContext(), object);
                 configureOwner(entity, ctx.getEntityContext(), ownerobject);
             }
             //configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
@@ -107,7 +107,7 @@ public class EntityInstance {
         }
         if (object != null) {
             if (entity.isWeak(ctx.getEntityContext())) {
-                final Object ownerobject = JPMUtils.get(object, entity.getOwner(ctx.getEntityContext()).getLocalProperty());
+                final Object ownerobject = entity.getOwner(ctx.getEntityContext()).getOwnerObject(ctx.getEntityContext(), object);
                 configureOwner(entity, ctx.getEntityContext(), ownerobject);
             }
             configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());

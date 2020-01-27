@@ -64,6 +64,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     /**
      * Return the list of fields including inherited ones.
      *
+     * @param context
      * @return The list
      */
     public List<Field> getAllFields(String context) {

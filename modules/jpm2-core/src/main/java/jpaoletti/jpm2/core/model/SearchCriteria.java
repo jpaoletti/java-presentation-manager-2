@@ -29,6 +29,7 @@ public class SearchCriteria implements Serializable {
     }
 
     public void clear() {
+        this.criterion = null;
         getDefinitions().clear();
         getAliases().clear();
     }

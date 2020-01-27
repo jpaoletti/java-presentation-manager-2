@@ -42,7 +42,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak) throws PMException {
         final Object owner = entity.getDao().get(instanceId);
-        final DAOListConfiguration cfg = new DAOListConfiguration(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+        final DAOListConfiguration cfg = new DAOListConfiguration();
+        addOwnerRestriction(weak, cfg, entity, owner);
         if (weak.getEntity().getDefaultSortField(entity.getContext()) != null) {
             final Field sortField = weak.getEntity().getFieldById(weak.getEntity().getDefaultSortField(entity.getContext()), weak.getContext());
             final ListSort sort = new ListSort(sortField, weak.getEntity().getDefaultSortDirection(entity.getContext()));
@@ -65,7 +66,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final Criterion search = sessionEntityData.getSearchCriteria().getCriterion();
         if (owner != null) {
             final Object ownerObject = owner.getDao().get(ownerId);
-            configuration.getRestrictions().add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
+            //configuration.getRestrictions().add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
+            addOwnerRestriction(entity, configuration, owner, ownerObject);
         }
         if (search != null) {
             configuration.getRestrictions().add(search);
@@ -217,7 +219,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public IdentifiedObject save(Entity owner, String ownerId, Entity entity, String context, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         final Object ownerObject = owner.getDao(context).get(ownerId);
         final Object object = JPMUtils.newInstance(entity.getClazz());
-        JPMUtils.set(object, entity.getOwner(context).getLocalProperty(), ownerObject);
+        entity.getOwner(context).setOwnerObject(getContext().getEntityContext(), object, ownerObject);
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao(context).save(object);
@@ -226,5 +228,13 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
         getJpm().audit(entity, operation, iobject);
         return iobject;
+    }
+
+    private void addOwnerRestriction(ContextualEntity weak, final DAOListConfiguration cfg, ContextualEntity ownerEntity, final Object owner) {
+        if (weak.getOwner().isOnlyId()) {
+            cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), ownerEntity.getDao().getId(owner)));
+        } else {
+            cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+        }
     }
 }

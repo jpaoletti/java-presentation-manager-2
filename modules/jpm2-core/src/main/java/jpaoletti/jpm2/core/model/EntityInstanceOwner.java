@@ -1,7 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
 import jpaoletti.jpm2.core.exception.ConfigurationException;
-import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  *
@@ -18,7 +17,7 @@ public class EntityInstanceOwner {
         this.iobject = iobject;
         if (entity.isWeak() && iobject != null) {
             final Entity superOwnerEntity = entity.getOwner().getOwner();
-            final Object superOwnerobject = JPMUtils.get(iobject.getObject(), entity.getOwner().getLocalProperty());
+            final Object superOwnerobject = entity.getOwner().getOwnerObject(null, iobject.getObject());
             final String superOwnerId = String.valueOf(superOwnerEntity.getDao().getId(superOwnerobject));
             this.owner = new EntityInstanceOwner(superOwnerEntity, new IdentifiedObject(superOwnerId, superOwnerobject));
         }
