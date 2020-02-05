@@ -33,6 +33,17 @@
         <property name="display" value="all" />
         <property name="scope" value="GENERAL" />
     </bean>
+    <bean id="repeatable-clear-add-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="add" />
+        <property name="repeatable" value="true" />
+        <property name="display" value="all" />
+        <property name="scope" value="GENERAL" />
+        <property name="properties">
+            <props>
+                <prop key="clear-on-repeat">true</prop>
+            </props>
+        </property>
+    </bean>
     <bean id="default-edit-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="edit" />
         <property name="display" value="show list" />
