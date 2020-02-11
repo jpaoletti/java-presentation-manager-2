@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
  *
  * @author jpaoletti
  */
-public class WebShowDateTime extends WebToString {
+public class PlainShowDateTime extends WebToString {
 
     private String format = "yyyy-MM-dd";
 
@@ -20,7 +20,7 @@ public class WebShowDateTime extends WebToString {
         final Date value = (Date) object;
         if (value != null) {
             final DateTime dt = new DateTime(value);
-            return wrap(field, process(dt.toString(getFormat())), value);
+            return process(dt.toString(getFormat()));
         } else {
             return "-";
         }

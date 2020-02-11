@@ -11,6 +11,7 @@ import jpaoletti.jpm2.core.PMException;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
@@ -26,6 +27,7 @@ import jpaoletti.jpm2.util.JPMUtils;
 import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
+import static jpaoletti.jpm2.web.controller.ShowController.OP_SHOW;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
@@ -33,6 +35,8 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,84 +74,88 @@ public class ListController extends BaseController {
 
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
-        final DAOListConfiguration cl = new DAOListConfiguration((page - 1) * ps, ps);
-        final List<Criterion> restrictions = new ArrayList<>();
-        if (filter != null && !"".equals(filter)) {
-            final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
-            synchronized (lfilter) {
-                if (lfilter instanceof RelatedListFilter) {
-                    ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
-                }
-                final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), ownerId);
-                if (c != null) {
-                    restrictions.add(c);
-                }
-            }
-        }
-        if (!"".equals(query)) {
-            final Map<String, String[]> searcherParameters = new LinkedHashMap();
-            searcherParameters.put("value", new String[]{query});
-            searcherParameters.put("operator", new String[]{"li"});
-            //Field can be a conbintaion of fields like "[{code}] {description}"
-            //Old style is supported if there is no { in the textField
-            if (!textField.contains("{")) {
-                final Field field = entity.getFieldById(textField, getContext().getEntityContext());
-                if (field.getSearcher() == null) {
-                    restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
-                } else {
-                    try {
-                        final DescribedCriterion dc = field.getSearcher().build(field, searcherParameters);
-                        for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
-                            cl.withAlias(alias.getProperty(), alias.getAlias());
-                        }
-                        restrictions.add(dc.getCriterion());
-                    } catch (Exception e) {
-                        //We ignore any errors avoiding the filter
+        r.setResults(new ArrayList<>());
+        try {
+            final DAOListConfiguration cl = new DAOListConfiguration((page - 1) * ps, ps);
+            final List<Criterion> restrictions = new ArrayList<>();
+            if (filter != null && !"".equals(filter)) {
+                final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
+                synchronized (lfilter) {
+                    if (lfilter instanceof RelatedListFilter) {
+                        ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
+                    }
+                    final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), ownerId);
+                    if (c != null) {
+                        restrictions.add(c);
                     }
                 }
-            } else {
-                final Disjunction disjunction = Restrictions.disjunction();
-                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-                while (matcher.find()) {
-                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    //Starting with !, properties are ignored
-                    if (!_display_field.startsWith("!")) {
-                        final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
-                        final String property = field2.getProperty();
-                        if (property.contains(".")) {//need an alias
-                            final String alias = property.substring(0, property.indexOf("."));
-                            cl.withAlias(alias, alias);
+            }
+            if (!"".equals(query)) {
+                final Map<String, String[]> searcherParameters = new LinkedHashMap();
+                searcherParameters.put("value", new String[]{query});
+                searcherParameters.put("operator", new String[]{"li"});
+                //Field can be a conbintaion of fields like "[{code}] {description}"
+                //Old style is supported if there is no { in the textField
+                if (!textField.contains("{")) {
+                    final Field field = entity.getFieldById(textField, getContext().getEntityContext());
+                    if (field.getSearcher() == null) {
+                        restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
+                    } else {
+                        try {
+                            final DescribedCriterion dc = field.getSearcher().build(entity, field, searcherParameters);
+                            for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
+                                cl.withAlias(alias.getProperty(), alias.getAlias());
+                            }
+                            restrictions.add(dc.getCriterion());
+                        } catch (Exception e) {
+                            //We ignore any errors avoiding the filter
                         }
-                        if (field2.getSearcher() == null) {
-                            disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
-                        } else {
-                            try {
-                                final DescribedCriterion dc = field2.getSearcher().build(field2, searcherParameters);
-                                for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
-                                    cl.withAlias(alias.getProperty(), alias.getAlias());
+                    }
+                } else {
+                    final Disjunction disjunction = Restrictions.disjunction();
+                    final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
+                    while (matcher.find()) {
+                        final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                        //Starting with !, properties are ignored
+                        if (!_display_field.startsWith("!")) {
+                            final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
+                            final String property = field2.getProperty();
+                            if (property.contains(".")) {//need an alias
+                                final String alias = property.substring(0, property.indexOf("."));
+                                cl.withAlias(alias, alias);
+                            }
+                            if (field2.getSearcher() == null) {
+                                disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
+                            } else {
+                                try {
+                                    final DescribedCriterion dc = field2.getSearcher().build(entity, field2, searcherParameters);
+                                    for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
+                                        cl.withAlias(alias.getProperty(), alias.getAlias());
+                                    }
+                                    disjunction.add(dc.getCriterion());
+                                } catch (Exception e) {
+                                    //We ignore any errors avoiding the filter
                                 }
-                                disjunction.add(dc.getCriterion());
-                            } catch (Exception e) {
-                                //We ignore any errors avoiding the filter
                             }
                         }
                     }
+                    restrictions.add(disjunction);
                 }
-                restrictions.add(disjunction);
             }
-        }
-        if (sortBy != null && !sortBy.equals("")) {
-            if (sortBy.startsWith("-")) {
-                cl.withOrder(Order.desc(sortBy.substring(1)));
-            } else {
-                cl.withOrder(Order.asc(sortBy));
+            if (sortBy != null && !sortBy.equals("")) {
+                if (sortBy.startsWith("-")) {
+                    cl.withOrder(Order.desc(sortBy.substring(1)));
+                } else {
+                    cl.withOrder(Order.asc(sortBy));
+                }
             }
-        }
-        final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
-        r.setMore(list.size() == ps);
-        r.setResults(new ArrayList<>());
-        for (Object object : list) {
-            getObjectDisplay(r, entity, object, useToString, textField);
+            final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
+            r.setMore(list.size() == ps);
+            for (Object object : list) {
+                getObjectDisplay(r, entity, object, useToString, textField);
+            }
+        } catch (FieldNotFoundException e) {
+            r.getResults().add(new ObjectConverterDataItem("?", "¿¿ " + textField + " ??"));
         }
         return r;
     }
@@ -206,7 +214,7 @@ public class ListController extends BaseController {
         final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak);
 
         final Operation operation = weak.getOperation(OP_LIST, null); //fixme
-        getContext().set(entity, entity.getOperation(OP_LIST, getContext().getContext())); //fixme
+        getContext().set(entity, entity.isContainingListOperation() ? entity.getOperation(OP_LIST, getContext().getContext()) : entity.getOperation(OP_SHOW, getContext().getContext())); //fixme
         getContext().setEntityContext(centity.getContext());
         getContext().setEntityInstance(new EntityInstance(getContext()));
         getContext().set(weak, operation);

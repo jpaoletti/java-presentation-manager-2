@@ -39,6 +39,8 @@ public class ExceptionController {
         JPMUtils.getLogger().warn("Parameter failure: " + ex.getRootCause().getLocalizedMessage());
         JPMUtils.getLogger().warn("Invalid value is: " + ex.getValue());
         JPMUtils.getLogger().warn("Required type is: " + ex.getRequiredType().getSimpleName());
+        JPMUtils.getLogger().warn("Request URL: " + req.getRequestURL().toString());
+        JPMUtils.getLogger().warn("Request Params: " + req.getQueryString());
         return null;
     }
 

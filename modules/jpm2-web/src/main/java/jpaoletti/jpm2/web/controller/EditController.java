@@ -43,7 +43,7 @@ public class EditController extends BaseController {
             final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext());
             getContext().setEntityInstance(instance);
             final Map<String, String[]> params = new HashMap<>();
-            params.put("field_" + name, (String[]) Arrays.asList(value).toArray());
+            params.put("field_" + name, (String[]) Arrays.asList(value).toArray(new String[1]));
             final Object tmp = instance.getValues().get(name);
             instance.getValues().clear();
             instance.getValues().put(name, tmp);

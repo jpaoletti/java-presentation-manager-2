@@ -68,7 +68,7 @@ public class AddController extends BaseController {
         IdentifiedObject iobjectOwner = null;
         if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
             iobjectOwner = getService().get(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), getContext().getEntityContext(), ownerId);
-            JPMUtils.set(object, getContext().getEntity().getOwner().getLocalProperty(), iobjectOwner.getObject());
+            getContext().getEntity().getOwner().setOwnerObject(getContext().getEntityContext(), object, iobjectOwner.getObject());
         }
         final Operation operation = getContext().getOperation();
         if (operation.getContext() != null) {
