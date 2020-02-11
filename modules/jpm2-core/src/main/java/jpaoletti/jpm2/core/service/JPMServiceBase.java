@@ -44,15 +44,19 @@ public class JPMServiceBase {
             final Field field = entity.getFieldById(entry.getKey(), getContext().getEntityContext());
             try {
                 final Converter converter = field.getConverter(entityInstance, operation);
-                final Object convertedValue = converter.build(getContext().getContextualEntity(), field, object, newValue);
-                final List<FieldValidator> validators = field.getValidators(entityInstance, operation);
                 boolean set = true;
-                for (FieldValidator fieldValidator : validators) {
-                    final Message msg = fieldValidator.validate(object, convertedValue);
-                    if (msg != null) {
-                        getContext().addFieldMsg(field, msg);
-                        set = false;
+                final Object convertedValue = converter != null ? converter.build(getContext().getContextualEntity(), field, object, newValue) : null;
+                if (converter != null) {
+                    final List<FieldValidator> validators = field.getValidators(entityInstance, operation);
+                    for (FieldValidator fieldValidator : validators) {
+                        final Message msg = fieldValidator.validate(object, convertedValue);
+                        if (msg != null) {
+                            getContext().addFieldMsg(field, msg);
+                            set = false;
+                        }
                     }
+                } else {
+                    set = false;
                 }
                 if (set) {
                     JPMUtils.set(object, field.getProperty(), convertedValue);
