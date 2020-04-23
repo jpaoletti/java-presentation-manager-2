@@ -12,7 +12,7 @@
     class="${clazz} confirm-${operation.confirm} ${operation.synchronic?' synchronic':' asynchronic'}" 
     title="<spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />"
     href="${cp}jpm/${contextualEntity}/${not empty instanceId?instanceId.concat('/'):''}${operation.pathId}">
-    <span class="glyphicon jpmicon-${operation.id}"></span>
+    <span class="${empty operation.icon?'glyphicon jpmicon-'.concat(operation.id):operation.icon}"></span>
     <c:if test="${not empty title and title}">
         <span class="hidden-sm hidden-xs">
             <spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />

@@ -60,6 +60,7 @@
                     <property name="context">
                         <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
                     </property>
+                    <property name="icon" value="fa fa-plus-square" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="generalAudit" />
@@ -322,6 +323,7 @@
                     <property name="scope" value="GENERAL" />
                     <property name="repeatable" value="true" />
                     <property name="follows" value="list" />
+                    <property name="icon" value="fa fa-plus-square" />
                 </bean>
                 <ref bean="default-show-operation" />
                 <ref bean="default-delete-operation" />

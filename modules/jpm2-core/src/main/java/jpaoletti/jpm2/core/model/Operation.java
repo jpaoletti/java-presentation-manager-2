@@ -31,6 +31,7 @@ public class Operation extends PMCoreObject {
      * operation will be shown
      */
     private String display;
+    private String icon; //In web stype, its a class like 'fa fa-plus'
     //If defined, its a direct link to a fixed URL
     private String url;
     //Indicates if the entity's title is shown
@@ -410,5 +411,13 @@ public class Operation extends PMCoreObject {
 
     public void setSynchronic(boolean synchronic) {
         this.synchronic = synchronic;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

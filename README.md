@@ -22,6 +22,7 @@ THIS IS A WORK IN PROGRESS PROJECT.
 * <a href='https://github.com/NicolasCARPi/jquery_jeditable'>jEditable </a>
 * Node js: 
 
+
 ## Functionalities
 
 * Localization (spring, view side)
@@ -31,6 +32,11 @@ THIS IS A WORK IN PROGRESS PROJECT.
 
 
 ## Notes ##
+
+To install nodejs in ubuntu:
+
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 
 ### Operation over entities with multiple contexts

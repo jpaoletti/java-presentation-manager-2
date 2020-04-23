@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +27,13 @@ public class BigDecimalSearcher extends IntegerSearcher {
 
     @Override
     protected Object getValue(Map<String, String[]> parameters) throws NumberFormatException {
-        return new BigDecimal(parameters.get("value")[0]);
+        final String v = parameters.get("value")[0];
+        if (StringUtils.isEmpty(v)) {
+            return null;
+        } else {
+            return new BigDecimal(v);
+        }
+
     }
 
     public String getOptions() {
