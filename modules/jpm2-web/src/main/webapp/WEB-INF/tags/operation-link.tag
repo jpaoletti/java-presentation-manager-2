@@ -9,7 +9,7 @@
 <%@attribute name = "title"             required="false" type="java.lang.Boolean" description="Show title " %>
 <a
     id="operation-${operation.id}"
-    class="${clazz} confirm-${operation.confirm} ${operation.synchronic?' synchronic':' asynchronic'}" 
+    class="${clazz} operation-${operation.id}-${contextualEntity} confirm-${operation.confirm} ${operation.synchronic?' synchronic':' asynchronic'}" 
     title="<spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />"
     href="${cp}jpm/${contextualEntity}/${not empty instanceId?instanceId.concat('/'):''}${operation.pathId}">
     <span class="${empty operation.icon?'glyphicon jpmicon-'.concat(operation.id):operation.icon}"></span>
