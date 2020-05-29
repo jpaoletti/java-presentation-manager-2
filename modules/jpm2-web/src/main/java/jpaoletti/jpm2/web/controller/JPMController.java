@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
@@ -18,9 +17,9 @@ import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,14 +35,14 @@ public class JPMController extends BaseController {
     @Autowired
     private FavoriteService favoriteService;
 
-    @RequestMapping(value = "/jpm", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm")
     public ModelAndView jpmStatus() {
         final ModelAndView mav = new ModelAndView("jpm-status");
         mav.addObject("jpm", getJpm());
         return mav;
     }
 
-    @RequestMapping(value = "/jpm/uploadFileConverter", method = RequestMethod.POST, headers = "Accept=application/json")
+    @PostMapping(value = "/jpm/uploadFileConverter", headers = "Accept=application/json")
     @ResponseBody
     public UploadFileResults uploadFileConverter(@RequestParam MultipartFile file) throws IOException {
         final Path tmpDir = Files.createTempDirectory("jpm");
@@ -56,7 +55,7 @@ public class JPMController extends BaseController {
         return res;
     }
 
-    @RequestMapping(value = "/jpm/uploadFileInMemoryConverter", method = RequestMethod.POST, headers = "Accept=application/json")
+    @PostMapping(value = "/jpm/uploadFileInMemoryConverter", headers = "Accept=application/json")
     @ResponseBody
     public UploadFileResults uploadFileInMemoryConverter(@RequestParam MultipartFile file) throws IOException {
         final String sessionKey = UUID.randomUUID().toString();
@@ -67,7 +66,7 @@ public class JPMController extends BaseController {
         return res;
     }
 
-    @RequestMapping(value = "/jpm/addFavorite", method = RequestMethod.POST, headers = "Accept=application/json")
+    @PostMapping(value = "/jpm/addFavorite", headers = "Accept=application/json")
     @ResponseBody
     public UserFavorite addFavorite(@RequestParam String url, @RequestParam(required = false, defaultValue = "?") String title) throws IOException {
         final UserFavorite res = favoriteService.addFavorite(getUserDetails().getUsername(), title, url);
@@ -75,21 +74,21 @@ public class JPMController extends BaseController {
         return res;
     }
 
-    @RequestMapping(value = "/jpm/removeFavorite", method = RequestMethod.POST, headers = "Accept=application/json")
+    @PostMapping(value = "/jpm/removeFavorite", headers = "Accept=application/json")
     @ResponseBody
     public String removeFavorite(@RequestParam String url) throws IOException {
         favoriteService.removeFavorite(getUserDetails().getUsername(), url);
         return url;
     }
 
-    @RequestMapping(value = "/jpm/favorites", method = RequestMethod.GET, headers = "Accept=application/json")
+    @GetMapping(value = "/jpm/favorites", headers = "Accept=application/json")
     @ResponseBody
     public List<UserFavorite> getFavorites() throws IOException {
         return favoriteService.getFavorites(getUserDetails().getUsername());
     }
 
     @ResponseBody
-    @RequestMapping(value = "/static/img/{entity}-{field}-{id}.png", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "/static/img/{entity}-{field}-{id}.png", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] showImageConverter(@PathVariable String entity, @PathVariable String field, @PathVariable String id, HttpServletResponse response) {
         try {
             final Entity e = getJpm().getEntity(entity);

@@ -5,7 +5,7 @@ import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -19,13 +19,13 @@ public class IndexController extends BaseController {
     @Autowired
     private WebApplicationContext ctx;
 
-    @RequestMapping(value = {"", "/", "/index", "/home"})
+    @GetMapping(value = {"", "/", "/index", "/home"})
     public ModelAndView index() throws PMException {
         setCurrentHome("index");
         return new ModelAndView("index");
     }
 
-    @RequestMapping(value = "/security")
+    @GetMapping(value = "/security")
     public ModelAndView security() {
         final ModelAndView res = new ModelAndView("security");
         if (getCtx().containsBean("jpm-dao-auth")) {

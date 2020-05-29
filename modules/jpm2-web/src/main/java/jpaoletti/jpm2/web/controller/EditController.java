@@ -15,8 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -30,13 +29,13 @@ public class EditController extends BaseController {
 
     public static final String OP_EDIT = "edit";
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/iledit", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/{entity}/{instanceId}/iledit")
     @ResponseBody
     public ResponseEntity<String> ileditCommit(
-            @PathVariable Entity entity,
-            @PathVariable String instanceId,
-            @RequestParam() String name,
-            @RequestParam() String value) throws PMException {
+        @PathVariable Entity entity,
+        @PathVariable String instanceId,
+        @RequestParam() String name,
+        @RequestParam() String value) throws PMException {
         final Operation operation = entity.getOperation(OP_EDIT, getContext().getContext());
         getContext().set(entity, operation);
         try {

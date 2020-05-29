@@ -1,44 +1,25 @@
 package jpaoletti.jpm2.web.controller;
 
 import com.google.gson.Gson;
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerException;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.MessageFactory;
-import jpaoletti.jpm2.core.model.ContextualEntity;
-import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.reports.EntityReport;
 import jpaoletti.jpm2.core.model.reports.EntityReportData;
 import jpaoletti.jpm2.core.model.Field;
-import jpaoletti.jpm2.core.model.reports.EntityReportResult;
 import jpaoletti.jpm2.core.model.reports.EntityReportUserSave;
 import jpaoletti.jpm2.core.service.ReportService;
-import jpaoletti.jpm2.util.XlsUtils;
-import static jpaoletti.jpm2.util.XlsUtils.MIME_XLS;
-import static jpaoletti.jpm2.util.XlsUtils.xlsAmountStyle;
-import static jpaoletti.jpm2.util.XlsUtils.xlsCellWithStyle;
-import static jpaoletti.jpm2.util.XlsUtils.xlsDateStyle;
-import static jpaoletti.jpm2.util.XlsUtils.xlsNewPage;
-import static jpaoletti.jpm2.util.XlsUtils.xlsStrechColumns;
 import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -52,14 +33,14 @@ public class JPMReportController extends BaseController {
     @Autowired
     private ReportService reportService;
 
-    @RequestMapping(value = "/jpm/report/{reportId}/save", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/report/{reportId}/save")
     public String saveReport(@PathVariable String reportId, @RequestParam String name, @RequestParam String content) throws PMException {
         final EntityReport report = getJpm().getReport(reportId);
         final EntityReportUserSave saveReport = reportService.saveReport(report, reportId, name, getUserDetails().getUsername(), content);
         return "redirect:/jpm/report/" + reportId + "?savedReportId=" + saveReport.getId();
     }
 
-    @RequestMapping(value = "/jpm/report/{reportId}", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm/report/{reportId}")
     public ModelAndView report(@PathVariable String reportId, @RequestParam(required = false) Long savedReportId) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-report");
         final EntityReport report = getJpm().getReport(reportId);
@@ -94,7 +75,7 @@ public class JPMReportController extends BaseController {
         return mav;
     }
 
-    @RequestMapping(value = "/jpm/report/{reportId}/html", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/report/{reportId}/html")
     public ModelAndView reportHtml(@PathVariable String reportId, @RequestParam String reportData) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-report.html");
         final EntityReport report = getJpm().getReport(reportId);
@@ -109,7 +90,7 @@ public class JPMReportController extends BaseController {
         return mav;
     }
 
-    @RequestMapping(value = {"/jpm/report/{reportId}/xls"})
+    @GetMapping(value = {"/jpm/report/{reportId}/xls"})
     public void reportXls(@PathVariable String reportId, @RequestParam String reportData, HttpServletRequest request, HttpServletResponse response) throws Exception {
         final EntityReport report = getJpm().getReport(reportId);
         if (report == null) {
@@ -122,7 +103,7 @@ public class JPMReportController extends BaseController {
         response.getOutputStream().write(xlsTobytes(wb));
     }
 
-    @RequestMapping(value = "/jpm/report/{reportId}/{savedReportId}/delete", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm/report/{reportId}/{savedReportId}/delete")
     public String deleteReport(@PathVariable String reportId, @PathVariable Long savedReportId) throws PMException {
         final EntityReport report = getJpm().getReport(reportId);
         reportService.deleteUserSave(savedReportId, getUserDetails().getUsername());

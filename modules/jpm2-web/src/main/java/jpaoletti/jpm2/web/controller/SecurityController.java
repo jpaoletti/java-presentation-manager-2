@@ -18,9 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -47,18 +47,18 @@ public class SecurityController extends BaseController {
     @Qualifier("jpm-dao-group")
     private DAO groupDAO;
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_RESET_PASSWORD + "}")
+    @GetMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_RESET_PASSWORD + "}")
     public ModelAndView resetPassword(@PathVariable String instanceId) throws PMException {
         final UserDetails user = getSecurityService().resetPassword(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
         getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(instanceId, user), getContext()));
         return new ModelAndView("jpm-" + OP_RESET_PASSWORD);
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}")
     public ModelAndView profile(
-            @PathVariable String instanceId,
-            @RequestParam(required = false) String current,
-            @RequestParam(required = false) String newpass) throws PMException {
+        @PathVariable String instanceId,
+        @RequestParam(required = false) String current,
+        @RequestParam(required = false) String newpass) throws PMException {
         final Entity entity = getContext().getEntity();
         final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId);
         final UserDetails user = (UserDetails) iobject.getObject();
@@ -75,12 +75,12 @@ public class SecurityController extends BaseController {
         return mav;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}")
     @ResponseBody
     public JPMPostResponse profilePost(
-            @PathVariable String instanceId,
-            @RequestParam(required = true) String current,
-            @RequestParam(required = true) String newpass) {
+        @PathVariable String instanceId,
+        @RequestParam(required = true) String current,
+        @RequestParam(required = true) String newpass) {
         try {
             final Entity entity = getContext().getEntity();
             final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId);
@@ -102,14 +102,14 @@ public class SecurityController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/jpm/security/i18n.js")
+    @GetMapping(value = "/jpm/security/i18n.js")
     public ModelAndView i18n() {
         final ModelAndView res = new ModelAndView("security.i18n");
         res.addObject("keys", getAuthDAO().list(new DAOListConfiguration()));
         return res;
     }
 
-    @RequestMapping(value = "/jpm/security/authorities.json", method = RequestMethod.GET, headers = "Accept=application/json")
+    @GetMapping(value = "/jpm/security/authorities.json", headers = "Accept=application/json")
     @ResponseBody
     public AuthoritiesResult getAuthorities(@RequestParam boolean readonly, @RequestParam String idGroup) {
         final AuthoritiesResult res = new AuthoritiesResult();

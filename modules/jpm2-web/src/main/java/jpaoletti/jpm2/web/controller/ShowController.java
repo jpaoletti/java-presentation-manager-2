@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -15,9 +14,8 @@ import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -30,12 +28,12 @@ public final class ShowController extends BaseController {
 
     public static final String OP_SHOW = "show";
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}.json", method = RequestMethod.GET, headers = "Accept=application/json")
+    @GetMapping(value = "/jpm/{entity}/{instanceId}.json", headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
-            @PathVariable Entity entity,
-            @PathVariable String instanceId,
-            @RequestParam(required = false) String textField) throws PMException {
+        @PathVariable Entity entity,
+        @PathVariable String instanceId,
+        @RequestParam(required = false) String textField) throws PMException {
         try {
             final String entityContext = getContext().getEntityContext();
             final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
@@ -49,7 +47,7 @@ public final class ShowController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", method = RequestMethod.GET, headers = "Accept=application/json")
+    @GetMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", headers = "Accept=application/json")
     @ResponseBody
     public Map<String, Object> showJSON(@PathVariable String instanceId, @RequestParam(required = false) String fields) {
         final Map<String, Object> values = new LinkedHashMap<>();
@@ -62,7 +60,7 @@ public final class ShowController extends BaseController {
                 if (converter != null) {
                     try {
                         values.put(field.getTitle(getContext().getEntity()),
-                                converter.visualize(getContext().getContextualEntity(), field, object, instanceId));
+                            converter.visualize(getContext().getContextualEntity(), field, object, instanceId));
                     } catch (IgnoreConvertionException ex) {
                     }
                 }
@@ -73,13 +71,13 @@ public final class ShowController extends BaseController {
         return values;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceId}/download/{fieldId}")
+    @GetMapping(value = "/jpm/{entity}/{instanceId}/download/{fieldId}")
     public void downloadFileConverter(HttpServletResponse response,
-            @PathVariable String instanceId,
-            @PathVariable String fieldId,
-            @RequestParam(required = false) String contentType,
-            @RequestParam(required = false) String prefix,
-            @RequestParam(required = false) String sufix
+        @PathVariable String instanceId,
+        @PathVariable String fieldId,
+        @RequestParam(required = false) String contentType,
+        @RequestParam(required = false) String prefix,
+        @RequestParam(required = false) String sufix
     ) throws IOException, PMException {
         getContext().setOperation(getContext().getEntity().getOperation(OP_SHOW, getContext().getContext()));
         final IdentifiedObject iobject = initItemControllerOperation(instanceId);

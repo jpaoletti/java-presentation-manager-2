@@ -10,9 +10,9 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,10 +35,10 @@ public class AddController extends BaseController {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}")
     public ModelAndView addPrepare(
-            @RequestParam(required = false) String lastId,
-            @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
+        @RequestParam(required = false) String lastId,
+        @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
         //If there is a "lastId" , the object values are used as defaults
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
         final Operation operation = getContext().getOperation();
@@ -62,7 +62,7 @@ public class AddController extends BaseController {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}")
     public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
         IdentifiedObject iobjectOwner = null;
@@ -90,7 +90,7 @@ public class AddController extends BaseController {
      * @return redirect to show
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}")
     @ResponseBody
     public JPMPostResponse addCommit(@RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
@@ -136,10 +136,10 @@ public class AddController extends BaseController {
      * @return redirect to show
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}")
     @ResponseBody
     public JPMPostResponse addWeakCommit(@PathVariable Entity owner, @PathVariable String ownerId,
-            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+        @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         try {
