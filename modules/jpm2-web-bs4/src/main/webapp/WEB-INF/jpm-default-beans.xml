@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean class="jpaoletti.jpm2.core.dao.AuditDAO" />
+    <bean id="jpm-dao-favorite" class="jpaoletti.jpm2.core.dao.FavoriteDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
+    <bean id="jpm-dao-entityReportUserSave" class="jpaoletti.jpm2.core.dao.EntityReportUserSaveDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
+
+    <!-- ID TRANSFORMERS -->
+    <bean id="transformer-str" class="jpaoletti.jpm2.core.idtransformer.Str" />
+    <bean id="transformer-strToLong" class="jpaoletti.jpm2.core.idtransformer.StrToLong" />
+    <bean id="transformer-strToInt" class="jpaoletti.jpm2.core.idtransformer.StrToInt" />
+
+    <!-- VALIDATORS -->
+    <bean id="jpm-validator-notNull" class="jpaoletti.jpm2.core.validator.NotNull" />
+    <bean id="jpm-validator-notEmpty" class="jpaoletti.jpm2.core.validator.NotEmpty" />
+
+    <!-- SEARCHERS -->
+    <bean id="jpm-searcher-int" class="jpaoletti.jpm2.core.search.IntegerSearcher" />
+    <bean id="jpm-searcher-long" class="jpaoletti.jpm2.core.search.LongSearcher" />
+    <bean id="jpm-searcher-string" class="jpaoletti.jpm2.core.search.StringSearcher" />
+    <bean id="jpm-searcher-bool" class="jpaoletti.jpm2.core.search.BoolSearcher" />
+
+    <!-- CONVERTERS -->
+    <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />
+    <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
+    <bean id="jpm-converter-editable" class="jpaoletti.jpm2.web.converter.EditableToString" />
+    <bean id="jpm-converter-editable-int" class="jpaoletti.jpm2.web.converter.WebILEditInteger" />
+    <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
+    <bean id="jpm-converter-show-bigstring" class="jpaoletti.jpm2.web.converter.ShowBigString" />
+
+    <bean id="jpm-converter-edit-bool" class="jpaoletti.jpm2.web.converter.WebEditBoolean" />
+    <bean id="jpm-converter-edit-string" class="jpaoletti.jpm2.web.converter.WebEditString" />
+    <bean id="jpm-converter-edit-int" class="jpaoletti.jpm2.web.converter.WebEditInteger" />
+    <bean id="jpm-converter-edit-long" class="jpaoletti.jpm2.web.converter.WebEditLong" />
+    <bean id="jpm-converter-edit-date" class="jpaoletti.jpm2.web.converter.WebEditDate2">
+        <property name="format" value="dd/MM/yyyy" />
+        <property name="jsFormat" value="DD/MM/YYYY" />
+    </bean>
+    <bean id="jpm-converter-edit-decimal" class="jpaoletti.jpm2.web.converter.WebEditDecimal" />
+    <bean id="jpm-converter-edit-bigstring" class="jpaoletti.jpm2.web.converter.EditBigString" />
+
+    <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
+
+    <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
+        <property name="prefix" value="U$S" />
+        <property name="suffix" value=".-"/>
+    </bean>
+    <bean id="jpm-converter-show-date" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
+        <property name="format" value="dd/MM/yyyy"/>
+    </bean>
+    <bean id="jpm-converter-show-datetime" class="jpaoletti.jpm2.web.converter.WebShowDateTime">
+        <property name="format" value="dd/MM/yyyy HH:mm:ss"/>
+    </bean>
+    <bean id="jpm-converter-show-html" class="jpaoletti.jpm2.web.converter.ShowHtml" />
+    <bean id="xls-config" class="jpaoletti.jpm2.core.model.FieldConfig">
+        <property name="operations" value="toExcel"/>
+        <property name="converter">
+            <ref bean="plainConverter" />
+        </property>
+    </bean>
+
+    <!-- DEFAULT CONFIG LISTS-->
+    <util:list id="default-id-field-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show edit"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <ref bean="xls-config" />
+    </util:list>
+
+    <util:list id="default-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-string"/>
+        </bean>
+        <ref bean="xls-config" />
+    </util:list>
+    <util:list id="default-long-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-long"/>
+        </bean>
+        <ref bean="xls-config" />
+
+    </util:list>
+    <util:list id="editable-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-editable"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-string"/>
+        </bean>
+        <ref bean="xls-config" />
+
+    </util:list>
+
+    <util:list id="default-bigstring-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="show"/>
+            <property name="converter" ref="jpm-converter-show-bigstring"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-bigstring"/>
+        </bean>
+    </util:list>
+
+    <util:list id="default-int-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-int"/>
+        </bean>
+        <ref bean="xls-config" />
+
+    </util:list>
+
+    <util:list id="default-date-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show-date"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-date"/>
+        </bean>
+        <ref bean="xls-config" />
+
+    </util:list>
+
+    <util:list id="default-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show-bool"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-bool"/>
+        </bean>
+        <ref bean="xls-config" />
+
+    </util:list>
+    <util:list id="inline-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter">
+                <bean class="jpaoletti.jpm2.web.converter.WebILEditBoolean" />
+            </property>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-bool"/>
+        </bean>
+        <ref bean="xls-config" />
+
+    </util:list>
+    <util:list id="default-enum-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-show" />
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter">
+                <bean class="jpaoletti.jpm2.web.converter.EnumConverter" />
+            </property>
+        </bean>
+        <ref bean="xls-config" />
+    </util:list>
+    <util:list id="default-html-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="show"/>
+            <property name="converter" ref="jpm-converter-show-html" />
+        </bean>
+    </util:list>
+    <import resource="jpm-default-beans-operations.xml" />
+</beans>

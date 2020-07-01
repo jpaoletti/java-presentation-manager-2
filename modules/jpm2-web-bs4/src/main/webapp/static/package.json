@@ -1,0 +1,21 @@
+{
+    "name": "jpm2-web-bs4",
+    "version": "1.0.0",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "jpaoletti",
+    "contributors": [],
+    "dependencies": {
+        "bootstrap": "^4.3.1",
+        "bootstrap4-dialog": "^4.1.0",
+        "jquery": "^3.4.1",
+        "jquery-blockui": "^2.7.0",
+        "jquery.cookie": "^1.4.1",
+        "moment": "^2.24.0"
+    }
+}

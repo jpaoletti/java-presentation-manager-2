@@ -1,0 +1,29 @@
+html {position: relative;min-height: 100%;}
+/*body {margin-bottom: 50px !important;}*/
+/*body.no-footer{margin-bottom: 0px !important;}*/
+main {padding-top: 65px;}
+.footer {
+    position: absolute;
+    bottom: 1px;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    background-color: #f5f5f5;
+}
+.asynchronicProgress{height: 4px; width: 100%; margin-top: -4px; display: none;}
+.asynchronicProgress .progress-bar{height: 3px !important;}
+#asynchronicProgress_status {font-size: 0.7em; color: gray; text-align: left; margin-top: -15px;}
+.borderless td, .borderless th {border: none;}
+[id^="showImageConverter"] {max-width: 100%;}
+.list-operation-heading{white-space:nowrap;}
+.list-pagination .pagination{margin-bottom: 0}
+.operation-list{ padding: 0.25rem !important;}
+.page-size{width: 60px !important;}
+.jpm-list-table td{ padding: 0.25rem !important;}
+
+.inline-block{display:inline-block}
+.control-label{text-align: right;}
+.converted-field-container .select2-container{
+    display:block !important;
+    width: 100% !important;
+}
