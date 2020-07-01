@@ -8,7 +8,7 @@
 <%@attribute name = "contextualEntity"  required="true"  type="java.lang.String" %>
 <%@attribute name = "title"             required="false" type="java.lang.Boolean" description="Show title " %>
 <a
-    id="operation-${operation.id}"
+    id="operation-${operation.id}" data-confirm="${operation.confirm}"
     class="${clazz} operation-${operation.id}-${contextualEntity} confirm-${operation.confirm} ${operation.synchronic?' synchronic':' asynchronic'}" 
     title="<spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />"
     href="${cp}jpm/${contextualEntity}/${not empty instanceId?instanceId.concat('/'):''}${operation.pathId}">
