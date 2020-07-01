@@ -37,7 +37,7 @@ public class BigDecimalSearcher extends IntegerSearcher {
     }
 
     public String getOptions() {
-        return String.format("{aSep: '%s', aDec: '%s', vMin: '%s', vMax: '%s'}", getGroupingSeparator(), getDecimalSeparator(), getMin(), getMax());
+        return String.format("{digitGroupSeparator: '%s', decimalCharacter: '%s', minimumValue: '%s', maximumValue: '%s'}", getGroupingSeparator(), getDecimalSeparator(), getMin(), getMax());
     }
 
     public String getFormat() {

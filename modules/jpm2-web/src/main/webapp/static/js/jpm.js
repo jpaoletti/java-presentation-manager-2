@@ -50,11 +50,17 @@ function initConfirm() {
     $("body").on("click", ".confirm-true", function (e) {
         e.preventDefault();
         var $href = $(this).attr("href");
-        BootstrapDialog.confirm(messages["jpm.modal.confirm.text"], function (result) {
-            if (result) {
-                document.location = $href;
-            }
-        });
+        //@@ are SELECTED scoped operations
+        if (!$href.contains("@@")) {
+            BootstrapDialog.confirm(messages["jpm.modal.confirm.text"], function (result) {
+                if (result) {
+                    jpmBlock();
+                    setTimeout(function () {
+                        document.location = $href;
+                    }, 300);
+                }
+            });
+        }
     });
 }
 
@@ -502,4 +508,42 @@ function asynchronicOperationProgress(id) {
     });
 }
 
+$("body").on("click", ".viewAttachmentIco", function (e) {
+    e.preventDefault();
+    var ct = $(this).attr("data-type");
+    var id = $(this).attr("data-id");
+    var entity = $(this).attr("data-entity");
+    var $textAndPic = $('<div id="attachmentPopup"></div>');
+    var html = "";
+    if (ct.contains("image")) {
+        html = html + "<img id='attachmentImg' src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "'/>";
+    } else if (ct.contains("pdf")) {
+        html = html + "<iframe src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "' style='height:500px;width:100%;'></iframe>";
+    } else {
+        html = html + "<div class='alert alert-info' >" + messages["jpm.modal.attachment.preview"] + "</div>";
+    }
+    $textAndPic.append(html);
+
+    BootstrapDialog.show({
+        title: messages["jpm.modal.attachment.title"],
+        message: $textAndPic,
+        cssClass: "modal-attachment",
+        onshown: function () {
+            //$(".modal-body").height($(document).height()-500);
+        },
+        buttons: [{
+                label: messages["jpm.modal.attachment.download"],
+                cssClass: 'btn-success',
+                action: function (dialogRef) {
+                    document.location = getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=true";
+                    dialogRef.close();
+                }
+            }, {
+                label: messages["jpm.modal.confirm.close"],
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }]
+    });
+});
 $(window).on("load", initPage);

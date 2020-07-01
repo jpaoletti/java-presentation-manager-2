@@ -22,6 +22,7 @@ import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.RelatedListFilter;
+import jpaoletti.jpm2.core.model.UserSearch;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.util.JPMUtils;
 import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
@@ -40,6 +41,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -60,16 +63,16 @@ public class ListController extends BaseController {
     @GetMapping(value = "/jpm/{entity}.json", headers = "Accept=application/json" /*, produces = {MediaType.APPLICATION_JSON_VALUE}*/)
     @ResponseBody
     public ObjectConverterData listObject(
-            @PathVariable Entity entity,
-            @RequestParam String textField,
-            @RequestParam(required = false, defaultValue = "false") boolean useToString,
-            @RequestParam(required = false) String relatedValue,
-            @RequestParam(required = false) String ownerId,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String filter,
-            @RequestParam(required = false, defaultValue = "") String query,
-            @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "2147483647") Integer pageSize) throws PMException {
+        @PathVariable Entity entity,
+        @RequestParam String textField,
+        @RequestParam(required = false, defaultValue = "false") boolean useToString,
+        @RequestParam(required = false) String relatedValue,
+        @RequestParam(required = false) String ownerId,
+        @RequestParam(required = false) String sortBy,
+        @RequestParam(required = false) String filter,
+        @RequestParam(required = false, defaultValue = "") String query,
+        @RequestParam(required = false, defaultValue = "1") Integer page,
+        @RequestParam(required = false, defaultValue = "2147483647") Integer pageSize) throws PMException {
 
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
@@ -224,11 +227,24 @@ public class ListController extends BaseController {
         return mav;
     }
 
-    @RequestMapping(value = "/jpm/{entity}/addSearch")
+    @PostMapping(value = "/jpm/{entity}/saveCurrentSearch")
+    public String saveCurrentSearch(@RequestParam String field, @RequestParam String name) throws PMException {
+        final UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final UserSearch res = new UserSearch();
+        res.setEnabled(true);
+        res.setName(name);
+        res.setUsername(user.getUsername());
+        res.setEntity(getContext().getEntityContext());
+        res.setField(field);
+        res.setParameters(name);
+        return buildRedirect(getContext().getEntity(), null, OP_LIST, null);
+    }
+
+    @PostMapping(value = "/jpm/{entity}/addSearch")
     public String addSearch(
-            @PathVariable Entity entity,
-            @RequestParam String fieldId,
-            HttpServletRequest request) throws PMException {
+        @PathVariable Entity entity,
+        @RequestParam String fieldId,
+        HttpServletRequest request) throws PMException {
         final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
@@ -241,13 +257,13 @@ public class ListController extends BaseController {
         return buildRedirect(entity, null, OP_LIST, params);
     }
 
-    @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
+    @PostMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
     public String addWeakSearch(
-            @PathVariable Entity owner,
-            @PathVariable String ownerId,
-            @PathVariable Entity entity,
-            @RequestParam String fieldId,
-            HttpServletRequest request) throws PMException {
+        @PathVariable Entity owner,
+        @PathVariable String ownerId,
+        @PathVariable Entity entity,
+        @RequestParam String fieldId,
+        HttpServletRequest request) throws PMException {
         final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
@@ -262,18 +278,18 @@ public class ListController extends BaseController {
 
     @GetMapping(value = "/jpm/{entity}/removeSearch")
     public String removeSearch(
-            @PathVariable Entity entity,
-            @RequestParam Integer i) throws PMException {
+        @PathVariable Entity entity,
+        @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
         return buildRedirect(entity, null, OP_LIST, PAGE1);
     }
 
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeSearch")
     public String removeWeakSearch(
-            @PathVariable Entity owner,
-            @PathVariable String ownerId,
-            @PathVariable Entity entity,
-            @RequestParam Integer i) throws PMException {
+        @PathVariable Entity owner,
+        @PathVariable String ownerId,
+        @PathVariable Entity entity,
+        @RequestParam Integer i) throws PMException {
         getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
         return buildRedirect(owner, ownerId, entity, null, OP_LIST, PAGE1);
     }
@@ -286,10 +302,10 @@ public class ListController extends BaseController {
 
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/sort")
     public String sortWeak(
-            @PathVariable Entity owner,
-            @PathVariable String ownerId,
-            @PathVariable Entity entity,
-            @RequestParam String fieldId) throws PMException {
+        @PathVariable Entity owner,
+        @PathVariable String ownerId,
+        @PathVariable Entity entity,
+        @RequestParam String fieldId) throws PMException {
         getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId, getContext().getEntityContext()));
         return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
     }
@@ -298,9 +314,9 @@ public class ListController extends BaseController {
         final Entity entity = getContext().getEntity();
         final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
         final PaginatedList paginatedList = getService().getPaginatedList(
-                getContext().getContextualEntity(),
-                getContext().getOperation(),
-                getSessionEntityData(entity), page, pageSize, owner, ownerId);
+            getContext().getContextualEntity(),
+            getContext().getOperation(),
+            getSessionEntityData(entity), page, pageSize, owner, ownerId);
         mav.addObject("paginatedList", paginatedList);
         mav.addObject("compactOperations", getContext().getOperation().isCompact());
         mav.addObject("sessionEntityData", getSessionEntityData(entity));

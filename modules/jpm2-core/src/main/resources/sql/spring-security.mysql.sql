@@ -46,6 +46,10 @@ INSERT INTO `groups` (`id`, `group_name`) VALUES (NULL, 'Administrators'), (NULL
 INSERT INTO `users` VALUES ('admin', 'Y', 'Y', 'Y', 'Y', '', 'Administrator', '$2a$12$zofXZl6UI.uTuqBSyKwvvOh2Qbx5vjGkgGv8MeH9/6TBPncRK2RHq', 0); -- admin / test
 INSERT INTO `group_members` (`username`, `group_id`) VALUES ('admin', '1');
 
+INSERT INTO `authorities` (`authority`) VALUES ('ROLE_USER');
+INSERT INTO `authorities` (`authority`) VALUES ('ROLE_USER_FAVORITE');
+INSERT INTO `authorities` (`authority`) VALUES ('ROLE_USER_RECENT');
+
 INSERT INTO group_authorities (group_id, authority) VALUES
 (1, 'ROLE_USER'),
 (1, 'ROLE_USER_FAVORITE'),

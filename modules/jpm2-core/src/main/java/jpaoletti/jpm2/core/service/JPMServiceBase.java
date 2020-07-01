@@ -36,7 +36,7 @@ public class JPMServiceBase {
     @Autowired
     private AuthorizationService authorizationService;
 
-    protected void processFields(Entity entity, Operation operation, Object object, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
+    public void processFields(Entity entity, Operation operation, Object object, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
         preConversion(operation, object);
         for (Map.Entry<String, Object> entry : entityInstance.getValues().entrySet()) {
             final String[] param = parameters.get("field_" + entry.getKey());

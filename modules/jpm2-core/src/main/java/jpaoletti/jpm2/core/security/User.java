@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -15,7 +16,7 @@ import org.hibernate.annotations.Type;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Security User. Override with a custom or use CustomUser
+ * Base Security User. Override with a custom or use JpmUser
  *
  * @author jpaoletti
  */
@@ -48,8 +49,8 @@ public abstract class User implements Serializable, UserDetails {
 
     @ManyToMany(targetEntity = Group.class)
     @JoinTable(name = "group_members", joinColumns
-            = @JoinColumn(name = "username"), inverseJoinColumns
-            = @JoinColumn(name = "group_id"))
+        = @JoinColumn(name = "username"), inverseJoinColumns
+        = @JoinColumn(name = "group_id"))
     private List<Group> groups;
 
     @Transient
@@ -193,5 +194,9 @@ public abstract class User implements Serializable, UserDetails {
 
     public void setLoginAttemps(Integer loginAttemps) {
         this.loginAttemps = loginAttemps;
+    }
+
+    public String getUserGroups() {
+        return getGroups().stream().map(Group::getName).collect(Collectors.joining(", "));
     }
 }

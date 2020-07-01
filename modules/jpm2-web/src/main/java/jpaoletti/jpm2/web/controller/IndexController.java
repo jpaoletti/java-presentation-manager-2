@@ -1,11 +1,18 @@
 package jpaoletti.jpm2.web.controller;
 
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.GenericDAO;
+import jpaoletti.jpm2.core.model.WithAttachment;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -43,6 +50,17 @@ public class IndexController extends BaseController {
         }
         setCurrentHome("security");
         return res;
+    }
+
+    @RequestMapping(value = "/static/{entity}/{instanceId}/downloadAttachment")
+    @ResponseBody
+    public void downloadFileConverter(HttpServletResponse response, @PathVariable String entity, @PathVariable String instanceId, @RequestParam boolean download) throws IOException, PMException {
+        final WithAttachment wa = (WithAttachment) getJpm().getEntity(entity).getDao().get(instanceId);
+        response.setContentType(wa.getContentType());
+        if (download) {
+            response.addHeader("Content-Disposition", "attachment;filename=" + wa.getAttachmentName());
+        }
+        response.getOutputStream().write(wa.getAttachment());
     }
 
     public WebApplicationContext getCtx() {

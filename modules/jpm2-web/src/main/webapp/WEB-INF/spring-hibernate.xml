@@ -25,6 +25,7 @@
                 <value>jpaoletti.jpm2.core.test.JPMTest</value>
                 <value>jpaoletti.jpm2.core.test.JPMTestWeak</value>
                 <value>jpaoletti.jpm2.core.model.reports.EntityReportUserSave</value>
+                <value>jpaoletti.jpm2.core.model.UserFavorite</value>
                 <value>jpaoletti.jpm2.core.security.Authority</value>
                 <value>jpaoletti.jpm2.core.security.User</value>
                 <value>jpaoletti.jpm2.core.security.JpmUser</value>

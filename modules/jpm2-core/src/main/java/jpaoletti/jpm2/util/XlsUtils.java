@@ -57,9 +57,9 @@ public class XlsUtils {
         final List<String> columntitles = titleFormat.getTitulosColumnas();
         if (wb.getSheet(titleFormat.getTitulo()) != null) {
             return xlsNewPage(wb, new XlsFormatTitle(
-                    titleFormat.getTitulo() + ".",
-                    titleFormat.getTituloInterno(),
-                    titleFormat.getTitleColor(), columntitles));
+                titleFormat.getTitulo() + ".",
+                titleFormat.getTituloInterno(),
+                titleFormat.getTitleColor(), columntitles));
         }
         final Sheet sheet = wb.createSheet(titleFormat.getTitulo());
         int r = titleFormat.getTituloInterno() != null ? xlsTitle(sheet, 0, titleFormat.getTituloInterno(), columntitles.size()) + 1 : 0;
@@ -146,17 +146,17 @@ public class XlsUtils {
 
     public static String replaceHtmlCodeAccents(String s) {
         return s.replaceAll("&aacute;", "á")
-                .replaceAll("&eacute;", "é")
-                .replaceAll("&iacute;", "í")
-                .replaceAll("&oacute;", "ó")
-                .replaceAll("&uacute;", "ú")
-                .replaceAll("&Aacute;", "Á")
-                .replaceAll("&Eacute;", "É")
-                .replaceAll("&Iacute;", "Í")
-                .replaceAll("&Oacute;", "Ó")
-                .replaceAll("&Uacute;", "Ú")
-                .replaceAll("&Nacute;", "Ñ")
-                .replaceAll("&ntilde;", "ñ");
+            .replaceAll("&eacute;", "é")
+            .replaceAll("&iacute;", "í")
+            .replaceAll("&oacute;", "ó")
+            .replaceAll("&uacute;", "ú")
+            .replaceAll("&Aacute;", "Á")
+            .replaceAll("&Eacute;", "É")
+            .replaceAll("&Iacute;", "Í")
+            .replaceAll("&Oacute;", "Ó")
+            .replaceAll("&Uacute;", "Ú")
+            .replaceAll("&Nacute;", "Ñ")
+            .replaceAll("&ntilde;", "ñ");
     }
 
     public static String xlsGetCellValue(Cell cell) {

@@ -55,6 +55,7 @@
         <property name="display" value="list" />
         <property name="scope" value="GENERAL" />
         <property name="executor" ref="operationExecutorDefaultReport" />
+        <property name="icon" value="fas fa-book" />
     </bean>
     <bean id="default-delete-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="delete" />
