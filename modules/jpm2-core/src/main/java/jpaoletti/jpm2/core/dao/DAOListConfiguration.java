@@ -2,8 +2,10 @@ package jpaoletti.jpm2.core.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.hibernate.criterion.Criterion;
@@ -22,6 +24,7 @@ public class DAOListConfiguration {
     private List<Criterion> restrictions;
     private List<Order> orders;
     private Set<DAOListConfigurationAlias> aliases;
+    private Map<String, String> properties = new LinkedHashMap<>();
 
     public DAOListConfiguration() {
         this.orders = new ArrayList<>();
@@ -145,6 +148,7 @@ public class DAOListConfiguration {
         this.orders = orders;
     }
 
+    @Override
     public DAOListConfiguration clone() {
         final DAOListConfiguration c = new DAOListConfiguration();
         c.setFrom(getFrom());
@@ -159,6 +163,14 @@ public class DAOListConfiguration {
             c.withOrder(o);
         }
         return c;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
     public static class DAOListConfigurationAlias {
