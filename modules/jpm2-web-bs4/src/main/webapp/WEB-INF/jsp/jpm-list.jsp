@@ -6,8 +6,12 @@
         <%@include file="inc/default-head.jsp" %>
     </head>
     <c:set var="entityName" value="${entity.title}" />
-    <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" text="Operation" />
+    <spring:message var="operationName" code="${operation.title}" arguments="${entity.pluralTitle}" text="Operation" />
     <jpm:jpm-body>
+        <div id="content-header">
+            <h3><span class="${operation.icon}"></span>  ${entity.pluralTitle}</h3>
+            <h4>&nbsp;</h4>
+        </div>
         <%@include file="inc/default-breadcrumb.jsp" %>
         <div class="row" id="container-${fn:replace(contextualEntity,'!', '-')}-${operation.id}">
             <div class="col-12">
@@ -15,36 +19,50 @@
                 <div class="row">
                     <div class="col-10">
                         <!--<div class="btn-group filter-list">-->
-                            <a class="btn btn-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="fas fa-filter"></span>
-                            </a>
-                            <ul class="dropdown-menu" role="menu">
-                                <c:forEach items="${paginatedList.fieldSearchs}" var="fs" varStatus="st">
-                                    <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}');">${st.index+1}. <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" /></a>
-                                </c:forEach>
-                            </ul>
-                            <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
-                                <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
-                                <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="fas fa-filter"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <c:forEach items="${paginatedList.fieldSearchs}" var="fs" varStatus="st">
+                                <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}');">${st.index+1}. <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" /></a>
+                            </c:forEach>
+                        </ul>
+                        <div class="btn-group">
+                            <c:forEach items="${generalOperations}" var="o">
                                 <c:if test="${empty owner}">
-                                    <a href="${cp}jpm/${contextualEntity}/removeSearch?i=${st.index}" class="btn btn-info removeSearchBtn">
-                                        "${fieldTitle}" ${text}
-                                        <span class="fa fa-trash-alt"></span>
-                                    </a>
+                                    <jpm:operation-link operation="${o}" clazz="btn ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="${o.showTitle}" />
                                 </c:if>
                                 <c:if test="${not empty owner}">
-                                    <!--BUG NEED OWNER CONTEXT--> 
-                                    <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/removeSearch?i=${st.index}" class="btn btn-info removeSearchBtn">
-                                        "${fieldTitle}" ${text}
-                                        <span class="fa fa-trash-alt"></span>
-                                    </a>
+                                    <jpm:operation-link operation="${o}" clazz="btn ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" instanceId="${item.id}" entityName="${entityName}"  title="${o.showTitle}" />
                                 </c:if>
                             </c:forEach>
+                        </div>
                         <!--</div>-->
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
+                            <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
+                            <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />
+                            <c:if test="${empty owner}">
+                                <a href="${cp}jpm/${contextualEntity}/removeSearch?i=${st.index}" class="badge badge-secondary removeSearchBtn">
+                                    "${fieldTitle}" ${text} &nbsp;&nbsp;
+                                    <span class="fa fa-times"></span>
+                                </a>
+                            </c:if>
+                            <c:if test="${not empty owner}">
+                                <!--BUG NEED OWNER CONTEXT--> 
+                                <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/removeSearch?i=${st.index}" class="badge badge-secondary removeSearchBtn">
+                                    "${fieldTitle}" ${text} &nbsp;&nbsp;
+                                    <span class="fa fa-times"></span>
+                                </a>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+                </div>
                 <!-- END Filter list-->
-                <hr/>
+                <hr class="mb-3 mt-3"/>
                 <!-- CONTENT DATA -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm jpm-list-table w-auto">
@@ -56,37 +74,7 @@
                                         <input type="checkbox" class="pull-left" id="select_unselect_all" />
                                     </c:if>
 
-                                    <div class="btn-group">
-                                        <c:if test="${not compactOperations}">
-                                            <c:forEach items="${generalOperations}" var="o">
-                                                <c:if test="${empty owner}">
-                                                    <jpm:operation-link operation="${o}" clazz="btn btn-primary btn-sm" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
-                                                </c:if>
-                                                <c:if test="${not empty owner}">
-                                                    <jpm:operation-link operation="${o}" clazz="btn btn-primary btn-sm" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
-                                                </c:if>
-                                            </c:forEach>
-                                        </c:if>
-                                        <c:if test="${compactOperations}">
-                                            <div class="btn-group">
-                                                <button type="button" class="btn  btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
-                                                    <span class="fas fa-cog"></span> <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <c:forEach items="${generalOperations}" var="o">
-                                                        <li>
-                                                            <c:if test="${empty owner}">
-                                                                <jpm:operation-link operation="${o}" clazz="btn btn-primary" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
-                                                            </c:if>
-                                                            <c:if test="${not empty owner}">
-                                                                <jpm:operation-link operation="${o}" clazz="btn btn-primary" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
-                                                            </c:if>
-                                                        </li>
-                                                    </c:forEach>
-                                                </ul>
-                                            </div>
-                                        </c:if>
-                                    </div>
+
                                 </th>
                                 <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
                                     <th data-field="${field.id}" data-entity="${contextualEntity}" data-index='${st.index+1}'
@@ -110,21 +98,19 @@
                                         <div class="btn-group">
                                             <c:if test="${not compactOperations}">
                                                 <c:forEach items="${item.operations}" var="o">
-                                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm btn-secondary" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
+                                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
                                                 </c:forEach>
                                             </c:if>
                                             <c:if test="${compactOperations}">
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn  btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
+                                                <div class="dropdown">
+                                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
                                                         <span class="fas fa-cog"></span> <span class="caret"></span>
                                                     </button>
-                                                    <ul class="dropdown-menu" role="menu">
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         <c:forEach items="${item.operations}" var="o">
-                                                            <li>
-                                                                <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" />
-                                                            </li>
+                                                            <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" clazz="dropdown-item" />
                                                         </c:forEach>
-                                                    </ul>
+                                                    </div>
                                                 </div>
                                             </c:if>
                                         </div>
@@ -150,7 +136,7 @@
                                     <td colspan="100">
                                         <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="pull-left" />
                                         <c:forEach var="o" items="${selectedOperations}">
-                                            <jpm:operation-link operation="${o}" clazz="btn btn-sm btn-warning selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
+                                            <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-warning'} selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
                                         </c:forEach>
                                     </td>
                                 </tr>
@@ -195,7 +181,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-light" data-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
-                                <button type="submit" class="btn btn-primary"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
+                                <button type="submit" class="btn btn-secondary"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
                             </div>
                         </div>
                     </div>

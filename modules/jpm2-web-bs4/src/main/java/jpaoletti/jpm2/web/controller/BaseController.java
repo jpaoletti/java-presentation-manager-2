@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
@@ -33,10 +34,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class BaseController {
 
     public static final String CURRENT_HOME = "currentHome";
+
     @Autowired
     public HttpSession session;
+
     @Autowired
     private HttpServletRequest request;
+
     @Autowired
     private JPMContext context;
     @Autowired
@@ -124,6 +128,10 @@ public class BaseController {
 
     public void setSession(HttpSession session) {
         this.session = session;
+    }
+
+    public Map getParameterMap() {
+        return getRequest().getParameterMap();
     }
 
     public HttpServletRequest getRequest() {

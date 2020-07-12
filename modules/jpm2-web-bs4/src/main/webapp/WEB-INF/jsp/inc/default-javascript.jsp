@@ -27,12 +27,19 @@
     messages["jpm.modal.confirm.submit"] = "<spring:message code='jpm.modal.confirm.submit' text='Ok' />";
     messages["jpm.modal.confirm.text"] = "<spring:message code='jpm.modal.confirm.text' text='Are you sure you want to continue?' />";
     messages["jpm.modal.confirm.close"] = "<spring:message code='jpm.modal.confirm.close' text='Close' />";
-    messages["jpm.usernav.addfavorite"] = "<spring:message code='jpm.usernav.addfavorite' text='' />";
+    messages["jpm.usernav.addfavorite"] = "<spring:message code='jpm.usernav.addfavorite' text='Add Fav' />";
+    messages["jpm.usernav.removefavorite"] = "<spring:message code='jpm.usernav.removefavorite' text='Remove Fav' />";
     messages["jpm.addfavorite.popupTitle"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
     function getContextPath() {
         return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "${cp}";
     }
+    var ROLE_USER_FAVORITE = false;
 </script>
+<security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
+    <script type="text/javascript">
+    ROLE_USER_FAVORITE = true;
+    </script>
+</security:authorize>
 <script type="text/javascript">
     jpmLoad(function () {
         $("#menu-${fn:replace(contextualEntity,'!', '-')}").addClass("active");

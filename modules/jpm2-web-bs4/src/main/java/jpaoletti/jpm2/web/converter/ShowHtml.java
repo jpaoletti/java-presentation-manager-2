@@ -13,8 +13,7 @@ import jpaoletti.jpm2.core.model.Field;
 public class ShowHtml extends Converter {
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Object value = getValue(object, field);
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
         return "<div class='html'>" + (value != null ? value : "") + "</div>";
     }
 

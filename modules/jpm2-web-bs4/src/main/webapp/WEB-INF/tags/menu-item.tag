@@ -6,5 +6,5 @@
 <%@attribute name = "icon" required="false" type="java.lang.String" %>
 <%@attribute name = "separator" required="false" type="java.lang.Boolean" %>
 <security:authorize access="hasRole('jpm.auth.operation.${code}.list')">
-    <li><a href="${cp}jpm/${code}/list" id="menu-${code}" class="jpm-menu-item"><i class="${icon}"></i>&nbsp;<spring:message code="top.menu.${code}" text="${code}" /></a></li>
+    <li><a href="${cp}jpm/${code}/list" id="menu-${code}" class="jpm-menu-item"><span class="${icon}"></span>&nbsp;<spring:message code="top.menu.${code}" text="${code}" /></a></li>
 </security:authorize>

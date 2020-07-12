@@ -31,10 +31,11 @@ public class Operation extends PMCoreObject {
      * operation will be shown
      */
     private String display;
-    private String icon; //In web stype, its a class like 'fa fa-plus'
+    private String icon; //In web type, its a class like 'fa fa-plus'
+    private String color; //In web type, its a class like 'btn-primary'
     //If defined, its a direct link to a fixed URL
     private String url;
-    //Indicates if the entity's title is shown
+    //Indicates if the operation title is shown
     private boolean showTitle;
     //Indicate if a confirmation is needed before proceed.
     private boolean confirm;
@@ -62,7 +63,7 @@ public class Operation extends PMCoreObject {
 
     public Operation() {
         this.enabled = true;
-        this.showTitle = true;
+        this.showTitle = false;
         this.compact = false;
         this.popup = false;
         this.available = true;
@@ -119,7 +120,7 @@ public class Operation extends PMCoreObject {
      */
     public boolean isDisplayed(String other) {
         return ((getDisplay() == null || getDisplay().contains("all") || getDisplay().contains(other)))
-                && (!getDisplay().contains("!" + other)); //new, this is for ignoring operations, like "all !add" means 'all' but not 'add'
+            && (!getDisplay().contains("!" + other)); //new, this is for ignoring operations, like "all !add" means 'all' but not 'add'
     }
 
     /**
@@ -419,5 +420,13 @@ public class Operation extends PMCoreObject {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

@@ -34,7 +34,7 @@ public class EditAuthoritiesConverter extends Converter {
     @Override
     public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue == null || "".equals(newValue)) {
-            return null;
+            throw new ConverterException("error.converting.authorities.empty");
         } else {
             try {
                 final List<String> c = (List<String>) getValue(object, field);

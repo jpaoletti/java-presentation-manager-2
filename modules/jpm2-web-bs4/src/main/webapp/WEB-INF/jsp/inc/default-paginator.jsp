@@ -3,7 +3,7 @@
         <c:if test="${not entity.countable}">
             <form action="" class="form-inline d-flex flex-nowrap" role="form">
                 <input class="form-control page-size form-control-sm" type="number" min="1" ${(paginatedList.more)?'':("max='".concat(paginatedList.page).concat("'"))} value="${paginatedList.page}" name="page" style="width:60px;" />
-                <button type="submit" class="btn btn-primary btn-sm"><span class="fas fa-arrow-right"></span></button>
+                <button type="submit" class="btn btn-secondary btn-sm"><span class="fas fa-arrow-right"></span></button>
             </form>
         </c:if>
         <c:if test="${entity.countable and paginatedList.pages > 20}">
@@ -32,17 +32,17 @@
             </li>
         </ul>
     </div>
-    <div class="inline-block float-right">
-        <form action="" class="form-inline d-flex flex-nowrap float-right" role="form">
+    <div class="inline-block float-right" >
+        <form action="" class="form-inline d-flex flex-nowrap float-right" role="form" id="pagination-pages-form">
             <input type="hidden" name="entityId" value="${entityId}" />
             <input type="hidden" name="page" value="${paginatedList.page}" />
             <div class="input-group mb-2 mr-sm-2">
                 <div class="input-group-prepend">
                     <div class="input-group-text" title="<spring:message code="jpm.list.pagesize" text="Page size" />"><span class="fas fa-ruler-vertical"></span></div>
+                </div>
+                <input class="form-control form-control-sm page-size" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" />
             </div>
-            <input class="form-control form-control-sm page-size" type="number" min="0" max="100" value="${paginatedList.pageSize}" name="pageSize" />
+            <button type="submit" class="btn btn-secondary btn-sm mb-2"><span class="fas fa-arrow-right"></span></button>
+        </form>
     </div>
-    <button type="submit" class="btn btn-primary btn-sm mb-2"><span class="fas fa-arrow-right"></span></button>
-</form>
-</div>
 </c:if>

@@ -35,6 +35,7 @@ public class Field extends PMCoreObject {
     private String property;
     private String width;
     private String display;
+    private boolean displayTitle = true;
     private String auth;
     private String defaultValue;
     private String align; //left right center, TODO
@@ -336,6 +337,14 @@ public class Field extends PMCoreObject {
     @Override
     public String getAuth() {
         return this.auth;
+    }
+
+    public boolean isDisplayTitle() {
+        return displayTitle;
+    }
+
+    public void setDisplayTitle(boolean displayTitle) {
+        this.displayTitle = displayTitle;
     }
 
     public String getAuthKey(Entity entity, EntityContext context, Operation operation) {

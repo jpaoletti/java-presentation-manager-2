@@ -7,53 +7,34 @@
     <c:set var="entityName" value="${entity.title}" />
     <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" />
     <jpm:jpm-body>
-        <%@include file="inc/default-breadcrumb.jsp" %>
-        <div class="container-fluid" id="container-${fn:replace(contextualEntity,'!', '-')}-${operation.id}">
-            <div class="row"><br/>
-                <div class="col-lg-12">
-                    <div class="card" id="jpmMainPanel">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-md-6 col-sm-12">
-                                    <%@include file="inc/item-operations.jsp" %>
-                                </div>
-                                <div class="col-md-6 col-sm-12">
-                                    <%@include file="inc/general-operations.jsp" %>
-                                </div>
+        <jpm:jpm-item-operation>
+            <form class="form-horizontal" role="form" method="POST" id="jpmForm">
+                <input name="entityId" value="${entity.id}" type="hidden" />
+                <input name="instanceId" value="${instance.id}" type="hidden" />
+                <%@include file="inc/default-form-content.jsp" %>
+                <c:if test="${not empty entityMessages}">
+                    <div class="row">
+                        <div class="col-lg-offset-2 col-lg-10">
+                            <div class="alert alert-danger">
+                                <c:forEach items="${entityMessages}" var="m">
+                                    * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
+                                </c:forEach>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <form class="form-horizontal" role="form" method="POST" id="jpmForm">
-                                <input name="entityId" value="${entity.id}" type="hidden" />
-                                <input name="instanceId" value="${instance.id}" type="hidden" />
-                                <%@include file="inc/default-form-content.jsp" %>
-                                <c:if test="${not empty entityMessages}">
-                                    <div class="row">
-                                        <div class="col-lg-offset-2 col-lg-10">
-                                            <div class="alert alert-danger">
-                                                <c:forEach items="${entityMessages}" var="m">
-                                                    * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
-                                                </c:forEach>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </c:if>
-                                <div class="row">
-                                    <div class="col-lg-1">
-                                        <button type="submit" class="btn btn-primary"><spring:message code="jpm.form.submit" text="Submit" /></button>
-                                    </div>
-                                    <c:if test="${operation.repeatable}">
-                                        <div class="col-lg-11">
-                                            <input class="repeat" type="checkbox" value="true" name="repeat" ${not empty param.repeated?'checked':''} /> <spring:message code="jpm.operation.repeat.${operation.id}" text="?" />
-                                        </div>
-                                    </c:if>
-                                </div>
-                            </form>
-                        </div>
                     </div>
+                </c:if>
+                <div class="row mt-2">
+                    <div class="col-lg-1">
+                        <button type="submit" class="btn btn-warning"><spring:message code="jpm.form.submit" text="Submit" /></button>
+                    </div>
+                    <c:if test="${operation.repeatable}">
+                        <div class="col-lg-11">
+                            <input class="repeat" type="checkbox" value="true" name="repeat" ${not empty param.repeated?'checked':''} /> <spring:message code="jpm.operation.repeat.${operation.id}" text="?" />
+                        </div>
+                    </c:if>
                 </div>
-            </div>
-        </div>
+            </form>
+        </jpm:jpm-item-operation>
     </jpm:jpm-body>
     <script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
     <script type="text/javascript">

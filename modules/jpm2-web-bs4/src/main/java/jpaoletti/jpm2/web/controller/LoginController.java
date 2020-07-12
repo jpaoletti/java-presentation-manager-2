@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -24,10 +24,10 @@ public class LoginController extends BaseController {
     @Qualifier("authenticationManager")
     protected AuthenticationManager authenticationManager;
 
-    @RequestMapping(value = "/login")
+    @GetMapping(value = "/login")
     @Transactional
     public ModelAndView login(@RequestParam(value = "error", required = false) String error) {
-        final ModelAndView result = new ModelAndView("login");
+        final ModelAndView result = new ModelAndView(getSecurityService().getLoginPage());
         if (error != null) {
             result.addObject("error", error);
             getJpm().audit("Login error: " + error);

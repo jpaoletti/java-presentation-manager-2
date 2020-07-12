@@ -9,8 +9,7 @@
     <c:set var="entityName" value="${entity.title}" />
     <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" />
     <jpm:jpm-body>
-        <%@include file="inc/default-content-header.jsp" %>
-        <%@include file="inc/default-breadcrumb.jsp" %>
+        <%@include file="inc/default-itemop-header.jsp" %>
         <div class="container-fluid">
             <div class="row"><br/>
                 <div class="col-lg-12">

@@ -6,12 +6,12 @@
     </head>
     <jpm:jpm-body>
         <div id="content-header" class="page-header">
-            <h1>${jpm.subtitle}</h1>
+            <h3>${jpm.subtitle}</h3>
         </div>
         <p>
             Welcome to Java Presentation Manager v2
         </p>
-        <img  src="${cp}static/img/welcome.jpg" />
+        <img  src="${cp}static/img/welcome.jpg" class="" style="max-width: 100%"/>
         <script type="text/javascript">
             jpmLoad(function() {
                 $("#menu-home").addClass("active");

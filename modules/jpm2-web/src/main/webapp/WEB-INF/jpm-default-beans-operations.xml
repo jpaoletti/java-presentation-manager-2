@@ -21,6 +21,7 @@
         <property name="id" value="show" />
         <property name="display" value="all !add" />
         <property name="executor" ref="operationExecutorSimple" />
+        <property name="icon" value="fas fa-search" />
     </bean>
     <bean id="default-add-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="add" />
@@ -49,6 +50,7 @@
         <property name="display" value="show list" />
         <property name="repeatable" value="true" />
         <property name="executor" ref="operationExecutorEdit" />
+        <property name="icon" value="fas fa-edit" />
     </bean>
     <bean id="default-report-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="defaultReport" />
@@ -62,11 +64,14 @@
         <property name="confirm" value="true" />
         <property name="display" value="edit show list" />
         <property name="executor" ref="operationExecutorDelete" />
+        <property name="icon" value="fas fa-trash-alt" />
     </bean>
     <bean id="default-generalAudit-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="generalAudit" />
         <property name="scope" value="GENERAL" />
         <property name="display" value="show list itemAudit" />
+        <property name="icon" value="fas fa-eye" />
+        
     </bean>
     <bean id="default-deleteSelected-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="deleteSelected" />
@@ -74,14 +79,17 @@
         <property name="confirm" value="true" />
         <property name="display" value="list" />
         <property name="executor" ref="operationExecutorDelete" />
+        <property name="icon" value="fas fa-trash-alt" />
     </bean>
     <bean id="default-itemAudit-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="itemAudit" />
         <property name="display" value="show list" />
+        <property name="icon" value="fas fa-eye" />
     </bean>
     <bean id="default-toExcel-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="toExcel" />
         <property name="display" value="show list" />
         <property name="scope" value="GENERAL" />
+        <property name="icon" value="fa fa-file-excel" />
     </bean>
 </beans>

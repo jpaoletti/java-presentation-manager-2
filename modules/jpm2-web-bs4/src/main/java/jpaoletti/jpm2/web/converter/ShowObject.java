@@ -51,12 +51,10 @@ public class ShowObject extends Converter {
                 final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
                 String operationLink = "";
                 String operationTitle = "";
-                String operationIcon = "";
                 if (getOperation() != null && (getOperationAuth() == null || getAuthorizationService().userHasRole(getOperationAuth()))) {
                     try {
                         final Operation op = getEntity().getOperation(getOperation(), getContext().getContext());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
-                        operationIcon = op.getIcon();
                         final String entityId = getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                         switch (op.getScope()) {
                             case ITEM:
@@ -76,7 +74,6 @@ public class ShowObject extends Converter {
                         + "&instanceId=" + localId
                         + "&operationId=" + getOperation()
                         + "&operationLink=" + operationLink
-                        + "&operationIcon=" + operationIcon
                         + "&operationTitle=" + operationTitle;
             } catch (ConfigurationException ex) {
                 throw new ConverterException(ex.getMessage());

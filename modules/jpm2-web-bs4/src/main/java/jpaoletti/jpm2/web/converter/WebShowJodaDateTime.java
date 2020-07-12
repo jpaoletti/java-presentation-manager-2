@@ -15,8 +15,8 @@ public class WebShowJodaDateTime extends WebToString {
     private String format = "yyyy-MM-dd";
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final DateTime value = (DateTime) getValue(object, field);
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+        final DateTime value = (DateTime) object;
         if (value != null) {
             return wrap(field, process(value.toString(getFormat())), value);
         } else {

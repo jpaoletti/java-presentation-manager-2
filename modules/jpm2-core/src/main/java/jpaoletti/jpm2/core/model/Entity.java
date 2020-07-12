@@ -395,6 +395,21 @@ public class Entity extends PMCoreObject implements BeanNameAware {
         return title;
     }
 
+    /**
+     * Returns the entity title key.
+     *
+     * @return
+     */
+    public String getPluralTitle() {
+        final String key = String.format("jpm.entity.title.pl.%s", getId());
+        final String title = getMessage(key);
+        if (title.equals(key) && getParent() != null) {
+            return getParent().getTitle();
+        } else {
+            return title;
+        }
+    }
+
     public List<PanelRow> getPanels() {
         if (panels != null) {
             return panels;

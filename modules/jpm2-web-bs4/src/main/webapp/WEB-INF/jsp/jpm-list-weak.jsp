@@ -25,17 +25,15 @@
                                 </c:forEach>
                             </c:if>
                             <c:if test="${compactOperations}">
-                                <div class="btn-group">
+                                <div class="dropdown">
                                     <button type="button" class="btn  btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
                                         <span class="fas fa-cog"></span> <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu">
+                                    <div class="dropdown-menu" role="menu">
                                         <c:forEach items="${item.operations}" var="o">
-                                            <li>
-                                                <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" />
-                                            </li>
+                                            <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" clazz="dropdown-item" />
                                         </c:forEach>
-                                    </ul>
+                                    </div>
                                 </div>
                             </c:if>
                         </div>

@@ -1,11 +1,8 @@
 package jpaoletti.jpm2.web.converter;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
-import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;

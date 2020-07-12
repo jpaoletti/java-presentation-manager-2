@@ -44,18 +44,31 @@ function initConfirm() {
     $("body").on("click", ".confirm-true", function (e) {
         e.preventDefault();
         var $href = $(this).attr("href");
-        BootstrapDialog.confirm(messages["jpm.modal.confirm.text"], function (result) {
-            if (result) {
-                document.location = $href;
-            }
-        });
+        //@@ are SELECTED scoped operations
+        if (!$href.includes("@@")) {
+            BootstrapDialog.confirm({
+                title: messages["jpm.modal.confirm.title"],
+                message: messages["jpm.modal.confirm.text"],
+                callback: function (result) {
+                    if (result) {
+                        jpmBlock();
+                        setTimeout(function () {
+                            document.location = $href;
+                        }, 300);
+                    }
+                }
+            });
+        }
     });
 }
 
 function initMenu() {
-    document.addEventListener('swiped-right', function (e) {
-        $('.page-wrapper').toggleClass('toggled');
-    });
+//    document.addEventListener('swiped-right', function (e) {
+//        $('.page-wrapper').toggleClass('toggled');
+//    });
+//    document.addEventListener('swiped-left', function (e) {
+//        $('.page-wrapper').toggleClass('toggled');
+//    });
     // Dropdown menu
     $('.sidebar-dropdown > a').click(function () {
         $('.sidebar-submenu').slideUp(200);
@@ -72,17 +85,16 @@ function initMenu() {
     //toggle sidebar
     $('#toggle-sidebar').click(function () {
         $('.page-wrapper').toggleClass('toggled');
+        $("#search-menu").trigger("focus");
     });
 
     // bind hover if pinned is initially enabled
     if ($('.page-wrapper').hasClass('pinned')) {
         $('#sidebar').hover(
                 function () {
-                    console.log('mouseenter');
                     $('.page-wrapper').addClass('sidebar-hovered');
                 },
                 function () {
-                    console.log('mouseout');
                     $('.page-wrapper').removeClass('sidebar-hovered');
                 }
         );
@@ -98,55 +110,31 @@ function initMenu() {
             $('.page-wrapper').addClass('pinned');
             $('#sidebar').hover(
                     function () {
-                        console.log('mouseenter');
                         $('.page-wrapper').addClass('sidebar-hovered');
                     },
                     function () {
-                        console.log('mouseout');
                         $('.page-wrapper').removeClass('sidebar-hovered');
                     }
             );
         }
+        $(':focus').blur();
     });
 
     //toggle sidebar overlay
     $('#overlay').click(function () {
         $('.page-wrapper').toggleClass('toggled');
     });
-
-    //switch between themes
-    var themes = 'default-theme legacy-theme chiller-theme ice-theme cool-theme light-themed';
-    $('[data-theme]').click(function () {
-        $('[data-theme]').removeClass('selected');
-        $(this).addClass('selected');
-        $('.page-wrapper').removeClass(themes);
-        $('.page-wrapper').addClass($(this).attr('data-theme'));
-    });
-
-    // toggle background image
-    $('#toggle-bg').change(function (e) {
-        e.preventDefault();
-        $('.page-wrapper').toggleClass('sidebar-bg');
-    });
-
-    // toggle border radius
-    $('#toggle-border-radius').change(function (e) {
-        e.preventDefault();
-        $('.page-wrapper').toggleClass('boder-radius-on');
-    });
-
     //custom scroll bar is only used on desktop
-    if (
-            !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                    navigator.userAgent
-                    )
-            ) {
+    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         $('.sidebar-content').mCustomScrollbar({
             axis: 'y',
             autoHideScrollbar: true,
-            scrollInertia: 300,
+            scrollInertia: 300
         });
         $('.sidebar-content').addClass('desktop');
+    }
+    if (window.matchMedia("(max-width: 767px)").matches) {
+        $('.page-wrapper').removeClass("toggled");
     }
 }
 
@@ -179,7 +167,7 @@ var initPage = function () {
         BootstrapDialog.DEFAULT_TEXTS['CANCEL'] = messages["jpm.modal.confirm.cancel"];
         //Clean empty help-blocks
         $(".help-block:empty").remove();
-        $(".panel-body:not(:has(*))").parent(".panel").parent().remove();
+        $(".card-body:not(:has(*))").parent(".card").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
         $(".sortable").on("click", function () {
             window.location = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field");
@@ -197,89 +185,92 @@ var initPage = function () {
         $('.tip-bottom').tooltip({placement: 'bottom'});
 
         if (currentUser && currentUser !== '') {
-            //Favorite navbar
-            $.getJSON(getContextPath() + "jpm/favorites", function (data) {
-                var isFav = false;
-                $.each(data, function (i, item) {
-                    var html = '<a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
-                    html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a>';
-                    if (item.link === document.location.href) {
-                        isFav = true;
-                    }else{
-                        $("#userNavFavorite").find(".dropdown-menu").append(html);
+            if (ROLE_USER_FAVORITE) {
+                //Favorite navbar
+                $.getJSON(getContextPath() + "jpm/favorites", function (data) {
+                    var isFav = false;
+                    $.each(data, function (i, item) {
+                        var html = '<a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
+                        html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a>';
+                        if (item.link === document.location.href) {
+                            isFav = true;
+                        } else {
+                            $("#userNavFavorite").find(".dropdown-menu").append(html);
+                        }
+                    });
+                    if (isFav) {
+                        $("#content-header").prepend('<a id="removeFavoriteLink" style="color: goldenrod" href="#" title="' + messages["jpm.usernav.removefavorite"] + '"><i class="fas fa-star"></i></a>&nbsp;');
+                    } else {
+                        $("#content-header").prepend('<a id="addFavoriteLink"    style="color: gray" href="#" title="' + messages["jpm.usernav.addfavorite"] + '"><i class="fas fa-star"></i></a>&nbsp;');
                     }
                 });
-                if(isFav){
-                    $("#addFavoriteLink").remove();
-                }else{
-                    $("#removeFavoriteLink").remove();
-                }
-            });
-            $("body").on("click", "#removeFavoriteLink", function (e) {
-                e.preventDefault();
-                $.ajax({
-                    type: "POST",
-                    dataType: 'text',
-                    url: getContextPath() + "jpm/removeFavorite?url=" + document.location.href,
-                    success: function (data) {
-                        document.location.reload();
-                    }
+                $("body").on("click", "#removeFavoriteLink", function (e) {
+                    e.preventDefault();
+                    $.ajax({
+                        type: "POST",
+                        dataType: 'text',
+                        url: getContextPath() + "jpm/removeFavorite?url=" + document.location.href,
+                        success: function (data) {
+                            document.location.reload();
+                        }
+                    });
                 });
-            });
-            $(".search-menu").on("keyup",function(e){
+                $("body").on("click", "#addFavoriteLink", function (e) {
+                    e.preventDefault();
+                    var $textAndPic = $('<div></div>');
+                    var html = "";
+                    html = html + '  <div class="form-group" id="note-group">';
+                    html = html + '    <label for="title">' + messages["jpm.addfavorite.popupTitle"] + '</label>';
+                    html = html + '    <input type="text" name="title" class="form-control" id="title" placeholder="...">';
+                    html = html + '  </div>';
+                    $textAndPic.append(html);
+
+                    BootstrapDialog.show({
+                        title: messages["jpm.usernav.addfavorite"],
+                        message: $textAndPic,
+                        buttons: [{
+                                label: messages["jpm.modal.confirm.submit"],
+                                cssClass: 'btn-success',
+                                action: function (dialogRef) {
+                                    if ($("#note").val() === "") {
+                                        $("#note-group").addClass("has-error");
+                                        $("#note").trigger('focus');
+                                    } else {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: getContextPath() + "jpm/addFavorite?url=" + document.location.href + "&title=" + $("#title").val(),
+                                            success: function (data) {
+                                                document.location.reload();
+                                            }
+                                        });
+                                    }
+                                }
+                            }, {
+                                label: messages["jpm.modal.confirm.cancel"],
+                                action: function (dialogRef) {
+                                    dialogRef.close();
+                                }
+                            }],
+                        onshown: function (dialogRef) {
+                            $("#title").trigger('focus');
+                        }
+                    });
+                });
+            }
+//            $("#content-header").prepend('<button id="pin-sidebar" class="btn btn-sm btn-dark d-none d-sm-flex" style="width: 35px;"><i class="fas fa-thumbtack"></i></button>&nbsp;');
+            $(".search-menu").on("keyup", function (e) {
                 $("#searchDropdown .dropdown-menu").remove();
                 $("#searchDropdown").append('<div class="dropdown-menu"></div>');
                 let value = e.target.value;
-                if(value.length > 2){
-                    $(".jpm-menu-item").each(function(){
-                        if ($(this).last().text().toLowerCase().includes(value.toLowerCase())){
-                            let html = '<a class="dropdown-item" href="'+$(this).attr("href")+'">'+$(this).html()+'</a>';
+                if (value.length > 2) {
+                    $(".jpm-menu-item").each(function () {
+                        if ($(this).last().text().toLowerCase().includes(value.toLowerCase())) {
+                            let html = '<a class="dropdown-item" href="' + $(this).attr("href") + '">' + $(this).html() + '</a>';
                             $("#searchDropdown .dropdown-menu").append(html);
                         }
                     });
                     $("#searchDropdown .dropdown-menu").toggle();
                 }
-            });
-            $("body").on("click", "#addFavoriteLink", function (e) {
-                e.preventDefault();
-                var $textAndPic = $('<div></div>');
-                var html = "";
-                html = html + '  <div class="form-group" id="note-group">';
-                html = html + '    <label for="title">' + messages["jpm.addfavorite.popupTitle"] + '</label>';
-                html = html + '    <input type="text" name="title" class="form-control" id="title" placeholder="...">';
-                html = html + '  </div>';
-                $textAndPic.append(html);
-
-                BootstrapDialog.show({
-                    title: messages["jpm.usernav.addfavorite"],
-                    message: $textAndPic,
-                    buttons: [{
-                            label: messages["jpm.modal.confirm.submit"],
-                            cssClass: 'btn-success',
-                            action: function (dialogRef) {
-                                if ($("#note").val() === "") {
-                                    $("#note-group").addClass("has-error");
-                                    $("#note").trigger('focus');
-                                } else {
-                                    $.ajax({
-                                        type: "POST",
-                                        url: getContextPath() + "jpm/addFavorite?url=" + document.location.href + "&title=" + $("#title").val(),
-                                        success: function (data) {
-                                            document.location.reload();
-                                        }
-                                    });
-                                }
-                            }
-                        }, {
-                            label: messages["jpm.modal.confirm.cancel"],
-                            action: function (dialogRef) {
-                                dialogRef.close();
-                            }
-                        }],
-                    onshown: function (dialogRef) {
-                        $("#title").trigger('focus');
-                    }
-                });
             });
 
             //Recent navbar

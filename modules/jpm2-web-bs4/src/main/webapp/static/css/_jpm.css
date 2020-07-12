@@ -27,3 +27,14 @@ main {padding-top: 65px;}
     display:block !important;
     width: 100% !important;
 }
+#content-header{
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding: .75rem 1rem 0rem 1rem;
+    margin-bottom: 1rem;
+    background-color: #e9ecef;
+    border-radius: .25rem;
+}
+#content-header h4{color: gray;margin-top: 10px;margin-left: 20px;}
+.jpm-content-panels .card{margin-bottom: 5px;}

@@ -24,9 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -54,7 +54,7 @@ public class ExecutorsController extends BaseController implements Observer {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec", "/jpm/{entity}/{operationId}.exec"}, method = RequestMethod.GET)
+    @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec", "/jpm/{entity}/{operationId}.exec"})
     public ModelAndView executorsGeneralPrepare(HttpServletRequest request) throws PMException {
         final Map<String, Object> preparation = getExecutor().prepare(new ArrayList<>());
         if (getExecutor().immediateExecute()) {
@@ -64,21 +64,21 @@ public class ExecutorsController extends BaseController implements Observer {
         } else {
             final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
             preparation.entrySet().stream().forEach(
-                    e -> mav.addObject(e.getKey(), e.getValue())
+                e -> mav.addObject(e.getKey(), e.getValue())
             );
             getRequest().getParameterMap().keySet().stream().forEach(
-                    key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
+                key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
             );
             return mav;
         }
     }
 
-    @RequestMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"}, method = RequestMethod.POST)
+    @PostMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"})
     @ResponseBody
     public JPMPostResponse executorsGeneralCommit(
-            HttpServletRequest request,
-            @PathVariable Entity owner, @PathVariable String ownerId,
-            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+        HttpServletRequest request,
+        @PathVariable Entity owner, @PathVariable String ownerId,
+        @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final List<EntityInstance> instances = new ArrayList<>();
         final Map parameterMap = new LinkedHashMap(request.getParameterMap());
         parameterMap.put(HTTP_SERVLET_REQUEST, request);
@@ -88,11 +88,11 @@ public class ExecutorsController extends BaseController implements Observer {
         return executorsGeneralCommit(instances, parameters, repeat);
     }
 
-    @RequestMapping(value = {"/jpm/{entity}/{operationId}.exec"}, method = RequestMethod.POST)
+    @PostMapping(value = {"/jpm/{entity}/{operationId}.exec"})
     @ResponseBody
     public JPMPostResponse executorsGeneralCommit(
-            HttpServletRequest request,
-            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+        HttpServletRequest request,
+        @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final List<EntityInstance> instances = new ArrayList<>();
         final Map parameterMap = new LinkedHashMap(request.getParameterMap());
         parameterMap.put(HTTP_SERVLET_REQUEST, request);
@@ -111,6 +111,10 @@ public class ExecutorsController extends BaseController implements Observer {
             if (repeat) {
                 buildRedirect = buildRedirect((Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getContext().getEntity(), null, getContext().getOperation().getPathId(), "repeated=true");
             } else {
+                if (getContext().getEntityInstance() != null && getContext().getEntityInstance().getIobject() != null) {
+                } else {
+                    return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), getContext().getEntityInstance().getIobject().getId(), getExecutor().getDefaultNextOperationId()).getViewName());
+                }
                 buildRedirect = next(getContext().getEntity(), getContext().getOperation(), (Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getExecutor().getDefaultNextOperationId()).getViewName();
             }
             return new JPMPostResponse(true, buildRedirect, MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
@@ -138,7 +142,7 @@ public class ExecutorsController extends BaseController implements Observer {
      * @return model and view
      * @throws PMException
      */
-    @RequestMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec", method = RequestMethod.GET)
+    @GetMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec")
     public ModelAndView executorsPrepare(HttpServletRequest request, @PathVariable List<String> instanceIds) throws PMException {
         final List<EntityInstance> instances = new ArrayList<>();
         for (String instanceId : instanceIds) {
@@ -160,16 +164,16 @@ public class ExecutorsController extends BaseController implements Observer {
         } else {
             final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
             preparation.entrySet().stream().forEach(
-                    e -> mav.addObject(e.getKey(), e.getValue())
+                e -> mav.addObject(e.getKey(), e.getValue())
             );
             getRequest().getParameterMap().keySet().stream().forEach(
-                    key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
+                key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
             );
             return mav;
         }
     }
 
-    @RequestMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec", method = RequestMethod.POST)
+    @PostMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec")
     @ResponseBody
     public JPMPostResponse executorsCommit(HttpServletRequest request, @PathVariable List<String> instanceIds, @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         try {
@@ -241,14 +245,14 @@ public class ExecutorsController extends BaseController implements Observer {
                 if (t.getId().contains(",")) {
                     for (String id : t.getId().split(",")) {
                         template.convertAndSend(
-                                "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + id,
-                                getJpm().getAsynchronicOperationExecutor(id).getProgress()
+                            "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + id,
+                            getJpm().getAsynchronicOperationExecutor(id).getProgress()
                         );
                     }
                 } else {
                     template.convertAndSend(
-                            "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + t.getId(),
-                            getJpm().getAsynchronicOperationExecutor(t.getId()).getProgress()
+                        "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + t.getId(),
+                        getJpm().getAsynchronicOperationExecutor(t.getId()).getProgress()
                     );
                 }
             }

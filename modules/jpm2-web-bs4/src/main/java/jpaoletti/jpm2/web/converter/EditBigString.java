@@ -23,8 +23,8 @@ public class EditBigString extends Converter {
     }
 
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final String value = (String) getValue(object, field);
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+        final String value = (String) object;
         String v = value != null ? value : "";
         for (Map.Entry<String, String> entry : replaces.entrySet()) {
             v = v.replaceAll(entry.getKey(), entry.getValue());

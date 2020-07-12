@@ -11,33 +11,12 @@ import jpaoletti.jpm2.core.model.Field;
  */
 public class WebShowBoolean extends WebToString {
 
-    private String trueIcon = "fa fa-check-circle";
-    private String falseIcon = "fas fa-times";
-
     @Override
-    public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final Boolean value = (Boolean) getValue(object, field);
-        if (value == null || value) {
-            return process("<span class=\"" + getTrueIcon() + "\"></span>");
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+        if (value == null || (Boolean) value) {
+            return process("<span class=\"fas fa-check\"></span>");
         } else {
-            return process("<span class=\"" + getFalseIcon() + "\"></span>");
+            return process("<span class=\"fas fa-times\"></span>");
         }
     }
-
-    public String getTrueIcon() {
-        return trueIcon;
-    }
-
-    public void setTrueIcon(String trueIcon) {
-        this.trueIcon = trueIcon;
-    }
-
-    public String getFalseIcon() {
-        return falseIcon;
-    }
-
-    public void setFalseIcon(String falseIcon) {
-        this.falseIcon = falseIcon;
-    }
-
 }

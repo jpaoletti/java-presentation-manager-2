@@ -60,7 +60,7 @@
                     <property name="context">
                         <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
                     </property>
-                    <property name="icon" value="fa fa-plus-square" />
+                    <property name="icon" value="fa fa-plus" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Operation">
                     <property name="id" value="generalAudit" />
@@ -74,6 +74,7 @@
                     <property name="display" value="list" />
                     <property name="synchronic" value="false" />
                     <property name="executor" ref="operationExecutorDelete" />
+                    <property name="icon" value="fas fa-trash-alt" />
                 </bean>
                 <ref bean="default-show-operation" />
                 <ref bean="default-edit-operation" />
@@ -96,6 +97,7 @@
                     <property name="condition">
                         <bean class="jpaoletti.jpm2.core.test.DeleteTestCondition" />
                     </property>
+                    <property name="icon" value="fas fa-trash-alt" />
                 </bean>
             </list>
         </property>
@@ -323,7 +325,7 @@
                     <property name="scope" value="GENERAL" />
                     <property name="repeatable" value="true" />
                     <property name="follows" value="list" />
-                    <property name="icon" value="fa fa-plus-square" />
+                    <property name="icon" value="fa fa-plus" />
                 </bean>
                 <ref bean="default-show-operation" />
                 <ref bean="default-delete-operation" />
@@ -338,6 +340,7 @@
                     <property name="display" value="list" />
                     <property name="synchronic" value="false" />
                     <property name="executor" ref="operationExecutorDelete" />
+                    <property name="icon" value="fas fa-trash-alt" />
                 </bean>
             </list>
         </property>

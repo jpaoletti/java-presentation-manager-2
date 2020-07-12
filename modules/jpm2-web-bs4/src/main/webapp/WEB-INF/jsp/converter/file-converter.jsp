@@ -1,7 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div id="file-converter-container-${field}">
-    <button type="button" class="btn btn-default btn-sm fileinput-button pull-left">
+    <button type="button" class="btn btn-secondary btn-sm fileinput-button pull-left">
         <span class="fas fa-upload"></span>
         <input name="file" id="field_${field}"  type="file" data-url="${cp}jpm/uploadFileConverter" ${param.multiple?'multiple=""':''} data-role="none"/>
     </button>

@@ -29,7 +29,7 @@
                     <property name="showTitle" value="true" />
                     <property name="confirm" value="false" />
                     <property name="available" value="true" />
-                    <property name="compact" value="false" />
+                    <property name="compact" value="true" />
                     <property name="popup" value="false" />
                     <property name="navigable" value="true" />
                     <property name="icon" value="fas fa-th-list" />
@@ -58,7 +58,7 @@
                     <property name="scope" value="GENERAL" />
                     <property name="follows" value="list" />
                     <property name="repeatable" value="true" />
-                    <property name="icon" value="fa fa-plus-square" />
+                    <property name="icon" value="fa fa-plus" />
                     <property name="context">
                         <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
                     </property>
@@ -244,6 +244,7 @@
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="weaks" />
                     <property name="width" value="150px" />
+                    <property name="displayTitle" value="false" />
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -329,7 +330,7 @@
                     <property name="scope" value="GENERAL" />
                     <property name="repeatable" value="true" />
                     <property name="follows" value="list" />
-                    <property name="icon" value="fa fa-plus-square" />
+                    <property name="icon" value="fa fa-plus" />
                 </bean>
                 <ref bean="default-show-operation" />
                 <ref bean="default-delete-operation" />
@@ -344,6 +345,7 @@
                     <property name="display" value="list" />
                     <property name="synchronic" value="false" />
                     <property name="executor" ref="operationExecutorDelete" />
+                    <property name="icon" value="fas fa-trash-alt" />
                 </bean>
             </list>
         </property>

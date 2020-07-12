@@ -29,14 +29,16 @@
         <property name="id" value="add" />
         <property name="display" value="all" />
         <property name="scope" value="GENERAL" />
-        <property name="icon" value="fa fa-plus-square" />
+        <property name="icon" value="fa fa-plus" />
+        <property name="color" value="btn-warning" />
     </bean>
     <bean id="repeatable-add-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="add" />
         <property name="repeatable" value="true" />
         <property name="display" value="all" />
         <property name="scope" value="GENERAL" />
-        <property name="icon" value="fa fa-plus-square" />
+        <property name="icon" value="fa fa-plus" />
+        <property name="color" value="btn-warning" />
     </bean>
     <bean id="default-edit-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="edit" />
@@ -62,7 +64,7 @@
     <bean id="default-generalAudit-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="generalAudit" />
         <property name="scope" value="GENERAL" />
-        <property name="display" value="show list itemAudit" />
+        <property name="display" value="list itemAudit" />
         <property name="icon" value="fas fa-eye" />
     </bean>
     <bean id="default-deleteSelected-operation" class="jpaoletti.jpm2.core.model.Operation">

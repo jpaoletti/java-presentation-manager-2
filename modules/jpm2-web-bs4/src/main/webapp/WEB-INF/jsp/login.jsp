@@ -23,7 +23,7 @@
             <c:if test="${not empty error}">
                 <div class="alert alert-danger pagination-centered">${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</div>
             </c:if>
-            <button class="btn btn-lg btn-primary btn-block" type="submit"><spring:message code="jpm.login.submit" text="Login" /></button>
+            <button class="btn btn-lg btn-warning btn-block" type="submit"><spring:message code="jpm.login.submit" text="Login" /></button>
         </form>
         <%@include  file="../jsp/inc/default-javascript.jsp" %>
         <script type="text/javascript">

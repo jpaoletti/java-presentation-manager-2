@@ -51,7 +51,7 @@ function initConfirm() {
         e.preventDefault();
         var $href = $(this).attr("href");
         //@@ are SELECTED scoped operations
-        if (!$href.contains("@@")) {
+        if (!$href.includes("@@")) {
             BootstrapDialog.confirm(messages["jpm.modal.confirm.text"], function (result) {
                 if (result) {
                     jpmBlock();
