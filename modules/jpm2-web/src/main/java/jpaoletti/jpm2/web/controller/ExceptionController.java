@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.web.controller;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,7 +68,7 @@ public class ExceptionController {
         return mav;
     }
 
-    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, MySQLNonTransientConnectionException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class})
     public ModelAndView handleSQLConstraintException(Exception ex) {
         final ModelAndView mav = new ModelAndView("exception");
         mav.addObject("message", MessageFactory.error("jpm.constraint.exception"));

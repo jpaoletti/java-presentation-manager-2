@@ -11,11 +11,12 @@
     "author": "jpaoletti",
     "contributors": [],
     "dependencies": {
-        "bootstrap": "^4.3.1",
-        "bootstrap4-dialog": "^4.1.0",
-        "jquery": "^3.4.1",
+        "bootstrap": "^4.5.0",
+        "bootstrap4-dialog": "^4.3.4",
+        "jquery": "^3.5.0",
         "jquery-blockui": "^2.7.0",
         "jquery.cookie": "^1.4.1",
-        "moment": "^2.24.0"
+        "moment": "^2.27.0",
+        "popper.js": "^1.16.1"
     }
 }
