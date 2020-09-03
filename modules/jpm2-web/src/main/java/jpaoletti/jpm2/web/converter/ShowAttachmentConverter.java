@@ -1,11 +1,16 @@
 package jpaoletti.jpm2.web.converter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.WithAttachment;
+import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +24,21 @@ public class ShowAttachmentConverter extends Converter {
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
-        final byte[] value = (byte[]) getValue(object, field);
+        final WithAttachment wa = (WithAttachment) object;
+        byte[] value = null;
+        if (wa.isExternalFile()) {
+            final File file = new File(wa.getInternalFileName());
+            final FileInputStream is;
+            try {
+                is = new FileInputStream(file);
+                value = IOUtils.toByteArray(is);
+                IOUtils.closeQuietly(is);
+            } catch (IOException ex) {
+                JPMUtils.getLogger().error("Error in ShowAttachmentConverter.visualize", ex);
+            }
+        } else {
+            value = (byte[]) getValue(object, field);
+        }
         if (value != null && value.length > 0) {
             final WithAttachment note = (WithAttachment) object;
             String len;

@@ -11,4 +11,14 @@ public interface WithAttachment {
     public String getAttachmentName();
 
     public String getContentType();
+
+    public boolean isExternalFile();
+
+    /**
+     * In case the file is external, this must return the full path of the file.
+     *
+     * @return
+     */
+    public String getInternalFileName();
+
 }
