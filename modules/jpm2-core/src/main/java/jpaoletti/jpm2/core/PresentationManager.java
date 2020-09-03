@@ -26,6 +26,8 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  *
@@ -307,6 +309,14 @@ public class PresentationManager implements Observer, Serializable {
             return (EntityReport) JPMUtils.getApplicationContext().getBean(reportId);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public String getMessage(String key, Object... params) {
+        try {
+            return getMessageSource().getMessage(key, params, LocaleContextHolder.getLocale());
+        } catch (NoSuchMessageException e) {
+            return key;
         }
     }
 }

@@ -34,9 +34,9 @@
         messages["jpm.modal.confirm.close"] = "<spring:message code='jpm.modal.confirm.close' text='Close' />";
         messages["jpm.usernav.addfavorite"] = "<spring:message code='jpm.usernav.addfavorite' text='' />";
         messages["jpm.addfavorite.popupTitle"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
-        messages["jpm.modal.attachment.preview"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
-        messages["jpm.modal.attachment.title"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
-        messages["jpm.modal.attachment.download"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
+        messages["jpm.modal.attachment.preview"] = "<spring:message code='jpm.modal.attachment.preview' text='' />";
+        messages["jpm.modal.attachment.title"] = "<spring:message code='jpm.modal.attachment.title' text='' />";
+        messages["jpm.modal.attachment.download"] = "<spring:message code='jpm.modal.attachment.download' text='' />";
         function getContextPath() {
             return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "${cp}";
         }

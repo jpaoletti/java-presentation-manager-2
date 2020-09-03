@@ -106,11 +106,7 @@ public class JPMServiceBase {
     }
 
     public String getMessage(String key, Object... params) {
-        try {
-            return getJpm().getMessageSource().getMessage(key, params, LocaleContextHolder.getLocale());
-        } catch (NoSuchMessageException e) {
-            return key;
-        }
+        return getJpm().getMessage(key, params);
     }
 
     public JPMContext getContext() {

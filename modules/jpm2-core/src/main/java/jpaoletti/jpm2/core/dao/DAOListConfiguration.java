@@ -17,7 +17,7 @@ import org.hibernate.sql.JoinType;
  *
  * @author jpaoletti
  */
-public class DAOListConfiguration {
+public class DAOListConfiguration implements IDAOListConfiguration {
 
     private Integer from;
     private Integer max;
@@ -55,18 +55,22 @@ public class DAOListConfiguration {
         this.restrictions = Arrays.asList(restrictions);
     }
 
+    @Override
     public Integer getFrom() {
         return from;
     }
 
+    @Override
     public void setFrom(Integer from) {
         this.from = from;
     }
 
+    @Override
     public Integer getMax() {
         return max;
     }
 
+    @Override
     public void setMax(Integer max) {
         this.max = max;
     }
@@ -89,11 +93,13 @@ public class DAOListConfiguration {
         return aliases;
     }
 
+    @Override
     public DAOListConfiguration withMax(Integer max) {
         setMax(max);
         return this;
     }
 
+    @Override
     public DAOListConfiguration withFrom(Integer from) {
         setFrom(from);
         return this;

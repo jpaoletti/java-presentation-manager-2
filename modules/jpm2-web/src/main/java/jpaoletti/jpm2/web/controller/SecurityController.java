@@ -188,14 +188,11 @@ public class SecurityController extends BaseController {
             this.key = entity.getAuthKey(context);
             this.name = entity.getTitle() + (context == null ? "" : " (" + context.getId() + ")");
             for (Operation operation : entity.getAllOperations()) {
-                //System.out.println(entity + "-" + operation);
                 if (operation.isAuthorizable()) {
                     final AuthoritiesResultOperation aro = new AuthoritiesResultOperation(entity, operation, context, selected);
-                    //if ((!operation.isUseFields() && (selected.isEmpty() || selected.contains(aro.getKey()))) || !aro.getFields().isEmpty()) {
                     if (selected.isEmpty() || selected.contains(aro.getKey())) {
                         this.operations.add(aro);
                     }
-                    //}
                 }
             }
         }
@@ -231,6 +228,7 @@ public class SecurityController extends BaseController {
         public void setOperations(List<AuthoritiesResultOperation> operations) {
             this.operations = operations;
         }
+
     }
 
     public static class AuthoritiesResultOperation {
@@ -238,12 +236,14 @@ public class SecurityController extends BaseController {
         private String id;
         private String key;
         private String name;
+        private String icon;
         private List<AuthoritiesResultField> fields = new ArrayList<>();
 
         public AuthoritiesResultOperation(Entity entity, Operation operation, EntityContext context, List<String> selected) {
             this.id = operation.getId();
             this.key = operation.getAuthKey(entity, context);
             this.name = operation.getMessage(operation.getTitle(), entity.getTitle());
+            this.icon = operation.getIcon();
             //Not implemented yet
             /*if (operation.isUseFields()) {
              for (Field f : entity.getAllFields(context == null ? null : context.getId())) {
@@ -289,6 +289,13 @@ public class SecurityController extends BaseController {
             this.fields = fields;
         }
 
+        public String getIcon() {
+            return icon;
+        }
+
+        public void setIcon(String icon) {
+            this.icon = icon;
+        }
     }
 
     public static class AuthoritiesResultField {

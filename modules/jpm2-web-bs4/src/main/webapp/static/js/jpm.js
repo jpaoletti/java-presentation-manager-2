@@ -1,3 +1,26 @@
+function appendScript(filepath) {
+    if ($('script[src="' + filepath + '"]').length > 0)
+        return;
+    var ele = document.createElement('script');
+    ele.setAttribute("type", "text/javascript");
+    ele.setAttribute("src", filepath);
+    $('head').append(ele);
+}
+
+function appendStyle(filepath) {
+    if ($('link[href="' + filepath + '"]').length > 0)
+        return;
+    var ele = document.createElement('link');
+    ele.setAttribute("type", "text/css");
+    ele.setAttribute("rel", "Stylesheet");
+    ele.setAttribute("href", filepath);
+    $('head').append(ele);
+}
+
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 String.prototype.trim = function () {
     return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
 };
@@ -85,7 +108,9 @@ function initMenu() {
     //toggle sidebar
     $('#toggle-sidebar').click(function () {
         $('.page-wrapper').toggleClass('toggled');
-        $("#search-menu").trigger("focus");
+        if (!isMobile()) {
+            $("#search-menu").trigger("focus");
+        }
     });
 
     // bind hover if pinned is initially enabled
@@ -125,7 +150,7 @@ function initMenu() {
         $('.page-wrapper').toggleClass('toggled');
     });
     //custom scroll bar is only used on desktop
-    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    if (!isMobile()) {
         $('.sidebar-content').mCustomScrollbar({
             axis: 'y',
             autoHideScrollbar: true,
@@ -446,11 +471,11 @@ var processFormResponse = function (data) {
         }
         if (data.next && data.next !== "") {
             setTimeout(function () {
-                document.location = getContextPath() + data.next;
+                document.location = getContextPath() + (data.next.startsWith("/")?data.next.substr(1):data.next);
             }, data.messageDelay);
         }
     } else {
-        $(".form-group").removeClass("has-error");
+        $(".form-control").removeClass("is-invalid");
         $(".jpm-validator-text").remove();
         //Entity
         if (data.messages.length > 0) {
@@ -477,12 +502,13 @@ var processFormResponse = function (data) {
             var controlGroup = $("#control-group-" + fieldId);
             controlGroup.addClass("has-error");
             $.each(msgs, function (i, item) {
-                controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
+                controlGroup.find(".form-control").addClass('is-invalid');
+                controlGroup.find(".converted-field-container").append('<div class="invalid-feedback jpm-validator-text">' + item.text + '</div>');
             });
         });
         jpmUnBlock();
     }
-}
+};
 
 function buildAjaxJpmForm(formId, callback, beforeSubmit) {
     if (!formId)

@@ -52,7 +52,9 @@ public class JPMIterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest hsr, HttpServletResponse hsr1, Object o, ModelAndView mav) throws Exception {
         try {
-            mav.addObject("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            if (!mav.getModel().containsKey("user")) {
+                mav.addObject("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            }
         } catch (Exception e) {
         }
         final JPMContext ctx = getContext();

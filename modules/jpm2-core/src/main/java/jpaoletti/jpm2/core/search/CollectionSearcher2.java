@@ -24,9 +24,13 @@ public class CollectionSearcher2 implements Searcher {
     @Override
     public DescribedCriterion build(Entity entity, Field field, Map<String, String[]> parameters) {
         final List<Object> values = getValues(entity, field, parameters);
-        return SearcherHelper.addAliases(new DescribedCriterion(
+        final String fieldAlias = field.getId() + "cs2";
+        final DescribedCriterion describedCriterion = new DescribedCriterion(
             MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
-            Restrictions.in(field.getProperty(), values)), field);
+            Restrictions.in(fieldAlias + ".elements", values));
+        SearcherHelper.addAliases(describedCriterion, field);
+        describedCriterion.addAlias(field.getProperty(), fieldAlias);
+        return describedCriterion;
     }
 
     @Override

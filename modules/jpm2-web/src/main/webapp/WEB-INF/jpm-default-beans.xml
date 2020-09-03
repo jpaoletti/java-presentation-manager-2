@@ -69,6 +69,16 @@
             <ref bean="plainConverter" />
         </property>
     </bean>
+    <bean id="xls-config-bool" class="jpaoletti.jpm2.core.model.FieldConfig">
+        <property name="operations" value="toExcel"/>
+        <property name="converter">
+            <bean class="jpaoletti.jpm2.core.converter.ShowBoolean">
+                <property name="trueValue" value="jpm.converter.bool.true"/>
+                <property name="falseValue" value="jpm.converter.bool.false"/>
+                <property name="nullValue" value="jpm.converter.bool.null"/>
+            </bean>
+        </property>
+    </bean>
 
     <!-- DEFAULT CONFIG LISTS-->
     <util:list id="default-id-field-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
@@ -161,8 +171,7 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
-        <ref bean="xls-config" />
-
+        <ref bean="xls-config-bool" />
     </util:list>
     <util:list id="inline-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -175,8 +184,7 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
-        <ref bean="xls-config" />
-
+        <ref bean="xls-config-bool" />
     </util:list>
     <util:list id="default-enum-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">

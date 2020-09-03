@@ -155,12 +155,15 @@ public class ExecutorsController extends BaseController implements Observer {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {
                 getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
-            } else if (response.getMessages().isEmpty()) {
-                getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".error"));
+                return next(getContext().getEntity(), getContext().getOperation(), StringUtils.join(instanceIds, ","), getExecutor().getDefaultNextOperationId());
             } else {
-                getContext().setGlobalMessage(response.getMessages().get(0));
+                if (response.getMessages().isEmpty()) {
+                    getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".error"));
+                } else {
+                    getContext().setGlobalMessage(response.getMessages().get(0));
+                }
+                return new ModelAndView("redirect:" + request.getHeader("Referer"));
             }
-            return next(getContext().getEntity(), getContext().getOperation(), StringUtils.join(instanceIds, ","), getExecutor().getDefaultNextOperationId());
         } else {
             final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
             preparation.entrySet().stream().forEach(

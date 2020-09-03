@@ -24,7 +24,7 @@ public interface Searcher {
 
         private Message description;
         private Criterion criterion;
-        private Set<DAOListConfiguration.DAOListConfigurationAlias> aliases;
+        private final Set<DAOListConfiguration.DAOListConfigurationAlias> aliases;
 
         public DescribedCriterion(Message description, Criterion criterion) {
             this.description = description;
@@ -59,13 +59,19 @@ public interface Searcher {
         }
 
         public DescribedCriterion addAlias(String a1, String a2) {
-            getAliases().add(new DAOListConfiguration.DAOListConfigurationAlias(a1, a2));
+            if (!aliasExists(a2)) {
+                getAliases().add(new DAOListConfiguration.DAOListConfigurationAlias(a1, a2));
+            }
             return this;
         }
 
         public DescribedCriterion addAlias(String a1, String a2, JoinType jt) {
             getAliases().add(new DAOListConfiguration.DAOListConfigurationAlias(a1, a2, jt));
             return this;
+        }
+
+        public boolean aliasExists(String a2) {
+            return getAliases().stream().anyMatch(a -> a.getAlias().equalsIgnoreCase(a2));
         }
     }
 }
