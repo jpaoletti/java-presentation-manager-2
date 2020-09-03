@@ -37,7 +37,7 @@ public class JPMReportController extends BaseController {
     public String saveReport(@PathVariable String reportId, @RequestParam String name, @RequestParam String content) throws PMException {
         final EntityReport report = getJpm().getReport(reportId);
         final EntityReportUserSave saveReport = reportService.saveReport(report, reportId, name, getUserDetails().getUsername(), content);
-        return "redirect:/jpm/report/" + reportId + "?savedReportId=" + saveReport.getId();
+        return "redirect:jpm/report/" + reportId + "?savedReportId=" + saveReport.getId();
     }
 
     @GetMapping(value = "/jpm/report/{reportId}")
@@ -107,7 +107,7 @@ public class JPMReportController extends BaseController {
     public String deleteReport(@PathVariable String reportId, @PathVariable Long savedReportId) throws PMException {
         final EntityReport report = getJpm().getReport(reportId);
         reportService.deleteUserSave(savedReportId, getUserDetails().getUsername());
-        return "redirect:/jpm/report/" + reportId;
+        return "redirect:jpm/report/" + reportId;
     }
 
 }
