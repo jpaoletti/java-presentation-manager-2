@@ -165,6 +165,13 @@
                 <ref bean="default-add-operation" />
                 <ref bean="default-show-operation" />
                 <ref bean="default-edit-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="securityGroupMembers" />
+                    <property name="display" value="show list" />
+                    <property name="repeatable" value="true" />
+                    <property name="executor" ref="securityGroupMembersExec" />
+                    <property name="icon" value="fas fa-users" />
+                </bean>
                 <ref bean="default-delete-operation" />
             </list>
         </property>

@@ -80,6 +80,7 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
         this.encoder = encoder;
     }
 
+    @Override
     public String getLoginPage() {
         return "login";
     }

@@ -255,7 +255,7 @@
                     if (confirm) {
                         //We simulate a link
                         var a = $("<a href='" + link + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
-                        $("body").append(a);
+                        $(document).append(a);
                         a.trigger("click");
                     } else {
                         document.location = link;

@@ -256,7 +256,7 @@
                         }
                     }, 1000);
                 });
-                $("body").on("click", ".closer", function () {
+                $(document).on("click", ".closer", function () {
                     $(this).parent().remove();
                 });
                 $("#saveReportBtn").on("click", function () {

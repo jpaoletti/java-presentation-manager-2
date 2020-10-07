@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author jpaoletti
  */
 @Entity
-@Table(name = "groups")
+@Table(name = "jpm_groups")
 public class Group implements Serializable {
 
     @Id
@@ -81,5 +81,4 @@ public class Group implements Serializable {
         }
         return res;
     }
-
 }

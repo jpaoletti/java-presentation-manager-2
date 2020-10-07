@@ -6,7 +6,7 @@
 </div>
 <script type="text/javascript">
     jpmLoad(function () {
-        $("body").on("click", "#${field}selectAll", function () {
+        $(document).on("click", "#${field}selectAll", function () {
             $("input[name='field_${field}']").prop("checked", $(this).is(":checked"));
         });
         $.ajax({

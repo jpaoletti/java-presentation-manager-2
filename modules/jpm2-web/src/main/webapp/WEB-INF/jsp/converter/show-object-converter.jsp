@@ -3,7 +3,7 @@
     <c:if test="${not empty param.fields}">
         <a disabled href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}" class="form-control">${param.value}<span class="glyphicon glyphicon-comment pull-right"></span></a>
         <script type="text/javascript">
-            $("body").on("click", "#field_${field}_${param.instanceId}_${param.objectId}", function () {
+            $(document).on("click", "#field_${field}_${param.instanceId}_${param.objectId}", function () {
                 var _this = $(this);
                 $.getJSON("${cp}jpm/${param.entityId}/${param.instanceId}/show.json?fields=${param.fields}", function (data) {
                             var content = "<table class='table table-compact table-bordered'><tbody>";
