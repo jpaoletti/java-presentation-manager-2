@@ -70,7 +70,7 @@ var delay = (function () {
 })();
 
 function initConfirm() {
-    $("body").on("click", ".confirm-true", function (e) {
+    $(document).on("click", ".confirm-true", function (e) {
         e.preventDefault();
         var $href = $(this).attr("href");
         //@@ are SELECTED scoped operations
@@ -181,7 +181,7 @@ var initPage = function () {
                     }
                 });
             });
-            $("body").on("click", "#removeFavoriteLink", function (e) {
+            $(document).on("click", "#removeFavoriteLink", function (e) {
                 e.preventDefault();
                 $.ajax({
                     type: "POST",
@@ -192,7 +192,7 @@ var initPage = function () {
                     }
                 });
             });
-            $("body").on("click", "#addFavoriteLink", function (e) {
+            $(document).on("click", "#addFavoriteLink", function (e) {
                 e.preventDefault();
                 var $textAndPic = $('<div></div>');
                 var html = "";
@@ -258,7 +258,7 @@ var initPage = function () {
             }
         }
 
-        $("body").on("click", ".inline-boolean", function () {
+        $(document).on("click", ".inline-boolean", function () {
             var instanceId = $(this).attr("data-id");
             var field = $(this).attr("data-field-name");
             var entity = $(this).attr("data-entity-id");
@@ -531,7 +531,7 @@ function asynchronicOperationProgress(id) {
     });
 }
 
-$("body").on("click", ".viewAttachmentIco", function (e) {
+$(document).on("click", ".viewAttachmentIco", function (e) {
     e.preventDefault();
     var ct = $(this).attr("data-type");
     var id = $(this).attr("data-id");

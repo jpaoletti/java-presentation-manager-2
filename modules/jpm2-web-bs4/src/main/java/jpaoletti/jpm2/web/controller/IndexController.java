@@ -23,7 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  * @author jpaoletti
  */
-@Controller // Uncomment this  line for a stand-alone behaviour
+//@Controller // Uncomment this  line for a stand-alone behaviour
 public class IndexController extends BaseController {
 
     @Autowired

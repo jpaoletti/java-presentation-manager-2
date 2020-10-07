@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -165,8 +166,10 @@ public class XlsUtils {
                 case Cell.CELL_TYPE_BOOLEAN:
                     return Boolean.toString(cell.getBooleanCellValue());
                 case Cell.CELL_TYPE_NUMERIC:
-                    final NumberFormat formatter = new DecimalFormat("#0");
-                    return formatter.format(cell.getNumericCellValue());
+                    DataFormatter df = new DataFormatter();
+                    return df.formatCellValue(cell);
+//                    final NumberFormat formatter = new DecimalFormat("#0");
+//                    return formatter.format(cell.getNumericCellValue());
                 case Cell.CELL_TYPE_STRING:
                     return cell.getStringCellValue();
             }

@@ -12,6 +12,16 @@
 <script type="text/javascript" src="${cp}jpm/security/i18n.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     var to = false;
+    function saveSelectedValues() {
+        var selectedElmsIds = [];
+        var selectedElms = $('#editAuthTree').jstree("get_selected", true);
+        $.each(selectedElms, function (i, node) {
+            if (node.children.length === 0) {
+                selectedElmsIds.push(this.id);
+            }
+        });
+        $('#field_${field}').val(selectedElmsIds.join(","));
+    }
     jpmLoad(function () {
         var readonly = ${param.readonly};
         var ids = "${param.value}".split(",");
@@ -56,7 +66,7 @@
                                     'text': oper.name + "<span class='authKey'> [" + oper.key + "]</span>",
                                     children: oper.fields.length > 0 ? [] : null,
                                     state: {'opened': false, selected: !readonly && $.inArray(oper.key, ids) >= 0},
-                                    'icon': oper.icon
+                                    'icon': (oper.icon === null ? "glyphicon jpmicon-" + oper.id : oper.icon)
                                 };
                                 if (oper.fields.length > 0) {
                                     $.each(oper.fields, function (i, field) {
@@ -94,14 +104,7 @@
                             'data': root
                         }
                     }).on('changed.jstree', function (e, data) {
-                        var selectedElmsIds = [];
-                        var selectedElms = $('#editAuthTree').jstree("get_selected", true);
-                        $.each(selectedElms, function (i, node) {
-                            if (node.children.length === 0) {
-                                selectedElmsIds.push(this.id);
-                            }
-                        });
-                        $('#field_${field}').val(selectedElmsIds.join(","));
+                        saveSelectedValues();
                     });
                     $('#${field}CollectionContainerSearchInput').keyup(function (e) {
                         if (to) {
@@ -114,6 +117,7 @@
                         e.preventDefault();
                     });
                 });
+                saveSelectedValues();
             });
             $("#${field}CollectionContainerSearchInput").keypress(function (e) {
                 if (e.which === 13) {

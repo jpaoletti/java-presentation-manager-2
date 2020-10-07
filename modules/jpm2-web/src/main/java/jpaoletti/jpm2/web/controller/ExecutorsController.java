@@ -112,7 +112,6 @@ public class ExecutorsController extends BaseController implements Observer {
                 buildRedirect = buildRedirect((Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getContext().getEntity(), null, getContext().getOperation().getPathId(), "repeated=true");
             } else {
                 if (getContext().getEntityInstance() != null && getContext().getEntityInstance().getIobject() != null) {
-                } else {
                     return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), getContext().getEntityInstance().getIobject().getId(), getExecutor().getDefaultNextOperationId()).getViewName());
                 }
                 buildRedirect = next(getContext().getEntity(), getContext().getOperation(), (Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getExecutor().getDefaultNextOperationId()).getViewName();
