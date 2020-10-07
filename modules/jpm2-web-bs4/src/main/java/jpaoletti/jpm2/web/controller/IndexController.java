@@ -1,14 +1,16 @@
 package jpaoletti.jpm2.web.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.GenericDAO;
 import jpaoletti.jpm2.core.model.WithAttachment;
+import org.apache.commons.io.IOUtils;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,7 +63,14 @@ public class IndexController extends BaseController {
         if (download) {
             response.addHeader("Content-Disposition", "attachment;filename=" + wa.getAttachmentName());
         }
-        response.getOutputStream().write(wa.getAttachment());
+        if (wa.isExternalFile()) {
+            final File file = new File(wa.getInternalFileName());
+            final FileInputStream is = new FileInputStream(file);
+            IOUtils.copy(is, response.getOutputStream());
+            IOUtils.closeQuietly(is);
+        } else {
+            response.getOutputStream().write(wa.getAttachment());
+        }
     }
 
     public WebApplicationContext getCtx() {

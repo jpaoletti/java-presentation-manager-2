@@ -43,6 +43,8 @@ public class PresentationManager implements Observer, Serializable {
     private String appversion;
     private String contact;
     private String cssMode;
+    private String menuMode = "top"; //none - left - top
+    private String menuTheme = "navbar-dark bg-dark"; //left: default-theme , top: 
     private AuditService auditService;
     private JPMService service;
     private CustomLoader customLoader;
@@ -246,6 +248,15 @@ public class PresentationManager implements Observer, Serializable {
                 new Thread(asynchronicOperationExecutor).start();
                 return true;
             }
+            //only one without instances
+            case GENERAL: {
+                final String key = newCtx.getContextualEntity().toString() + "#";
+                final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
+                asynchronicOperationExecutor.addObserver(this);
+                asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
+                new Thread(asynchronicOperationExecutor).start();
+                return true;
+            }
         }
         return false;
     }
@@ -318,5 +329,21 @@ public class PresentationManager implements Observer, Serializable {
         } catch (NoSuchMessageException e) {
             return key;
         }
+    }
+
+    public String getMenuMode() {
+        return menuMode;
+    }
+
+    public void setMenuMode(String menuMode) {
+        this.menuMode = menuMode;
+    }
+
+    public String getMenuTheme() {
+        return menuTheme;
+    }
+
+    public void setMenuTheme(String menuTheme) {
+        this.menuTheme = menuTheme;
     }
 }

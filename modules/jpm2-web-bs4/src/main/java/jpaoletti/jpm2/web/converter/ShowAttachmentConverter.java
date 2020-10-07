@@ -2,6 +2,7 @@ package jpaoletti.jpm2.web.converter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
@@ -33,6 +34,8 @@ public class ShowAttachmentConverter extends Converter {
                 is = new FileInputStream(file);
                 value = IOUtils.toByteArray(is);
                 IOUtils.closeQuietly(is);
+            } catch (FileNotFoundException ex) {
+                value = null;
             } catch (IOException ex) {
                 JPMUtils.getLogger().error("Error in ShowAttachmentConverter.visualize", ex);
             }

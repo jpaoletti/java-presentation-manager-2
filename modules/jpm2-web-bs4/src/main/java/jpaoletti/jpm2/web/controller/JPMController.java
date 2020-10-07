@@ -61,6 +61,7 @@ public class JPMController extends BaseController {
         final String sessionKey = UUID.randomUUID().toString();
         getRequest().getSession().setAttribute(sessionKey, file.getBytes());
         getRequest().getSession().setAttribute(sessionKey + "originalName", file.getOriginalFilename());
+        getRequest().getSession().setAttribute(sessionKey + "originalContentType", file.getContentType());
         final UploadFileResults res = new UploadFileResults();
         res.getFiles().add(new UploadFileResult(sessionKey, file.getContentType(), (long) file.getBytes().length));
         return res;

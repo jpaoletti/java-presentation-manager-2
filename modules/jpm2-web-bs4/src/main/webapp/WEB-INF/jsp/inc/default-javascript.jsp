@@ -30,6 +30,9 @@
     messages["jpm.usernav.addfavorite"] = "<spring:message code='jpm.usernav.addfavorite' text='Add Fav' />";
     messages["jpm.usernav.removefavorite"] = "<spring:message code='jpm.usernav.removefavorite' text='Remove Fav' />";
     messages["jpm.addfavorite.popupTitle"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
+    messages["jpm.modal.attachment.preview"] = "<spring:message code='jpm.modal.attachment.preview' text='' />";
+    messages["jpm.modal.attachment.title"] = "<spring:message code='jpm.modal.attachment.title' text='' />";
+    messages["jpm.modal.attachment.download"] = "<spring:message code='jpm.modal.attachment.download' text='' />";
     function getContextPath() {
         return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "${cp}";
     }
@@ -37,7 +40,7 @@
 </script>
 <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
     <script type="text/javascript">
-    ROLE_USER_FAVORITE = true;
+        ROLE_USER_FAVORITE = true;
     </script>
 </security:authorize>
 <script type="text/javascript">

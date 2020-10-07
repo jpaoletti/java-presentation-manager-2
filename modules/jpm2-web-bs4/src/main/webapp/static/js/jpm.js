@@ -64,7 +64,7 @@ var delay = (function () {
 })();
 
 function initConfirm() {
-    $("body").on("click", ".confirm-true", function (e) {
+    $(document).on("click", ".confirm-true", function (e) {
         e.preventDefault();
         var $href = $(this).attr("href");
         //@@ are SELECTED scoped operations
@@ -229,7 +229,7 @@ var initPage = function () {
                         $("#content-header").prepend('<a id="addFavoriteLink"    style="color: gray" href="#" title="' + messages["jpm.usernav.addfavorite"] + '"><i class="fas fa-star"></i></a>&nbsp;');
                     }
                 });
-                $("body").on("click", "#removeFavoriteLink", function (e) {
+                $(document).on("click", "#removeFavoriteLink", function (e) {
                     e.preventDefault();
                     $.ajax({
                         type: "POST",
@@ -240,7 +240,7 @@ var initPage = function () {
                         }
                     });
                 });
-                $("body").on("click", "#addFavoriteLink", function (e) {
+                $(document).on("click", "#addFavoriteLink", function (e) {
                     e.preventDefault();
                     var $textAndPic = $('<div></div>');
                     var html = "";
@@ -325,7 +325,7 @@ var initPage = function () {
             }
         }
 
-        $("body").on("click", ".inline-boolean", function () {
+        $(document).on("click", ".inline-boolean", function () {
             var instanceId = $(this).attr("data-id");
             var field = $(this).attr("data-field-name");
             var entity = $(this).attr("data-entity-id");
@@ -600,4 +600,42 @@ function asynchronicOperationProgress(id) {
     });
 }
 
+$(document).on("click", ".viewAttachmentIco", function (e) {
+    e.preventDefault();
+    var ct = $(this).attr("data-type");
+    var id = $(this).attr("data-id");
+    var entity = $(this).attr("data-entity");
+    var $textAndPic = $('<div id="attachmentPopup"></div>');
+    var html = "";
+    if (ct.contains("image")) {
+        html = html + "<img id='attachmentImg' src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "'/>";
+    } else if (ct.contains("pdf")) {
+        html = html + "<iframe src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "' style='height:500px;width:100%;'></iframe>";
+    } else {
+        html = html + "<div class='alert alert-info' >" + messages["jpm.modal.attachment.preview"] + "</div>";
+    }
+    $textAndPic.append(html);
+
+    BootstrapDialog.show({
+        title: messages["jpm.modal.attachment.title"],
+        message: $textAndPic,
+        cssClass: "modal-attachment",
+        onshown: function () {
+            //$(".modal-body").height($(document).height()-500);
+        },
+        buttons: [{
+                label: messages["jpm.modal.attachment.download"],
+                cssClass: 'btn-success',
+                action: function (dialogRef) {
+                    document.location = getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=true";
+                    dialogRef.close();
+                }
+            }, {
+                label: messages["jpm.modal.confirm.close"],
+                action: function (dialogRef) {
+                    dialogRef.close();
+                }
+            }]
+    });
+});
 $(window).on("load", initPage);

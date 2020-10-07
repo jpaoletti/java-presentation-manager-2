@@ -98,7 +98,7 @@ public class EntityInstance {
                 if (converter != null) {
                     try {
                         values.put(field.getId(), converter.visualize(
-                                contextualEntity, field, object, id));
+                            contextualEntity, field, object, id));
                         fields.add(field);
                     } catch (IgnoreConvertionException ex) {
                     }
@@ -163,7 +163,7 @@ public class EntityInstance {
     public final void configureOwner(Entity entity, String context, final Object ownerobject) throws ConfigurationException {
         final Entity ownerEntity = entity.getOwner(context).getOwner();
         if (ownerobject != null) {
-            final String ownerId = String.valueOf(ownerEntity.getDao(context).getId(ownerobject));
+            final String ownerId = (entity.getOwner(context).isOnlyId()) ? ownerobject.toString() : String.valueOf(ownerEntity.getDao(context).getId(ownerobject));
             this.owner = new EntityInstanceOwner(ownerEntity, new IdentifiedObject(ownerId, ownerobject));
         } else {
             this.owner = new EntityInstanceOwner(ownerEntity, null);

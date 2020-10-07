@@ -1,5 +1,5 @@
+<%-- OVERRIDE ME --%>
 <%@include file="../default-taglibs.jsp" %>
-
 <ul>
     <li class="header-menu">
         <span>General</span>
@@ -13,7 +13,7 @@
         <div class="sidebar-submenu" style="display: none;">
             <ul>
                 <li>
-                    <jpm:menu-item code="jpm-entity-test"  icon="fab fa-java"/>
+                    <jpm:menu-item code="jpm-entity-test"  icon="fab fa-java" />
                     <!--<span class="badge badge-pill badge-success">Pro</span>-->
                 </li>
             </ul>

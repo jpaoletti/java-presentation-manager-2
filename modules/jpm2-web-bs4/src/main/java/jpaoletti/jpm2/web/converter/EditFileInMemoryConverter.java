@@ -18,6 +18,7 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
 
     @Autowired
     private HttpSession session;
+    private String contentTypeField = null;
 
     @Override
     protected String getPage(ContextualEntity contextualEntity, Field field, Object object, String instanceId) {
@@ -49,10 +50,28 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
                     throw new ConverterException("jpm.error.uploading.file");
                 }
             }
+            if (contentTypeField != null) {
+                try {
+                    final Field f = contextualEntity.getEntity().getFieldById(contentTypeField, contextualEntity.getContext());
+                    JPMUtils.set(object, f.getProperty(), session.getAttribute(newValue + "originalContentType"));
+                    session.removeAttribute(newValue + "originalContentType");
+                } catch (FieldNotFoundException ex) {
+                    JPMUtils.getLogger().error("Filename field not exists");
+                    throw new ConverterException("jpm.error.uploading.file");
+                }
+            }
         } finally {
             session.removeAttribute(newValue.toString());
         }
         return bFile;
+    }
+
+    public String getContentTypeField() {
+        return contentTypeField;
+    }
+
+    public void setContentTypeField(String contentTypeField) {
+        this.contentTypeField = contentTypeField;
     }
 
 }
