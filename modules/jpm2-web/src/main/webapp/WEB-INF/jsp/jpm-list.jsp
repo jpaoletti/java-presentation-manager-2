@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@include file="inc/default-taglibs.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<html>
+<html lang="${locale.language}">
     <head>
         <%@include file="inc/default-head.jsp" %>
     </head>
@@ -255,7 +255,7 @@
                     if (confirm) {
                         //We simulate a link
                         var a = $("<a href='" + link + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
-                        $(document).append(a);
+                        $("body").append(a);
                         a.trigger("click");
                     } else {
                         document.location = link;
