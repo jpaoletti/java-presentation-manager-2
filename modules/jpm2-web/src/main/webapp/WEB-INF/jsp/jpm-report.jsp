@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@include file="inc/default-taglibs.jsp" %>
-<html>
+<html lang="${locale.language}">
     <head>
         <%@include file="inc/default-head.jsp" %>
         <script type='text/javascript' src="${cp}static/js/jpm-report.js?v=${jpm.appversion}" ></script>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@include file="inc/default-taglibs.jsp" %>
-<html>
+<html lang="${locale.language}">
     <head>
         <%@include file="inc/default-head.jsp" %>
         <link href="${cp}static/css/login.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
