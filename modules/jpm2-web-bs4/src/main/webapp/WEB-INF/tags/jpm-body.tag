@@ -65,7 +65,7 @@
             </nav>
         </header>
         <main role="main" class="flex-shrink-0">
-            <div class="container-fluid">
+            <div class="container-fluid container-if-fixed-footer">
                 <jsp:doBody />
             </div>
         </main>
