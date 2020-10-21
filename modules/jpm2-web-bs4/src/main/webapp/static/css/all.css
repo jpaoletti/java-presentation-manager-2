@@ -1,7 +1,7 @@
-@import url("bootstrap.min.css");
+@import url("../node_modules/bootstrap/dist/css/bootstrap.min.css");
 @import url("bootstrap-datetimepicker.min.css");
 @import url("../node_modules/bootstrap4-dialog/dist/css/bootstrap-dialog.min.css");
-@import url("font-awesome.css");
+@import url("../node_modules/@fortawesome/fontawesome-free/css/all.min.css");
 @import url("_jpm.css");
 @import url("_jpm_colors.css");
 @import url("sidebar-main.css");

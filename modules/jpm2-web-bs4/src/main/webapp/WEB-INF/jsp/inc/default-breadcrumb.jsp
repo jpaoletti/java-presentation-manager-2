@@ -9,14 +9,14 @@
                     <c:if test="${empty instance.owner.owner}">
                         <li class="breadcrumb-item">
                             <a href="${cp}jpm/${owner.id}${entityContext}/list">
-                                <span class="fas fa-th-list"></span> <span class="d-none d-md-inline"><spring:message code="jpm.operation.list" text="List" arguments="${owner.title}" /></span>
+                                <span class="fas fa-th-list"></span> <span class="d-none d-md-inline"><spring:message code="jpm.operation.list" text="List" arguments="${owner.plularTitle}" /></span>
                             </a>
                         </li>
                     </c:if>
                     <c:if test="${not empty instance.owner.owner}">
                         <li class="breadcrumb-item">
                             <a href="${cp}jpm/${instance.owner.owner.entity.id}/${instance.owner.owner.iobject.id}/${owner.id}${entityContext}/list">
-                                <span class="fas fa-th-list"></span> <span class="d-none d-md-inline"><spring:message code="jpm.operation.list" text="List" arguments="${owner.title}" /></span>
+                                <span class="fas fa-th-list"></span> <span class="d-none d-md-inline"><spring:message code="jpm.operation.list" text="List" arguments="${owner.plularTitle}" /></span>
                             </a>
                         </li>
                     </c:if>

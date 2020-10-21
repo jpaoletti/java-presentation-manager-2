@@ -8,7 +8,7 @@ main {padding-top: 65px;}
     width: 100%;
     height: 50px;
     line-height: 50px;
-    background-color: #f5f5f5;
+    background-color: #eeeeee;
 }
 .asynchronicProgress{height: 4px; width: 100%; margin-top: -4px; display: none;}
 .asynchronicProgress .progress-bar{height: 3px !important;}
@@ -55,3 +55,7 @@ main {padding-top: 65px;}
 .popover{max-width: 400px;}
 .viewAttachmentIco{cursor: pointer}
 .container-if-fixed-footer{margin-bottom:55px;}
+.btn-group-xs > .btn, .btn-xs {padding: .25rem .4rem; font-size: .875rem; line-height: .5; border-radius: .2rem;}
+.dropdown-300{max-height:300px;overflow-y:auto;}
+.dropdown-500{max-height:500px;overflow-y:auto;}
+.form-group{margin-bottom: 0.5rem;}

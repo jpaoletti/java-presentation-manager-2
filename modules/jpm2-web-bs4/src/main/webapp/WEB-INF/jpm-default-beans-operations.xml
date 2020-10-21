@@ -25,6 +25,13 @@
         <property name="executor" ref="operationExecutorSimple" />
         <property name="icon" value="fas fa-search" />
     </bean>
+    <bean id="compact-show-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="show" />
+        <property name="display" value="all !add" />
+        <property name="executor" ref="operationExecutorSimple" />
+        <property name="compact" value="true" />
+        <property name="icon" value="fas fa-search" />
+    </bean>
     <bean id="default-add-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="add" />
         <property name="display" value="all" />

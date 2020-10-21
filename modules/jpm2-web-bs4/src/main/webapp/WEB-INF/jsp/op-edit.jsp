@@ -4,8 +4,6 @@
     <head>
         <%@include file="inc/default-head.jsp" %>
     </head>
-    <c:set var="entityName" value="${entity.title}" />
-    <spring:message var="operationName" code="${operation.title}" arguments="${entityName}" />
     <jpm:jpm-body>
         <jpm:jpm-item-operation>
             <form class="form-horizontal" role="form" method="POST" id="jpmForm">

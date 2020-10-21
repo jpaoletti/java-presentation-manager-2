@@ -42,7 +42,7 @@
                                         <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
                                             <i class="fa fa-star text-warning"></i>
                                         </button>
-                                        <div class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage"></div>
+                                        <div class="dropdown-menu dropdown-500 messages" aria-labelledby="dropdownMenuMessage"></div>
                                     </div>
                                 </div>
                             </security:authorize>
@@ -52,7 +52,7 @@
                                         <button class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
                                             <i class="fa fa-history text-info"></i>
                                         </button>
-                                        <div class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage">
+                                        <div class="dropdown-menu dropdown-500 messages" aria-labelledby="dropdownMenuMessage">
                                         </div>
                                     </div>
                                 </div>
@@ -131,7 +131,7 @@
                                     <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
                                         <i class="fa fa-star text-warning"></i>
                                     </a>
-                                    <div class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage">
+                                    <div class="dropdown-menu dropdown-500 messages" aria-labelledby="dropdownMenuMessage">
                                     </div>
                                 </div>
                             </security:authorize>
@@ -140,7 +140,7 @@
                                     <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
                                         <i class="fa fa-history text-info"></i>
                                     </a>
-                                    <div class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage">
+                                    <div class="dropdown-menu dropdown-500 messages" aria-labelledby="dropdownMenuMessage">
                                     </div>
                                 </div>
                             </security:authorize>

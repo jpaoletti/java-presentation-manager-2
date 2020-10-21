@@ -29,7 +29,7 @@
                                     <button type="button" class="btn  btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
                                         <span class="fas fa-cog"></span> <span class="caret"></span>
                                     </button>
-                                    <div class="dropdown-menu" role="menu">
+                                    <div class="dropdown-menu dropdown-300" role="menu">
                                         <c:forEach items="${item.operations}" var="o">
                                             <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" clazz="dropdown-item" />
                                         </c:forEach>

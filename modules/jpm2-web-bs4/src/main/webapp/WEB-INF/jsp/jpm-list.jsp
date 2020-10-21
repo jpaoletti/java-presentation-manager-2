@@ -19,21 +19,22 @@
                 <div class="row">
                     <div class="col-10">
                         <!--<div class="btn-group filter-list">-->
-                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="btn btn-sm btn-secondary dropdown-toggle dropright" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="fas fa-filter"></span>
                         </a>
-                        <ul class="dropdown-menu" role="menu">
+                        <div class="dropdown-menu dropdown-300" role="menu">
                             <c:forEach items="${paginatedList.fieldSearchs}" var="fs" varStatus="st">
-                                <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}');">${st.index+1}. <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" /></a>
+                                <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" var="searchTitle" />
+                                <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}', '${searchTitle}');">${st.index+1}. ${searchTitle}</a>
                             </c:forEach>
-                        </ul>
+                        </div>
                         <div class="btn-group">
                             <c:forEach items="${generalOperations}" var="o">
                                 <c:if test="${empty owner}">
-                                    <jpm:operation-link operation="${o}" clazz="btn ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="${o.showTitle}" />
+                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="${o.showTitle}" />
                                 </c:if>
                                 <c:if test="${not empty owner}">
-                                    <jpm:operation-link operation="${o}" clazz="btn ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" instanceId="${item.id}" entityName="${entityName}"  title="${o.showTitle}" />
+                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" instanceId="${item.id}" entityName="${entityName}"  title="${o.showTitle}" />
                                 </c:if>
                             </c:forEach>
                         </div>
@@ -98,12 +99,12 @@
                                         <div class="btn-group">
                                             <c:if test="${not compactOperations}">
                                                 <c:forEach items="${item.operations}" var="o">
-                                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
+                                                    <jpm:operation-link operation="${o}" clazz="btn btn-xs ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
                                                 </c:forEach>
                                             </c:if>
                                             <c:if test="${compactOperations}">
                                                 <div class="dropdown">
-                                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown">
+                                                    <button type="button" class="btn btn-xs btn-secondary dropdown-toggle" data-toggle="dropdown">
                                                         <span class="fas fa-cog"></span> <span class="caret"></span>
                                                     </button>
                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -136,7 +137,7 @@
                                     <td colspan="100">
                                         <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="pull-left" />
                                         <c:forEach var="o" items="${selectedOperations}">
-                                            <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-warning'} selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
+                                            <jpm:operation-link operation="${o}" clazz="btn btn-xs ${not empty o.color?o.color:'btn-warning'} selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
                                         </c:forEach>
                                     </td>
                                 </tr>
@@ -144,48 +145,46 @@
                         </c:if>
                         <tfoot>
                             <tr>
-                                <td colspan="${entity.countable?paginatedList.fields.size():paginatedList.fields.size() + 1}">
+                                <td colspan="${paginatedList.fields.size() + 1}">
                                     <div class="list-pagination">
                                         <%@include file="inc/default-paginator.jsp" %>
                                     </div>
-                                </td>
                                 <c:if test="${entity.countable}">
-                                    <td>
-                                        <span class="label label-default"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
-                                    </td>
+                                    <div class="float-right float-right mt-1 mr-1">
+                                        <span class="badge badge-secondary"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
+                                    </div>
                                 </c:if>
+                                </td>
                             </tr>
                         </tfoot>
                     </table>
                     <!-- END CONTENT -->
                 </div>
             </div>
-            <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+            <div class="modal fade"  id="searchModal" tabindex="-1">
                 <c:if test="${empty owner}">
                     <c:set var="addSearchUrl" value="${cp}jpm/${contextualEntity}/addSearch"/>
                 </c:if>
                 <c:if test="${not empty owner}">
                     <c:set var="addSearchUrl" value="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/addSearch"/>
                 </c:if>
-                <form method="POST" id='addSearchForm' action="${addSearchUrl}">
-                    <input type="hidden" name="entityId" value="${entityId}"/>
-                    <input type="hidden" name="fieldId" value=""/>
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title"><spring:message code="jpm.list.modalsearch.title" text="New Search" /></h4>
-                            </div>
-                            <div class="modal-body">
-                                ...
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-light" data-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
-                                <button type="submit" class="btn btn-secondary"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
-                            </div>
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><spring:message code="jpm.list.modalsearch.title" text="New Search" /></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
+                            <button type="submit" class="btn btn-success"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
             <div style="display: none;" id='fieldSearchForms'>
                 <c:forEach items="${paginatedList.fieldSearchs}" var="fs">
@@ -202,8 +201,8 @@
         </jpm:jpm-body>
         <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
         <script type="text/javascript">
-            function openSearchModal(field) {
-                $("#searchModal .modal-body").html($("#fieldSearchForm_" + field).html());
+            function openSearchModal(field, name) {
+                $("#searchModal .modal-body").html("<h6>" + name + "</h6>" + $("#fieldSearchForm_" + field).html());
                 $("#addSearchForm [name='fieldId']").val(field);
                 $("#searchModal").modal("show").on("shown.bs.modal", function () {
                     $("#searchModal .modal-body").find("input").trigger('focus');

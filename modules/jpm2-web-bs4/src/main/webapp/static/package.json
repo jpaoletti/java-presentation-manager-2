@@ -11,12 +11,13 @@
     "author": "jpaoletti",
     "contributors": [],
     "dependencies": {
-        "bootstrap": "^4.5.0",
-        "bootstrap4-dialog": "^4.3.4",
+        "@fortawesome/fontawesome-free": "^5.15.1",
+        "bootstrap": "^4.5.3",
+        "bootstrap4-dialog": "^4.3.8",
         "jquery": "^3.5.0",
         "jquery-blockui": "^2.7.0",
         "jquery.cookie": "^1.4.1",
-        "moment": "^2.27.0",
+        "moment": "^2.29.1",
         "popper.js": "^1.16.1"
     }
 }
