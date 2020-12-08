@@ -96,6 +96,7 @@ public class JPMController extends BaseController {
             final Field f = e.getFieldById(field, "");
             return (byte[]) JPMUtils.get(e.getDao().get(id), f.getProperty());
         } catch (Exception e) {
+            JPMUtils.getLogger().error("Error in entity image", e);
             return null;
         }
     }

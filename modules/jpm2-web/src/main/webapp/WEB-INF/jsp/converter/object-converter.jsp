@@ -14,6 +14,7 @@
             placeholder: "${param.placeHolder}",
             minSearch:${param.minSearch},
             filter: "${param.filter}",
+            owner: "${not empty owner?owner.id:''}",
             ownerId: "${not empty owner?ownerId:''}",
             related: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('")'):'null'},
             sortBy: "${param.sortBy}",

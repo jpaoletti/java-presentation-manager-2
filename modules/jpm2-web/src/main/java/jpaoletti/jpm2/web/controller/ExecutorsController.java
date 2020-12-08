@@ -54,9 +54,14 @@ public class ExecutorsController extends BaseController implements Observer {
      * @return model and view
      * @throws PMException
      */
-    @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec", "/jpm/{entity}/{operationId}.exec"})
+    @GetMapping(value = {"/jpm/{entity}/{operationId}.exec"})
     public ModelAndView executorsGeneralPrepare(HttpServletRequest request) throws PMException {
-        final Map<String, Object> preparation = getExecutor().prepare(new ArrayList<>());
+        return executorsGeneralPrepare(request, null, null);
+    }
+
+    @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"})
+    public ModelAndView executorsGeneralPrepare(HttpServletRequest request, @PathVariable Entity owner, @PathVariable String ownerId) throws PMException {
+        final Map<String, Object> preparation = getExecutor().prepare(owner, ownerId, new ArrayList<>());
         if (getExecutor().immediateExecute()) {
             executorsCommit(request, new ArrayList<>(), false);
             getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
@@ -149,7 +154,7 @@ public class ExecutorsController extends BaseController implements Observer {
             instances.add(getContext().getEntityInstance());
         }
         setLastAccessed(request, getContext(), instanceIds);
-        final Map<String, Object> preparation = getExecutor().prepare(instances);
+        final Map<String, Object> preparation = getExecutor().prepare(null, null, instances);
         if (getExecutor().immediateExecute()) {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {

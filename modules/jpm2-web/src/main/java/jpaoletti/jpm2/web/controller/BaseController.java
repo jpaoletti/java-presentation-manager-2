@@ -193,7 +193,11 @@ public class BaseController {
     }
 
     protected IdentifiedObject initItemControllerOperation(String instanceId) throws PMException {
-        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
+        final Operation operation = getContext().getOperation();
+        final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getEntityContext(), operation, instanceId);
+        if (operation.getContext() != null) {
+            operation.getContext().preConversion(iobject.getObject());
+        }
         getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
         checkOperationCondition(getContext().getOperation(), getContext().getEntityInstance());
         return iobject;

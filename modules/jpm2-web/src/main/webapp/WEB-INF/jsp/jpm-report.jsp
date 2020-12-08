@@ -138,7 +138,7 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         <li>
-                            <a href="#" id="saveReportBtn" data-toggle="modal" data-target="#saveReportModal"><spring:message code="jpm.reports.saveReport.btn" text="Save Report" /></a>
+                            <a href="javascript: void(0)" id="saveReportBtn" data-toggle="modal" data-target="#saveReportModal"><spring:message code="jpm.reports.saveReport.btn" text="Save Report" /></a>
                         </li>
                         <li class="divider"></li>
                             <c:forEach items="${savedReports}" var="fs" varStatus="st">

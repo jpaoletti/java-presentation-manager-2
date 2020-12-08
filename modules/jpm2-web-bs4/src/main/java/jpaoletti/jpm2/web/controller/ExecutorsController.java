@@ -16,6 +16,8 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.OperationExecutor;
+import static jpaoletti.jpm2.core.model.OperationExecutor.OWNER_ENTITY;
+import static jpaoletti.jpm2.core.model.OperationExecutor.OWNER_ID;
 import jpaoletti.jpm2.core.model.Progress;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -40,8 +42,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class ExecutorsController extends BaseController implements Observer {
 
     public static final String HTTP_SERVLET_REQUEST = "HTTP_SERVLET_REQUEST";
-    public static final String OWNER_ENTITY = "OWNER_ENTITY";
-    public static final String OWNER_ID = "OWNER_ID";
     public static final String LAST_ACCESSED = "LAST_ACCESSED_";
 
     @Autowired
@@ -54,9 +54,14 @@ public class ExecutorsController extends BaseController implements Observer {
      * @return model and view
      * @throws PMException
      */
-    @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec", "/jpm/{entity}/{operationId}.exec"})
+    @GetMapping(value = {"/jpm/{entity}/{operationId}.exec"})
     public ModelAndView executorsGeneralPrepare(HttpServletRequest request) throws PMException {
-        final Map<String, Object> preparation = getExecutor().prepare(new ArrayList<>());
+        return executorsGeneralPrepare(request, null, null);
+    }
+
+    @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"})
+    public ModelAndView executorsGeneralPrepare(HttpServletRequest request, @PathVariable Entity owner, @PathVariable String ownerId) throws PMException {
+        final Map<String, Object> preparation = getExecutor().prepare(owner, ownerId, new ArrayList<>());
         if (getExecutor().immediateExecute()) {
             executorsCommit(request, new ArrayList<>(), false);
             getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
@@ -102,20 +107,24 @@ public class ExecutorsController extends BaseController implements Observer {
 
     protected JPMPostResponse executorsGeneralCommit(final List<EntityInstance> instances, final Map parameters, boolean repeat) {
         try {
+            String execute = null;
             if (getContext().getOperation().isSynchronic()) {
-                getExecutor().execute(getContext(), instances, parameters, new Progress());
+                execute = getExecutor().execute(getContext(), instances, parameters, new Progress());
             } else if (!getJpm().registerAsynchronicExecutor(getContext(), getExecutor(), instances, parameters)) {
                 throw new PMException("unable.to.register.asynchronic.executor");
             }
             String buildRedirect;
-            if (repeat) {
-                buildRedirect = buildRedirect((Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getContext().getEntity(), null, getContext().getOperation().getPathId(), "repeated=true");
-            } else {
-                if (getContext().getEntityInstance() != null && getContext().getEntityInstance().getIobject() != null) {
+            if (StringUtils.isEmpty(execute)) {
+                if (repeat) {
+                    buildRedirect = buildRedirect((Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getContext().getEntity(), null, getContext().getOperation().getPathId(), "repeated=true");
                 } else {
-                    return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), getContext().getEntityInstance().getIobject().getId(), getExecutor().getDefaultNextOperationId()).getViewName());
+                    if (getContext().getEntityInstance() != null && getContext().getEntityInstance().getIobject() != null) {
+                        return new JPMPostResponse(true, next(getContext().getEntity(), getContext().getOperation(), getContext().getEntityInstance().getIobject().getId(), getExecutor().getDefaultNextOperationId()).getViewName());
+                    }
+                    buildRedirect = next(getContext().getEntity(), getContext().getOperation(), (Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getExecutor().getDefaultNextOperationId()).getViewName();
                 }
-                buildRedirect = next(getContext().getEntity(), getContext().getOperation(), (Entity) parameters.get(OWNER_ENTITY), (String) parameters.get(OWNER_ID), getExecutor().getDefaultNextOperationId()).getViewName();
+            } else {
+                buildRedirect = execute;
             }
             return new JPMPostResponse(true, buildRedirect, MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
         } catch (ValidationException e) {
@@ -150,7 +159,7 @@ public class ExecutorsController extends BaseController implements Observer {
             instances.add(getContext().getEntityInstance());
         }
         setLastAccessed(request, getContext(), instanceIds);
-        final Map<String, Object> preparation = getExecutor().prepare(instances);
+        final Map<String, Object> preparation = getExecutor().prepare(null, null, instances);
         if (getExecutor().immediateExecute()) {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {
@@ -189,18 +198,23 @@ public class ExecutorsController extends BaseController implements Observer {
             final Map parameterMap = new LinkedHashMap(request.getParameterMap());
             parameterMap.put(HTTP_SERVLET_REQUEST, request);
             final Map parameters = getExecutor().preExecute(getContext(), instances, parameterMap);
+            String execute = null;
             if (getContext().getOperation().isSynchronic()) {
-                getExecutor().execute(getContext(), instances, parameters, new Progress());
+                execute = getExecutor().execute(getContext(), instances, parameters, new Progress());
             } else if (!getJpm().registerAsynchronicExecutor(getContext(), getExecutor(), instances, parameters)) {
                 throw new PMException("unable.to.register.asynchronic.executor");
             }
             String buildRedirect;
-            final String newIds = StringUtils.join(instances.stream().map(EntityInstance::getId).collect(Collectors.toList()), ",");
-            if (repeat) {
-                buildRedirect = buildRedirect(null, null, getContext().getEntity(), newIds, getContext().getOperation().getPathId(), "repeated=true");
+            if (StringUtils.isEmpty(execute)) {
+                final String newIds = StringUtils.join(instances.stream().map(EntityInstance::getId).collect(Collectors.toList()), ",");
+                if (repeat) {
+                    buildRedirect = buildRedirect(null, null, getContext().getEntity(), newIds, getContext().getOperation().getPathId(), "repeated=true");
+                } else {
+                    //BUG follows list in weak not working
+                    buildRedirect = next(getContext().getEntity(), getContext().getOperation(), newIds, getExecutor().getDefaultNextOperationId()).getViewName();
+                }
             } else {
-                //BUG follows list in weak not working
-                buildRedirect = next(getContext().getEntity(), getContext().getOperation(), newIds, getExecutor().getDefaultNextOperationId()).getViewName();
+                buildRedirect = execute;
             }
             return new JPMPostResponse(true, buildRedirect, MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
         } catch (ValidationException e) {

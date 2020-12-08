@@ -16,7 +16,7 @@
             <nav id="top-navbar" class="navbar navbar-expand-md fixed-top ${jpm.menuTheme}">
                 <a class="navbar-brand" href="${cp}index"><span class="fas fa-home"></span> <span class="hidden-sm">${jpm.title}</span></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="fas fa-bars"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav mr-auto">
@@ -39,7 +39,7 @@
                             <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
                                 <div class="btn-group dropleft">
                                     <div  id="userNavFavorite" >
-                                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
+                                        <button class="btn my-2 my-sm-0  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
                                             <i class="fa fa-star text-warning"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-500 messages" aria-labelledby="dropdownMenuMessage"></div>
@@ -49,7 +49,7 @@
                             <security:authorize access="hasAnyRole('ROLE_USER_RECENT')">
                                 <div class="btn-group dropleft">
                                     <div class="dropdown" id="userNavRecent">
-                                        <button class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
+                                        <button class="btn my-2 my-sm-0 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
                                             <i class="fa fa-history text-info"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-500 messages" aria-labelledby="dropdownMenuMessage">

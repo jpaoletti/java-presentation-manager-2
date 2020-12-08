@@ -65,7 +65,7 @@
                 <!-- END Filter list-->
                 <hr class="mb-3 mt-3"/>
                 <!-- CONTENT DATA -->
-                <div class="table-responsive">
+                <div class="table-responsive list-operation-table-container">
                     <table class="table table-bordered table-sm jpm-list-table w-auto">
                         <thead class="thead-light">
                             <tr>
@@ -107,7 +107,7 @@
                                                     <button type="button" class="btn btn-xs btn-secondary dropdown-toggle" data-toggle="dropdown">
                                                         <span class="fas fa-cog"></span> <span class="caret"></span>
                                                     </button>
-                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <div class="dropdown-menu dropdown-300" aria-labelledby="dropdownMenuButton">
                                                         <c:forEach items="${item.operations}" var="o">
                                                             <jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" clazz="dropdown-item" />
                                                         </c:forEach>
@@ -149,11 +149,11 @@
                                     <div class="list-pagination">
                                         <%@include file="inc/default-paginator.jsp" %>
                                     </div>
-                                <c:if test="${entity.countable}">
-                                    <div class="float-right float-right mt-1 mr-1">
-                                        <span class="badge badge-secondary"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
-                                    </div>
-                                </c:if>
+                                    <c:if test="${entity.countable}">
+                                        <div class="float-right float-right mt-1 mr-1">
+                                            <span class="badge badge-secondary"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
+                                        </div>
+                                    </c:if>
                                 </td>
                             </tr>
                         </tfoot>
@@ -170,19 +170,23 @@
                 </c:if>
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title"><spring:message code="jpm.list.modalsearch.title" text="New Search" /></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            ...
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
-                            <button type="submit" class="btn btn-success"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
-                        </div>
+                        <form method="POST" id='addSearchForm' action="${addSearchUrl}">
+                            <input type="hidden" name="entityId" value="${entityId}"/>
+                            <input type="hidden" name="fieldId" value=""/>
+                            <div class="modal-header">
+                                <h5 class="modal-title"><spring:message code="jpm.list.modalsearch.title" text="New Search" /></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                ...
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
+                                <button type="submit" class="btn btn-success"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -235,11 +239,11 @@
                     }).join(',');
                     if (instanceIds !== "") {
                         var btn = $(this);
-                        var confirm = btn.attr("data-confirm") === "true";
+                        var confirm = btn.hasClass("confirm-true");
                         var link = $(this).attr("href").replace("@@", instanceIds);
                         if (confirm) {
                             //We simulate a link
-                            var a = $("<a href='" + link + "' class='hide confirm-" + btn.attr("data-confirm") + "' />");
+                            var a = $("<a href='" + link + "' class='hide confirm-true' />");
                             $("body").append(a);
                             a.trigger("click");
                         } else {

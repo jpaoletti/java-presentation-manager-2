@@ -5,6 +5,7 @@
     </c:if>
 </select>
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" src="${cp}static/js/locale/select2/${locale.language}.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
         $("#field_${field}").buildJpmSelect2({
@@ -13,6 +14,7 @@
             placeholder: "${param.placeHolder}",
             minSearch:${param.minSearch},
             filter: "${param.filter}",
+            owner: "${not empty owner?owner.id:''}",
             ownerId: "${not empty owner?ownerId:''}",
             related: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('")'):'null'},
             sortBy: "${param.sortBy}",

@@ -307,6 +307,7 @@ var initPage = function () {
                  placeholder: "...",
                  minSearch: 0,
                  filter: "",
+                 owner: "",
                  ownerId: "",
                  related: null, (use another select2 object here)
                  sortBy: "",
@@ -323,7 +324,7 @@ var initPage = function () {
                             dropdownCssClass: "bigdrop",
                             minimumInputLength: params.minSearch || 0,
                             ajax: {
-                                url: getContextPath() + "jpm/" + params.entity + ".json?filter=" + (params.filter || "") + "&ownerId=" + (params.ownerId || ""),
+                                url: getContextPath() + "jpm/" + params.entity + ".json",
                                 dataType: 'json',
                                 processResults: function (data, params) {
                                     params.page = params.page || 1;
@@ -336,6 +337,9 @@ var initPage = function () {
                                 },
                                 data: function (p) {
                                     return {
+                                        owner: (params.owner) ? params.owner : "",
+                                        ownerId: (params.ownerId) ? params.ownerId : "",
+                                        filter: (params.filter) ? params.filter : "",
                                         relatedValue: (params.related) ? params.related.val() : "",
                                         textField: params.textField || "",
                                         query: p.term,
@@ -403,7 +407,7 @@ var processFormResponse = function (data) {
         }
         if (data.next && data.next !== "") {
             setTimeout(function () {
-                document.location = getContextPath() + (data.next.startsWith("/")?data.next.substr(1):data.next);
+                document.location = getContextPath() + (data.next.startsWith("/") ? data.next.substr(1) : data.next);
             }, data.messageDelay);
         }
     } else {

@@ -46,7 +46,7 @@
         </li>
     </c:if>
     <li class="active">
-        <a href="#"><span class="glyphicon jpmicon-${operation.id}"></span> <span class="hidden-xs">${operationName} ${instance.iobject.object}</span></a>
+        <a href="javascript: void(0)"><span class="glyphicon jpmicon-${operation.id}"></span> <span class="hidden-xs">${operationName} ${instance.iobject.object}</span></a>
     </li>
 </ol>
 <div class="asynchronicProgress hide" id="asynchronicProgress">

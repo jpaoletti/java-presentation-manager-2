@@ -1,7 +1,7 @@
 <%@include file="default-content-header.jsp" %>
 <%@include file="default-breadcrumb.jsp" %>
 <c:if test="${not empty itemOperations or not empty generalOperations}">
-    <div class="row">
+    <div class="row" id="item-operation-general-operations">
         <div class="col-md-6 col-sm-12">
             <%@include file="item-operations.jsp" %>
         </div>

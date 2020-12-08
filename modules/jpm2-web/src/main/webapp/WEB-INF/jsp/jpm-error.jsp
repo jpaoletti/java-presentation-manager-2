@@ -9,8 +9,8 @@
             <h1>${jpm.subtitle}</h1>
         </div>
         <div id="breadcrumb">
-            <a href="#" title="" class="tip-bottom" class="current"><i class="glyphicon glyphicon-home"></i> <spring:message code="jpm.index.home" text="Home" /></a>
-            <a href="#" class="current"><spring:message code="jpm.menu.status" text="Status" /></a>
+            <a href="javascript: void(0)" title="" class="tip-bottom" class="current"><i class="glyphicon glyphicon-home"></i> <spring:message code="jpm.index.home" text="Home" /></a>
+            <a href="javascript: void(0)" class="current"><spring:message code="jpm.menu.status" text="Status" /></a>
         </div>
         <div class="container-fluid">
             <br/>

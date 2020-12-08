@@ -42,7 +42,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -67,6 +66,7 @@ public class ListController extends BaseController {
         @RequestParam String textField,
         @RequestParam(required = false, defaultValue = "false") boolean useToString,
         @RequestParam(required = false) String relatedValue,
+        @RequestParam(required = false) String owner,
         @RequestParam(required = false) String ownerId,
         @RequestParam(required = false) String sortBy,
         @RequestParam(required = false) String filter,
@@ -86,7 +86,7 @@ public class ListController extends BaseController {
                     if (lfilter instanceof RelatedListFilter) {
                         ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
                     }
-                    final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), ownerId);
+                    final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), owner, ownerId);
                     if (c != null) {
                         restrictions.add(c);
                     }
