@@ -6,6 +6,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.OperationExecutor;
 import jpaoletti.jpm2.core.model.Progress;
@@ -27,13 +28,16 @@ public class OperationExecutorSimple implements OperationExecutor {
     private PresentationManager jpm;
 
     @Override
-    public Map<String, Object> prepare(List<EntityInstance> instances) throws PMException {
-        return new LinkedHashMap<>();
+    public Map<String, Object> prepare(Entity owner, String ownerId, List<EntityInstance> instances) throws PMException {
+        final LinkedHashMap<String, Object> res = new LinkedHashMap<>();
+        res.put(OWNER_ENTITY, owner);
+        res.put(OWNER_ID, ownerId);
+        return res;
     }
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
-
+    public String execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
+        return null;
     }
 
     @Override

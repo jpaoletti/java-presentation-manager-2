@@ -5,6 +5,7 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.security.Group;
 import org.hibernate.criterion.Restrictions;
@@ -24,8 +25,8 @@ public class SecurityGroupMembersExec extends OperationExecutorSimple {
     private DAO userDAO;
 
     @Override
-    public Map<String, Object> prepare(List<EntityInstance> instances) throws PMException {
-        final Map<String, Object> prepare = super.prepare(instances);
+    public Map<String, Object> prepare(Entity owner, String ownerId, List<EntityInstance> instances) throws PMException {
+        final Map<String, Object> prepare = super.prepare(owner, ownerId, instances);
         for (EntityInstance instance : instances) {
             final Group group = (Group) instance.getIobject().getObject();
             prepare.put("members", userDAO.list(new DAOListConfiguration(Restrictions.eq("group.id", group.getId())).withAlias("groups", "group")));

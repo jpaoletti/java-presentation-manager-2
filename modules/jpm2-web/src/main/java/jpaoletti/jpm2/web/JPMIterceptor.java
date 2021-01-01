@@ -45,6 +45,9 @@ public class JPMIterceptor implements HandlerInterceptor {
                     getContext().setEntity(entity);
                 }
             }
+            if (pathVariables.containsKey("ownerId")) {
+                getContext().setOwnerId((String) pathVariables.get("ownerId"));
+            }
         }
         return true;
     }

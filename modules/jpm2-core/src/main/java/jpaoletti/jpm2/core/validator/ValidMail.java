@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.validator;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.FieldValidator;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.EmailValidator;
 
 /**
@@ -15,8 +16,9 @@ public class ValidMail implements FieldValidator {
 
     @Override
     public Message validate(Object object, Object convertedValue) {
-        if (convertedValue != null) {
-            if (EmailValidator.getInstance().isValid(convertedValue.toString())) {
+        final String mail = convertedValue.toString();
+        if (StringUtils.isNotEmpty(mail)) {
+            if (EmailValidator.getInstance().isValid(mail)) {
                 return null;
             } else {
                 return MessageFactory.error(getMessage());

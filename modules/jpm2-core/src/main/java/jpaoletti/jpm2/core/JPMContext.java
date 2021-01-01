@@ -58,4 +58,8 @@ public interface JPMContext {
     public ContextualEntity getContextualEntity();
 
     public EntityContext getContext();
+
+    public String getOwnerId();
+
+    public void setOwnerId(String ownerId);
 }

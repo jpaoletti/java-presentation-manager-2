@@ -14,7 +14,10 @@ import jpaoletti.jpm2.core.PMException;
  */
 public interface OperationExecutor {
 
-    public Map<String, Object> prepare(List<EntityInstance> instances) throws PMException;
+    public static final String OWNER_ENTITY = "OWNER_ENTITY";
+    public static final String OWNER_ID = "OWNER_ID";
+
+    public Map<String, Object> prepare(Entity owner, String ownerId, List<EntityInstance> instances) throws PMException;
 
     /**
      * Preprocess de parameter map in case we need synchronic processing
@@ -27,7 +30,7 @@ public interface OperationExecutor {
      */
     public Map preExecute(JPMContext ctx, List<EntityInstance> instances, Map parameters) throws PMException;
 
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException;
+    public String execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException;
 
     public String getDefaultNextOperationId();
 

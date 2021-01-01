@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class OperationExecutorEdit extends OperationExecutorSimple {
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
+    public String execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
         for (EntityInstance instance : instances) {
             getJpm().getService().update(
                     ctx.getEntity(),
@@ -26,6 +26,7 @@ public class OperationExecutorEdit extends OperationExecutorSimple {
                     parameters
             );
         }
+        return null;
     }
 
     @Override

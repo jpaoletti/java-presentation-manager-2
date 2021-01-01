@@ -13,6 +13,7 @@ public class Panel {
     private String icon;
     private String title;
     private String fields;
+    private String auth = "ROLE_USER";
     private Integer blocks;
 
     public String getTitle() {
@@ -41,6 +42,8 @@ public class Panel {
 
     /**
      * Fields contained in this panel.
+     *
+     * @return
      */
     public List<String> getFieldList() {
         return Arrays.asList(getFields().split("[ ]"));
@@ -52,5 +55,13 @@ public class Panel {
 
     public void setBlocks(Integer blocks) {
         this.blocks = blocks;
+    }
+
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 }

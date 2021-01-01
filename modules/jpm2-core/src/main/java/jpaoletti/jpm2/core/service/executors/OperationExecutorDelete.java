@@ -16,13 +16,14 @@ import org.springframework.stereotype.Component;
 public class OperationExecutorDelete extends OperationExecutorSimple {
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
+    public String execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
         progress.setCurrentProgress(1L);
         progress.setMaxProgress((long) instances.size());
         for (EntityInstance instance : instances) {
             getJpm().getService().delete(ctx.getEntity(), ctx.getEntityContext(), ctx.getOperation(), instance.getId());
             progress.inc();
         }
+        return null;
     }
 
     @Override

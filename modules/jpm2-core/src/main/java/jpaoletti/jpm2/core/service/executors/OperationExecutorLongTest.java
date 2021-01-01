@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class OperationExecutorLongTest extends OperationExecutorSimple {
 
     @Override
-    public void execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
+    public String execute(JPMContext ctx, List<EntityInstance> instances, Map parameters, Progress progress) throws PMException {
         progress.setCurrentProgress(1L);
         progress.setMaxProgress(100L);
         for (int i = 1; i <= 100; i++) {
@@ -29,6 +29,7 @@ public class OperationExecutorLongTest extends OperationExecutorSimple {
             progress.setStatus("Processing " + i);
             progress.inc();
         }
+        return null;
     }
 
     @Override

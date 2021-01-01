@@ -6,6 +6,10 @@
                 - v${jpm.appversion}
                 - <a href="mailto:${jpm.contact}" ><spring:message code='jpm.contact' text='Contact' /> </a>
             </small>
+            <small class="float-right">
+                <i class="fa fa-user"></i>
+                ${user.name}
+            </small>
         </span>
     </div>
 </footer>

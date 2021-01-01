@@ -30,6 +30,7 @@ public class JPMContextImpl implements JPMContext {
     private Map<String, List<Message>> fieldMessages; //field
     private List<Message> entityMessages;
     private Message globalMessage;
+    private String ownerId;
 
     public JPMContextImpl() {
         this.fieldMessages = new HashMap<>();
@@ -133,6 +134,16 @@ public class JPMContextImpl implements JPMContext {
     @Override
     public EntityContext getContext() {
         return getEntity().getContext(getEntityContext());
+    }
+
+    @Override
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    @Override
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
 }

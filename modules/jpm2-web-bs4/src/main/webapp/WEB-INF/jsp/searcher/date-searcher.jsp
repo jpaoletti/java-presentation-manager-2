@@ -12,7 +12,6 @@
     <div class="col-lg-9">
         <div class="input-group">
             <input data-format="${param.format}" type='date' name="value" class="form-control" id="date-searcher"/>
-            <span class="input-group-addon add-on"><i class="fas fa-calendar-alt"></i></span>
         </div>
     </div>
 </div>
