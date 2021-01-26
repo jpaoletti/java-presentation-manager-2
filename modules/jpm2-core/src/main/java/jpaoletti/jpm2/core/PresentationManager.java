@@ -21,7 +21,7 @@ import jpaoletti.jpm2.core.model.OperationExecutor;
 import jpaoletti.jpm2.core.service.AuditService;
 import jpaoletti.jpm2.core.service.JPMService;
 import jpaoletti.jpm2.util.JPMUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

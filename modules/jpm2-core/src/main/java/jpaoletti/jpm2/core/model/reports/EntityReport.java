@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.model.Entity;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * An Entity Report is configuration class based on an Entity that provides

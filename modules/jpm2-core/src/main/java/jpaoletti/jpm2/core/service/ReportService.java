@@ -31,7 +31,7 @@ import static jpaoletti.jpm2.util.XlsUtils.xlsCellWithStyle;
 import static jpaoletti.jpm2.util.XlsUtils.xlsDateStyle;
 import static jpaoletti.jpm2.util.XlsUtils.xlsNewPage;
 import static jpaoletti.jpm2.util.XlsUtils.xlsStrechColumns;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;

@@ -1,7 +1,7 @@
 package jpaoletti.jpm2.core.search;
 
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
