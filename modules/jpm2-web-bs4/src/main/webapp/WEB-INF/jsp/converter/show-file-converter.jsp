@@ -4,8 +4,8 @@
     <div class="input-group">
         <input disabled="" class="form-control" type="text" value='<spring:message code="jpm.converter.showfile.bytes.text" text="File: ?" arguments="${param.len}" />' />
         <c:if test="${param.downloadable}">
-            <div class="input-group-addon">
-                <a href="${cp}jpm/${entity.id}/${param.instanceId}/download/${field}?contentType=${param.contentType}&prefix=${param.prefix}&sufix=${param.sufix}"><span class="fas fa-download"></span></a>
+            <div class="input-group-append">
+                <span class="input-group-text" ><a href="${cp}jpm/${entity.id}/${param.instanceId}/download/${field}?contentType=${param.contentType}&prefix=${param.prefix}&sufix=${param.sufix}"><span class="fas fa-download"></span></a></span>
             </div>
         </c:if>
     </div>
