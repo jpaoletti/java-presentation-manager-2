@@ -37,6 +37,7 @@ public class WebEditCollection extends WebEditObject {
                 + "&textField=" + getTextField()
                 + "&pageSize=" + getPageSize()
                 + "&allowDuplicates=" + isAllowDuplicates()
+                + "&addable=" + isAddable()
                 + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
             request.removeAttribute("values_" + field.getId());

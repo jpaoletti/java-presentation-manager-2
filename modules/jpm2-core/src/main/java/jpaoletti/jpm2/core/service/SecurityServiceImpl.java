@@ -12,7 +12,6 @@ import jpaoletti.jpm2.core.security.User;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author jpaoletti
  */
 @Transactional
-public class SecurityServiceImpl extends JPMServiceBase implements SecurityService, UserDetailsService {
+public class SecurityServiceImpl extends JPMServiceBase implements SecurityService {
 
     @Autowired
     private BCrypt encoder;

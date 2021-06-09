@@ -51,7 +51,9 @@
     <bean id="jpm-converter-edit-bigstring" class="jpaoletti.jpm2.web.converter.EditBigString" />
 
     <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
-
+    <bean id="jpm-converter-show-collection-size" class="jpaoletti.jpm2.web.converter.ShowCollectionSize" />
+    <bean id="jpm-converter-show-tags" class="jpaoletti.jpm2.web.converter.ShowTags" />
+    
     <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
         <property name="prefix" value="U$S" />
         <property name="suffix" value=".-"/>

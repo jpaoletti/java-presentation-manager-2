@@ -96,7 +96,7 @@ public class BaseController {
     }
 
     protected ModelAndView next(Entity entity, Operation operation, final String instanceId, String defaultOp) throws OperationNotFoundException, NotAuthorizedException {
-        final String nextOpId = (operation.getFollows() == null) ? defaultOp : operation.getFollows();
+        final String nextOpId = (operation == null || operation.getFollows() == null) ? defaultOp : operation.getFollows();
         final Operation nextOp = entity.getOperation(nextOpId, getContext().getContext());
         final EntityInstance instance = getContext().getEntityInstance();
         final String nexOpPath = nextOp.getPathId();

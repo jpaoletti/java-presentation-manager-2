@@ -69,10 +69,10 @@ public class ExecutorsController extends BaseController implements Observer {
         } else {
             final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
             preparation.entrySet().stream().forEach(
-                e -> mav.addObject(e.getKey(), e.getValue())
+                    e -> mav.addObject(e.getKey(), e.getValue())
             );
             getRequest().getParameterMap().keySet().stream().forEach(
-                key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
+                    key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
             );
             return mav;
         }
@@ -81,9 +81,9 @@ public class ExecutorsController extends BaseController implements Observer {
     @PostMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"})
     @ResponseBody
     public JPMPostResponse executorsGeneralCommit(
-        HttpServletRequest request,
-        @PathVariable Entity owner, @PathVariable String ownerId,
-        @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+            HttpServletRequest request,
+            @PathVariable Entity owner, @PathVariable String ownerId,
+            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final List<EntityInstance> instances = new ArrayList<>();
         final Map parameterMap = new LinkedHashMap(request.getParameterMap());
         parameterMap.put(HTTP_SERVLET_REQUEST, request);
@@ -96,8 +96,8 @@ public class ExecutorsController extends BaseController implements Observer {
     @PostMapping(value = {"/jpm/{entity}/{operationId}.exec"})
     @ResponseBody
     public JPMPostResponse executorsGeneralCommit(
-        HttpServletRequest request,
-        @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+            HttpServletRequest request,
+            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final List<EntityInstance> instances = new ArrayList<>();
         final Map parameterMap = new LinkedHashMap(request.getParameterMap());
         parameterMap.put(HTTP_SERVLET_REQUEST, request);
@@ -110,7 +110,7 @@ public class ExecutorsController extends BaseController implements Observer {
             String execute = null;
             if (getContext().getOperation().isSynchronic()) {
                 execute = getExecutor().execute(getContext(), instances, parameters, new Progress());
-            } else if (!getJpm().registerAsynchronicExecutor(getContext(), getExecutor(), instances, parameters)) {
+            } else if (!getJpm().registerAsynchronicExecutor(getContext(), getExecutor(), instances, parameters, this)) {
                 throw new PMException("unable.to.register.asynchronic.executor");
             }
             String buildRedirect;
@@ -164,7 +164,11 @@ public class ExecutorsController extends BaseController implements Observer {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {
                 getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
-                return next(getContext().getEntity(), getContext().getOperation(), StringUtils.join(instanceIds, ","), getExecutor().getDefaultNextOperationId());
+                if (StringUtils.isNotEmpty(response.getNext())) {
+                    return new ModelAndView("redirect:" + response.getNext());
+                } else {
+                    return next(getContext().getEntity(), getContext().getOperation(), StringUtils.join(instanceIds, ","), getExecutor().getDefaultNextOperationId());
+                }
             } else {
                 if (response.getMessages().isEmpty()) {
                     getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".error"));
@@ -176,10 +180,10 @@ public class ExecutorsController extends BaseController implements Observer {
         } else {
             final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
             preparation.entrySet().stream().forEach(
-                e -> mav.addObject(e.getKey(), e.getValue())
+                    e -> mav.addObject(e.getKey(), e.getValue())
             );
             getRequest().getParameterMap().keySet().stream().forEach(
-                key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
+                    key -> mav.addObject((String) key, (String[]) getRequest().getParameterValues((String) key))
             );
             return mav;
         }
@@ -201,7 +205,7 @@ public class ExecutorsController extends BaseController implements Observer {
             String execute = null;
             if (getContext().getOperation().isSynchronic()) {
                 execute = getExecutor().execute(getContext(), instances, parameters, new Progress());
-            } else if (!getJpm().registerAsynchronicExecutor(getContext(), getExecutor(), instances, parameters)) {
+            } else if (!getJpm().registerAsynchronicExecutor(getContext(), getExecutor(), instances, parameters, this)) {
                 throw new PMException("unable.to.register.asynchronic.executor");
             }
             String buildRedirect;
@@ -262,14 +266,14 @@ public class ExecutorsController extends BaseController implements Observer {
                 if (t.getId().contains(",")) {
                     for (String id : t.getId().split(",")) {
                         template.convertAndSend(
-                            "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + id,
-                            getJpm().getAsynchronicOperationExecutor(id).getProgress()
+                                "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + id,
+                                getJpm().getAsynchronicOperationExecutor(id).getProgress()
                         );
                     }
                 } else {
                     template.convertAndSend(
-                        "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + t.getId(),
-                        getJpm().getAsynchronicOperationExecutor(t.getId()).getProgress()
+                            "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + t.getId(),
+                            getJpm().getAsynchronicOperationExecutor(t.getId()).getProgress()
                     );
                 }
             }

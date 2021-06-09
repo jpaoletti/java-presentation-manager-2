@@ -10,9 +10,9 @@ main {padding-top: 65px;}
     line-height: 50px;
     background-color: #eeeeee;
 }
-.asynchronicProgress{height: 4px; width: 100%; margin-top: -4px; display: none;}
-.asynchronicProgress .progress-bar{height: 3px !important;}
-#asynchronicProgress_status {font-size: 0.7em; color: gray; text-align: left; margin-top: -15px;}
+.asynchronicProgress{height: 4px; width: 100%; margin-top: -13px; margin-bottom: 3px; display: none;}
+.asynchronicProgress .progress-bar{height: 4px !important;}
+#asynchronicProgress_status {font-size: 0.7em; color: gray; text-align: right; margin-top: -15px;}
 .borderless td, .borderless th {border: none;}
 [id^="showImageConverter"] {max-width: 100%;}
 .list-operation-heading{white-space:nowrap;}

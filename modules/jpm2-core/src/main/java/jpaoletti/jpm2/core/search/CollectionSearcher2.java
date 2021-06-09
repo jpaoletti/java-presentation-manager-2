@@ -3,9 +3,12 @@ package jpaoletti.jpm2.core.search;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.util.JPMUtils;
+import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -25,9 +28,18 @@ public class CollectionSearcher2 implements Searcher {
     public DescribedCriterion build(Entity entity, Field field, Map<String, String[]> parameters) {
         final List<Object> values = getValues(entity, field, parameters);
         final String fieldAlias = field.getId() + "cs2";
-        final DescribedCriterion describedCriterion = new DescribedCriterion(
-            MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
-            Restrictions.in(fieldAlias + ".elements", values));
+        //final Criterion in = Restrictions.in(fieldAlias + ".elements", values);
+
+        final Conjunction and = Restrictions.conjunction();
+        for (Object value : values) {
+            try {
+                and.add(Restrictions.eq(fieldAlias + ".id", JPMUtils.get(value, "id"))); //mmm nope
+            } catch (ConfigurationException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        final DescribedCriterion describedCriterion = new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)), and);
         SearcherHelper.addAliases(describedCriterion, field);
         describedCriterion.addAlias(field.getProperty(), fieldAlias);
         return describedCriterion;
@@ -36,10 +48,10 @@ public class CollectionSearcher2 implements Searcher {
     @Override
     public String visualization(Entity entity, Field field) {
         return "@page:collection-searcher2.jsp"
-            + "?entityId=" + getEntity().getId()
-            + "&field=" + field.getId()
-            + "&textField=" + getTextField()
-            + (getFilter() != null ? "&filter=" + getFilter() : "");
+                + "?entityId=" + getEntity().getId()
+                + "&field=" + field.getId()
+                + "&textField=" + getTextField()
+                + (getFilter() != null ? "&filter=" + getFilter() : "");
     }
 
     protected List<Object> getValues(Entity entity, Field field, Map<String, String[]> parameters) throws NumberFormatException {

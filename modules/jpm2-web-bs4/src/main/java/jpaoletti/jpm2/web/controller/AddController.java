@@ -37,8 +37,8 @@ public class AddController extends BaseController {
      */
     @GetMapping(value = "/jpm/{entity}/{operationId:" + OP_ADD + "}")
     public ModelAndView addPrepare(
-        @RequestParam(required = false) String lastId,
-        @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
+            @RequestParam(required = false) String lastId,
+            @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
         //If there is a "lastId" , the object values are used as defaults
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
         final Operation operation = getContext().getOperation();
@@ -98,15 +98,15 @@ public class AddController extends BaseController {
         try {
             final IdentifiedObject newObject = getService().save(entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
-            getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
+            getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
             if (repeat) {
                 if (operation.getConfig("clear-on-repeat", "false").equalsIgnoreCase("true")) {
-                    return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, ""), MessageFactory.success("jpm.add.success"));
+                    return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, ""), MessageFactory.success(getSuccessMsg(operation)));
                 } else {
-                    return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()), MessageFactory.success("jpm.add.success"));
+                    return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()), MessageFactory.success(getSuccessMsg(operation)));
                 }
             } else {
-                return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName(), MessageFactory.success("jpm.add.success"));
+                return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName(), MessageFactory.success(getSuccessMsg(operation)));
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
@@ -127,6 +127,10 @@ public class AddController extends BaseController {
         }
     }
 
+    private static String getSuccessMsg(final Operation operation) {
+        return operation.getConfig("add-success-msg", "jpm.add.success");
+    }
+
     /**
      * POST method finalizes the operation
      *
@@ -139,22 +143,22 @@ public class AddController extends BaseController {
     @PostMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}")
     @ResponseBody
     public JPMPostResponse addWeakCommit(@PathVariable Entity owner, @PathVariable String ownerId,
-        @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
+            @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         try {
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
-            getContext().setGlobalMessage(MessageFactory.success("jpm.add.success"));
+            getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
                 if (operation.getConfig("clear-on-repeat", "false").equalsIgnoreCase("true")) {
-                    return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, ""), MessageFactory.success("jpm.add.success"));
+                    return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, ""), MessageFactory.success(getSuccessMsg(operation)));
                 } else {
-                    return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()), MessageFactory.success("jpm.add.success"));
+                    return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()), MessageFactory.success(getSuccessMsg(operation)));
                 }
             } else {
-                return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName(), MessageFactory.success("jpm.add.success"));
+                return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName(), MessageFactory.success(getSuccessMsg(operation)));
             }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {

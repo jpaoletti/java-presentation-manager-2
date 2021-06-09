@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:extra.properties" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
+    <bean id="jpm" class="jpaoletti.jpm2.core.PresentationManager">
+        <property name="appversion" value="${jpm.version}" />
+        <property name="title" value="JPM2 Test" />
+        <property name="subtitle" value="Java Presentation Manager 2" />
+        <property name="contact" value="jpaoletti@mail.com" />
+        <!--<property name="menuMode" value="left" />
+        <property name="menuTheme" value="light-theme" />-->
+        <property name="menuMode" value="top" />
+        <property name="menuTheme" value="navbar-dark bg-dark" />
+        <property name="auditService">
+            <bean class="jpaoletti.jpm2.core.service.AuditServiceDatabase" />
+        </property>
+        <property name="service">
+            <bean class="jpaoletti.jpm2.core.service.JPMServiceImpl" />
+        </property>
+    </bean>
+    <bean id="securityService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
+    <import resource="jpm-default-beans.xml" />
+    <import resource="entities/test.xml" />
+    <import resource="entities/jpm-security-entities.xml" />
+</beans>

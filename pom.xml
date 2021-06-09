@@ -16,5 +16,6 @@
         <module>modules/jpm2-web</module>
         <module>modules/jpm2-web-bs4</module>
         <module>modules/jpm2-core</module>
+        <module>modules/jpm2-web-bs4-test</module>
     </modules>
 </project>

@@ -45,3 +45,10 @@
                         });
                     });
 </script>
+<c:if test="${param.addable}">
+    <script type="text/javascript">
+        jpmLoad(function () {
+            $("#control-group-${field} label.control-label").append("<a href='${cp}jpm/${param.entityId}/add?close=true' target='_blank'>[<span class='fas fa-plus'></span>]</a>");
+        });
+    </script>
+</c:if>

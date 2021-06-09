@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<select name="field_${field}" id="field_${field}" multiple="multiple" class="jpm-collection-converter">
+<select name="field_${field}" id="field_${field}" multiple="multiple" class="jpm-collection-converter form-control">
     <c:forEach var="v" items="${requestScope['values_'.concat(field)]}">
         <option value="${v.id}" selected="selected">${v.text}</option>
     </c:forEach>    
@@ -43,3 +43,10 @@
                         });
                     });
 </script>
+<c:if test="${param.addable}">
+    <script type="text/javascript">
+        jpmLoad(function () {
+            $("#control-group-${field} label.control-label").append("<a href='${cp}jpm/${param.entityId}/add?close=true' target='_blank'>[<span class='fas fa-plus'></span>]</a>");
+        });
+    </script>
+</c:if>

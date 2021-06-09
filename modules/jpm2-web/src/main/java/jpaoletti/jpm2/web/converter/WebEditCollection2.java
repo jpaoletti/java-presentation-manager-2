@@ -26,6 +26,7 @@ public class WebEditCollection2 extends WebEditObject {
                 + "&related=" + getRelated()
                 + "&filter=" + ((getFilter() != null) ? getFilter().getId() : "")
                 + "&pageSize=" + getPageSize()
+                + "&addable=" + isAddable()
                 + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
             return res;

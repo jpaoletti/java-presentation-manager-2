@@ -11,7 +11,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import static org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND;
@@ -32,7 +31,7 @@ public class XlsUtils {
 
     public static void xlsFormula(Row row, int pos, String formula, CellStyle style) {
         final Cell cell = row.createCell(pos);
-        cell.setCellType(CellType.FORMULA);
+        //cell.setCellType(CellType.FORMULA);
         cell.setCellFormula(formula);
         if (style != null) {
             cell.setCellStyle(style);
@@ -188,6 +187,10 @@ public class XlsUtils {
         return cell;
     }
 
+    public static short color_yellow() {
+        return HSSFColor.HSSFColorPredefined.YELLOW.getIndex();
+    }
+
     public static class XlsFormatTitle {
 
         private final String titulo;
@@ -203,7 +206,7 @@ public class XlsUtils {
         }
 
         public XlsFormatTitle(String titulo, String tituloInterno, List<String> titulos) {
-            this(titulo, tituloInterno, (short) 0, titulos);
+            this(titulo, tituloInterno, color_yellow(), titulos);
         }
 
         public XlsFormatTitle(String titulo, String tituloInterno, String... titulos) {

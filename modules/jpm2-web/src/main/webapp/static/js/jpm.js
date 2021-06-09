@@ -320,7 +320,7 @@ var initPage = function () {
                         select.select2({
                             placeholder: params.placeHolder || "...",
                             allowClear: true,
-                            width: 'copy',
+                            width: 'resolve',
                             dropdownCssClass: "bigdrop",
                             minimumInputLength: params.minSearch || 0,
                             ajax: {
@@ -488,7 +488,9 @@ function buildAjaxJpmForm(formId, callback, beforeSubmit) {
 }
 
 function setEntityVal(select, id, callback) {
-    $.getJSON(getContextPath() + "jpm/" + select.attr('data-entity') + "/" + id + ".json" + ((!!select.attr('data-textField')) ? "?textField=" + select.attr('data-textField') : ""), function (data) {
+    $.getJSON(getContextPath() + "jpm/" + select.attr('data-entity') + "/" + id + ".json", {
+        textField: ((!!select.attr('data-textField')) ? select.attr('data-textField') : "")
+    }, function (data) {
         select.append("<option value=" + id + ">" + data.text + "</option>");
         select.val(id).trigger("change");
         if (callback) {

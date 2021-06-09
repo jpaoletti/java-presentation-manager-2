@@ -35,6 +35,9 @@
     <bean id="jpm-converter-editable-int" class="jpaoletti.jpm2.web.converter.WebILEditInteger" />
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
     <bean id="jpm-converter-show-bigstring" class="jpaoletti.jpm2.web.converter.ShowBigString" />
+    <bean id="jpm-converter-editable-always" class="jpaoletti.jpm2.web.converter.EditableToString">
+        <property name="always" value="true" />
+    </bean>
 
     <bean id="jpm-converter-edit-bool" class="jpaoletti.jpm2.web.converter.WebEditBoolean" />
     <bean id="jpm-converter-edit-string" class="jpaoletti.jpm2.web.converter.WebEditString" />
@@ -48,6 +51,7 @@
     <bean id="jpm-converter-edit-bigstring" class="jpaoletti.jpm2.web.converter.EditBigString" />
 
     <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
+    <bean id="jpm-converter-show-collection-size" class="jpaoletti.jpm2.web.converter.ShowCollectionSize" />
 
     <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
         <property name="prefix" value="U$S" />
@@ -193,6 +197,17 @@
             <property name="operations" value="show"/>
             <property name="converter" ref="jpm-converter-show-html" />
         </bean>
+    </util:list>
+    <util:list id="always-editable-string-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show"/>
+            <property name="converter" ref="jpm-converter-editable-always"/>
+        </bean>
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="add edit"/>
+            <property name="converter" ref="jpm-converter-edit-string"/>
+        </bean>
+        <ref bean="xls-config" />
     </util:list>
     <import resource="jpm-default-beans-operations.xml" />
 </beans>

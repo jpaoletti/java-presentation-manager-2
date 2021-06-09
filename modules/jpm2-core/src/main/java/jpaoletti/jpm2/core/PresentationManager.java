@@ -49,6 +49,7 @@ public class PresentationManager implements Observer, Serializable {
     private JPMService service;
     private CustomLoader customLoader;
     private Integer maxLoginAttemps = 0; //max number of attemps before locking user. 0 is disabled
+    private Integer apiSessionExpiration = 24; //number of hours that last the api token
 
     @Autowired(required = false)
     private Map<String, Entity> entities;
@@ -204,7 +205,7 @@ public class PresentationManager implements Observer, Serializable {
         }
     }
 
-    public synchronized boolean registerAsynchronicExecutor(JPMContext ctx, OperationExecutor executor, List<EntityInstance> instances, Map parameters) throws PMException {
+    public synchronized boolean registerAsynchronicExecutor(JPMContext ctx, OperationExecutor executor, List<EntityInstance> instances, Map parameters, Observer observer) throws PMException {
         final JPMContext newCtx = new JPMContextImpl(ctx.getEntity(), ctx.getEntityContext(), ctx.getOperation());
         for (EntityInstance instance : instances) {
             if (asynchronicOperationExecutors.containsKey(getKey(newCtx, instance))) {
@@ -222,6 +223,7 @@ public class PresentationManager implements Observer, Serializable {
                 final String id = StringUtils.join(instances.stream().map(i -> getKey(newCtx, i)).collect(Collectors.toList()), ",");
                 final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(id, executor, instances, parameters, sessionFactory, newCtx);
                 asynchronicOperationExecutor.addObserver(this);
+                asynchronicOperationExecutor.addObserver(observer);
                 for (EntityInstance instance : instances) {
                     asynchronicOperationExecutors.put(getKey(newCtx, instance), asynchronicOperationExecutor);
                 }
@@ -234,6 +236,7 @@ public class PresentationManager implements Observer, Serializable {
                     final String key = getKey(newCtx, instance);
                     final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
                     asynchronicOperationExecutor.addObserver(this);
+                    asynchronicOperationExecutor.addObserver(observer);
                     asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
                     new Thread(asynchronicOperationExecutor).start();
                 }
@@ -244,6 +247,7 @@ public class PresentationManager implements Observer, Serializable {
                 final String key = getKey(newCtx, instances.get(0));
                 final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
                 asynchronicOperationExecutor.addObserver(this);
+                asynchronicOperationExecutor.addObserver(observer);
                 asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
                 new Thread(asynchronicOperationExecutor).start();
                 return true;
@@ -253,6 +257,7 @@ public class PresentationManager implements Observer, Serializable {
                 final String key = newCtx.getContextualEntity().toString() + "#";
                 final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
                 asynchronicOperationExecutor.addObserver(this);
+                asynchronicOperationExecutor.addObserver(observer);
                 asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
                 new Thread(asynchronicOperationExecutor).start();
                 return true;
@@ -346,4 +351,13 @@ public class PresentationManager implements Observer, Serializable {
     public void setMenuTheme(String menuTheme) {
         this.menuTheme = menuTheme;
     }
+
+    public Integer getApiSessionExpiration() {
+        return apiSessionExpiration;
+    }
+
+    public void setApiSessionExpiration(Integer apiSessionExpiration) {
+        this.apiSessionExpiration = apiSessionExpiration;
+    }
+
 }

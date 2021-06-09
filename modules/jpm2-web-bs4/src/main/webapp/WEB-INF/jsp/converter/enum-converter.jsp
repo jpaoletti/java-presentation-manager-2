@@ -11,7 +11,7 @@
         $("#field_${field}").val("${param.value}").select2({
             placeholder: "...",
             allowClear: true,
-            width: 'copy',
+            width: 'resolve',
             dropdownCssClass: "bigdrop"
         });
     });

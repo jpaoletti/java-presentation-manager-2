@@ -306,6 +306,7 @@
                     openSearchModal($("#search-link-" + (e.which - 48)).attr("data-field"));
                 }
             });
+            asynchronicOperationProgress("${contextualEntity}#");
         });
     </script>
 </html>

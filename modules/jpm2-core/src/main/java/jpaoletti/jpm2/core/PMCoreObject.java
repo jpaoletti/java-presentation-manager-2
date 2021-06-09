@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.PMCoreConstants;
@@ -20,9 +21,11 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
     @Autowired
+    @JsonIgnore
     private PresentationManager jpm;
 
     @Autowired
+    @JsonIgnore
     private AuthorizationService authorizationService;
 
     private Boolean debug;

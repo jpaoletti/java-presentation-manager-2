@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +29,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private String id; // Represents the entity id. This must me unique.
     private Integer numericId; //Optional reference id
     private String clazz;//The full name of the class represented by the entity.
+    @JsonIgnore
     private DAO dao;
     private String order;
     private Entity parent;

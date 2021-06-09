@@ -27,7 +27,7 @@ public class ShowAttachmentConverter extends Converter {
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final WithAttachment wa = (WithAttachment) object;
         byte[] value = null;
-        if (wa.isExternalFile()) {
+        if (wa != null && wa.isExternalFile()) {
             final File file = new File(wa.getInternalFileName());
             final FileInputStream is;
             try {

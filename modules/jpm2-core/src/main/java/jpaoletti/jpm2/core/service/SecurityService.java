@@ -4,13 +4,14 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author jpaoletti
  */
-public interface SecurityService {
+public interface SecurityService extends UserDetailsService {
 
     /**
      *

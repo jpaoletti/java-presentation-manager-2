@@ -22,7 +22,7 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
 
     @Override
     protected String getPage(ContextualEntity contextualEntity, Field field, Object object, String instanceId) {
-        return "@page:file-converter.jsp?postAction=uploadFileInMemoryConverter&";
+        return "@page:file-converter.jsp?postAction=uploadFileInMemoryConverter&accept=" + getAccept() + "&";
     }
 
     @Override
