@@ -228,7 +228,7 @@ public class ListController extends BaseController {
         return mav;
     }
 
-    @PostMapping(value = "/jpm/{entity}/saveCurrentSearch")
+    @PostMapping(value = "/jpm/{entity}/saveCurrentSearch")//WORK IN PROGESS
     public String saveCurrentSearch(@RequestParam String field, @RequestParam String name) throws PMException {
         final UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         final UserSearch res = new UserSearch();
