@@ -17,6 +17,7 @@
         "jquery": "^3.5.0",
         "jquery-blockui": "^2.7.0",
         "jquery.cookie": "^1.4.1",
+        "jstree": "^3.3.11",
         "moment": "^2.29.1",
         "popper.js": "^1.16.1",
         "tempusdominus-bootstrap-4": "^5.39.0",

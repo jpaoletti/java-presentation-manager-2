@@ -21,7 +21,7 @@
                         <div class="btn-group">
                             <c:if test="${not compactOperations}">
                                 <c:forEach items="${item.operations}" var="o">
-                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm btn-secondary" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
+                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
                                 </c:forEach>
                             </c:if>
                             <c:if test="${compactOperations}">

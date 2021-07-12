@@ -370,6 +370,7 @@ var initPage = function () {
                  
                  $("#select2ID").buildJpmSelect2({
                  entity: "<REQUIRED>",
+                 field: "<REQUIRED>",
                  textField: "<REQUIRED>",
                  placeholder: "...",
                  minSearch: 0,
@@ -383,7 +384,7 @@ var initPage = function () {
                 buildJpmSelect2: function (params) {
                     return this.each(function () {
                         select = $(this);
-                        select.select2({
+                        var s2 = select.select2({
                             placeholder: params.placeHolder || "...",
                             allowClear: true,
                             width: 'resolve',
@@ -415,6 +416,10 @@ var initPage = function () {
                                     };
                                 }
                             }
+                        });
+                        //All related must be reseted
+                        s2.on("change", function () {
+                            $("select[data-related='" + params.field + "']").val(null).trigger("change");
                         });
                     });
                 }

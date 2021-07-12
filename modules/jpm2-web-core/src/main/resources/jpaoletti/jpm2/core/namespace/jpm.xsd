@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://yun-electronics.com.ar/schema/jpm"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    targetNamespace="http://yun-electronics.com.ar/schema/jpm"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+   <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+   <xsd:element name="dao">
+      <xsd:complexType>
+         <xsd:complexContent>
+            <xsd:extension base="beans:identifiedType">
+               <xsd:attribute name="test" type="xsd:string" use="required"/>
+            </xsd:extension>
+         </xsd:complexContent>
+      </xsd:complexType>
+   </xsd:element>
+
+</xsd:schema>
+
+
+
+
+
+<!--<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://yun-electronics.com.ar/schema/jpm" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://yun-electronics.com.ar/schema/jpm" elementFormDefault="qualified"
+            attributeFormDefault="unqualified" >
+    <xsd:element name="operation">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="context"/>
+                <xsd:element ref="condition"/>
+                <xsd:element maxOccurs="unbounded" ref="validator"/>
+                <xsd:element maxOccurs="unbounded" ref="property"/>
+            </xsd:sequence>
+            <xsd:attribute name="confirm"  type="xsd:string"  />
+            <xsd:attribute name="display"  type="xsd:string" />
+            <xsd:attribute name="follows"  type="xsd:string" />
+            <xsd:attribute name="id"  type="xsd:string"  />
+            <xsd:attribute name="scope"  type="xsd:string"  />
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="context">
+        <xsd:complexType>
+            <xsd:attribute name="class" />
+            <xsd:attribute name="ref" type="xsd:NCName" />
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="condition">
+        <xsd:complexType>
+            <xsd:attribute name="class" />
+            <xsd:attribute name="ref" type="xsd:NCName" />
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="validator">
+        <xsd:complexType>
+            <xsd:attribute name="class" type="xsd:NCName" />
+            <xsd:attribute name="ref" type="xsd:NCName" />
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="property">
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:NCName" />
+            <xsd:attribute name="value" type="xsd:NCName" />
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>-->

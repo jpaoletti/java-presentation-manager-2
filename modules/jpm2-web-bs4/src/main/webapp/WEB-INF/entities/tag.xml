@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+    
+    <bean id="tag" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.model.Tag" />
+        <property name="operations" >
+            <list>
+                <ref bean="default-list-operation" />
+                <ref bean="default-add-operation" />
+                <ref bean="default-generalAudit-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+                <ref bean="default-itemAudit-operation" />
+                <ref bean="default-delete-operation" />
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="description" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="style" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="operations" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

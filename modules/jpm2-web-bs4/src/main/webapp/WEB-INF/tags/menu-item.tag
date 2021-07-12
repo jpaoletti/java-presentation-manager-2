@@ -14,4 +14,7 @@
             <li><a href="${cp}jpm/${code}/list" id="menu-${code}" class="jpm-menu-item"><span class="${icon}"></span>&nbsp;<spring:message code="top.menu.${code}" text="${code}" /></a></li>
         </c:when>
     </c:choose>
+    <c:if test="separator">
+        <div class="dropdown-divider"></div>
+    </c:if>
 </security:authorize>

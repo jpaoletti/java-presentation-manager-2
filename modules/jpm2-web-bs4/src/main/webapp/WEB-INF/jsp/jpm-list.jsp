@@ -43,6 +43,13 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
+                        <c:if test="${not empty sessionEntityData.searchCriteria.definitions}">
+                            <a type="button" href="${cp}jpm/${contextualEntity}/removeAllSearch" class="badge badge-info removeSearchBtn">
+                                <spring:message code="jpm.removeAllSearch" text="Clear"/>
+                                <span class="fa fa-times-circle"></span>
+                            </a>
+                        </c:if>
+
                         <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
                             <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
                             <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />

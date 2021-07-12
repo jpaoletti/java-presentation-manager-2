@@ -1,0 +1,57 @@
+<beans:beans 
+    xmlns:websocket="http://www.springframework.org/schema/websocket"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <beans:bean id="encoder" class="jpaoletti.jpm2.core.security.BCrypt"/>
+    <beans:bean id="userDetailsService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
+    <beans:bean id="authorizationService" class="jpaoletti.jpm2.core.service.SpringAuthorizationService"/>
+    
+    <beans:bean id="jpmApiEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+        <beans:property name="algorithm" value="PBEWithMD5AndTripleDES" />
+        <beans:property name="password" value="xxx1232131234xxx" />
+    </beans:bean>
+    
+    <http auto-config='true' disable-url-rewriting="false">
+        <headers disabled="true"/>
+        <csrf disabled="true"/>
+        <intercept-url pattern="/login" access="permitAll" />
+        <intercept-url pattern="/static/**" access="permitAll" />
+        <intercept-url pattern="/favicon.ico" access="permitAll" />
+        <intercept-url pattern="/jpmrest/**" access="permitAll" /> <!-- REST -->
+        <intercept-url pattern="/jpm-websocket/**" access="permitAll" /> <!-- WEBSOCKET -->
+        <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+        <form-login login-page="/login" authentication-failure-url="/login?error=1" default-target-url="/index" />
+        <logout logout-success-url="/login" delete-cookies="JSESSIONID,JPM_RECENT" invalidate-session="true" />
+        <session-management>
+            <!--<concurrency-control max-sessions="1" />--> <!-- This limits the number of logins the same user may have-->
+        </session-management>
+        <remember-me data-source-ref="dataSource" user-service-ref="userDetailsService" remember-me-cookie="SPRING_SECURITY_REMEMBER_ME_COOKIE" 
+                     token-validity-seconds="5184000"
+        /><!-- 24hs -->
+    </http>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="userDetailsService">
+            <password-encoder ref="encoder" />
+        </authentication-provider>
+    </authentication-manager>
+    <global-method-security pre-post-annotations="enabled" />
+    <beans:bean class="jpaoletti.jpm2.web.DefaultRolesPrefixPostProcessor"/>
+    
+    <websocket:message-broker application-destination-prefix="/jpm" >
+        <websocket:stomp-endpoint path="/jpm-websocket">
+            <websocket:handshake-interceptors>
+                <beans:bean class="org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor"/>
+            </websocket:handshake-interceptors>
+            <websocket:sockjs/>
+        </websocket:stomp-endpoint>
+        <websocket:simple-broker prefix="/asynchronicOperationExecutor"/>
+    </websocket:message-broker>
+
+</beans:beans>

@@ -1,0 +1,134 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.jpaoletti</groupId>
+    <artifactId>jpm2-web-bs5-test</artifactId>
+    <packaging>war</packaging>
+    <name>jpm2-web-bs5-test</name>
+    <version>1.0.0</version>
+    
+    <scm>
+        <connection>scm:git:https://github.com/jpaoletti/java-presentation-manager-2.git</connection>
+        <developerConnection>scm:git:https://github.com/jpaoletti/java-presentation-manager-2.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/jpaoletti/java-presentation-manager-2.git</url>
+    </scm>
+
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jpm.version>2.0.0</jpm.version>
+    </properties>
+    
+    <!-- You may want to copy this profiles in your own project -->
+    <profiles>
+        <profile>
+            <!-- Development profile -->
+            <id>Development</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!--<lessMode>less</lessMode>-->
+                <lessMode>less</lessMode>
+                <connection.url>jdbc:mysql://jpm.mysql.com:3306/jpm_test?autoReconnect=true</connection.url>
+                <connection.username>desa</connection.username>
+                <connection.password>desa</connection.password>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Production profile -->
+            <id>Production</id>
+            <properties>
+                <lessMode>css</lessMode>
+                <connection.url>jdbc:mysql://jpm.mysql.com:3306/jpm_test?autoReconnect=true</connection.url>
+                <connection.username>desa</connection.username>
+                <connection.password>desa</connection.password>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.jpaoletti</groupId>
+            <artifactId>jpm2-web-bs5</artifactId>
+            <version>${jpm.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jpaoletti</groupId>
+            <artifactId>jpm2-web-bs5</artifactId>
+            <version>${jpm.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jpaoletti</groupId>
+            <artifactId>jpm2-core</artifactId>
+            <version>${jpm.version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jpaoletti</groupId>
+            <artifactId>jpm2-rest</artifactId>
+            <version>${jpm.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jpaoletti</groupId>
+            <artifactId>jpm2-rest</artifactId>
+            <version>${jpm.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.0.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArguments>
+                        <endorseddirs>${endorsed.dir}</endorseddirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <packagingExcludes>WEB-INF/classes/**</packagingExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,25 @@
+{
+    "name": "jpm2-web-bs5",
+    "version": "2.0.0",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "jpaoletti",
+    "contributors": [],
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.15.3",
+        "@popperjs/core": "^2.9.2",
+        "bootstrap": "^5.0.2",
+        "jquery": "^3.5.0",
+        "jquery-blockui": "^2.7.0",
+        "jquery.cookie": "^1.4.1",
+        "jstree": "^3.3.11",
+        "moment": "^2.29.1",
+        "tempusdominus-bootstrap-4": "^5.39.0",
+        "tempusdominus-core": "^5.19.0"
+    }
+}

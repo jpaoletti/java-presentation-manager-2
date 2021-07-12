@@ -1,0 +1,10 @@
+@import url("../node_modules/bootstrap/dist/css/bootstrap.min.css");
+@import url("bootstrap-datetimepicker.min.css");
+@import url("../node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css");
+@import url("../node_modules/@fortawesome/fontawesome-free/css/all.min.css");
+@import url("_jpm.css");
+@import url("_jpm_colors.css");
+@import url("sidebar-main.css");
+@import url("sidebar-themes.css");
+@import url("jquery.mCustomScrollbar.min.css");
+@import url("customization.css");
