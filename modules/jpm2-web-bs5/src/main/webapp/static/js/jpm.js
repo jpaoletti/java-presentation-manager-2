@@ -267,12 +267,17 @@ var initPage = function () {
                 $("#searchDropdown").append('<ul class="dropdown-menu"></ul>');
                 let value = e.target.value;
                 if (value.length >= 2) {
+                    let empty = true;
                     $(".jpm-menu-item").each(function () {
                         if ($(this).last().text().toLowerCase().includes(value.toLowerCase())) {
                             let html = '<li><a class="dropdown-item" href="' + $(this).attr("href") + '">' + $(this).html() + '</a></li>';
                             $("#searchDropdown .dropdown-menu").append(html);
+                            empty = false;
                         }
                     });
+                    if(empty){
+                        $("#searchDropdown .dropdown-menu").append('<li><a class="dropdown-item disabled" href="javascript:;"><span class="fa fa-eye-slash"></span></a></li>');
+                    }
                     $("#searchDropdown .dropdown-menu").toggle();
                 }
             });
@@ -386,6 +391,7 @@ var initPage = function () {
                                         owner: (params.owner) ? params.owner : "",
                                         ownerId: (params.ownerId) ? params.ownerId : "",
                                         filter: (params.filter) ? params.filter : "",
+                                        currentId: params.currentId || "",
                                         relatedValue: (params.related) ? params.related.val() : "",
                                         textField: params.textField || "",
                                         query: p.term,
@@ -434,11 +440,11 @@ let jpmUnBlock = function () {
 var processFormResponse = function (data) {
     if (data.ok) {
         if (data.messages.length > 0) {
-            var $message = '<div><ul>';
+            var $message = '<ul>';
             $.each(data.messages, function (m, text) {
-                $message = "<li>" + text.text + "</li>";
+                $message += "<li>" + text.text + "</li>";
             });
-            $message = $message + "</ul></div>";
+            $message += "</ul>";
             let params = {
                 title: messages["jpm.modal.confirm.close"],
                 titleBackground: 'bg-success text-light',
@@ -461,7 +467,7 @@ var processFormResponse = function (data) {
         if (data.messages.length > 0) {
             var $message = '<div><ul>';
             $.each(data.messages, function (m, text) {
-                $message = "<li>" + text.text + "</li>";
+                $message += "<li>" + text.text + "</li>";
             });
             $message = $message + "</ul></div>";
             jpmDialog({
@@ -485,11 +491,19 @@ var processFormResponse = function (data) {
     }
 };
 
-function buildAjaxJpmForm(formId, callback, beforeSubmit) {
-    if (!formId)
+function buildAjaxJpmForm(formId, callback, beforeSubmit, beforeSerialize) {
+    if (!formId) {
         formId = "jpmForm";
-    $('#' + formId).ajaxForm({
+    }
+    return $('#' + formId).ajaxForm({
         dataType: 'json',
+        beforeSerialize: function ($form, options) {
+            if (beforeSerialize) {
+                if (!beforeSerialize($form, options)) {
+                    return false;
+                }
+            }
+        },
         beforeSubmit: function (arr, $form, options) {
             if (beforeSubmit) {
                 if (!beforeSubmit(arr, $form, options)) {

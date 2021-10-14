@@ -66,7 +66,7 @@
                                     'text': oper.name + "<span class='authKey'> [" + oper.key + "]</span>",
                                     children: oper.fields.length > 0 ? [] : null,
                                     state: {'opened': false, selected: !readonly && $.inArray(oper.key, ids) >= 0},
-                                    'icon': (oper.icon === null ? "glyphicon jpmicon-" + oper.id : oper.icon)
+                                    'icon': (oper.icon === null ? "fas fa-leaf": oper.icon)
                                 };
                                 if (oper.fields.length > 0) {
                                     $.each(oper.fields, function (i, field) {

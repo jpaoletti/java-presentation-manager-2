@@ -19,7 +19,7 @@ public class WebILEditBoolean extends WebEditBoolean {
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Boolean fieldValue = (Boolean) getValue(object, field);
         final Boolean value = (fieldValue == null) ? Boolean.valueOf(field.getDefaultValue()) : fieldValue;
-        return "<a href='javascript:;' data-entity-id='" + contextualEntity.toString() + "' data-field-name='" + field.getId() + "' data-id='" + instanceId + "' data-true-icon='glyphicon " + getTrueIcon() + "' data-false-icon='glyphicon " + getFalseIcon() + "' class='inline-boolean' data-align='" + field.getAlign() + "'><span class='glyphicon " + (value ? getTrueIcon() : getFalseIcon()) + "'></span></a>";
+        return "<a href='javascript:;' data-entity-id='" + contextualEntity.toString() + "' data-field-name='" + field.getId() + "' data-id='" + instanceId + "' data-true-icon='" + getTrueIcon() + "' data-false-icon='" + getFalseIcon() + "' class='inline-boolean' data-align='" + field.getAlign() + "'><span class='" + (value ? getTrueIcon() : getFalseIcon()) + "'></span></a>";
     }
 
     public String getTrueIcon() {

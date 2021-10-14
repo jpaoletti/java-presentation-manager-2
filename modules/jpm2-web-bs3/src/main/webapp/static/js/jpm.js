@@ -55,6 +55,7 @@ function getLocalStorage() {
 }
 
 var wrapToString = function () {
+    $(".inline-edit").addClass("form-control");
     $(".to-string").each(function () {
         var v = $(this).html();
         $(this).html("<input disabled class='form-control' type='text' value='" + v + "' style='text-align:" + $(this).attr("data-align") + "' />");
@@ -340,6 +341,7 @@ var initPage = function () {
                                         owner: (params.owner) ? params.owner : "",
                                         ownerId: (params.ownerId) ? params.ownerId : "",
                                         filter: (params.filter) ? params.filter : "",
+                                        currentId: params.currentId || "",
                                         relatedValue: (params.related) ? params.related.val() : "",
                                         textField: params.textField || "",
                                         query: p.term,

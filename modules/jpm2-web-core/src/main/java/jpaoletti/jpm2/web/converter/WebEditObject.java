@@ -46,6 +46,7 @@ public class WebEditObject extends Converter {
         sb.append("&minSearch=").append(getMinSearch());
         sb.append("&readonly=").append(isReadonly());
         sb.append("&addable=").append(isAddable());
+        sb.append("&currentId=").append(instanceId);
         sb.append("&sortBy=").append(getSortBy() == null ? "" : getSortBy());
         if (value != null) {
             final ObjectConverterData.ObjectConverterDataItem data = ObjectConverterData.buildDataObject(getTextField(), getEntity(), null, getEntity().getDao().getId(value).toString(), value);

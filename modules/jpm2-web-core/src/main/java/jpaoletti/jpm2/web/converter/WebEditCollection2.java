@@ -24,6 +24,7 @@ public class WebEditCollection2 extends WebEditObject {
                 + "?entityId=" + getEntity().getId()
                 + "&textField=" + getTextField()
                 + "&related=" + getRelated()
+                + "&currentId=" + instanceId
                 + "&filter=" + ((getFilter() != null) ? getFilter().getId() : "")
                 + "&pageSize=" + getPageSize()
                 + "&addable=" + isAddable()

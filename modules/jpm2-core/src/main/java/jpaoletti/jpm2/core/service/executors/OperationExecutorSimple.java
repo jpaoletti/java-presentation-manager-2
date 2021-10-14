@@ -78,4 +78,9 @@ public class OperationExecutorSimple implements OperationExecutor {
             return null;
         }
     }
+
+    @Override
+    public String getViewName(String operationId) {
+        return "op-" + operationId;
+    }
 }

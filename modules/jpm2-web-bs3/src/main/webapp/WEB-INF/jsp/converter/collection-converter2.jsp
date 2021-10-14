@@ -8,7 +8,7 @@
 <script type="text/javascript">
     jpmLoad(function () {
         $(document).on("click", "#${field}selectAll", function () {
-            $("input[name='field_${field}']").prop("checked", $(this).is(":checked"));
+            $("input[name='field_${field}']").prop("checked", $(this).is(":checked")).trigger("change");
         });
         $.ajax({
             url: "${cp}jpm/${param.entityId}.json",

@@ -68,6 +68,7 @@ public class ListController extends BaseController {
             @RequestParam(required = false) String relatedValue,
             @RequestParam(required = false) String owner,
             @RequestParam(required = false) String ownerId,
+            @RequestParam(required = false) String currentId,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String filter,
             @RequestParam(required = false, defaultValue = "") String query,
@@ -86,7 +87,7 @@ public class ListController extends BaseController {
                     if (lfilter instanceof RelatedListFilter) {
                         ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
                     }
-                    final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), owner, ownerId);
+                    final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), currentId, owner, ownerId);
                     if (c != null) {
                         restrictions.add(c);
                     }

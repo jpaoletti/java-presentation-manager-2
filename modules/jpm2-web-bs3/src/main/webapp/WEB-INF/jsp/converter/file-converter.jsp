@@ -3,7 +3,7 @@
 <div id="file-converter-container-${field}">
     <button type="button" class="btn btn-default btn-sm fileinput-button pull-left">
         <span class="glyphicon glyphicon-upload"></span>
-        <input name="file" id="field_${field}"  type="file" data-url="${cp}jpm/${param.postAction}" ${param.multiple?'multiple=""':''} data-role="none"/>
+        <input name="file" id="field_${field}"  type="file" data-url="${cp}jpm/${param.postAction}" ${param.multiple?'multiple=""':''} data-role="none" accept="${param.accept}"/>
     </button>
     <input name="field_${field}" type="hidden" value="@current:" />
     <div id="progress_${field}" class="progress file-converter-progress"><div class="progress-bar"></div></div>
@@ -31,7 +31,7 @@
         });
         $('#field_${field}').fileupload({
             dataType: 'json',
-            acceptFileTypes: ${param.accept}
+            acceptFileTypes: "${param.accept}"
         }).on('fileuploadprogressall', function (e, data) {
             $("button[type='submit']").addClass("disabled");
             var progress = parseInt(data.loaded / data.total * 100, 10);

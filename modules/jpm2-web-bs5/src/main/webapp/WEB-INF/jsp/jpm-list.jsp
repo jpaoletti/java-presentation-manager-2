@@ -76,7 +76,7 @@
                 <!-- CONTENT DATA -->
                 <div class="table-responsive list-operation-table-container">
                     <table class="table table-bordered table-sm jpm-list-table w-auto">
-                        <thead class="thead-light">
+                        <thead class="table-secondary">
                             <tr>
                                 <!-- GENERAL Operations -->
                                 <th id='operation-column-header' class="list-operation-heading" >
@@ -184,15 +184,13 @@
                             <input type="hidden" name="fieldId" value=""/>
                             <div class="modal-header">
                                 <h5 class="modal-title"><spring:message code="jpm.list.modalsearch.title" text="New Search" /></h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 ...
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
                                 <button type="submit" class="btn btn-success"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
                             </div>
                         </form>

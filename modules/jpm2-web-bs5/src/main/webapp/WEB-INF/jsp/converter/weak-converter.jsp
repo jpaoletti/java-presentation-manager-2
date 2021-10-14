@@ -3,7 +3,7 @@
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <security:authorize access="hasAnyRole('${param.weakAuth}', 'SPECIAL')">
     <c:if test="${param.showBtn}">
-        <a id="weak${field}" class="btn btn-info btn-xs text-nowrap" href="${cp}jpm/${contextualEntity}/${param.ownerId}/${param.weakId}${param.context}/list"><span class="${param.btnIcon}"></span>&nbsp;<spring:message code='${param.btnText}' text='Change' /></a><br/>
+        <a id="weak${field}" class="btn btn-info btn-xs text-nowrap ${param.showList?'':'w-100'} text-light" href="${cp}jpm/${contextualEntity}/${param.ownerId}/${param.weakId}${param.context}/list"><span class="${param.btnIcon}"></span>&nbsp;<spring:message code='${param.btnText}' text='Change' /></a><br/>
     </c:if>
     <c:if test="${param.showList}">
         <div id="weak${field}-list">
@@ -14,7 +14,7 @@
                 $("#control-group-${field}").find(".col-lg-4").remove();
                 $("#control-group-${field}").find(".col-lg-8").removeClass("col-lg-8").addClass("col-lg-12");
                 $("#weak${field}-list").load("${cp}jpm/${contextualEntity}/${instance.id}/${param.weakId}${param.context}/weaklist?showOperations=${param.showOperations}");
-            });
+                    });
         </script>
     </c:if>
 </security:authorize>

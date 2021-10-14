@@ -1,7 +1,7 @@
 <%@include file="inc/default-taglibs.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <table class="table table-bordered table-sm jpm-list-table w-auto">
-    <thead class="thead-light">
+    <thead class="table-secondary">
         <tr>
             <c:if test="${showOperations}"><th></th></c:if>
                 <c:forEach items="${paginatedList.fields}" var="field">
@@ -14,7 +14,7 @@
     <tbody>
         <spring:message var="entityName" code="jpm.entity.title.${weakId}" text=" " />
         <c:forEach items="${paginatedList.contents}" var="item">
-            <tr data-id="${item.id}">
+            <tr data-id="${item.id}" class="instance-row ${item.highlight}">
                 <c:if test="${showOperations}">
 
                     <th class="operation-list" style="white-space:nowrap;width: ${(not compactOperations)?(fn:length(item.operations) * 30 + 25):((empty selectedOperations)?40:70)}px">

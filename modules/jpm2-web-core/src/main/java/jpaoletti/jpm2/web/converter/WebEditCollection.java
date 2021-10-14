@@ -36,6 +36,7 @@ public class WebEditCollection extends WebEditObject {
                 + ((getFilter() != null) ? "&filter=" + getFilter().getId() : "")
                 + "&textField=" + getTextField()
                 + "&pageSize=" + getPageSize()
+                + "&currentId=" + instanceId
                 + "&allowDuplicates=" + isAllowDuplicates()
                 + "&addable=" + isAddable()
                 + "&minSearch=" + getMinSearch();

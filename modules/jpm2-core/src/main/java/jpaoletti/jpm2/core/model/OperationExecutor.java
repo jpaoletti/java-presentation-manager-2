@@ -34,6 +34,8 @@ public interface OperationExecutor {
 
     public String getDefaultNextOperationId();
 
+    public String getViewName(String operationId);
+
     /**
      * if true, does not redirect to a preparation page after prepare, instead
      * executes right away.

@@ -22,9 +22,10 @@ public interface ListFilter {
      * @param dlc Dao configuration list being configured
      * @param entity
      * @param sessionData
+     * @param currentId
      * @param owner
      * @param ownerId
      * @return the filter object
      */
-    public Criterion getListFilter(final DAOListConfiguration dlc, Entity entity, SessionEntityData sessionData, String owner, String ownerId);
+    public Criterion getListFilter(final DAOListConfiguration dlc, Entity entity, SessionEntityData sessionData, String currentId, String owner, String ownerId);
 }

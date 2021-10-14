@@ -27,10 +27,13 @@
                 };
             },
             ajax: {
-                url: "${cp}jpm/${param.entityId}.json?filter=${param.filter}&ownerId=${not empty owner?ownerId:''}",
+                url: "${cp}jpm/${param.entityId}.json",
                                 dataType: 'json',
                                 data: function (params) {
                                     return {
+                                        filter: "${param.filter}",
+                                        currentId: "${instance.id}",
+                                        ownerId: "${not empty owner?ownerId:''}",
                                         relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
                                         textField: "${param.textField}",
                                         query: params.term, // search term

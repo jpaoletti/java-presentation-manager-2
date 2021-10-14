@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<select name="field_${field}" id="field_${field}" class="objectConverterInput form-control" data-entity="${param.entityId}" data-textField="${param.textField}" data-related="${param.related}">
+<select name="field_${field}" id="field_${field}" class="objectConverterInput form-select" data-entity="${param.entityId}" data-textField="${param.textField}" data-related="${param.related}">
     <c:if test="${not empty param.value}">
         <option value="${param.value}">${param.valueText}</option>
     </c:if>
@@ -15,6 +15,7 @@
             placeholder: "${param.placeHolder}",
             minSearch:${param.minSearch},
             filter: "${param.filter}",
+            currentId: "${param.currentId}",
             owner: "${not empty owner?owner.id:''}",
             ownerId: "${not empty owner?ownerId:''}",
             related: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('")'):'null'},

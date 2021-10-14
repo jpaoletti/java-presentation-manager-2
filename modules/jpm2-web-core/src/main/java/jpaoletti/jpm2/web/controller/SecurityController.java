@@ -56,9 +56,9 @@ public class SecurityController extends BaseController {
 
     @GetMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}")
     public ModelAndView profile(
-        @PathVariable String instanceId,
-        @RequestParam(required = false) String current,
-        @RequestParam(required = false) String newpass) throws PMException {
+            @PathVariable String instanceId,
+            @RequestParam(required = false) String current,
+            @RequestParam(required = false) String newpass) throws PMException {
         final Entity entity = getContext().getEntity();
         final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId);
         final UserDetails user = (UserDetails) iobject.getObject();
@@ -78,9 +78,9 @@ public class SecurityController extends BaseController {
     @PostMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_PROFILE + "}")
     @ResponseBody
     public JPMPostResponse profilePost(
-        @PathVariable String instanceId,
-        @RequestParam(required = true) String current,
-        @RequestParam(required = true) String newpass) {
+            @PathVariable String instanceId,
+            @RequestParam(required = true) String current,
+            @RequestParam(required = true) String newpass) {
         try {
             final Entity entity = getContext().getEntity();
             final IdentifiedObject iobject = getService().get(entity, getContext().getEntityContext(), getContext().getOperation(), instanceId);
@@ -119,7 +119,7 @@ public class SecurityController extends BaseController {
             selected.addAll(group.getAuthorities());
         }
         for (Entity e : getJpm().getEntityList()) {
-            if (e.getClazz() != null && !"".equals(e.getClazz()) && !e.getAllOperations().isEmpty() && e.isAuthorizable()) {
+            if (e != null && e.getClazz() != null && !"".equals(e.getClazz()) && !e.getAllOperations().isEmpty() && e.isAuthorizable()) {
                 final AuthoritiesResultEntity are1 = new AuthoritiesResultEntity(e, null, selected);
                 if (!are1.getOperations().isEmpty()) {
                     res.getEntities().add(are1);
@@ -238,11 +238,13 @@ public class SecurityController extends BaseController {
         private String id;
         private String key;
         private String name;
+        private String icon;
         private List<AuthoritiesResultField> fields = new ArrayList<>();
 
         public AuthoritiesResultOperation(Entity entity, Operation operation, EntityContext context, List<String> selected) {
             this.id = operation.getId();
             this.key = operation.getAuthKey(entity, context);
+            this.icon = operation.getIcon();
             this.name = operation.getMessage(operation.getTitle(), entity.getTitle());
             //Not implemented yet
             /*if (operation.isUseFields()) {
@@ -255,6 +257,14 @@ public class SecurityController extends BaseController {
              }
              }
              }*/
+        }
+
+        public String getIcon() {
+            return icon;
+        }
+
+        public void setIcon(String icon) {
+            this.icon = icon;
         }
 
         public String getId() {

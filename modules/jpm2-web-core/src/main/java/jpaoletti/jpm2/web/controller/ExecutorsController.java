@@ -67,7 +67,8 @@ public class ExecutorsController extends BaseController implements Observer {
             getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
             return next(getContext().getEntity(), getContext().getOperation(), "", getExecutor().getDefaultNextOperationId());
         } else {
-            final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
+//            final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
+            final ModelAndView mav = new ModelAndView(getExecutor().getViewName(getContext().getOperation().getId()));
             preparation.entrySet().stream().forEach(
                     e -> mav.addObject(e.getKey(), e.getValue())
             );

@@ -17,13 +17,14 @@ function jpmDialogConfirm(params) {
 function jpmDialog(params) {
     var wrapper = document.createElement('div');
     wrapper.classList.add("modal");
-    wrapper.innerHTML = '<div class="modal-dialog "><div class="modal-content"><div class="modal-header ' + (params.titleBackground || "bg-info") + '"><h5 class="modal-title">' + (params.title || "") + '</h5>'
-            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p>' + (params.message || "") + '</p></div>'
+    var html ='<div class="modal-dialog "><div class="modal-content"><div class="modal-header ' + (params.titleBackground || "bg-info") + '"><h5 class="modal-title">' + (params.title || "") + '</h5>'
+            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body">' + (params.message || "") + '</div>'
             + '<div class="modal-footer">';
     if (!params.closeTimeout) {
-        wrapper.innerHTML += '<button type="button" class="btn btn-primary btn-confirm">' + (params.okBtn || messages["jpm.modal.confirm.submit"]) + '</button>';
+        html += '<button type="button" class="btn btn-primary btn-confirm">' + (params.okBtn || messages["jpm.modal.confirm.submit"]) + '</button>';
     }
-    wrapper.innerHTML += '</div></div></div>';
+    html += '</div></div></div>';
+    wrapper.innerHTML = html;
     var myModal = new bootstrap.Modal(wrapper);
     if (!params.closeTimeout) {
         $(wrapper).find(".btn-confirm").on("click", function () {

@@ -1,7 +1,10 @@
 package jpaoletti.jpm2.web.converter;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
+import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
@@ -17,6 +20,7 @@ import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Shows a link that uses the jSON show to get some extra info. Use only with
@@ -36,9 +40,16 @@ public class ShowObject extends Converter {
     @Autowired
     private JPMContext context;
 
+    @Autowired
+    private HttpServletRequest request;
+
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
+        if (request.getAttribute(SHOW_OBJECT_FIELD_VALUE) == null) {
+            request.setAttribute(SHOW_OBJECT_FIELD_VALUE, new LinkedHashMap<String, String>());
+        }
+        final Map<String, String> values = (Map<String, String>) request.getAttribute(SHOW_OBJECT_FIELD_VALUE);
 
         final String res = "@page:show-object-converter.jsp"
                 + "?entityId=" + getEntity().getId()
@@ -51,10 +62,12 @@ public class ShowObject extends Converter {
                 final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
                 String operationLink = "";
                 String operationTitle = "";
+                String operationIcon = "";
                 if (getOperation() != null && (getOperationAuth() == null || getAuthorizationService().userHasRole(getOperationAuth()))) {
                     try {
                         final Operation op = getEntity().getOperation(getOperation(), getContext().getContext());
                         operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
+                        operationIcon = op.getIcon();
                         final String entityId = getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                         switch (op.getScope()) {
                             case ITEM:
@@ -68,18 +81,21 @@ public class ShowObject extends Converter {
                         //We don't care for now
                     }
                 }
-                final String finalValue = getFinalValue(value);
+                final String finalValue = HtmlUtils.htmlEscape(getFinalValue(value));
+                values.put(field.getId() + instanceId, finalValue);
                 return res
-                        + "&value=" + finalValue
+                        // + "&value=" + finalValue
                         + "&instanceId=" + localId
                         + "&operationId=" + getOperation()
                         + "&operationLink=" + operationLink
+                        + "&operationIcon=" + operationIcon
                         + "&operationTitle=" + operationTitle;
             } catch (ConfigurationException ex) {
                 throw new ConverterException(ex.getMessage());
             }
         }
     }
+    protected static final String SHOW_OBJECT_FIELD_VALUE = "show_object_field_value";
 
     public Entity getEntity() {
         return entity;
@@ -128,11 +144,11 @@ public class ShowObject extends Converter {
                 final Field field = getEntity().getFieldById(getTextField(), getContext().getEntityContext());
                 return String.valueOf(JPMUtils.get(value, field.getProperty()));
             } else {
-                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-                finalValue = textField;
+                final Matcher matcher = DISPLAY_PATTERN.matcher(getTextField());
+                finalValue = getTextField();
                 while (matcher.find()) {
                     final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
+                    final Field field2 = getEntity().getFieldById(_display_field, getContext().getEntityContext());
                     finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(value, field2.getProperty())));
                 }
             }

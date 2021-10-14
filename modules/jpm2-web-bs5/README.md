@@ -37,4 +37,9 @@ Replace float-right with float-end
 
 Replace float-left with float-start
 
+Replace thead-light with table-secondary
 
+Replace form-control for form-select in <select>
+
+Replace jQuery .modal()  with plain javascript creator : 
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), options)

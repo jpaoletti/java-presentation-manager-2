@@ -407,6 +407,7 @@ var initPage = function () {
                                         owner: (params.owner) ? params.owner : "",
                                         ownerId: (params.ownerId) ? params.ownerId : "",
                                         filter: (params.filter) ? params.filter : "",
+                                        currentId: params.currentId || "",
                                         relatedValue: (params.related) ? params.related.val() : "",
                                         textField: params.textField || "",
                                         query: p.term,

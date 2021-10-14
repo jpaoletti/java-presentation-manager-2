@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-3">
-        <select name='operator' class="form-control">
+        <select name='operator' class="form-select">
             <option value='li'>&sub;</option>
             <option value='nli'>&nsub;</option>
             <option value='eq'>&equals;</option>

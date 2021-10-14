@@ -1,7 +1,9 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:if test="${not empty param.value}">
+<c:set var="fieldValue" value="${show_object_field_value[field.concat(param.objectId)]}" />
+<c:if test="${not empty fieldValue}">
     <c:if test="${not empty param.fields}">
-        <a disabled href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}" class="form-control">${param.value}<span class="glyphicon glyphicon-comment pull-right"></span></a>
+        <a disabled href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}" class="form-control">${fieldValue}<span class="fa fa-comment-alt pull-right"></span></a>
         <script type="text/javascript">
             $(document).on("click", "#field_${field}_${param.instanceId}_${param.objectId}", function () {
                 var _this = $(this);
@@ -20,6 +22,6 @@
             </script>
     </c:if>
     <c:if test="${empty param.fields}">
-        ${param.value}
+        <span class="to-string" title="${fieldValue}" data-align="null">${fieldValue}</span>
     </c:if>
 </c:if>
