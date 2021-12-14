@@ -12,6 +12,8 @@ import jpaoletti.jpm2.core.model.Field;
  */
 public class WebToString extends ToStringConverter {
 
+    private boolean useTitle = true;
+
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
         return wrap(field, process(value), value);
@@ -19,6 +21,15 @@ public class WebToString extends ToStringConverter {
 
     public String wrap(Field field, String process, Object value) {
         final String originalValue = (value == null) ? getNullValue() : getFinalValue(value, getProperties());
-        return "<span class='to-string' title='" + originalValue + "' data-align='" + field.getAlign() + "'>" + process + "</span>";
+        return "<span class='to-string' title='" + (isUseTitle() ? originalValue : "") + "' data-align='" + field.getAlign() + "'>" + process + "</span>";
     }
+
+    public boolean isUseTitle() {
+        return useTitle;
+    }
+
+    public void setUseTitle(boolean useTitle) {
+        this.useTitle = useTitle;
+    }
+
 }

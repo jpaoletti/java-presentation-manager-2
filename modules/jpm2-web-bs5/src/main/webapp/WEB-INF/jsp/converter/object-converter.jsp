@@ -16,8 +16,8 @@
             minSearch:${param.minSearch},
             filter: "${param.filter}",
             currentId: "${param.currentId}",
-            owner: "${not empty owner?owner.id:''}",
-            ownerId: "${not empty owner?ownerId:''}",
+            //owner: "${not empty owner?owner.id:''}",
+            ownerId: "${not empty ownerId?ownerId:''}",
             related: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('")'):'null'},
             sortBy: "${param.sortBy}",
             pageSize:${param.pageSize}

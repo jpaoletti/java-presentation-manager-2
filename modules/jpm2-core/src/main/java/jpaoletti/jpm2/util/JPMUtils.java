@@ -1,12 +1,17 @@
 package jpaoletti.jpm2.util;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
+import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.Field;
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
-import org.jboss.logging.Logger;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
@@ -94,7 +99,7 @@ public class JPMUtils implements ApplicationContextAware {
     }
 
     public static Logger getLogger() {
-        return Logger.getLogger(LOGGER_NAME);
+        return LogManager.getLogger(LOGGER_NAME);
     }
 
     /**
@@ -140,6 +145,18 @@ public class JPMUtils implements ApplicationContextAware {
         } catch (Exception e) {
             getLogger().error(e);
         }
+    }
+
+    public static Map<String, Object> getOriginalValues(Entity entity, Object object) {
+        final Map<String, Object> originalValues = new LinkedHashMap<>();
+        for (Field field : entity.getFields()) {
+            try {
+                originalValues.put(field.getId(), Converter.getValue(object, field));
+            } catch (ConfigurationException ex) {
+                originalValues.put(field.getId(), null);
+            }
+        }
+        return originalValues;
     }
 
     @Override

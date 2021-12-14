@@ -57,6 +57,21 @@ public class SearchCriteria implements Serializable {
         addCriterion(describedCriterion.getCriterion());
     }
 
+    public void removeDefinition(String fieldId) {
+        int i = 0;
+        Integer toRemove = null;
+        for (SearchCriteriaField definition : getDefinitions()) {
+            if (definition.getFieldId().equalsIgnoreCase(fieldId)) {
+                toRemove = i;
+                break;
+            }
+            i++;
+        }
+        if (toRemove != null) {
+            removeDefinition(i);
+        }
+    }
+
     public void removeDefinition(Integer i) {
         try {
             getDefinitions().remove(i.intValue());

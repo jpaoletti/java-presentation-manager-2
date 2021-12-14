@@ -101,7 +101,7 @@ public class AddController extends BaseController {
             getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
             if (repeat) {
                 if (operation.getConfig("clear-on-repeat", "false").equalsIgnoreCase("true")) {
-                    return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, ""), MessageFactory.success(getSuccessMsg(operation)));
+                    return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeated=true"), MessageFactory.success(getSuccessMsg(operation)));
                 } else {
                     return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()), MessageFactory.success(getSuccessMsg(operation)));
                 }
@@ -153,7 +153,7 @@ public class AddController extends BaseController {
             if (repeat) {
                 final EntityInstance instance = getContext().getEntityInstance();
                 if (operation.getConfig("clear-on-repeat", "false").equalsIgnoreCase("true")) {
-                    return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, ""), MessageFactory.success(getSuccessMsg(operation)));
+                    return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeated=true"), MessageFactory.success(getSuccessMsg(operation)));
                 } else {
                     return new JPMPostResponse(true, buildRedirect(instance.getOwner().getEntity(), instance.getOwnerId(), entity, null, OP_ADD, "repeated=true&lastId=" + newObject.getId()), MessageFactory.success(getSuccessMsg(operation)));
                 }

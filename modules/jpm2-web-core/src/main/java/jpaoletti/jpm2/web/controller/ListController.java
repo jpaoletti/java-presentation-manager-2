@@ -29,6 +29,7 @@ import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import static jpaoletti.jpm2.web.controller.ShowController.OP_SHOW;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
@@ -152,6 +153,13 @@ public class ListController extends BaseController {
                     cl.withOrder(Order.asc(sortBy));
                 }
             }
+            if (StringUtils.isNotEmpty(owner) && entity.getOwner() != null) {
+                final ContextualEntity cowner = getJpm().getContextualEntity(owner);
+                if (cowner != null) {
+                    final Object ownerObject = cowner.getDao().get(ownerId);
+                    restrictions.add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
+                }
+            }
             final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
             r.setMore(list.size() == ps);
             for (Object object : list) {
@@ -227,7 +235,7 @@ public class ListController extends BaseController {
         mav.addObject("compactOperations", operation.isCompact());
         return mav;
     }
-
+    
     @PostMapping(value = "/jpm/{entity}/saveCurrentSearch")//WORK IN PROGESS
     public String saveCurrentSearch(@RequestParam String field, @RequestParam String name) throws PMException {
         final UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

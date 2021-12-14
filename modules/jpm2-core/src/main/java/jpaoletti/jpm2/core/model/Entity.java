@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,13 +44,14 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private List<Entity> weaks;
     private List<PanelRow> panels;
     private List<Operation> operations;
-    private Map<String, Field> fieldsbyid;
+    private Map<String, Map<String, Field>> fieldsbyid;
     private List<SearchDefinition> defaultSearchs;
     private String defaultSortField;
     private ListSort.SortDirection defaultSortDirection;
     private Integer pageSize;
     private Highlighter highlighter;
     private String auditId; //Optional ID for auditoring
+    private boolean detailedAudit = false; //In the update, logs every modified field.
 
     private List<EntityContext> contexts;
 
@@ -100,6 +102,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      * Getter for a field by its id
      *
      * @param id The Field id
+     * @param context
      * @return The Field with the given id
      * @throws jpaoletti.jpm2.core.exception.FieldNotFoundException when the
      * field was not found for this entity
@@ -121,11 +124,15 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private Map<String, Field> getFieldsbyid(String context) {
         if (fieldsbyid == null) {
             fieldsbyid = new HashMap<>();
+        }
+        final String key = context != null ? context : "_ALL_";
+        if (!fieldsbyid.containsKey(key)) {
+            fieldsbyid.put(key, new LinkedHashMap<>());
             for (Field f : getAllFields(context)) {
-                fieldsbyid.put(f.getId(), f);
+                fieldsbyid.get(key).put(f.getId(), f);
             }
         }
-        return fieldsbyid;
+        return fieldsbyid.get(key);
     }
 
     /**
@@ -469,12 +476,29 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      */
     public Operation getOperation(String id, EntityContext context) throws OperationNotFoundException, NotAuthorizedException {
         for (Operation oper : getAllOperations()) {
-            if (oper.getId().compareTo(id) == 0) {
+            if (oper.getId().equalsIgnoreCase(id)) {
                 oper.checkAuthorization(this, context);
                 return oper;
             }
         }
         throw new OperationNotFoundException(getId(), id);
+    }
+
+    /**
+     * Returns the operation of the given id. If no operation was found, return
+     * null. No authorization checked.
+     *
+     * @param id The id
+     * @param context
+     * @return The operation
+     */
+    public Operation getOperationWithoutAuth(String id, EntityContext context) {
+        for (Operation oper : getAllOperations()) {
+            if (oper.getId().equalsIgnoreCase(id)) {
+                return oper;
+            }
+        }
+        return null;
     }
 
     public List<Operation> getOperationsFor(EntityInstance instance, String context, Operation operation, OperationScope... scopes) throws PMException {
@@ -648,5 +672,13 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public List<Field> getFieldsByOperation(String id) {
         return getFields().stream().filter(f -> f.shouldDisplay(id)).collect(Collectors.toList());
+    }
+
+    public boolean isDetailedAudit() {
+        return detailedAudit;
+    }
+
+    public void setDetailedAudit(boolean detailedAudit) {
+        this.detailedAudit = detailedAudit;
     }
 }

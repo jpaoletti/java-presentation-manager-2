@@ -74,7 +74,7 @@ public class Converter extends PMCoreObject {
      * @return The field value on the entity instance
      * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      */
-    protected static Object getValue(Object einstance, Field field) throws ConfigurationException {
+    public static Object getValue(Object einstance, Field field) throws ConfigurationException {
         return getValue(einstance, field.getProperty());
     }
 

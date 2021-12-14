@@ -31,9 +31,9 @@ public final class ShowController extends BaseController {
     @GetMapping(value = "/jpm/{entity}/{instanceId}.json", headers = "Accept=application/json")
     @ResponseBody
     public ObjectConverterData.ObjectConverterDataItem listObject(
-        @PathVariable Entity entity,
-        @PathVariable String instanceId,
-        @RequestParam(required = false) String textField) throws PMException {
+            @PathVariable Entity entity,
+            @PathVariable String instanceId,
+            @RequestParam(required = false) String textField) throws PMException {
         try {
             final String entityContext = getContext().getEntityContext();
             final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
@@ -59,8 +59,12 @@ public final class ShowController extends BaseController {
                 final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());
                 if (converter != null) {
                     try {
-                        values.put(field.getTitle(getContext().getEntity()),
-                            converter.visualize(getContext().getContextualEntity(), field, object, instanceId));
+                        final Object convertedValue = converter.visualize(getContext().getContextualEntity(), field, object, instanceId);
+                        if (convertedValue.toString().startsWith("@page:")) {
+                            values.put(field.getTitle(getContext().getEntity()), String.valueOf(Converter.getValue(object, field)));
+                        } else {
+                            values.put(field.getTitle(getContext().getEntity()), convertedValue);
+                        }
                     } catch (IgnoreConvertionException ex) {
                     }
                 }
@@ -73,11 +77,11 @@ public final class ShowController extends BaseController {
 
     @GetMapping(value = "/jpm/{entity}/{instanceId}/download/{fieldId}")
     public void downloadFileConverter(HttpServletResponse response,
-        @PathVariable String instanceId,
-        @PathVariable String fieldId,
-        @RequestParam(required = false) String contentType,
-        @RequestParam(required = false) String prefix,
-        @RequestParam(required = false) String sufix
+            @PathVariable String instanceId,
+            @PathVariable String fieldId,
+            @RequestParam(required = false) String contentType,
+            @RequestParam(required = false) String prefix,
+            @RequestParam(required = false) String sufix
     ) throws IOException, PMException {
         getContext().setOperation(getContext().getEntity().getOperation(OP_SHOW, getContext().getContext()));
         final IdentifiedObject iobject = initItemControllerOperation(instanceId);

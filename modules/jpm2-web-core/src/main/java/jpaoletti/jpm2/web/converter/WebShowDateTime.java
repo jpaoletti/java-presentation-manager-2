@@ -22,7 +22,7 @@ public class WebShowDateTime extends WebToString {
             final DateTime dt = new DateTime(value);
             return wrap(field, process(dt.toString(getFormat())), value);
         } else {
-            return "-";
+            return wrap(field, "-", value);
         }
     }
 

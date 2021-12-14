@@ -10,7 +10,7 @@
         </select>
     </div>
     <div class="col-lg-9">
-        <input class='form-control decimal' name='value' type='text' value="0" id="bigdecimal-searcher">
+        <input class='form-control decimal' name='value' type='text' value="0" id="bigdecimal-searcher"  autocomplete="off">
     </div>
 </div>
 <script type="text/javascript" src="${cp}static/js/autoNumeric-4.x.x.js?v=${jpm.appversion}"></script>

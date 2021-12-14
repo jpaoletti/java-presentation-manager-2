@@ -49,6 +49,7 @@ function getLocalStorage() {
 }
 
 var wrapToString = function () {
+    $(".inline-edit,.showObjectConverter").addClass("form-control");
     $(".to-string").each(function () {
         var v = $(this).html();
         $(this).html("<input disabled class='form-control' type='text' value='" + v + "' style='text-align:" + $(this).attr("data-align") + "' />");
@@ -484,6 +485,7 @@ var processFormResponse = function (data) {
             controlGroup.addClass("has-error");
             $.each(msgs, function (i, item) {
                 controlGroup.find(".form-control").addClass('is-invalid');
+                controlGroup.find(".form-select").addClass('is-invalid');
                 controlGroup.find(".converted-field-container").append('<div class="invalid-feedback jpm-validator-text">' + item.text + '</div>');
             });
         });

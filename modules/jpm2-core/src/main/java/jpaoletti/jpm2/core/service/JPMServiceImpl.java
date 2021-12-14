@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
@@ -61,7 +63,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public PaginatedList getPaginatedList(ContextualEntity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException {
         getContext().setOwnerId(ownerId);
         entity.checkAuthorization();
-        operation.checkAuthorization();
+        if (operation != null) {
+            operation.checkAuthorization();
+        }
         final DAOListConfiguration configuration = new DAOListConfiguration();
         final PaginatedList pl = new PaginatedList();
         final Criterion search = sessionEntityData.getSearchCriteria().getCriterion();
@@ -114,13 +118,29 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public IdentifiedObject update(Entity entity, String context, Operation operation, EntityInstance instance, Map<String, String[]> parameters) throws PMException {
         final String instanceId = instance.getIobject().getId();
         final Object object = entity.getDao(context).get(instanceId);
+        Map<String, Object> originalValues = null;
         instance.getIobject().setObject(object);
         try {
+            if (entity.isDetailedAudit()) {
+                originalValues = JPMUtils.getOriginalValues(entity, object);
+            }
             processFields(entity, operation, object, instance, parameters);
             preExecute(operation, object);
             entity.getDao(context).update(object);
             postExecute(operation, object);
-            getJpm().audit(entity, operation, instance.getIobject());
+            if (originalValues != null) {
+                final StringBuilder sb = new StringBuilder();
+                for (Field field : entity.getFields()) {
+                    final Object newValue = Converter.getValue(object, field);
+                    final Object original = originalValues.get(field.getId());
+                    if (Objects.equals(newValue, original)) {
+                        sb.append(String.format("%s -&gt; %s", Objects.toString(original), Objects.toString(newValue))).append("<br/>");
+                    }
+                }
+                getJpm().audit(entity, operation, instance.getIobject(), sb.toString());
+            } else {
+                getJpm().audit(entity, operation, instance.getIobject());
+            }
             return new IdentifiedObject(instanceId, object);
         } catch (PMException e) {
             entity.getDao(context).detach(object);
@@ -232,10 +252,12 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     private void addOwnerRestriction(ContextualEntity weak, final DAOListConfiguration cfg, ContextualEntity ownerEntity, final Object owner) {
-        if (weak.getOwner().isOnlyId()) {
-            cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), ownerEntity.getDao().getId(owner)));
-        } else {
-            cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+        if (weak != null && weak.getOwner() != null) {
+            if (weak.getOwner().isOnlyId()) {
+                cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), ownerEntity.getDao().getId(owner)));
+            } else {
+                cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+            }
         }
     }
 }

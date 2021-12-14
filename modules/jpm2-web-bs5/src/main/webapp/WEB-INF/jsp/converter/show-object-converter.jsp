@@ -3,7 +3,7 @@
 <c:set var="fieldValue" value="${show_object_field_value[field.concat(param.objectId)]}" />
 <c:if test="${not empty fieldValue}">
     <c:if test="${not empty param.fields}">
-        <a disabled href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}" class="">${fieldValue} <span class="fa fa-comment-alt float-end"></span></a>
+        <a disabled href="javascript:;" id="field_${field}_${param.instanceId}_${param.objectId}" class="showObjectConverter">${fieldValue} <span class="fa fa-comment-alt float-end"></span></a>
         <script type="text/javascript">
             $(document).on("click", "#field_${field}_${param.instanceId}_${param.objectId}", function () {
                 var _this = $(this);

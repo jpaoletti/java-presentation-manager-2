@@ -62,7 +62,10 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
 
     @Override
     public T find(DAOListConfiguration configuration) {
+        Integer max = configuration.getMax();
+        configuration.setMax(1);
         final List<T> list = list(configuration);
+        configuration.setMax(max);
         if (list.isEmpty()) {
             return null;
         }

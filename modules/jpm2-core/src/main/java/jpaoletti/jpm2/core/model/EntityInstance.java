@@ -10,7 +10,6 @@ import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
-import jpaoletti.jpm2.util.JPMUtils;
 
 /**
  * Contains fields and fields values. It depends on operation.
