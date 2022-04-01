@@ -15,6 +15,7 @@ public class ShowCollection extends ShowObject {
 
     private Entity entity;
     private String textField;
+    private boolean linked = false;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -28,10 +29,14 @@ public class ShowCollection extends ShowObject {
         if (value == null || value.isEmpty()) {
             return "";
         } else {
-            final StringBuilder sb = new StringBuilder("<ul class='show-collection-converter'>");
+            final StringBuilder sb = new StringBuilder("<ul class='show-collection-converter " + (isLinked() ? "show-collection-converter-linked" : "") + "'>");
             for (Object o : value) {
                 sb.append("<li>");
-                sb.append(o != null ? getFinalValue(o) : "-");
+                if (isLinked()) {
+                    sb.append(o != null ? "<a href='@cp@/jpm/" + getEntity().getId() + "/" + getEntity().getDao().getId(o) + "/show.exec'>" + getFinalValue(o) + "</a>" : "-");
+                } else {
+                    sb.append(o != null ? getFinalValue(o) : "-");
+                }
                 sb.append("</li>");
             }
             return sb.append("</ul>").toString();
@@ -56,5 +61,13 @@ public class ShowCollection extends ShowObject {
     @Override
     public void setTextField(String textField) {
         this.textField = textField;
+    }
+
+    public boolean isLinked() {
+        return linked;
+    }
+
+    public void setLinked(boolean linked) {
+        this.linked = linked;
     }
 }

@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -68,7 +69,7 @@ public class ExceptionController {
         return mav;
     }
 
-    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class, DataIntegrityViolationException.class, ConstraintViolationException.class})
     public ModelAndView handleSQLConstraintException(Exception ex) {
         final ModelAndView mav = new ModelAndView("exception");
         mav.addObject("message", MessageFactory.error("jpm.constraint.exception"));

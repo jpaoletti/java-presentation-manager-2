@@ -70,19 +70,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.github.jpaoletti</groupId>
-            <artifactId>jpm2-rest</artifactId>
-            <version>${jpm.version}</version>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>com.github.jpaoletti</groupId>
-            <artifactId>jpm2-rest</artifactId>
-            <version>${jpm.version}</version>
-            <type>jar</type>
-            <classifier>classes</classifier>
-        </dependency>
-        <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>3.0.0</version>

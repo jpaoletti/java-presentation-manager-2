@@ -210,7 +210,6 @@
                 </c:forEach>
             </div>
         </jpm:jpm-body>
-        <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
         <script type="text/javascript">
             function openSearchModal(field, name) {
                 $("#searchModal .modal-body").html("<h6>" + name + "</h6>" + $("#fieldSearchForm_" + field).html());

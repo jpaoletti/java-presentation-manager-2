@@ -98,6 +98,7 @@
                         <bean class="jpaoletti.jpm2.core.test.DeleteTestCondition" />
                     </property>
                     <property name="icon" value="fas fa-trash-alt" />
+                    <property name="color" value="btn-danger" />
                 </bean>
             </list>
         </property>

@@ -23,6 +23,7 @@
 <script type="text/javascript" src="${cp}static/js/jpm-dialogs.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/jpm.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/custom.js?v=${jpm.appversion}"></script>
+<script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
 
 <link rel="shortcut icon" href="${cp}static/favicon.ico?v=${jpm.appversion}">
 <link rel="icon" type="image/png" sizes="150x150" href="${cp}static/favicon.ico?v=${jpm.appversion}">

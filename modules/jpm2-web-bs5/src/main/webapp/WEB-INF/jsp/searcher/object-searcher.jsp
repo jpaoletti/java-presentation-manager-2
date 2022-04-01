@@ -1,4 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <div id="${param.field}objectSearcher" class="objectSearcher">
     <label>
         <input type="checkbox" id="${param.field}selectAll" /> <spring:message code="jpm.converter.collection.selectall" text="Select all" />
@@ -8,6 +9,9 @@
     jpmLoad(function () {
         $(document).on("click", "#${param.field}selectAll", function () {
             $("input[name='value']").prop("checked", $(this).is(":checked"));
+        });
+        $(document).on("click", "input[name='value']", function () {
+            $("#${param.field}selectAll").prop("checked", $("input[name='value']:checked").length === $("input[name='value']").length);
         });
         $.ajax({
             url: "${cp}jpm/${param.entityId}.json",

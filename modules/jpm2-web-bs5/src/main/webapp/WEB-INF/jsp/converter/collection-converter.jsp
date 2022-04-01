@@ -7,6 +7,10 @@
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
+        $("#control-group-${field} label").append('<button class="btn btn-outline-secondary btn-xs" type="button" id="field_${field}_clear">×</button>');
+        $(document).on("click", "#field_${field}_clear", function () {
+            $("#field_${field}").val(null).trigger("change");
+        });
         $("#field_${field}").select2({
             //allowDuplicates: ${param.allowDuplicates},
             placeholder: "...",

@@ -276,7 +276,7 @@ var initPage = function () {
                             empty = false;
                         }
                     });
-                    if(empty){
+                    if (empty) {
                         $("#searchDropdown .dropdown-menu").append('<li><a class="dropdown-item disabled" href="javascript:;"><span class="fa fa-eye-slash"></span></a></li>');
                     }
                     $("#searchDropdown .dropdown-menu").toggle();
@@ -330,6 +330,23 @@ var initPage = function () {
                 }
             });
         });
+
+        $(".inline-edit-combo").each(function () {
+            $(this).editable(getContextPath() + 'jpm/' + $(this).attr("data-contextualEntity") + '/' + $(this).attr("data-instanceId") + '/iledit?name=' + $(this).attr("data-name"), {
+                placeholder: "-",
+                type: "select",
+                //tooltip: 'Modificar', //TODO
+                cssclass: 'inline-select',
+                data: $(this).attr("data-options")
+            });
+        });
+        $("a").each(function () {
+            if ($(this).attr("href")) {
+                $(this).attr("href", $(this).attr("href").replace("@cp@/", getContextPath()));
+            }
+        });
+
+
         if ($.fn.select2) {
             $("<script type=text/javascript' src='" + getContextPath() + "static/js/locale/select2/" + localeLanguage + ".js'></script>").appendTo("head");
             $("<link href='" + getContextPath() + "static/css/select2.css' rel='stylesheet'>").appendTo("head");

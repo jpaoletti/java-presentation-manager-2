@@ -67,6 +67,7 @@
         <property name="display" value="edit show list" />
         <property name="executor" ref="operationExecutorDelete" />
         <property name="icon" value="fas fa-trash-alt" />
+        <property name="color" value="btn-danger" />
     </bean>
     <bean id="default-generalAudit-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="generalAudit" />

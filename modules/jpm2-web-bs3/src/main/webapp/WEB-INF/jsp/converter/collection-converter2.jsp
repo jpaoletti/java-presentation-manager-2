@@ -10,6 +10,9 @@
         $(document).on("click", "#${field}selectAll", function () {
             $("input[name='field_${field}']").prop("checked", $(this).is(":checked")).trigger("change");
         });
+        $(document).on("click", "input[name='field_${field}']", function () {
+            $("#${field}selectAll").prop("checked", $("input[name='field_${field}']:checked").length === $("input[name='field_${field}']").length);
+        });
         $.ajax({
             url: "${cp}jpm/${param.entityId}.json",
             dataType: "json",

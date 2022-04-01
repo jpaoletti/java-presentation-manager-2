@@ -1,6 +1,8 @@
 package jpaoletti.jpm2.core.model;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +12,7 @@ import java.util.Map;
 public class SearchDefinition {
 
     private String fieldId;
-    private Map<String, String[]> parameters;
+    private Map<String, List<String>> parameters;
 
     public SearchDefinition() {
     }
@@ -25,12 +27,12 @@ public class SearchDefinition {
     public SearchDefinition(String fieldId, String paramName, String paramValue) {
         this.fieldId = fieldId;
         this.parameters = new LinkedHashMap<>();
-        final String[] params = new String[1];
-        params[0] = paramValue;
+        final List<String> params = new ArrayList<>();
+        params.add(paramValue);
         this.parameters.put(paramName, params);
     }
 
-    public SearchDefinition(String fieldId, Map<String, String[]> parameters) {
+    public SearchDefinition(String fieldId, Map<String, List<String>> parameters) {
         this.fieldId = fieldId;
         this.parameters = parameters;
     }
@@ -43,11 +45,22 @@ public class SearchDefinition {
         this.fieldId = fieldId;
     }
 
-    public Map<String, String[]> getParameters() {
+    public Map<String, List<String>> getParameters() {
         return parameters;
     }
 
-    public void setParameters(Map<String, String[]> parameters) {
+    public void setParameters(Map<String, List<String>> parameters) {
         this.parameters = parameters;
     }
+
+    public Map<String, String[]> getParametersForBuild() {
+        final Map<String, String[]> res = new java.util.LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> e : parameters.entrySet()) {
+            String key = e.getKey();
+            List<String> value = e.getValue();
+            res.put(key, value.toArray(new String[value.size()]));
+        }
+        return res;
+    }
+
 }
