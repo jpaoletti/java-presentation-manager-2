@@ -264,13 +264,14 @@ var initPage = function () {
             }
 //            $("#content-header").prepend('<button id="pin-sidebar" class="btn btn-sm btn-dark d-none d-sm-flex" style="width: 35px;"><i class="fas fa-thumbtack"></i></button>&nbsp;');
             $("#search-menu").on("keyup", function (e) {
+                let value = e.target.value;
+                var normalizedValue = value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
                 $("#searchDropdown .dropdown-menu").remove();
                 $("#searchDropdown").append('<ul class="dropdown-menu"></ul>');
-                let value = e.target.value;
                 if (value.length >= 2) {
                     let empty = true;
                     $(".jpm-menu-item").each(function () {
-                        if ($(this).last().text().toLowerCase().includes(value.toLowerCase())) {
+                        if ($(this).last().text().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedValue)) {
                             let html = '<li><a class="dropdown-item" href="' + $(this).attr("href") + '">' + $(this).html() + '</a></li>';
                             $("#searchDropdown .dropdown-menu").append(html);
                             empty = false;
