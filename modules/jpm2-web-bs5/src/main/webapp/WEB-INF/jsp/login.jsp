@@ -9,7 +9,7 @@
             .input-group{padding: 0px;}
         </style>
     </head>
-    <body>
+    <body id="login-body">
         <!--<main class="page-content pt-2">-->
         <div class="container-fluid p-0">
             <div class="row justify-content-center align-items-center">

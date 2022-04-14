@@ -21,6 +21,7 @@ import static jpaoletti.jpm2.core.model.OperationExecutor.OWNER_ID;
 import jpaoletti.jpm2.core.model.Progress;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.JPMAskConfirmationException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -133,6 +134,12 @@ public class ExecutorsController extends BaseController implements Observer {
                 getContext().getEntityMessages().add(e.getMsg());
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (JPMAskConfirmationException e) {
+            if (e.getMsg() != null) {
+                return new JPMPostResponse(false, null).askConfirmation(e.getMsg());
+            } else {
+                return new JPMPostResponse(false, null).askConfirmation(MessageFactory.error(e.getMessage()));
+            }
         } catch (PMException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());

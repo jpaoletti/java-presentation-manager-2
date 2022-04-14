@@ -19,6 +19,7 @@ public class JPMPostResponse {
     private final Map<String, List<Message>> fieldMessages = new LinkedHashMap<>();
     private final String next;
     private Long messageDelay = 1000L;
+    private Message confirmation; //If setted, UI must show this message and ask user for confirmation, then send POST again with confirmed=true
 
     public JPMPostResponse(boolean ok, String next, Message... messages) {
         this.ok = ok;
@@ -61,6 +62,19 @@ public class JPMPostResponse {
 
     public void setMessageDelay(Long messageDelay) {
         this.messageDelay = messageDelay;
+    }
+
+    public Message getConfirmation() {
+        return confirmation;
+    }
+
+    public void setConfirmation(Message confirmation) {
+        this.confirmation = confirmation;
+    }
+
+    public JPMPostResponse askConfirmation(Message msg) {
+        setConfirmation(msg);
+        return this;
     }
 
 }

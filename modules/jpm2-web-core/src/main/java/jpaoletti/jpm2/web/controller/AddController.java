@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.JPMAskConfirmationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -116,6 +117,12 @@ public class AddController extends BaseController {
             getContext().setEntityInstance(new EntityInstance(new IdentifiedObject(null, object), getContext()));
 
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (JPMAskConfirmationException e) {
+            if (e.getMsg() != null) {
+                return new JPMPostResponse(false, null).askConfirmation(e.getMsg());
+            } else {
+                return new JPMPostResponse(false, null).askConfirmation(MessageFactory.error(e.getMessage()));
+            }
         } catch (PMException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
@@ -170,6 +177,12 @@ public class AddController extends BaseController {
                 getContext().getEntityInstance().setOwner(new EntityInstanceOwner(entity.getOwner(getContext().getEntityContext()).getOwner(), new IdentifiedObject(ownerId)));
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (JPMAskConfirmationException e) {
+            if (e.getMsg() != null) {
+                return new JPMPostResponse(false, null).askConfirmation(e.getMsg());
+            } else {
+                return new JPMPostResponse(false, null).askConfirmation(MessageFactory.error(e.getMessage()));
+            }
         } catch (PMException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());

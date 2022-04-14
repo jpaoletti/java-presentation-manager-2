@@ -481,6 +481,16 @@ var processFormResponse = function (data) {
     } else {
         $(".form-control").removeClass("is-invalid");
         $(".jpm-validator-text").remove();
+        if (data.confirmation) {
+            jpmDialogConfirm({
+                message: data.confirmation.text,
+                callback: function () {
+                    var form = $('#jpmForm'); //TODO
+                    form.append("<input type='hidden' name='jpm_confirm' value='true' />");
+                    form.submit();
+                }
+            });
+        }
         //Entity
         if (data.messages.length > 0) {
             var $message = '<div><ul>';
