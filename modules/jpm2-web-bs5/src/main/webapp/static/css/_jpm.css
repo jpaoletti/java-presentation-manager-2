@@ -94,3 +94,11 @@ a{text-decoration: none;}
     -moz-appearance: none;
     appearance: none;
 }
+.collectionSearcherContainer{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(100, 1fr);
+    grid-column-gap: 1em;
+    grid-auto-flow: column;
+    font-size: 0.9em;
+}

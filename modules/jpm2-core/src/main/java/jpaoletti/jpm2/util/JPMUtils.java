@@ -1,5 +1,12 @@
 package jpaoletti.jpm2.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import jpaoletti.jpm2.core.converter.Converter;
@@ -12,6 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
@@ -185,6 +194,32 @@ public class JPMUtils implements ApplicationContextAware {
             return (T) ((Advised) proxy).getTargetSource().getTarget();
         } else {
             return (T) proxy;
+        }
+    }
+
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+        try (InputStream is = new URL(url).openStream()) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            JSONObject json = new JSONObject(jsonText);
+            return json;
+        }
+    }
+
+    public static String readJsonAsStringFromUrl(String url) throws IOException, JSONException {
+        try (InputStream is = new URL(url).openStream()) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            return jsonText;
         }
     }
 }

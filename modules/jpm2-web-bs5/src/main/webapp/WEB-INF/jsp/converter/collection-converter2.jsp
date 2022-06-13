@@ -20,6 +20,7 @@
             data: {
                 textField: "${param.textField}",
                 filter: "${param.filter}",
+                currentId: "${instance.id}",
                 ownerId: "${not empty owner?ownerId:''}"
             },
             success: function (data) {

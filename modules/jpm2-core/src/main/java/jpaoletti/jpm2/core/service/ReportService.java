@@ -1,4 +1,4 @@
- package jpaoletti.jpm2.core.service;
+package jpaoletti.jpm2.core.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -345,7 +345,7 @@ public class ReportService extends JPMServiceBase {
     }
 
     @Transactional
-    public void deleteUserSave(Long savedReportId, String username) {
+    public void deleteUserSave(Long savedReportId, String username) throws PMException {
         final EntityReportUserSave userSave = getUserSave(savedReportId, username);
         if (userSave != null) {
             entityReportUserSaveDAO.delete(userSave);

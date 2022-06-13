@@ -28,7 +28,7 @@
                                     <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" var="searchTitle" />
                                     <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}', '${searchTitle}');">${st.index+1}. ${searchTitle}</a>
                                 <li>
-                            </c:forEach>
+                                </c:forEach>
                         </ul>
                         <div class="btn-group">
                             <c:forEach items="${generalOperations}" var="o">
@@ -214,6 +214,11 @@
             function openSearchModal(field, name) {
                 $("#searchModal .modal-body").html("<h6>" + name + "</h6>" + $("#fieldSearchForm_" + field).html());
                 $("#addSearchForm [name='fieldId']").val(field);
+                $("#searchModal .modal-dialog").attr('class', "modal-dialog");
+                var size = $("[data-field='" + field + "']").data("size");
+                if (size) {
+                    $("#searchModal .modal-dialog").addClass(size);
+                }
                 $("#searchModal").modal("show").on("shown.bs.modal", function () {
                     $("#searchModal .modal-body").find("input").trigger('focus');
                 });

@@ -2,7 +2,7 @@
 
 cd src/main/webapp/static
 npm install --save bootstrap5
-npm install --save bootstrap5-dialog
+#npm install --save bootstrap5-dialog
 npm install --save @fortawesome/fontawesome-free
 
 #TODO npm install --save jquery-jeditable 

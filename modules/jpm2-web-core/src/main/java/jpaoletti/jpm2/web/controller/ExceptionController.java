@@ -50,7 +50,8 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(NotAuthorizedException.class)
-    public String handleNotAuthorizedException() {
+    public String handleNotAuthorizedException(NotAuthorizedException ex) {
+        ex.printStackTrace();
         return "not-authotized";
     }
 

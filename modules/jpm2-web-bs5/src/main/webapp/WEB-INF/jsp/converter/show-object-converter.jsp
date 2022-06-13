@@ -27,3 +27,6 @@
         <span class="to-string" title="${fieldValue}" data-align="null">${fieldValue}</span>
     </c:if>
 </c:if>
+<c:if test="${empty fieldValue}">
+    <span class="to-string">-</span>
+</c:if>

@@ -63,7 +63,7 @@ public class ExecutorsController extends BaseController implements Observer {
     @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"})
     public ModelAndView executorsGeneralPrepare(HttpServletRequest request, @PathVariable Entity owner, @PathVariable String ownerId) throws PMException {
         final Map<String, Object> preparation = getExecutor().prepare(owner, ownerId, new ArrayList<>());
-        if (getExecutor().immediateExecute()) {
+        if (getExecutor().immediateExecute() || preparation == null) {
             executorsCommit(request, new ArrayList<>(), false);
             getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
             return next(getContext().getEntity(), getContext().getOperation(), "", getExecutor().getDefaultNextOperationId());
@@ -168,7 +168,7 @@ public class ExecutorsController extends BaseController implements Observer {
         }
         setLastAccessed(request, getContext(), instanceIds);
         final Map<String, Object> preparation = getExecutor().prepare(null, null, instances);
-        if (getExecutor().immediateExecute()) {
+        if (getExecutor().immediateExecute() || preparation == null) {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {
                 getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
@@ -245,6 +245,7 @@ public class ExecutorsController extends BaseController implements Observer {
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         } catch (Exception e) {
+            JPMUtils.getLogger().error(e);
             getContext().getEntityMessages().add(MessageFactory.error(e.getMessage()));
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }

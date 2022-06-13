@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -77,7 +78,7 @@ public class JPMController extends BaseController {
 
     @PostMapping(value = "/jpm/removeFavorite", headers = "Accept=application/json")
     @ResponseBody
-    public String removeFavorite(@RequestParam String url) throws IOException {
+    public String removeFavorite(@RequestParam String url) throws IOException, PMException {
         favoriteService.removeFavorite(getUserDetails().getUsername(), url);
         return url;
     }

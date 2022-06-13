@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.service;
 
 import java.util.List;
+import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.FavoriteDAO;
 import jpaoletti.jpm2.core.model.UserFavorite;
@@ -30,7 +31,7 @@ public class FavoriteService {
     }
 
     @Transactional
-    public void removeFavorite(String username, String url) {
+    public void removeFavorite(String username, String url) throws PMException {
         final UserFavorite fav = favoriteDAO.find(new DAOListConfiguration(
                 Restrictions.eq("username", username),
                 Restrictions.eq("link", url)

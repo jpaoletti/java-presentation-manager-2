@@ -41,6 +41,7 @@ public class Field extends PMCoreObject {
     private String align; //left right center, TODO
     private Searcher searcher;
     private boolean sortable;
+    private boolean auditable=true;
     private List<FieldConfig> configs;
 
     /**
@@ -345,6 +346,14 @@ public class Field extends PMCoreObject {
 
     public void setDisplayTitle(boolean displayTitle) {
         this.displayTitle = displayTitle;
+    }
+
+    public boolean isAuditable() {
+        return auditable;
+    }
+
+    public void setAuditable(boolean auditable) {
+        this.auditable = auditable;
     }
 
     public String getAuthKey(Entity entity, EntityContext context, Operation operation) {

@@ -133,8 +133,12 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                 for (Field field : entity.getFields()) {
                     final Object newValue = Converter.getValue(object, field);
                     final Object original = originalValues.get(field.getId());
-                    if (Objects.equals(newValue, original)) {
-                        sb.append(String.format("%s -&gt; %s", Objects.toString(original), Objects.toString(newValue))).append("<br/>");
+                    if (!Objects.equals(newValue, original)) {
+                        sb.append(String.format("<b>%s</b>: %s -&gt; %s",
+                                field.getTitle(entity),
+                                Objects.toString(original),
+                                Objects.toString(newValue))
+                        ).append("<br/>");
                     }
                 }
                 getJpm().audit(entity, operation, instance.getIobject(), sb.toString());
