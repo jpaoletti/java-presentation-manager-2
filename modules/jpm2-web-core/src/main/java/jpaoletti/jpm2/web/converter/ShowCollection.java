@@ -26,10 +26,8 @@ public class ShowCollection extends ShowObject {
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : object);
-        if (value == null || value.isEmpty()) {
-            return "";
-        } else {
-            final StringBuilder sb = new StringBuilder("<ul class='show-collection-converter " + (isLinked() ? "show-collection-converter-linked" : "") + "'>");
+        final StringBuilder sb = new StringBuilder("<ul class='show-collection-converter " + (isLinked() ? "show-collection-converter-linked" : "") + "'>");
+        if (value != null) {
             for (Object o : value) {
                 sb.append("<li>");
                 if (isLinked()) {
@@ -39,8 +37,8 @@ public class ShowCollection extends ShowObject {
                 }
                 sb.append("</li>");
             }
-            return sb.append("</ul>").toString();
         }
+        return sb.append("</ul>").toString();
     }
 
     @Override

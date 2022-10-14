@@ -32,7 +32,7 @@
                                     </div>
                                 </li>
                                 <li>
-                                    <div class="cc"><i class="glyphicon glyphicon-bullhorn"></i>
+                                    <div class="cc"><i class="fas fa-bullhorn"></i>
                                         <spring:message code="jpm.security.home.groupCount" arguments="${groupCount}" />
                                     </div>
                                 </li>

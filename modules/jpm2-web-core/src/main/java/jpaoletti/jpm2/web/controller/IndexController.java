@@ -60,6 +60,9 @@ public class IndexController extends BaseController {
     @ResponseBody
     public void downloadFileConverter(HttpServletResponse response, @PathVariable String entity, @PathVariable String instanceId, @RequestParam boolean download) throws IOException, PMException {
         final WithAttachment wa = (WithAttachment) getJpm().getEntity(entity).getDao().get(instanceId);
+        if (!wa.isDownloadable()) {
+            throw new PMException("jpm.not.downloadable");
+        }
         response.setContentType(wa.getContentType());
         if (download) {
             response.addHeader("Content-Disposition", "attachment;filename=" + wa.getAttachmentName());

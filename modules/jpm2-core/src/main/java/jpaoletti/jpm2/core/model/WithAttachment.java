@@ -21,4 +21,6 @@ public interface WithAttachment {
      */
     public String getInternalFileName();
 
+    public boolean isDownloadable();
+
 }

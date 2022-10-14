@@ -10,6 +10,7 @@ import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -22,6 +23,7 @@ public class WebEditCollection extends WebEditObject {
     private HttpServletRequest request;
 
     private boolean allowDuplicates = false;
+    private String reference; //set value in the collected entity
 
     public WebEditCollection() {
         super();
@@ -65,10 +67,21 @@ public class WebEditCollection extends WebEditObject {
         } else {
             try {
                 final Collection<Object> c = (Collection<Object>) getValue(object, field);
+                if (StringUtils.isNotEmpty(reference)) {
+                    for (Object other : c) {
+                        JPMUtils.set(other, reference, null);
+                        getEntity().getDao().update(other);
+                    }
+                }
                 c.clear();
                 final String[] split = newValue instanceof String ? ((String) newValue).split("[,]") : ((String[]) newValue);
                 for (String s : split) {
-                    c.add(getEntity().getDao().get(s));
+                    final Object other = getEntity().getDao().get(s);
+                    c.add(other);
+                    if (StringUtils.isNotEmpty(reference)) {
+                        JPMUtils.set(other, reference, object);
+                        getEntity().getDao().update(other);
+                    }
                 }
                 return c;
             } catch (Exception ex) {
@@ -85,4 +98,13 @@ public class WebEditCollection extends WebEditObject {
     public void setAllowDuplicates(boolean allowDuplicates) {
         this.allowDuplicates = allowDuplicates;
     }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
 }

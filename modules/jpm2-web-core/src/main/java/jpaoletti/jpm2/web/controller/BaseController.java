@@ -188,7 +188,7 @@ public class BaseController {
         if (operation.getCondition() != null) {
             if (!operation.getCondition().check(instance, operation, null)) {
                 throw new NotAuthorizedException();
-            };
+            }
         }
     }
 

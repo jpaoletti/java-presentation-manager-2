@@ -49,7 +49,7 @@ function getLocalStorage() {
 }
 
 var wrapToString = function () {
-    $(".inline-edit").addClass("form-control");
+    $(".inline-edit,.showObjectConverter").addClass("form-control");
     $(".to-string").each(function () {
         var v = $(this).html();
         $(this).html("<input disabled class='form-control' type='text' value='" + v + "' style='text-align:" + $(this).attr("data-align") + "' />");

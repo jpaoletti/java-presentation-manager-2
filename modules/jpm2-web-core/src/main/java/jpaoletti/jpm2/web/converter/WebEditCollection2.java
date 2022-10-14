@@ -6,12 +6,15 @@ import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author jpaoletti
  */
 public class WebEditCollection2 extends WebEditObject {
+
+    private String reference; //set value in the collected entity
 
     public WebEditCollection2() {
         super();
@@ -51,10 +54,21 @@ public class WebEditCollection2 extends WebEditObject {
         } else {
             try {
                 final Collection<Object> c = (Collection<Object>) getValue(object, field);
+                if (StringUtils.isNotEmpty(reference)) {
+                    for (Object other : c) {
+                        JPMUtils.set(other, reference, null);
+                        getEntity().getDao().update(other);
+                    }
+                }
                 c.clear();
                 final String[] split = splitValues(newValue);
                 for (String s : split) {
-                    c.add(getEntity().getDao().get(s));
+                    final Object other = getEntity().getDao().get(s);
+                    c.add(other);
+                    if (StringUtils.isNotEmpty(reference)) {
+                        JPMUtils.set(other, reference, object);
+                        getEntity().getDao().update(other);
+                    }
                 }
                 return c;
             } catch (Exception ex) {
@@ -67,4 +81,13 @@ public class WebEditCollection2 extends WebEditObject {
     protected String[] splitValues(Object newValue) {
         return (newValue instanceof String) ? (new String[]{newValue.toString()}) : (String[]) newValue;
     }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
 }

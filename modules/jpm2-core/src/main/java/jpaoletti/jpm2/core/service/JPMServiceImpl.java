@@ -216,9 +216,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     @Override
     public IdentifiedObject get(Entity entity, String context, Operation operation, String instanceId) throws PMException {
-        preExecute(operation, null);
+        //preExecute(operation, null);
         final Object object = entity.getDao(context).get(instanceId); //current object
-        postExecute(operation, object);
+        //postExecute(operation, object);
         return new IdentifiedObject(instanceId, object);
     }
 

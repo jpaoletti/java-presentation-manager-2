@@ -17,7 +17,11 @@ public class NotAuthorizedException extends PMException {
 
     @Override
     public String toString() {
-        return "NotAuthorizedException{" + getMsg().getText() + '}';
+        if (getMsg() != null) {
+            return "NotAuthorizedException{" + getMsg().getText() + '}';
+        } else {
+            return "NotAuthorizedException";
+        }
     }
 
 }

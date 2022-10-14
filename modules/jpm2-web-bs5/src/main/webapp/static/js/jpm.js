@@ -76,6 +76,7 @@ function initConfirm() {
                     setTimeout(function () {
                         document.location = $href;
                     }, 300);
+                    return true;
                 }
             });
         }
@@ -258,6 +259,7 @@ var initPage = function () {
                                     }
                                 });
                             }
+                            return true;
                         }
                     });
                 });
@@ -457,6 +459,7 @@ let jpmUnBlock = function () {
 };
 
 var processFormResponse = function (data) {
+    $("#jpm_confirm").remove();
     if (data.ok) {
         if (data.messages.length > 0) {
             var $message = '<ul>';
@@ -487,11 +490,12 @@ var processFormResponse = function (data) {
                 message: data.confirmation.text,
                 callback: function () {
                     var form = $('#jpmForm'); //TODO
-                    form.append("<input type='hidden' name='jpm_confirm' value='true' />");
+                    form.append("<input type='hidden' name='jpm_confirm' value='true' id='jpm_confirm' />");
                     var extraInputs = $("<div style='display: none;'></div>");
                     extraInputs.append($("#jpm-dialog-confirm").find("input,select,textarea"));
                     form.append(extraInputs);
                     form.submit();
+                    return true;
                 }
             });
         }
@@ -621,9 +625,9 @@ function asynchronicOperationProgress(id) {
 
 $(document).on("click", ".viewAttachmentIco", function (e) {
     e.preventDefault();
-    var ct = $(this).attr("data-type");
-    var id = $(this).attr("data-id");
-    var entity = $(this).attr("data-entity");
+    var ct = $(this).data("type");
+    var id = $(this).data("id");
+    var entity = $(this).data("entity");
     var $textAndPic = $('<div id="attachmentPopup"></div>');
     var html = "";
     if (ct.contains("image")) {
@@ -636,7 +640,9 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
     $textAndPic.append(html);
     jpmDialogConfirm({
         title: messages["jpm.modal.attachment.title"],
+        okBtn: messages["jpm.modal.attachment.download"],
         message: $textAndPic.html(),
+        addClass: "modal-lg",
         callback: function () {
             document.location = getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=true";
         }
