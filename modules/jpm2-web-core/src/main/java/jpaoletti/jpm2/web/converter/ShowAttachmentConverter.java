@@ -59,6 +59,7 @@ public class ShowAttachmentConverter extends Converter {
             }
             return "@page:show-attachment-converter.jsp"
                     + "?len=" + len
+                    + "&downloadable=" + note.isDownloadable()
                     + "&contentType=" + note.getContentType()
                     + "&attachmentName=" + note.getAttachmentName()
                     + "&noteId=" + instanceId

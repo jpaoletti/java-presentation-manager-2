@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.web.ObjectConverterData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.taglibs.standard.tag.common.core.Util;
 
 /**
@@ -20,6 +21,7 @@ public class WebEditObject extends Converter {
     private Entity entity;
     private ListFilter filter;
     private String textField;
+    private String textFieldDetails;
     private Integer pageSize;
     private Integer minSearch;
     private String placeHolder;
@@ -58,6 +60,9 @@ public class WebEditObject extends Converter {
         }
         if (getRelated() != null) {
             sb.append("&related=").append(getRelated());
+        }
+        if (StringUtils.isNotEmpty(textFieldDetails)) {
+            sb.append("&textFieldDetails=").append(textFieldDetails);
         }
         sb.append("&placeHolder=").append(getPlaceHolder());
         return sb.toString();
@@ -153,5 +158,13 @@ public class WebEditObject extends Converter {
 
     public void setAddable(boolean addable) {
         this.addable = addable;
+    }
+
+    public String getTextFieldDetails() {
+        return textFieldDetails;
+    }
+
+    public void setTextFieldDetails(String textFieldDetails) {
+        this.textFieldDetails = textFieldDetails;
     }
 }

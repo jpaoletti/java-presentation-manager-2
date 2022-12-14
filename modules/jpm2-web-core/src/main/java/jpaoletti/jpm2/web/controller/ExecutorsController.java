@@ -146,6 +146,7 @@ public class ExecutorsController extends BaseController implements Observer {
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         } catch (Exception e) {
+            e.printStackTrace();
             getContext().getEntityMessages().add(MessageFactory.error(e.getMessage()));
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
@@ -245,7 +246,7 @@ public class ExecutorsController extends BaseController implements Observer {
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         } catch (Exception e) {
-            JPMUtils.getLogger().error(e);
+            JPMUtils.getLogger().error("Error", e);
             getContext().getEntityMessages().add(MessageFactory.error(e.getMessage()));
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }

@@ -13,8 +13,8 @@
             cropperAspectRatio: Number.Nan,
             cancelBtnLabel: "Cancel",
             confirmBtnLabel: "Confirm",
-            width: 250,
-            height: 250,
+            width: 3072,
+            height: 3072,
             croppable: true, //No implemented
             afterUpload: null
         }, options);
@@ -50,8 +50,13 @@
                                             jpmBlock();
                                             var initialAvatarURL = original.src;
                                             var canvas = cropper.getCroppedCanvas({
+                                                imageSmoothingQuality: 'high',
                                                 width: settings.width,
-                                                height: settings.height
+                                                height: settings.height,
+                                                minWidth: 256,
+                                                minHeight: 256,
+                                                maxWidth: 4000,
+                                                maxHeight: 4000
                                             });
                                             original.src = canvas.toDataURL();
                                             canvas.toBlob(function (blob) {

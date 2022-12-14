@@ -102,3 +102,4 @@ a{text-decoration: none;}
     grid-auto-flow: column;
     font-size: 0.9em;
 }
+.objectConverterInputDetails{font-size: 0.9em;color: gray;text-decoration: underline;}

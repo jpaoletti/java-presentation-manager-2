@@ -472,7 +472,7 @@ var processFormResponse = function (data) {
                 titleBackground: 'bg-success text-light',
                 message: $message
             };
-            if (!data.next || data.next === "") {
+            if (!data.next || data.next === "" || data.next === "-") {
                 params.callback = jpmUnBlock;
             } else {
                 params.closeTimeout = data.messageDelay;
@@ -628,6 +628,7 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
     var ct = $(this).data("type");
     var id = $(this).data("id");
     var entity = $(this).data("entity");
+    var downloadable = $(this).data("downloadable");
     var $textAndPic = $('<div id="attachmentPopup"></div>');
     var html = "";
     if (ct.contains("image")) {
@@ -638,14 +639,22 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
         html = html + "<div class='alert alert-info' >" + messages["jpm.modal.attachment.preview"] + "</div>";
     }
     $textAndPic.append(html);
-    jpmDialogConfirm({
-        title: messages["jpm.modal.attachment.title"],
-        okBtn: messages["jpm.modal.attachment.download"],
-        message: $textAndPic.html(),
-        addClass: "modal-lg",
-        callback: function () {
-            document.location = getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=true";
-        }
-    });
+    if (downloadable === "true") {
+        jpmDialogConfirm({
+            title: messages["jpm.modal.attachment.title"],
+            okBtn: messages["jpm.modal.attachment.download"],
+            message: $textAndPic.html(),
+            addClass: "modal-lg",
+            callback: function () {
+                document.location = getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=true";
+            }
+        });
+    } else {
+        jpmDialog({
+            title: messages["jpm.modal.attachment.title"],
+            message: $textAndPic.html(),
+            addClass: "modal-lg"
+        });
+    }
 });
 $(window).on("load", initPage);

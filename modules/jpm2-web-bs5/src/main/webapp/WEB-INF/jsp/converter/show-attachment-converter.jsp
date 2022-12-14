@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:if test="${not empty param.len}">
     <%--<spring:message code="jpm.converter.showfile.bytes.text" text="File: ?" arguments="${param.len}" /> --%>
-    <span data-type="${param.contentType}" data-id="${param.noteId}" data-entity="${param.entity}" class="viewAttachmentIco fas fa-search"></span> &nbsp;
+    <span data-downloadable="${param.downloadable}" data-type="${param.contentType}" data-id="${param.noteId}" data-entity="${param.entity}" class="viewAttachmentIco fas fa-search"></span> &nbsp;
     ${param.attachmentName} (${param.len})
 </c:if>
 <c:if test="${empty param.len}">

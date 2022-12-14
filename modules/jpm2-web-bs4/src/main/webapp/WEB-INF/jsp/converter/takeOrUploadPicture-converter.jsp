@@ -32,8 +32,6 @@
             cropperAspectRatio: ${param.cropperAspectRatio},
             confirmBtnLabel: "<spring:message text="${param.confirmBtnLabel}" code="${param.confirmBtnLabel}" />",
             cancelBtnLabel: "<spring:message text="${param.cancelBtnLabel}" code="${param.cancelBtnLabel}" />",
-            width: Number.Nan,
-            height: Number.Nan,
             afterUpload: function (data) {
                 $.each(data.files, function (index, file) {
                     $("input[name='field_${field}']").val(file.name);
