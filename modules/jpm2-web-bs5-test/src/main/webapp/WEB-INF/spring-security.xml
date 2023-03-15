@@ -12,10 +12,10 @@
     <beans:bean id="userDetailsService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
     <beans:bean id="authorizationService" class="jpaoletti.jpm2.core.service.SpringAuthorizationService"/>
     
-    <beans:bean id="jpmApiEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+<!--    <beans:bean id="jpmApiEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
         <beans:property name="algorithm" value="PBEWithMD5AndTripleDES" />
         <beans:property name="password" value="xxx1232131234xxx" />
-    </beans:bean>
+    </beans:bean>-->
     
     <http auto-config='true' disable-url-rewriting="false">
         <headers disabled="true"/>

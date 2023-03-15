@@ -10,6 +10,7 @@ import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.search.Searcher;
+import jpaoletti.jpm2.core.search.SearcherHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class EnumSearcher implements Searcher {
         final List<Object> values = getValues(entity, field, parameters);
         return new DescribedCriterion(
                 MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
-                Restrictions.in(field.getProperty(), values));
+                Restrictions.in(SearcherHelper.getSearchProperty(field), values));
     }
 
     protected List<Object> getValues(Entity entity, Field field, Map<String, String[]> parameters) throws NumberFormatException {

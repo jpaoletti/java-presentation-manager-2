@@ -23,8 +23,6 @@
             <list>
                 <value>jpaoletti.jpm2.core.model.AuditRecord</value>
                 <value>jpaoletti.jpm2.core.model.UserFavorite</value>
-                <value>jpaoletti.jpm2.core.model.UserMenu</value>
-                <value>jpaoletti.jpm2.core.model.UserMenuItem</value>
                 
                 <value>jpaoletti.jpm2.core.model.reports.EntityReportUserSave</value>
 
@@ -33,8 +31,8 @@
                 <value>jpaoletti.jpm2.core.security.JpmUser</value>
                 <value>jpaoletti.jpm2.core.security.Group</value>
                 
-                <value>jpaoletti.jpm2.api.model.ApiMessage</value>
-                <value>jpaoletti.jpm2.api.model.ApiSession</value>
+<!--                <value>jpaoletti.jpm2.api.model.ApiMessage</value>-->
+                <!--<value>jpaoletti.jpm2.api.model.ApiSession</value>-->
                 
                 <value>jpaoletti.jpm2.core.test.JPMTest</value>
                 <value>jpaoletti.jpm2.core.test.JPMTestWeak</value>

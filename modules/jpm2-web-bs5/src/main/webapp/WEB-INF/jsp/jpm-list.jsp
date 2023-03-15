@@ -243,25 +243,6 @@
                         $(".selectable").prop("checked", false);
                     }
                 });
-                $(".selected-operation").on("click", function (e) {
-                    e.preventDefault();
-                    var instanceIds = $.map($('.selectable:checked'), function (n, i) {
-                        return $(n).attr("data-id");
-                    }).join(',');
-                    if (instanceIds !== "") {
-                        var btn = $(this);
-                        var confirm = btn.hasClass("confirm-true");
-                        var link = $(this).attr("href").replace("@@", instanceIds);
-                        if (confirm) {
-                            //We simulate a link
-                            var a = $("<a href='" + link + "' class='hide confirm-true' />");
-                            $("body").append(a);
-                            a.trigger("click");
-                        } else {
-                            document.location = link;
-                        }
-                    }
-                });
                 $("#help-btn").popover({
                     title: "<spring:message code='jpm.list.shortcut.help.title' text='Help' />",
                     content: "<spring:message code='jpm.list.shortcut.help.content' text='<ul><li>Press \'f\' to search</li><li>Press \'s\' to sort</li><li>Press \'h\' for help</li></ul>' />"

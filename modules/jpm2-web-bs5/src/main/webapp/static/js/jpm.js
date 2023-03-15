@@ -1,3 +1,11 @@
+function postToIframe(url, data, target) {
+    $('body').append('<form action="' + url + '" method="post" target="' + target + '" id="postToIframe"></form>');
+    $.each(data, function (n, v) {
+        $('#postToIframe').append('<input type="hidden" name="' + n + '" value="' + v + '" />');
+    });
+    $('#postToIframe').submit().remove();
+}
+
 function appendScript(filepath) {
     if ($('script[src="' + filepath + '"]').length > 0)
         return;
@@ -349,6 +357,25 @@ var initPage = function () {
             }
         });
 
+        $(".selected-operation").on("click", function (e) {
+            e.preventDefault();
+            var instanceIds = $.map($('.selectable:checked'), function (n, i) {
+                return $(n).attr("data-id");
+            }).join(',');
+            if (instanceIds !== "") {
+                var btn = $(this);
+                var confirm = btn.hasClass("confirm-true");
+                var link = $(this).attr("href").replace("@@", instanceIds);
+                if (confirm) {
+                    //We simulate a link
+                    var a = $("<a href='" + link + "' class='hide confirm-true' />");
+                    $("body").append(a);
+                    a.trigger("click");
+                } else {
+                    document.location = link;
+                }
+            }
+        });
 
         if ($.fn.select2) {
             $("<script type=text/javascript' src='" + getContextPath() + "static/js/locale/select2/" + localeLanguage + ".js'></script>").appendTo("head");
@@ -602,17 +629,28 @@ function asynchronicOperationProgress(id) {
                     $(id + "_status").text((Math.round(r.percent * 100) / 100) + "% (" + r.status + ")");
                 });
                 stompClient.subscribe('/asynchronicOperationExecutor/done/' + id, function (s) {
-                    var status = JSON.parse(s.body).status;
-                    if (status !== '') {
-                        jpmDialogConfirm({
-                            message: status,
+                    var res = JSON.parse(s.body);
+                    if (res.error !== null && res.error !== '') {
+                        jpmDialog({
+                            message: res.error,
+                            titleBackground: "bg-danger",
                             callback: function () {
-                                document.location.reload();
+                                window.history.back();
                             }
                         });
-                        setTimeout(function () {
-                            document.location.reload();
-                        }, 2000);
+                    } else {
+                        var status = res.status;
+                        if (status !== '') {
+                            jpmDialogConfirm({
+                                message: status,
+                                callback: function () {
+                                    document.location.reload();
+                                }
+                            });
+                            setTimeout(function () {
+                                document.location.reload();
+                            }, 2000);
+                        }
                     }
                     $("#asynchronicProgress").hide();
                     $(".asynchronic").removeClass('disabled');

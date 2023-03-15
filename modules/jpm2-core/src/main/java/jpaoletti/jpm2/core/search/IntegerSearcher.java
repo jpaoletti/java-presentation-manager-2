@@ -65,7 +65,7 @@ public class IntegerSearcher implements Searcher {
     }
 
     protected String getProperty(Field field) {
-        return field.getProperty();
+        return SearcherHelper.getSearchProperty(field);
     }
 
     protected Object getValue(Map<String, String[]> parameters) throws NumberFormatException {

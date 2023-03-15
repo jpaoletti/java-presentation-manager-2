@@ -24,7 +24,7 @@ public class BoolSearcher implements Searcher {
         final boolean value = parameters.get("value") != null && !"false".equals(parameters.get("value")[0]);
         return SearcherHelper.addAliases(new DescribedCriterion(
                 value ? MessageFactory.info("jpm.searcher.boolSearcher.eq.true") : MessageFactory.info("jpm.searcher.boolSearcher.eq.false"),
-                Restrictions.eq(field.getProperty(), value)), field);
+                Restrictions.eq(SearcherHelper.getSearchProperty(field), value)), field);
     }
 
     public String getLabel() {

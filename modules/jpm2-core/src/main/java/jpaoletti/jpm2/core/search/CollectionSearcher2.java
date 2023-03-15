@@ -41,7 +41,7 @@ public class CollectionSearcher2 implements Searcher {
 
         final DescribedCriterion describedCriterion = new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)), and);
         SearcherHelper.addAliases(describedCriterion, field);
-        describedCriterion.addAlias(field.getProperty(), fieldAlias);
+        describedCriterion.addAlias(SearcherHelper.getSearchProperty(field), fieldAlias);
         return describedCriterion;
     }
 

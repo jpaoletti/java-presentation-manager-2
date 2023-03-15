@@ -41,7 +41,7 @@ public class CollectionSearcher extends StringSearcher {
             default:
                 describedCriterion = new DescribedCriterion(info, Restrictions.eq(property, value));
         }
-        describedCriterion.addAlias(field.getProperty(), aliasName);
+        describedCriterion.addAlias(SearcherHelper.getSearchProperty(field), aliasName);
         return SearcherHelper.addAliases(describedCriterion, field);
     }
 

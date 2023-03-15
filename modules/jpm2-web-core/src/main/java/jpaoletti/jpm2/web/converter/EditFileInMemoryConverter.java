@@ -60,6 +60,11 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
                     throw new ConverterException("jpm.error.uploading.file");
                 }
             }
+        } catch (ConverterException e) {
+            throw e;
+        } catch (Exception e) {
+            JPMUtils.getLogger().error(e);
+            throw new ConverterException("jpm.error.uploading.file");
         } finally {
             session.removeAttribute(newValue.toString());
         }

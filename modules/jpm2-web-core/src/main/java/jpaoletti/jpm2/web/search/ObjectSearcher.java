@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.search.Searcher;
+import jpaoletti.jpm2.core.search.SearcherHelper;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,7 +47,7 @@ public class ObjectSearcher implements Searcher {
         for (String value : values) {
             result.add(getEntity().getDao().get(value));
         }
-        return new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(result)), Restrictions.in(field.getProperty(), result));
+        return new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(result)), Restrictions.in(SearcherHelper.getSearchProperty(field), result));
     }
 
     public Entity getEntity() {

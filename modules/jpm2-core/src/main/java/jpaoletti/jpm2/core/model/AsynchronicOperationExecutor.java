@@ -43,6 +43,7 @@ public class AsynchronicOperationExecutor extends Observable implements Runnable
             progress.addObserver(this);
             getExecutor().execute(ctx, instances, parameters, progress);
         } catch (Exception e) {
+            progress.setError(e.getMessage());
             JPMUtils.getLogger().error("AsynchronicOperationExecutor error", e);
         } finally {
             setChanged();

@@ -38,32 +38,32 @@ public class DateSearcher implements Searcher {
                 case "ne":
                     describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "!=", sdf.format(value)),
-                            Restrictions.ne(field.getProperty(), value));
+                            Restrictions.ne(SearcherHelper.getSearchProperty(field), value));
                     break;
                 case ">":
                     describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, ">", sdf.format(value)),
-                            Restrictions.gt(field.getProperty(), value));
+                            Restrictions.gt(SearcherHelper.getSearchProperty(field), value));
                     break;
                 case ">=":
                     describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, ">=", sdf.format(value)),
-                            Restrictions.ge(field.getProperty(), value));
+                            Restrictions.ge(SearcherHelper.getSearchProperty(field), value));
                     break;
                 case "<":
                     describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "<", sdf.format(value)),
-                            Restrictions.lt(field.getProperty(), value));
+                            Restrictions.lt(SearcherHelper.getSearchProperty(field), value));
                     break;
                 case "<=":
                     describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "<=", sdf.format(value)),
-                            Restrictions.le(field.getProperty(), value));
+                            Restrictions.le(SearcherHelper.getSearchProperty(field), value));
                     break;
                 default:
                     describedCriterion = new DescribedCriterion(
                             MessageFactory.info(DESCRIPTION_KEY, "=", sdf.format(value)),
-                            Restrictions.eq(field.getProperty(), value));
+                            Restrictions.eq(SearcherHelper.getSearchProperty(field), value));
                     break;
             }
             return SearcherHelper.addAliases(describedCriterion, field);

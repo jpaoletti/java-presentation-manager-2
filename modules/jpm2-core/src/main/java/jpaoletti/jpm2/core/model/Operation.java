@@ -37,6 +37,7 @@ public class Operation extends PMCoreObject {
     private String url;
     //Indicates if the operation title is shown
     private boolean showTitle;
+    private boolean showAlways = false; //shows a disabled button instead of not showing it when condition is false
     //Indicate if a confirmation is needed before proceed.
     private boolean confirm;
     private OperationContext context;
@@ -120,7 +121,7 @@ public class Operation extends PMCoreObject {
      */
     public boolean isDisplayed(String other) {
         return ((getDisplay() == null || getDisplay().contains("all") || getDisplay().contains(other)))
-            && (!getDisplay().contains("!" + other)); //new, this is for ignoring operations, like "all !add" means 'all' but not 'add'
+                && (!getDisplay().contains("!" + other)); //new, this is for ignoring operations, like "all !add" means 'all' but not 'add'
     }
 
     /**
@@ -428,5 +429,13 @@ public class Operation extends PMCoreObject {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public boolean isShowAlways() {
+        return showAlways;
+    }
+
+    public void setShowAlways(boolean showAlways) {
+        this.showAlways = showAlways;
     }
 }

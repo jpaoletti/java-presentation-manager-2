@@ -27,19 +27,19 @@ public class StringSearcher implements Searcher {
         DescribedCriterion describedCriterion;
         switch (operator) {
             case "li":
-                describedCriterion = new DescribedCriterion(info, Restrictions.ilike(field.getProperty(), value, MatchMode.ANYWHERE));
+                describedCriterion = new DescribedCriterion(info, Restrictions.ilike(SearcherHelper.getSearchProperty(field), value, MatchMode.ANYWHERE));
                 break;
             case "nli":
-                describedCriterion = new DescribedCriterion(info, Restrictions.not(Restrictions.ilike(field.getProperty(), value, MatchMode.ANYWHERE)));
+                describedCriterion = new DescribedCriterion(info, Restrictions.not(Restrictions.ilike(SearcherHelper.getSearchProperty(field), value, MatchMode.ANYWHERE)));
                 break;
             case "ne":
-                describedCriterion = new DescribedCriterion(info, Restrictions.ne(field.getProperty(), value));
+                describedCriterion = new DescribedCriterion(info, Restrictions.ne(SearcherHelper.getSearchProperty(field), value));
                 break;
             case "null":
-                describedCriterion = new DescribedCriterion(info, Restrictions.isNull(field.getProperty()));
+                describedCriterion = new DescribedCriterion(info, Restrictions.isNull(SearcherHelper.getSearchProperty(field)));
                 break;
             default:
-                describedCriterion = new DescribedCriterion(info, Restrictions.eq(field.getProperty(), value));
+                describedCriterion = new DescribedCriterion(info, Restrictions.eq(SearcherHelper.getSearchProperty(field), value));
         }
         return SearcherHelper.addAliases(describedCriterion, field);
     }

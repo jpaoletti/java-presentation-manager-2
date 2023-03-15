@@ -69,4 +69,13 @@ public class Progress extends Observable implements Progresable {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
 }
