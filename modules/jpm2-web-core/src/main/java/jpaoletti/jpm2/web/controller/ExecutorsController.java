@@ -238,6 +238,12 @@ public class ExecutorsController extends BaseController implements Observer {
             final IdentifiedObject iobject = new IdentifiedObject(StringUtils.join(instanceIds, ","), e.getValidatedObject());
             getContext().setEntityInstance(new EntityInstance(iobject, getContext()));
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
+        } catch (JPMAskConfirmationException e) {
+            if (e.getMsg() != null) {
+                return new JPMPostResponse(false, null).askConfirmation(e.getMsg());
+            } else {
+                return new JPMPostResponse(false, null).askConfirmation(MessageFactory.error(e.getMessage()));
+            }
         } catch (PMException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
@@ -276,16 +282,20 @@ public class ExecutorsController extends BaseController implements Observer {
                 final AsynchronicOperationExecutor t = (AsynchronicOperationExecutor) o;
                 if (t.getId().contains(",")) {
                     for (String id : t.getId().split(",")) {
-                        template.convertAndSend(
-                                "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + id,
-                                getJpm().getAsynchronicOperationExecutor(id).getProgress()
-                        );
+                        final AsynchronicOperationExecutor asynchronicOperationExecutor = getJpm().getAsynchronicOperationExecutor(id);
+                        if (asynchronicOperationExecutor != null) {
+                            template.convertAndSend("/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + id,
+                                    asynchronicOperationExecutor.getProgress()
+                            );
+                        }
                     }
                 } else {
-                    template.convertAndSend(
-                            "/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + t.getId(),
-                            getJpm().getAsynchronicOperationExecutor(t.getId()).getProgress()
-                    );
+                    final AsynchronicOperationExecutor asynchronicOperationExecutor = getJpm().getAsynchronicOperationExecutor(t.getId());
+                    if (asynchronicOperationExecutor != null) {
+                        template.convertAndSend("/asynchronicOperationExecutor/" + (ended ? "done" : "progress") + "/" + t.getId(),
+                                asynchronicOperationExecutor.getProgress()
+                        );
+                    }
                 }
             }
         } catch (Exception e) {

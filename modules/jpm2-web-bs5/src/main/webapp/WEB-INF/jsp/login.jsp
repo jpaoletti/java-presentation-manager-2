@@ -44,6 +44,7 @@
                                     <label>
                                         <input type='checkbox' name='remember-me' /> <spring:message code="jpm.login.rememberme" text="Remember Me" />
                                     </label>
+                                    <small>v${jpm.appversion}</small>
                                 </div>
                                 <c:if test="${not empty error}">
                                     <div class="alert alert-danger pagination-centered">${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</div>

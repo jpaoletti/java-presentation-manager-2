@@ -8,7 +8,6 @@ import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -23,8 +22,7 @@ public class WebEditDate extends WebToString {
         final Date date = (Date) getValue(object, field);
         String value = field.getDefaultValue();
         if (date != null) {
-            final DateTime dt = new DateTime(date);
-            value = dt.toString(RFC3339);
+            value = new SimpleDateFormat(RFC3339).format(date);
         }
         return "<input class='form-control' name='field_" + field.getId() + "' type='date' value='" + value + "'>";
     }

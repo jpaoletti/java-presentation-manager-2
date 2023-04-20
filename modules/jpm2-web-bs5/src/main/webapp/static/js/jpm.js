@@ -500,7 +500,7 @@ var processFormResponse = function (data) {
                 message: $message
             };
             if (!data.next || data.next === "" || data.next === "-") {
-                params.callback = jpmUnBlock;
+                jpmUnBlock();
             } else {
                 params.closeTimeout = data.messageDelay;
                 params.callback = function () {

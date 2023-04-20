@@ -5,7 +5,7 @@ import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
-import org.joda.time.DateTime;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
  *
@@ -19,8 +19,7 @@ public class PlainShowDateTime extends WebToString {
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Date value = (Date) object;
         if (value != null) {
-            final DateTime dt = new DateTime(value);
-            return process(dt.toString(getFormat()));
+            return process(DateFormatUtils.format(value, format));
         } else {
             return "-";
         }
