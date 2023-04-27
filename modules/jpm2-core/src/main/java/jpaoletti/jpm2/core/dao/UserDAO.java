@@ -6,7 +6,7 @@ import jpaoletti.jpm2.core.security.JpmUser;
  *
  * @author jpaoletti
  */
-public class UserDAO extends GenericDAO<JpmUser, String> {
+public class UserDAO extends HibernateCriteriaDAO<JpmUser, String> {
 
     @Override
     public String getId(Object object) {

@@ -8,7 +8,7 @@ import jpaoletti.jpm2.util.JPMUtils;
  *
  * @author jpaoletti
  */
-public class DefaultDAO extends GenericDAO<Object, Long> {
+public class DefaultDAO extends HibernateCriteriaDAO<Object, Long> {
 
     private String className;
 

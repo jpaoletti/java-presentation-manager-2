@@ -1,6 +1,5 @@
 package jpaoletti.jpm2.util;
 
-import com.sun.crypto.provider.SunJCE;
 import java.net.URLDecoder;
 
 import javax.crypto.Cipher;
@@ -32,7 +31,7 @@ public class StringEncrypter {
     /**
      * The simplest constructor which will use a default password and salt to
      * encode the string.
-     * 
+     *
      * @throws SecurityException
      */
     public StringEncrypter() throws SecurityException {
@@ -42,7 +41,7 @@ public class StringEncrypter {
     /**
      * Dynamic constructor to give own key and salt to it which going to be used
      * to encrypt and then decrypt the given string.
-     * 
+     *
      * @param encryptionPassword
      * @param salt
      */
@@ -51,9 +50,9 @@ public class StringEncrypter {
     }
 
     /**
-     * Dynamic constructor to give own key and use default salt to it which 
+     * Dynamic constructor to give own key and use default salt to it which
      * going to be used to encrypt and then decrypt the given string.
-     * 
+     *
      * @param encryptionPassword
      */
     public StringEncrypter(String encryptionPassword) {
@@ -75,16 +74,14 @@ public class StringEncrypter {
     }
 
     /**
-     * 
+     *
      * method to decrypt a string.
-     * 
-     * @param str
-     *            Description of the Parameter
-     * 
+     *
+     * @param str Description of the Parameter
+     *
      * @return String the encrypted string.
-     * 
-     * @exception SecurityException
-     *                Description of the Exception
+     *
+     * @exception SecurityException Description of the Exception
      */
     public synchronized String encrypt(String str) throws SecurityException {
         try {
@@ -97,15 +94,14 @@ public class StringEncrypter {
     }
 
     /**
-     * 
+     *
      * Method to encrypting a string.
-     * 
+     *
      * @param str String to encript
-     * 
+     *
      * @return String the encrypted string.
-     * 
-     * @exception SecurityException
-     *                Description of the Exception
+     *
+     * @exception SecurityException Description of the Exception
      */
     public synchronized String decrypt(String str) throws SecurityException {
         try {
@@ -118,7 +114,7 @@ public class StringEncrypter {
     }
 
     private void setupEncryptor(String defaultEncryptionPassword, byte[] salt) {
-        java.security.Security.addProvider(new SunJCE());
+        java.security.Security.addProvider(java.security.Security.getProvider("SunJCE"));
         char[] pass = defaultEncryptionPassword.toCharArray();
         int iterations = 3;
         init(pass, salt, iterations);

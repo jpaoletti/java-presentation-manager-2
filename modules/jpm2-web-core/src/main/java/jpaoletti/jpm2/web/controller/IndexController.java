@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
-import jpaoletti.jpm2.core.dao.GenericDAO;
+import jpaoletti.jpm2.core.dao.HibernateCriteriaDAO;
 import jpaoletti.jpm2.core.model.WithAttachment;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.criterion.Restrictions;
@@ -40,16 +40,16 @@ public class IndexController extends BaseController {
     public ModelAndView security() {
         final ModelAndView res = new ModelAndView("security");
         if (getCtx().containsBean("jpm-dao-auth")) {
-            final GenericDAO dao = (GenericDAO) getCtx().getBean("jpm-dao-auth");
+            final HibernateCriteriaDAO dao = (HibernateCriteriaDAO) getCtx().getBean("jpm-dao-auth");
             res.addObject("authorities", dao.list(new DAOListConfiguration()));
         }
         if (getCtx().containsBean("jpm-dao-user")) {
-            final GenericDAO dao = (GenericDAO) getCtx().getBean("jpm-dao-user");
+            final HibernateCriteriaDAO dao = (HibernateCriteriaDAO) getCtx().getBean("jpm-dao-user");
             res.addObject("enabledUsersCount", dao.count(new DAOListConfiguration(Restrictions.eq("enabled", true))));
             res.addObject("disabledUsersCount", dao.count(new DAOListConfiguration(Restrictions.eq("enabled", false))));
         }
         if (getCtx().containsBean("jpm-dao-group")) {
-            final GenericDAO dao = (GenericDAO) getCtx().getBean("jpm-dao-group");
+            final HibernateCriteriaDAO dao = (HibernateCriteriaDAO) getCtx().getBean("jpm-dao-group");
             res.addObject("groupCount", dao.count(new DAOListConfiguration()));
         }
         setCurrentHome("security");

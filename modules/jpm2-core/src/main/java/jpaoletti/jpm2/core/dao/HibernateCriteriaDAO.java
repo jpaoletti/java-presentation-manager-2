@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @param <T>
  * @param <ID>
  */
-public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, ID> {
+public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     @Autowired
     @Qualifier("sessionFactory")
@@ -37,8 +37,8 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     protected Class<ID> idClass;
     private IdTransformer<ID> transformer;
 
-    public GenericDAO() {
-        Class<?>[] typeArguments = TypeResolver.resolveRawArguments(GenericDAO.class, getClass());
+    public HibernateCriteriaDAO() {
+        Class<?>[] typeArguments = TypeResolver.resolveRawArguments(HibernateCriteriaDAO.class, getClass());
         this.persistentClass = (Class<T>) typeArguments[0];
         this.idClass = (Class<ID>) typeArguments[1];
     }
@@ -61,7 +61,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     }
 
     @Override
-    public T find(DAOListConfiguration configuration) {
+    public T find(IDAOListConfiguration configuration) {
         Integer max = configuration.getMax();
         configuration.setMax(1);
         final List<T> list = list(configuration);
@@ -95,7 +95,7 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     }
 
     @Override
-    public Long count(DAOListConfiguration configuration) {
+    public Long count(IDAOListConfiguration configuration) {
         final Criteria c = getBaseCriteria(configuration);
         c.setFirstResult(0);
         c.setProjection(Projections.rowCount());
@@ -103,7 +103,8 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
     }
 
     @Override
-    public List<T> list(DAOListConfiguration configuration) {
+    public List<T> list(IDAOListConfiguration configuration) {
+        final DAOListConfiguration cfg = (DAOListConfiguration) configuration;
         final Criteria c = getBaseCriteria(configuration);
         if (configuration != null) {
             if (configuration.getMax() != null) {
@@ -112,12 +113,12 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
             if (configuration.getFrom() != null) {
                 c.setFirstResult(configuration.getFrom());
             }
-            if (!configuration.getOrders().isEmpty()) {
-                for (Order order : configuration.getOrders()) {
+            if (!cfg.getOrders().isEmpty()) {
+                for (Order order : cfg.getOrders()) {
                     c.addOrder(order);
                 }
             }
-            if (!configuration.getProperties().isEmpty()) {
+            if (!cfg.getProperties().isEmpty()) {
                 final ProjectionList projectionList = Projections.projectionList();
                 for (Map.Entry<String, String> entry : configuration.getProperties().entrySet()) {
                     projectionList.add(Projections.property(entry.getKey()), entry.getValue());
@@ -128,7 +129,8 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
         return c.list();
     }
 
-    public Criteria getBaseCriteria(DAOListConfiguration configuration) {
+    public Criteria getBaseCriteria(IDAOListConfiguration configuration) {
+        final DAOListConfiguration cfg = (DAOListConfiguration) configuration;
         Criteria c = getSession().createCriteria(getPersistentClass());
         c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
         if (configuration != null) {
@@ -138,14 +140,14 @@ public abstract class GenericDAO<T, ID extends Serializable> implements DAO<T, I
             if (configuration.getFrom() != null) {
                 c.setFirstResult(configuration.getFrom());
             }
-            for (DAOListConfiguration.DAOListConfigurationAlias alias : configuration.getAliases()) {
+            for (DAOListConfiguration.DAOListConfigurationAlias alias : cfg.getAliases()) {
                 if (alias.getJoinType() != null) {
                     c = c.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
                 } else {
                     c = c.createAlias(alias.getProperty(), alias.getAlias());
                 }
             }
-            for (Criterion criterion : configuration.getRestrictions()) {
+            for (Criterion criterion : cfg.getRestrictions()) {
                 if (criterion != null) {
                     c.add(criterion);
                 }

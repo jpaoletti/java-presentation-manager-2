@@ -8,7 +8,7 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.EntityReportUserSaveDAO;
-import jpaoletti.jpm2.core.dao.GenericDAO;
+import jpaoletti.jpm2.core.dao.HibernateCriteriaDAO;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.reports.EntityReport;
@@ -88,7 +88,7 @@ public class ReportService extends JPMServiceBase {
             cfg.getAliases().addAll(searchCriteria.getAliases());
         }
         //Not very happy with this. Needs generalization.
-        final Criteria c = ((GenericDAO) report.getEntity().getDao()).getBaseCriteria(cfg);
+        final Criteria c = ((HibernateCriteriaDAO) report.getEntity().getDao()).getBaseCriteria(cfg);
 
         //Only show descriptive fields
         final List<String> visibleFields = new ArrayList<>();
@@ -289,7 +289,7 @@ public class ReportService extends JPMServiceBase {
             cfg.getAliases().addAll(searchCriteria.getAliases());
         }
         //Not very happy with this. Needs generalization.
-        final Criteria c = ((GenericDAO) report.getEntity().getDao()).getBaseCriteria(cfg);
+        final Criteria c = ((HibernateCriteriaDAO) report.getEntity().getDao()).getBaseCriteria(cfg);
 
         //Only show descriptive fields
         final ProjectionList pl = Projections.projectionList();

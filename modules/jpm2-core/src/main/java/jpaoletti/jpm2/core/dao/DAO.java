@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface DAO<T, ID extends Serializable> {
 
-    public Long count(DAOListConfiguration configuration);
+    public Long count(IDAOListConfiguration configuration);
 
     public void delete(Object object);
 
@@ -23,11 +23,11 @@ public interface DAO<T, ID extends Serializable> {
      * @param configuration search configuration
      * @return the first item matching the configuration
      */
-    public T find(DAOListConfiguration configuration);
+    public T find(IDAOListConfiguration configuration);
 
     public ID getId(Object object);
 
-    public List<T> list(DAOListConfiguration configuration);
+    public List<T> list(IDAOListConfiguration configuration);
 
     public void save(Object object);
 

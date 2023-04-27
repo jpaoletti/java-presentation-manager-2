@@ -1,21 +1,27 @@
 package jpaoletti.jpm2.core.dao;
 
+import java.util.Map;
+
 /**
  *
  * @author jpaoletti
  */
 public interface IDAOListConfiguration {
 
-    Integer getFrom();
+    public Integer getFrom();
 
-    Integer getMax();
+    public Integer getMax();
 
-    void setFrom(Integer from);
+    public void setFrom(Integer from);
 
-    void setMax(Integer max);
+    public void setMax(Integer max);
 
-    DAOListConfiguration withFrom(Integer from);
+    public IDAOListConfiguration withFrom(Integer from);
 
-    DAOListConfiguration withMax(Integer max);
+    public IDAOListConfiguration withMax(Integer max);
+
+    public Map<String, String> getProperties();
+
+    public boolean containsAlias(String alias);
 
 }

@@ -137,6 +137,7 @@ public class DAOListConfiguration implements IDAOListConfiguration {
         return this;
     }
 
+    @Override
     public boolean containsAlias(String alias) {
         for (DAOListConfigurationAlias a : getAliases()) {
             if (a.getAlias().equals(alias)) {
@@ -171,6 +172,7 @@ public class DAOListConfiguration implements IDAOListConfiguration {
         return c;
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return properties;
     }

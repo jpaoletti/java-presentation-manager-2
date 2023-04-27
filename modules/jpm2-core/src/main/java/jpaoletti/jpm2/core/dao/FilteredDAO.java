@@ -18,12 +18,12 @@ public abstract class FilteredDAO extends DefaultDAO {
     }
 
     @Override
-    public Criteria getBaseCriteria(DAOListConfiguration configuration) {
+    public Criteria getBaseCriteria(IDAOListConfiguration configuration) {
         final Criteria c = super.getBaseCriteria(configuration);
         addRestrictions(c, configuration);
         return c;
     }
 
-    public abstract void addRestrictions(Criteria c, DAOListConfiguration configuration);
+    public abstract void addRestrictions(Criteria c, IDAOListConfiguration configuration);
 
 }

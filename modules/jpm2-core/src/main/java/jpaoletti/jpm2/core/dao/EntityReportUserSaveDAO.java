@@ -6,7 +6,7 @@ import jpaoletti.jpm2.core.model.reports.EntityReportUserSave;
  *
  * @author jpaoletti
  */
-public class EntityReportUserSaveDAO extends GenericDAO<EntityReportUserSave, String> {
+public class EntityReportUserSaveDAO extends HibernateCriteriaDAO<EntityReportUserSave, String> {
 
     @Override
     public String getId(Object object) {

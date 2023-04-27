@@ -6,7 +6,7 @@ import jpaoletti.jpm2.core.model.UserFavorite;
  *
  * @author jpaoletti
  */
-public class FavoriteDAO extends GenericDAO<UserFavorite, String> {
+public class FavoriteDAO extends HibernateCriteriaDAO<UserFavorite, String> {
 
     @Override
     public String getId(Object object) {

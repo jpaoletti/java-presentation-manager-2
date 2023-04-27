@@ -6,7 +6,7 @@ import jpaoletti.jpm2.core.security.Group;
  *
  * @author jpaoletti
  */
-public class GroupDAO extends GenericDAO<Group, Long> {
+public class GroupDAO extends HibernateCriteriaDAO<Group, Long> {
 
     @Override
     public Long getId(Object object) {
