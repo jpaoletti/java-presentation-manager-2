@@ -230,7 +230,11 @@ public class ExecutorsController extends BaseController implements Observer {
             } else {
                 buildRedirect = execute;
             }
-            return new JPMPostResponse(true, buildRedirect, MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+            if (buildRedirect != null && buildRedirect.startsWith("message:")) {
+                return new JPMPostResponse(true, null, MessageFactory.success(buildRedirect.replaceFirst("message:", "")));
+            } else {
+                return new JPMPostResponse(true, buildRedirect, MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+            }
         } catch (ValidationException e) {
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
