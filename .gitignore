@@ -3,3 +3,4 @@ target/
 /modules/jpm2-web/src/main/webapp/META-INF/context.xml
 /modules/jpm2-core/src/main/resources/rebel.xml
 node_modules
+/modules/jpm2-rest
