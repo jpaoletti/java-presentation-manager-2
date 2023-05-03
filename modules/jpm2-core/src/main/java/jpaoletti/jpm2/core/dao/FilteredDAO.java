@@ -12,9 +12,13 @@ public abstract class FilteredDAO extends DefaultDAO {
 
     @Override
     public Object get(String id) {
-        Criteria c = getSession().createCriteria(getPersistentClass()).add(Restrictions.eq("id", Long.parseLong(id)));
-        addRestrictions(c, null);
-        return c.uniqueResult();
+        try {
+            Criteria c = getSession().createCriteria(getPersistentClass()).add(Restrictions.eq("id", Long.parseLong(id)));
+            addRestrictions(c, null);
+            return c.uniqueResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

@@ -170,12 +170,6 @@
             <version>3.1.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
-            <type>jar</type>
-        </dependency>
     </dependencies>
     <build>
         <finalName>jpm2-web-core</finalName>

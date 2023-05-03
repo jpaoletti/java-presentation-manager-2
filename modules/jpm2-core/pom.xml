@@ -203,12 +203,6 @@
             <version>1.4.0</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
-            <type>jar</type>
-        </dependency>
     </dependencies>
     <build>
         <finalName>jpm2-core</finalName>
