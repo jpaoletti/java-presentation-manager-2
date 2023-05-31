@@ -10,6 +10,7 @@ import jpaoletti.jpm2.core.model.FieldValidator;
  */
 public class StringMin implements FieldValidator {
 
+    private boolean optional = true;
     private Integer min = 0;
     private String message = "jpm.validator.too.short";
 
@@ -19,6 +20,9 @@ public class StringMin implements FieldValidator {
         if (value == null || value.length() >= getMin()) {
             return null;
         } else {
+            if (value.trim().equalsIgnoreCase("") && optional) {
+                return null;
+            }
             return MessageFactory.error(getMessage(), String.valueOf(value.length()), String.valueOf(getMin()));
         }
     }
@@ -37,5 +41,13 @@ public class StringMin implements FieldValidator {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
     }
 }
