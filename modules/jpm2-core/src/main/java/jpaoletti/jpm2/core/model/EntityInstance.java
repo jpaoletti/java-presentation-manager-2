@@ -97,7 +97,7 @@ public class EntityInstance {
                 if (converter != null) {
                     try {
                         values.put(field.getId(), converter.visualize(
-                            contextualEntity, field, object, id));
+                                contextualEntity, field, object, id));
                         fields.add(field);
                     } catch (IgnoreConvertionException ex) {
                     }
@@ -123,6 +123,13 @@ public class EntityInstance {
 
     public Map<String, Object> getValues() {
         return values;
+    }
+
+    public Object getObject() {
+        if (iobject == null) {
+            return null;
+        }
+        return iobject.getObject();
     }
 
     public IdentifiedObject getIobject() {

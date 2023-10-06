@@ -24,6 +24,7 @@
         <property name="display" value="all !add" />
         <property name="executor" ref="operationExecutorSimple" />
         <property name="icon" value="fas fa-search" />
+        <property name="color" value="btn-info" />
     </bean>
     <bean id="compact-show-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="show" />

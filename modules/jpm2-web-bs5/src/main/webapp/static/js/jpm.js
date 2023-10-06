@@ -81,9 +81,10 @@ function initConfirm() {
             jpmDialogConfirm({
                 callback: function () {
                     jpmBlock();
-                    setTimeout(function () {
-                        document.location = $href;
-                    }, 300);
+                    var form = $('<form method="POST" action="' + $href + '" id="tmpjpmForm"></form>');
+                    buildAjaxJpmFormObject(form, function (data) {
+                        processFormResponse(data);
+                    }).submit();
                     return true;
                 }
             });
@@ -402,14 +403,21 @@ var initPage = function () {
             if (instanceIds !== "") {
                 var btn = $(this);
                 var confirm = btn.hasClass("confirm-true");
-                var link = $(this).attr("href").replace("@@", instanceIds);
+                var $href = $(this).attr("href").replace("@@", instanceIds);
                 if (confirm) {
-                    //We simulate a link
-                    var a = $("<a href='" + link + "' class='hide confirm-true' />");
-                    $("body").append(a);
-                    a.trigger("click");
+                    jpmDialogConfirm({
+                        callback: function () {
+                            jpmBlock();
+                            var form = $('<form method="POST" action="' + $href + '" id="tmpjpmForm"></form>');
+                            buildAjaxJpmFormObject(form, function (data) {
+                                processFormResponse(data);
+                            }).submit();
+                            return true;
+                        }
+                    });
                 } else {
-                    document.location = link;
+                    jpmBlock();
+                    document.location=$href;
                 }
             }
         });
@@ -596,7 +604,11 @@ function buildAjaxJpmForm(formId, callback, beforeSubmit, beforeSerialize) {
     if (!formId) {
         formId = "jpmForm";
     }
-    return $('#' + formId).ajaxForm({
+    return buildAjaxJpmFormObject($('#' + formId), callback, beforeSubmit, beforeSerialize);
+}
+
+function buildAjaxJpmFormObject(form, callback, beforeSubmit, beforeSerialize) {
+    return form.ajaxForm({
         dataType: 'json',
         beforeSerialize: function ($form, options) {
             if (beforeSerialize) {
@@ -714,7 +726,7 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
         html = html + "<div class='alert alert-info' >" + messages["jpm.modal.attachment.preview"] + "</div>";
     }
     $textAndPic.append(html);
-    if (downloadable === "true") {
+    if (downloadable) {
         jpmDialogConfirm({
             title: messages["jpm.modal.attachment.title"],
             okBtn: messages["jpm.modal.attachment.download"],

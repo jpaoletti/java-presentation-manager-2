@@ -235,7 +235,7 @@ public class ListController extends BaseController {
         mav.addObject("compactOperations", operation.isCompact());
         return mav;
     }
-    
+
     @PostMapping(value = "/jpm/{entity}/saveCurrentSearch")//WORK IN PROGESS
     public String saveCurrentSearch(@RequestParam String field, @RequestParam String name) throws PMException {
         final UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -385,7 +385,7 @@ public class ListController extends BaseController {
         final ContextualEntity cowner = getJpm().getContextualEntity(owner);
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), cowner, ownerId);
         response.setContentType("application/vnd.ms-excel");
-        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getTitle() + ".xls");
+        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getPluralTitle() + ".xls");
         response.getOutputStream().write(xlsTobytes(wb));
     }
 
@@ -394,7 +394,7 @@ public class ListController extends BaseController {
         final Entity entity = getContext().getEntity();
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), null, null);
         response.setContentType("application/vnd.ms-excel");
-        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getTitle() + ".xls");
+        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getPluralTitle() + ".xls");
         response.getOutputStream().write(xlsTobytes(wb));
     }
 

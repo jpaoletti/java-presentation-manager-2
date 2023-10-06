@@ -59,7 +59,9 @@ public class ExceptionController {
     public ModelAndView handleTypeMismatchException(Exception ex, HttpServletRequest req, HttpServletResponse resp) {
         final ModelAndView mav = new ModelAndView("exception");
         mav.addObject("message", MessageFactory.error("unexpected.exception", ex.getMessage()));
-        JPMUtils.getLogger().fatal("Unexpected Exception", ex);
+        if (ex.getMessage() == null || !ex.getMessage().contains("Broken pipe")) {
+            JPMUtils.getLogger().fatal("Unexpected Exception", ex);
+        }
         return mav;
     }
 
