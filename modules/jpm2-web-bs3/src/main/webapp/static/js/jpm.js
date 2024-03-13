@@ -440,7 +440,7 @@ var processFormResponse = function (data) {
             var controlGroup = $("#control-group-" + fieldId);
             controlGroup.addClass("has-error");
             $.each(msgs, function (i, item) {
-                controlGroup.find(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
+                controlGroup.find("[name='field_" + fieldId + "']").parents(".converted-field-container").append('<p class="help-block jpm-validator-text">' + item.text + '</p>');
             });
         });
         jpmUnBlock();

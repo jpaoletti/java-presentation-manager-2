@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    
+    <!--
+    http://static.springsource.org/spring/docs/2.5.6/reference/extensible-xml.html
+    -->
+    <bean id="jpm-dao-test" class="jpaoletti.jpm2.core.test.JPMTestDAOImpl" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
+    <bean id="jpm-dao-weaktest" class="jpaoletti.jpm2.core.test.JPMTestWeakDAOImpl" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
+    
+    <bean id="jpm-entity-test" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTest" />
+        <property name="dao" ref="jpm-dao-test" />
+        <property name="order" value="id string integer bool" />
+        <property name="countable" value="false" />
+        <property name="defaultSortField" value="id" />
+        <property name="defaultSortDirection" value="DESC" />
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="enabled" value="true" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="all" />
+                    <property name="showTitle" value="true" />
+                    <property name="confirm" value="false" />
+                    <property name="available" value="true" />
+                    <property name="compact" value="true" />
+                    <property name="popup" value="false" />
+                    <property name="navigable" value="true" />
+                    <property name="icon" value="fas fa-th-list" />
+                    <property name="properties">
+                        <props>
+                            <prop key="compactOperations">true</prop>
+                        </props>
+                    </property>
+                    <!-- <property name="follows" value="otheroper" />-->
+                    <!--<property name="condition">
+                        <bean class="some.OperationCondition">
+                            ...
+                        </bean>
+                    </property>-->
+                    <!--<property name="context">
+                        <bean class="some.OperationContext" />
+                    </property>-->
+                    <!--<property name="validators">
+                        <list>
+                            ...
+                        </list>
+                    </property>-->
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="follows" value="list" />
+                    <property name="repeatable" value="true" />
+                    <property name="icon" value="fa fa-plus" />
+                    <property name="context">
+                        <bean class="jpaoletti.jpm2.core.test.JPMTestOperationContext" />
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="generalAudit" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="show list itemAudit" />
+                    <property name="icon" value="fas fa-eye" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="deleteSelected" />
+                    <property name="scope" value="SELECTED" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="list" />
+                    <property name="synchronic" value="false" />
+                    <property name="executor" ref="operationExecutorDelete" />
+                    <property name="icon" value="fas fa-trash-alt" />
+                </bean>
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="itemAudit" />
+                    <property name="display" value="show list" />
+                    <property name="icon" value="fas fa-eye" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="longTest" />
+                    <property name="display" value="show list" />
+                    <property name="synchronic" value="false" />
+                    <property name="executor" ref="operationExecutorLongTest" />
+                    <property name="icon" value="fas fa-ruler" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="delete" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="edit show list" />
+                    <property name="useFields" value="false" />
+                    <property name="executor" ref="operationExecutorDelete" />
+                    <property name="condition">
+                        <bean class="jpaoletti.jpm2.core.test.DeleteTestCondition" />
+                    </property>
+                    <property name="icon" value="fas fa-trash-alt" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="id" />
+                    <property name="configs" ref="default-id-field-config" />
+                    <property name="width" value="55px" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="string" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="integer" />
+                    <property name="align" value="right" />
+                    <property name="searcher" ref="jpm-searcher-int"/>
+                    <property name="width" value="55px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-editable-int"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter" ref="jpm-converter-edit-int"/>
+                                <property name="validator">
+                                    <bean class="jpaoletti.jpm2.core.validator.IntegerMax">
+                                        <property name="max" value="200" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="decimal" />
+                    <property name="align" value="right" />
+                    <property name="searcher" ref="jpm-searcher-int"/>
+                    <property name="width" value="55px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter" ref="jpm-converter-edit-decimal"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="date" />
+                    <property name="width" value="100px" />
+                    <property name="configs" ref="default-date-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="bool" />
+                    <property name="searcher" ref="jpm-searcher-bool" />
+                    <property name="width" value="55px" />
+                    <property name="align" value="center" />
+                    <property name="configs" ref="default-bool-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="bigstring" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="align" value="center" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="test" />
+                    <property name="width" value="150px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowObject">
+                                        <property name="entity" ref="jpm-entity-test" />
+                                        <property name="fields" value="id,string,integer,date,bool" />
+                                        <property name="operation" value="show" />
+                                    </bean>
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditObject">
+                                        <property name="entity" ref="jpm-entity-test" />
+                                        <property name="textField" value="string" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="testEnum" />
+                    <property name="width" value="150px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter" ref="jpm-converter-show" />
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EnumConverter" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="file" />
+                    <property name="width" value="150px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowFileConverter"/>
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EditFileConverter" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="weaks" />
+                    <property name="width" value="150px" />
+                    <property name="displayTitle" value="false" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                        <property name="entity" ref="jpm-entity-weaktest" />
+                                        <property name="showList" value="false" />
+                                    </bean>
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                        <property name="entity" ref="jpm-entity-weaktest" />
+                                        <property name="showOperations" value="true" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="fa fa-bell" />
+                                <property name="title" value="jpm.jpm-entity-test.panel1" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="id string test integer decimal" />
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="fas fa-briefcase" />
+                                <property name="title" value="jpm.jpm-entity-test.panel2" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="date bool testEnum file bigstring" />
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="fas fa-cog" />
+                                <property name="title" value="Another Test" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="weaks" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+        <property name="defaultSearchs">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.SearchDefinition">
+                    <constructor-arg value="bool" />
+                    <constructor-arg value="value" />
+                    <constructor-arg value="true" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="jpm-entity-weaktest" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.test.JPMTestWeak" />
+        <property name="dao" ref="jpm-dao-weaktest" />
+        <property name="owner">
+            <bean class="jpaoletti.jpm2.core.model.EntityOwner">
+                <property name="owner" ref="jpm-entity-test" />
+                <property name="localProperty" value="test" />
+            </bean>
+        </property>
+        <property name="operations" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="list" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="all" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="repeatable" value="true" />
+                    <property name="follows" value="list" />
+                    <property name="icon" value="fa fa-plus" />
+                </bean>
+                <ref bean="default-show-operation" />
+                <ref bean="default-delete-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="none" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="deleteSelected" />
+                    <property name="scope" value="SELECTED" />
+                    <property name="confirm" value="true" />
+                    <property name="display" value="list" />
+                    <property name="synchronic" value="false" />
+                    <property name="executor" ref="operationExecutorDelete" />
+                    <property name="icon" value="fas fa-trash-alt" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="id" />
+                    <property name="configs" ref="default-id-field-config" />
+                    <property name="width" value="55px" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="text" />
+                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="fa fa-bell" />
+                                <property name="title" value="jpm.jpm-entity-test.panel1" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="id text" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

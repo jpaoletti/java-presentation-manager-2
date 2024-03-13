@@ -1,16 +1,23 @@
 package jpaoletti.jpm2.web.converter;
 
+import java.io.Serializable;
+import jpaoletti.jpm2.core.JPMContext;
+import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.ListFilter;
+import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.taglibs.standard.tag.common.core.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -22,6 +29,9 @@ public class WebEditObject extends Converter {
     private ListFilter filter;
     private String textField;
     private String textFieldDetails;
+    private String textFieldDetailsOperation;
+    private String textFieldDetailsEntity;
+    private String entityContext;
     private Integer pageSize;
     private Integer minSearch;
     private String placeHolder;
@@ -29,6 +39,9 @@ public class WebEditObject extends Converter {
     private String sortBy; //field id
     private boolean readonly;
     private boolean addable;
+
+    @Autowired
+    private JPMContext context;
 
     public WebEditObject() {
         this.pageSize = 10;
@@ -63,6 +76,34 @@ public class WebEditObject extends Converter {
         }
         if (StringUtils.isNotEmpty(textFieldDetails)) {
             sb.append("&textFieldDetails=").append(textFieldDetails);
+            String operationLink = "";
+            String operationTitle = "";
+            String operationIcon = "";
+            if (StringUtils.isNotEmpty(textFieldDetailsOperation) || getAuthorizationService().userHasRole(textFieldDetailsOperation)) {
+                try {
+                    final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
+                    final Operation op = getEntity().getOperation(textFieldDetailsOperation, getContext().getContext());
+                    operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
+                    operationIcon = op.getIcon();
+                    final String entityId
+                            = StringUtils.isNotEmpty(textFieldDetailsEntity) ? textFieldDetailsEntity
+                            : getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
+                    switch (op.getScope()) {
+                        case ITEM:
+                            operationLink = "jpm/" + entityId + "/" + localId + "/" + op.getPathId();
+                            break;
+                        default:
+                            operationLink = "jpm/" + entityId + "/" + op.getPathId();
+                            break;
+                    }
+                    sb.append("&textFieldDetailsOperation=").append(textFieldDetailsOperation);
+                    sb.append("&operationLink=").append(operationLink);
+                    sb.append("&operationIcon=").append(operationIcon);
+                    sb.append("&operationTitle=").append(operationTitle);
+                } catch (NotAuthorizedException | OperationNotFoundException ex) {
+                    //We don't care for now
+                }
+            }
         }
         sb.append("&placeHolder=").append(getPlaceHolder());
         return sb.toString();
@@ -166,5 +207,37 @@ public class WebEditObject extends Converter {
 
     public void setTextFieldDetails(String textFieldDetails) {
         this.textFieldDetails = textFieldDetails;
+    }
+
+    public String getTextFieldDetailsOperation() {
+        return textFieldDetailsOperation;
+    }
+
+    public void setTextFieldDetailsOperation(String textFieldDetailsOperation) {
+        this.textFieldDetailsOperation = textFieldDetailsOperation;
+    }
+
+    public JPMContext getContext() {
+        return context;
+    }
+
+    public void setContext(JPMContext context) {
+        this.context = context;
+    }
+
+    public String getEntityContext() {
+        return entityContext;
+    }
+
+    public void setEntityContext(String entityContext) {
+        this.entityContext = entityContext;
+    }
+
+    public String getTextFieldDetailsEntity() {
+        return textFieldDetailsEntity;
+    }
+
+    public void setTextFieldDetailsEntity(String textFieldDetailsEntity) {
+        this.textFieldDetailsEntity = textFieldDetailsEntity;
     }
 }

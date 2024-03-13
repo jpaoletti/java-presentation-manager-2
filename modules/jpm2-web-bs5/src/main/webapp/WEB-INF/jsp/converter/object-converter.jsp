@@ -17,7 +17,11 @@
                     $.each(data, function (i, v) {
                         content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
                     });
-                    content = content + "</tbody></table></div>";
+                    content = content + "</tbody></table>";
+                    //<c:if test="${not empty param.textFieldDetailsOperation}">
+                    content = content + "<a href='${cp}${param.operationLink}'><i class='${param.operationIcon}'></i> ${param.operationTitle}</a>";
+                    //</c:if>
+                    content = content + "</div>";
                     content = content + "<button onclick=\"$(this).parents('div.popover').popover('dispose');\" class='float-end btn btn-sm close'  type='button' ><i class='fas fa-times'></i></button>";
                     content = content + "</div>";
                     _this.popover({html: true, content: $(content)}).popover('show');
@@ -29,7 +33,7 @@
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript" src="${cp}static/js/locale/select2/${locale.language}.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
-    var jpmObjectConverter${field};
+        var jpmObjectConverter${field};
         jpmLoad(function () {
             jpmObjectConverter${field} = $("#field_${field}").buildJpmSelect2({
                 entity: "${param.entityId}",

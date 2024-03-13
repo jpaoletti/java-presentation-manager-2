@@ -166,7 +166,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         }
         final Sheet sheet = xlsNewPage(wb, new XlsFormatTitle(
                 getMessage("jpm.toExcel.pageName", null, LocaleContextHolder.getLocale()),
-                getMessage("jpm.toExcel.pageTitle", entity.getTitle().toUpperCase(), LocaleContextHolder.getLocale())
+                getMessage("jpm.toExcel.pageTitle", entity.getPluralTitle().toUpperCase(), LocaleContextHolder.getLocale())
         ));
         sheet.createFreezePane(0, 3);
         final CellStyle bold = xlsBoldStyle(wb);

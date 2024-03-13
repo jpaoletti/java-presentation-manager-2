@@ -15,10 +15,10 @@
     <modules>
         <module>modules/jpm2-core</module>
         <module>modules/jpm2-web-core</module>
-        <module>modules/jpm2-web-bs3</module>
-        <module>modules/jpm2-web-bs4</module>
+        <!--<module>modules/jpm2-web-bs3</module>-->
+        <!--<module>modules/jpm2-web-bs4</module>-->
         <module>modules/jpm2-web-bs5</module>
-        <module>modules/jpm2-web-bs4-test</module>
+        <!--<module>modules/jpm2-web-bs4-test</module>-->
         <module>modules/jpm2-web-bs5-test</module>
     </modules>
 </project>

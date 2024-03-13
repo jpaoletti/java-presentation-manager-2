@@ -417,7 +417,7 @@ var initPage = function () {
                     });
                 } else {
                     jpmBlock();
-                    document.location=$href;
+                    document.location = $href;
                 }
             }
         });
@@ -497,7 +497,7 @@ var initPage = function () {
                         });
                         //All related must be reseted
                         s2.on("change", function () {
-                            $("select[data-related='" + params.field + "']").val(null).trigger("change");
+                            select.parents(".jpm-content-panels:first").find("select[data-related='" + params.field + "']").val(null).trigger("change");
                         });
                     });
                 }
@@ -564,7 +564,9 @@ var processFormResponse = function (data) {
                     var form = $('#jpmForm'); //TODO
                     form.append("<input type='hidden' name='jpm_confirm' value='true' id='jpm_confirm' />");
                     var extraInputs = $("<div style='display: none;'></div>");
-                    extraInputs.append($("#jpm-dialog-confirm").find("input,select,textarea"));
+                    $("#jpm-dialog-confirm").find("input,select,textarea").each(function () {
+                        extraInputs.append($(this));
+                    });
                     form.append(extraInputs);
                     form.submit();
                     return true;
