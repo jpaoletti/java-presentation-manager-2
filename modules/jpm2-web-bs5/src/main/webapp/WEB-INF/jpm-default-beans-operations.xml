@@ -94,5 +94,18 @@
         <property name="display" value="show list" />
         <property name="scope" value="GENERAL" />
         <property name="icon" value="fas fa-file-excel" />
+        <property name="color" value="btn-success" />
+    </bean>
+    <bean id="repeatable-clear-add-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="add" />
+        <property name="repeatable" value="true" />
+        <property name="display" value="all" />
+        <property name="scope" value="GENERAL" />
+        <property name="icon" value="fa fa-plus" />
+        <property name="properties">
+            <props>
+                <prop key="clear-on-repeat">true</prop>
+            </props>
+        </property>
     </bean>
 </beans>

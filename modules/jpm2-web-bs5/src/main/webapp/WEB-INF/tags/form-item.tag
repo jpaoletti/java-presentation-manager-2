@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@attribute name = "id"    required="false" type="java.lang.String" %>
 <%@attribute name = "label" required="false" type="java.lang.String" %>
+<%@attribute name = "help" required="false" type="java.lang.String" %>
 <%@attribute name = "clazz" required="false" type="java.lang.String" %>
 <%@attribute name = "entity" required="false" type="jpaoletti.jpm2.core.model.Entity" %>
 <%@attribute name = "fieldId" required="false" type="java.lang.String" %>

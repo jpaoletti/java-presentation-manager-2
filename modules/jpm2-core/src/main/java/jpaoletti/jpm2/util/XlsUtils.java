@@ -67,22 +67,26 @@ public class XlsUtils {
         int r = titleFormat.getTituloInterno() != null ? xlsTitle(sheet, 0, titleFormat.getTituloInterno(), columntitles.size()) + 1 : 0;
         if (columntitles != null && !columntitles.isEmpty()) {
             sheet.createFreezePane(0, 3);
-            final CellStyle bold = xlsBoldStyle(wb);
-            final Row headerRow = sheet.createRow(r);
-            int i = 0;
-            for (String string : columntitles) {
-                final Cell cell = headerRow.createCell(i++);
-                cell.setCellStyle(bold);
-                cell.setCellValue(string);
-                bold.setFillForegroundColor(titleFormat.getTitleColor());
-                bold.setFillPattern(SOLID_FOREGROUND);
-                bold.setBorderBottom(BorderStyle.THIN);
-                bold.setBorderLeft(BorderStyle.THIN);
-                bold.setBorderRight(BorderStyle.THIN);
-                bold.setBorderTop(BorderStyle.THIN);
-            }
+            xlsHeaderRow(wb, sheet, r, columntitles, titleFormat.getTitleColor());
         }
         return sheet;
+    }
+
+    public static void xlsHeaderRow(final Workbook wb, final Sheet sheet, int rownum, final List<String> columntitles, short color) {
+        final CellStyle bold = xlsBoldStyle(wb);
+        final Row headerRow = sheet.createRow(rownum);
+        int i = 0;
+        for (String string : columntitles) {
+            final Cell cell = headerRow.createCell(i++);
+            cell.setCellStyle(bold);
+            cell.setCellValue(string);
+            bold.setFillForegroundColor(color);
+            bold.setFillPattern(SOLID_FOREGROUND);
+            bold.setBorderBottom(BorderStyle.THIN);
+            bold.setBorderLeft(BorderStyle.THIN);
+            bold.setBorderRight(BorderStyle.THIN);
+            bold.setBorderTop(BorderStyle.THIN);
+        }
     }
 
     public static int xlsTitle(final Sheet sheet, int r, final String title, int colspan) {

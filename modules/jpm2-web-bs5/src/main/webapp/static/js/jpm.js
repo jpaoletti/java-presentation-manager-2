@@ -564,7 +564,7 @@ var processFormResponse = function (data) {
                     var form = $('#jpmForm'); //TODO
                     form.append("<input type='hidden' name='jpm_confirm' value='true' id='jpm_confirm' />");
                     var extraInputs = $("<div style='display: none;'></div>");
-                    $("#jpm-dialog-confirm").find("input,select,textarea").each(function () {
+                    $(".jpm-dialog-confirm").find("input,select,textarea").each(function () {
                         extraInputs.append($(this));
                     });
                     form.append(extraInputs);

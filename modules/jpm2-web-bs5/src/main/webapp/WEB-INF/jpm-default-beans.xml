@@ -33,6 +33,9 @@
     <bean id="jpm-converter-show" class="jpaoletti.jpm2.web.converter.WebToString" />
     <bean id="jpm-converter-editable" class="jpaoletti.jpm2.web.converter.EditableToString" />
     <bean id="jpm-converter-editable-int" class="jpaoletti.jpm2.web.converter.WebILEditInteger" />
+    <bean id="jpm-converter-show-decimal" class="jpaoletti.jpm2.web.converter.WebShowDecimalConverter">
+        <property name="format" value="###,##0.00" />
+    </bean>
     <bean id="jpm-converter-show-bool" class="jpaoletti.jpm2.web.converter.WebShowBoolean" />
     <bean id="jpm-converter-show-bigstring" class="jpaoletti.jpm2.web.converter.ShowBigString" />
     <bean id="jpm-converter-editable-always" class="jpaoletti.jpm2.web.converter.EditableToString">
@@ -53,7 +56,7 @@
     <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
     <bean id="jpm-converter-show-collection-size" class="jpaoletti.jpm2.web.converter.ShowCollectionSize" />
     <bean id="jpm-converter-show-tags" class="jpaoletti.jpm2.web.converter.ShowTags" />
-
+    
     <bean id="jpm-converter-show-cash" class="jpaoletti.jpm2.web.converter.WebToString">
         <property name="prefix" value="U$S" />
         <property name="suffix" value=".-"/>
@@ -69,6 +72,16 @@
         <property name="operations" value="toExcel"/>
         <property name="converter">
             <ref bean="plainConverter" />
+        </property>
+    </bean>
+    <bean id="xls-config-bool" class="jpaoletti.jpm2.core.model.FieldConfig">
+        <property name="operations" value="toExcel"/>
+        <property name="converter">
+            <bean class="jpaoletti.jpm2.core.converter.ShowBoolean">
+                <property name="trueValue" value="jpm.converter.bool.true"/>
+                <property name="falseValue" value="jpm.converter.bool.false"/>
+                <property name="nullValue" value="jpm.converter.bool.null"/>
+            </bean>
         </property>
     </bean>
 
@@ -163,8 +176,7 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
-        <ref bean="xls-config" />
-
+        <ref bean="xls-config-bool" />
     </util:list>
     <util:list id="inline-bool-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -177,8 +189,7 @@
             <property name="operations" value="add edit"/>
             <property name="converter" ref="jpm-converter-edit-bool"/>
         </bean>
-        <ref bean="xls-config" />
-
+        <ref bean="xls-config-bool" />
     </util:list>
     <util:list id="default-enum-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
         <bean class="jpaoletti.jpm2.core.model.FieldConfig">
