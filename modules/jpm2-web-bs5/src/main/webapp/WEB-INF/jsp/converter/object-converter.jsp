@@ -35,6 +35,11 @@
 <script type="text/javascript">
         var jpmObjectConverter${field};
         jpmLoad(function () {
+            var related = "${(not empty param.related)?param.related:''}".split(",");
+            var relatedSelects = [];
+            $.each(related, function (i, rel) {
+                relatedSelects.push($("#field_" + rel));
+            });
             jpmObjectConverter${field} = $("#field_${field}").buildJpmSelect2({
                 entity: "${param.entityId}",
                 field: "${field}",

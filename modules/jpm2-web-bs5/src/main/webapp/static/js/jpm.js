@@ -485,7 +485,9 @@ var initPage = function () {
                                         ownerId: (params.ownerId) ? params.ownerId : "",
                                         filter: (params.filter) ? params.filter : "",
                                         currentId: params.currentId || "",
-                                        relatedValue: (params.related) ? params.related.val() : "",
+                                        relatedValue: (params.related) ? (Array.isArray(params.related) ? params.related.map(function (i, sel) {
+                                            return sel.val();
+                                        }).toArray().join(',') : params.related.val()) : "",
                                         textField: params.textField || "",
                                         query: p.term,
                                         sortBy: params.sortBy || "",
