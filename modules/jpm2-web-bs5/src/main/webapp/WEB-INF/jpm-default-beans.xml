@@ -9,6 +9,9 @@
     <bean id="jpm-dao-favorite" class="jpaoletti.jpm2.core.dao.FavoriteDAO" >
         <property name="transformer" ref="transformer-strToLong" />
     </bean>
+    <bean id="jpm-dao-visibleColumn" class="jpaoletti.jpm2.core.dao.UserVisibleColumnDAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+    </bean>
     <bean id="jpm-dao-entityReportUserSave" class="jpaoletti.jpm2.core.dao.EntityReportUserSaveDAO" >
         <property name="transformer" ref="transformer-strToLong" />
     </bean>

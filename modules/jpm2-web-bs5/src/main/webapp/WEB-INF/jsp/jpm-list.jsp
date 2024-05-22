@@ -83,18 +83,20 @@
                                     <c:if test="${not empty selectedOperations}">
                                         <input type="checkbox" class="pull-left" id="select_unselect_all" />
                                     </c:if>
-
+                                    <button class="btn btn-primary btn-xs float-end" id="columnsModalShow"><span class="fas fa-eye"></span></button>
 
                                 </th>
                                 <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
-                                    <th data-field="${field.id}" data-entity="${contextualEntity}" data-index='${st.index+1}'
-                                        data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
-                                        class="list-operation-heading ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
-                                        <c:if test="${field.sortable}">
-                                            <span class="sort-icon fas ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'fa-sort-alpha-down':'fa-sort-alpha-up'):'fa-sort'} pull-right"></span>
-                                        </c:if>
-                                        <jpm:field-title entity="${entity}" fieldId="${field.id}" />
-                                    </th>
+                                    <c:if test="${visibleColumns.contains(field.id)}">
+                                        <th data-field="${field.id}" data-entity="${contextualEntity}" data-index='${st.index+1}'
+                                            data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
+                                            class="data list-operation-heading ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
+                                            <c:if test="${field.sortable}">
+                                                <span class="sort-icon fas ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'fa-sort-alpha-down':'fa-sort-alpha-up'):'fa-sort'} pull-right"></span>
+                                            </c:if>
+                                            <jpm:field-title entity="${entity}" fieldId="${field.id}" />
+                                        </th>
+                                    </c:if>
                                 </c:forEach>
                             </tr>
                         </thead>
@@ -126,16 +128,18 @@
                                         </div>
                                     </th>
                                     <c:forEach items="${item.values}" var="v">
-                                        <td data-field="${v.key}" >
-                                            <c:set var="convertedValue" value="${v.value}"/>
-                                            <c:set var="field" value="${v.key}" scope="request" />
-                                            <c:if test="${fn:startsWith(convertedValue, '@page:')}">
-                                                <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
-                                            </c:if>
-                                            <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
-                                                ${convertedValue}
-                                            </c:if>
-                                        </td>
+                                        <c:if test="${visibleColumns.contains(v.key)}">
+                                            <td class="data" data-field="${v.key}" >
+                                                <c:set var="convertedValue" value="${v.value}"/>
+                                                <c:set var="field" value="${v.key}" scope="request" />
+                                                <c:if test="${fn:startsWith(convertedValue, '@page:')}">
+                                                    <jsp:include page="converter/${fn:replace(convertedValue, '@page:', '')}" flush="true" />
+                                                </c:if>
+                                                <c:if test="${not fn:startsWith(convertedValue, '@page:')}">
+                                                    ${convertedValue}
+                                                </c:if>
+                                            </td>
+                                        </c:if>
                                     </c:forEach>
                                 </tr>
                             </c:forEach>
@@ -154,7 +158,7 @@
                         </c:if>
                         <tfoot>
                             <tr>
-                                <td colspan="${paginatedList.fields.size() + 1}">
+                                <td id="list-pagination-cell" colspan="${paginatedList.fields.size() + 1}">
                                     <div class="list-pagination">
                                         <%@include file="inc/default-paginator.jsp" %>
                                     </div>
@@ -209,6 +213,34 @@
                     </div>
                 </c:forEach>
             </div>
+            <div class="modal fade"  id="columnsModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <c:if test="${empty owner}">
+                            <c:set var="setVisibleColumnsUrl" value="${cp}jpm/${contextualEntity}/setVisibleColumns"/>
+                        </c:if>
+                        <c:if test="${not empty owner}">
+                            <c:set var="setVisibleColumnsUrl" value="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/setVisibleColumns"/>
+                        </c:if>
+                        <form method="POST" id='setVisibleColumnsForm' action="${setVisibleColumnsUrl}">
+                            <input type="hidden" name="entityId" value="${entityId}"/>
+                            <div class="modal-header">
+                                <h5 class="modal-title"><spring:message code="jpm.list.columnmodal.title" text="Column Visualization" /></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <c:forEach var="field" items="${paginatedList.fields}">
+                                    <label><input type="checkbox" value="${field.id}" name="column" class="columnVisibleChk" ${visibleColumns.contains(field.id)?'checked':''}> <jpm:field-title entity="${entity}" fieldId="${field.id}" /></label><br/>
+                                    </c:forEach>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><spring:message code="jpm.list.modalsearch.close" text="Close" /></button>
+                                <button type="submit" class="btn btn-success" id="columnsModalOk"><spring:message code="jpm.list.modalsearch.ok" text="Ok" /></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </jpm:jpm-body>
         <script type="text/javascript">
             function openSearchModal(field, name) {
@@ -225,6 +257,9 @@
             }
             var sorting = false;
             jpmLoad(function () {
+                $("#columnsModalShow").on("click", function () {
+                    $("#columnsModal").modal("show");
+                });
                 $("#pageSizeSubmit").on("click", function () {
                     $(this).parents("form").trigger('submit');
                 });

@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
@@ -24,6 +25,7 @@ import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.RelatedListFilter;
 import jpaoletti.jpm2.core.model.UserSearch;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
+import jpaoletti.jpm2.core.service.MiscEntityService;
 import jpaoletti.jpm2.util.JPMUtils;
 import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
 import jpaoletti.jpm2.web.ObjectConverterData;
@@ -57,6 +59,10 @@ public class ListController extends BaseController {
 
     public static final String PAGE1 = "page=1";
     public static final String OP_LIST = "list";
+
+    @Autowired
+    private MiscEntityService miscEntityService;
+
     @Autowired
     private WebApplicationContext ctx;
 
@@ -249,6 +255,26 @@ public class ListController extends BaseController {
         return buildRedirect(getContext().getEntity(), null, OP_LIST, null);
     }
 
+    @PostMapping(value = "/jpm/{entity}/setVisibleColumns")
+    public String setVisibleColumns(
+            @PathVariable Entity entity,
+            @RequestParam List<String> column,
+            HttpServletRequest request) throws PMException {
+        miscEntityService.setVisibleColumns(getAuthorizationService().getCurrentUsername(), getContext().getContextualEntity(), column);
+        return buildRedirect(entity, null, OP_LIST, null);
+    }
+
+    @PostMapping(value = "/jpm/{owner}/{ownerId}/{entity}/setVisibleColumns")
+    public String setVisibleColumns(
+            @PathVariable Entity owner,
+            @PathVariable String ownerId,
+            @PathVariable Entity entity,
+            @RequestParam List<String> column,
+            HttpServletRequest request) throws PMException {
+        miscEntityService.setVisibleColumns(getAuthorizationService().getCurrentUsername(), getContext().getContextualEntity(), column);
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
+    }
+
     @PostMapping(value = "/jpm/{entity}/addSearch")
     public String addSearch(
             @PathVariable Entity entity,
@@ -341,6 +367,8 @@ public class ListController extends BaseController {
         mav.addObject("paginatedList", paginatedList);
         mav.addObject("compactOperations", getContext().getOperation().isCompact());
         mav.addObject("sessionEntityData", getSessionEntityData(entity));
+        final List<String> visibleColumns = miscEntityService.getVisibleColumns(getAuthorizationService().getCurrentUsername(), getContext().getContextualEntity());
+        mav.addObject("visibleColumns", visibleColumns);
         return mav;
     }
 
