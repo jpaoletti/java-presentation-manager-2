@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -30,16 +31,16 @@ public class CollectionSearcher2 implements Searcher {
         final String fieldAlias = field.getId() + "cs2";
         //final Criterion in = Restrictions.in(fieldAlias + ".elements", values);
 
-        final Conjunction and = Restrictions.conjunction();
+        final Disjunction restrictions = Restrictions.disjunction();
         for (Object value : values) {
             try {
-                and.add(Restrictions.eq(fieldAlias + ".id", JPMUtils.get(value, "id"))); //mmm nope
+                restrictions.add(Restrictions.eq(fieldAlias + ".id", JPMUtils.get(value, "id"))); //mmm nope
             } catch (ConfigurationException ex) {
                 ex.printStackTrace();
             }
         }
 
-        final DescribedCriterion describedCriterion = new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)), and);
+        final DescribedCriterion describedCriterion = new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)), restrictions);
         SearcherHelper.addAliases(describedCriterion, field);
         describedCriterion.addAlias(SearcherHelper.getSearchProperty(field), fieldAlias);
         return describedCriterion;
