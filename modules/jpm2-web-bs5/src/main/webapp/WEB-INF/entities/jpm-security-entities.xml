@@ -49,6 +49,7 @@
                         <bean class="jpaoletti.jpm2.core.validator.ValidateNewUser" />
                     </property>
                     <property name="icon" value="fa fa-plus" />
+                    <property name="color" value="btn-warning" />
                 </bean>
                 <ref bean="default-show-operation" />
                 <ref bean="default-edit-operation" />

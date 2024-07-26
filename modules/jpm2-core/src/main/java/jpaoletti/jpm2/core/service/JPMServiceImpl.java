@@ -164,6 +164,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (list == null || list.isEmpty()) {
             throw new PMException("jpm.toExcel.noData");
         }
+        if (list.size() > 65530) {
+            throw new PMException("jpm.toExcel.tooMuchData");
+        }
         final Sheet sheet = xlsNewPage(wb, new XlsFormatTitle(
                 getMessage("jpm.toExcel.pageName", null, LocaleContextHolder.getLocale()),
                 getMessage("jpm.toExcel.pageTitle", entity.getPluralTitle().toUpperCase(), LocaleContextHolder.getLocale())

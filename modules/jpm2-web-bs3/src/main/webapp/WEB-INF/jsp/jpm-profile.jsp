@@ -22,7 +22,7 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
                                             <h3 class="panel-title">
-                                                <span class="glyphicon glyphicon-info-sign"></span> &nbsp;
+                                                <span class="fas fa-info-circle"></span> &nbsp;
                                                 <spring:message code="jpm.profile.info" text="User Information" />
                                             </h3>
                                         </div>

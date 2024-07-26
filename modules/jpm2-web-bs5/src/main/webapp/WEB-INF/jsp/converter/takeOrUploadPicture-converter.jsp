@@ -3,7 +3,7 @@
 <div id="file-converter-container-${field}">
     <input name="field_${field}" type="hidden" value="@current:" />
     <c:if test="${param.delete}">
-        <a class="file-converter-delete ${field}_delete" href="javascript: ;"><span class="glyphicon glyphicon-remove"></span> <spring:message code="jpm.converter.file.delete" text="Delete" /></a>
+        <a class="file-converter-delete ${field}_delete" href="javascript: ;"><span class="fas fa-remove"></span> <spring:message code="jpm.converter.file.delete" text="Delete" /></a>
         <span class="file-converter-text"><spring:message code="jpm.converter.file.bytes.text" text="?" arguments="${param.len}" /></span><br/>
         <img src="${cp}static/img/${param.entityId}-${param.fieldId}-${param.instanceId}.png" title="" id="showImageConverter${param.entityId}${param.fieldId}" />
     </c:if>

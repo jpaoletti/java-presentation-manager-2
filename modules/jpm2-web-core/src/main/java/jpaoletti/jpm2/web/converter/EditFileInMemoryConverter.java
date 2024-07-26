@@ -7,6 +7,8 @@ import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.compress.utils.ByteUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -19,6 +21,7 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
     @Autowired
     private HttpSession session;
     private String contentTypeField = null;
+    private Long maxSize = null;
 
     @Override
     protected String getPage(ContextualEntity contextualEntity, Field field, Object object, String instanceId) {
@@ -40,6 +43,11 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
             throw new ConverterException("jpm.error.uploading.file");
         }
         try {
+            if (maxSize != null) {
+                if (bFile.length > maxSize) {
+                    throw new ConverterException("jpm.error.uploading.file.tooLarge");
+                }
+            }
             if (getFilenameField() != null) {
                 try {
                     final Field f = contextualEntity.getEntity().getFieldById(getFilenameField(), contextualEntity.getContext());
@@ -77,6 +85,14 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
 
     public void setContentTypeField(String contentTypeField) {
         this.contentTypeField = contentTypeField;
+    }
+
+    public Long getMaxSize() {
+        return maxSize;
+    }
+
+    public void setMaxSize(Long maxSize) {
+        this.maxSize = maxSize;
     }
 
 }
