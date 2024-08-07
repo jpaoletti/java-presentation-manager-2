@@ -31,7 +31,7 @@ public class ShowLinkObject extends ShowObject {
         } else {
             try {
                 final String finalValue = getFinalValue(value);
-                final Operation op = getEntity().getOperation(getOperation(), null);
+                final Operation op = getEntity().getOperation(getOperation());
                 return res
                         + "&value=" + finalValue
                         + "&operationId=" + op.getPathId();

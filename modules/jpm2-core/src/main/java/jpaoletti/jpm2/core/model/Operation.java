@@ -97,6 +97,18 @@ public class Operation extends PMCoreObject {
         }
     }
 
+    public void checkAuthorization(Entity entity, String context) throws NotAuthorizedException {
+        if (getAuth() != null) {
+            checkAuthorization();//getAuthorizationService().getCurrentUsername();
+        } else if (!getAuthorizationService().userHasRole(ROLE_SPECIAL)) {
+            final String authKey = getAuthKey(entity, context);
+            //if user is "special" then we ignore the new auth system
+            if (!getAuthorizationService().userHasRole(authKey)) {
+                throw new NotAuthorizedException(authKey);
+            }
+        }
+    }
+
     public OperationCondition getCondition() {
         return condition;
     }
@@ -395,7 +407,11 @@ public class Operation extends PMCoreObject {
     }
 
     public String getAuthKey(Entity entity, EntityContext context) {
-        final String eid = entity.getId() + (context == null ? "" : "." + context.getId());
+        return getAuthKey(entity, context == null ? null : context.getId());
+    }
+
+    public String getAuthKey(Entity entity, String context) {
+        final String eid = entity.getId() + (context == null ? "" : "." + context);
         return String.format("jpm.auth.operation.%s.%s", eid, getId());
     }
 

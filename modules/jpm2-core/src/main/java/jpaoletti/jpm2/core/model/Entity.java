@@ -485,6 +485,28 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     }
 
     /**
+     * Returns the operation of the given id or a new default operation. If no
+     * operation was found, OperationNotFoundException is trhown.
+     *
+     * @param id The id
+     * @param context
+     * @return The operation
+     * @throws jpaoletti.jpm2.core.exception.OperationNotFoundException when
+     * operation does not exists for this entity.
+     * @throws jpaoletti.jpm2.core.exception.NotAuthorizedException when the
+     * operation exists but the user has no permission to access it.
+     */
+    public Operation getOperation(String id, String context) throws OperationNotFoundException, NotAuthorizedException {
+        for (Operation oper : getAllOperations()) {
+            if (oper.getId().equalsIgnoreCase(id)) {
+                oper.checkAuthorization(this, context);
+                return oper;
+            }
+        }
+        throw new OperationNotFoundException(getId(), id);
+    }
+
+    /**
      * Returns the operation of the given id. If no operation was found, return
      * null. No authorization checked.
      *
@@ -641,7 +663,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public boolean isContainingListOperation() {
         try {
-            return getOperation("list", null) != null; //cant use context here
+            return getOperation("list", (String) null) != null; //cant use context here
         } catch (OperationNotFoundException | NotAuthorizedException ex) {
             return false;
         }
@@ -680,5 +702,9 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setDetailedAudit(boolean detailedAudit) {
         this.detailedAudit = detailedAudit;
+    }
+
+    public Operation getOperation(String operation) throws OperationNotFoundException, NotAuthorizedException {
+        return getOperation(operation, (String) null);
     }
 }

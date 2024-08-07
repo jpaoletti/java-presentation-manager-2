@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ValidMail implements FieldValidator {
 
     private String message = "jpm.validator.mail.invalid";
-    private String regexPattern = "^[A-Za-z]+[a-zA-Z0-9._-]+[a-zA-Z0-9]@[A-Za-z]{2,}\\.[A-Za-z]{2,4}$";
+    private String regexPattern = "^[A-Za-z0-9]+[a-zA-Z0-9._-]+[a-zA-Z0-9]@[A-Za-z]{2,}\\.[A-Za-z]{2,4}(\\.[a-zA-Z]{2})?$";
 
     @Override
     public Message validate(Object object, Object convertedValue) {

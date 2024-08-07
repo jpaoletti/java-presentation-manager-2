@@ -10,7 +10,6 @@ import jpaoletti.jpm2.core.exception.EntityNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
-import jpaoletti.jpm2.core.model.EntityContext;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.UserVisibleColumn;
 import static org.apache.commons.lang3.StringUtils.join;
@@ -47,7 +46,7 @@ public class MiscEntityService extends JPMServiceBase {
         if (find == null) {
             final List<String> res = new ArrayList<>();
             for (Field field : entity.getEntity().getOrderedFields(entity.getContext())) {
-                final Converter converter = field.getConverter(null, entity.getEntity().getOperation("list", null));
+                final Converter converter = field.getConverter(null, entity.getEntity().getOperation("list", entity.getContext()));
                 if (converter != null) {
                     if (field.shouldDisplay("list")) {
                         res.add(field.getId());

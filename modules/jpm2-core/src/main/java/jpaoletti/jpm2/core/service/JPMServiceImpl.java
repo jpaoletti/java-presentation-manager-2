@@ -55,7 +55,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final PaginatedList pl = new PaginatedList();
         getContext().setEntity(entity.getEntity());
         pl.setTotal((long) list.size());
-        pl.getContents().load(list, weak, weak.getEntity().getOperation("list", null));
+        pl.getContents().load(list, weak, weak.getEntity().getOperation("list"));
         return pl;
     }
 

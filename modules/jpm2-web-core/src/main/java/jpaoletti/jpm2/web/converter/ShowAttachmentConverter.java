@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class ShowAttachmentConverter extends Converter {
 
     private String measure = "k";
+    private boolean showName = true;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -61,7 +62,7 @@ public class ShowAttachmentConverter extends Converter {
                     + "?len=" + len
                     + "&downloadable=" + note.isDownloadable()
                     + "&contentType=" + note.getContentType()
-                    + "&attachmentName=" + note.getAttachmentName()
+                    + "&attachmentName=" + (showName ? note.getAttachmentName() : "")
                     + "&noteId=" + instanceId
                     + "&entity=" + contextualEntity.getEntity().getId();
         } else {
@@ -75,5 +76,13 @@ public class ShowAttachmentConverter extends Converter {
 
     public void setMeasure(String measure) {
         this.measure = measure;
+    }
+
+    public boolean isShowName() {
+        return showName;
+    }
+
+    public void setShowName(boolean showName) {
+        this.showName = showName;
     }
 }

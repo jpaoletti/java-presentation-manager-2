@@ -230,7 +230,7 @@ public class ListController extends BaseController {
 
         final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak);
 
-        final Operation operation = weak.getOperation(OP_LIST, null); //fixme
+        final Operation operation = weak.getOperation(OP_LIST); //fixme
         getContext().set(entity, entity.isContainingListOperation() ? entity.getOperation(OP_LIST, getContext().getContext()) : entity.getOperation(OP_SHOW, getContext().getContext())); //fixme
         getContext().setEntityContext(centity.getContext());
         getContext().setEntityInstance(new EntityInstance(getContext()));
@@ -401,7 +401,7 @@ public class ListController extends BaseController {
     }
 
     protected Operation getOperation(Entity entity) throws OperationNotFoundException, NotAuthorizedException {
-        return entity.getOperation(OP_LIST, null); //mmmh
+        return entity.getOperation(OP_LIST); //mmmh
     }
 
     @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:toExcel}"})
