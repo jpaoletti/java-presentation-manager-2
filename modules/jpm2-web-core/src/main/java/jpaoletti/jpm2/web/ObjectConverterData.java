@@ -38,7 +38,7 @@ public class ObjectConverterData {
         if (textField != null) {
             if (!textField.contains("{")) {
                 final Field field = entity.getFieldById(textField, entityContext);
-                return new ObjectConverterDataItem(instanceId, JPMUtils.get(object, field.getProperty()).toString());
+                return new ObjectConverterDataItem(instanceId, String.valueOf(JPMUtils.get(object, field.getProperty())));
             } else {
                 final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
                 String finalValue = textField;

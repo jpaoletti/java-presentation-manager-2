@@ -83,34 +83,8 @@ public class EntityInstance {
      * @throws jpaoletti.jpm2.core.PMException
      */
     public EntityInstance(ContextualEntity contextualEntity, IdentifiedObject iobject, JPMContext ctx) throws PMException {
-        this.iobject = iobject;
-        final Object object = (iobject != null) ? iobject.getObject() : null;
-        final String id = (iobject != null) ? iobject.getId() : null;
-        values = new LinkedHashMap<>();
-        fields = new ArrayList<>();
-        operations = new ArrayList<>();
         this.contextualEntity = contextualEntity;
-        final Entity entity = contextualEntity.getEntity();
-        for (Field field : entity.getOrderedFields(contextualEntity.getContext())) {
-            if (field.shouldDisplay(ctx.getOperation().getId())) {
-                final Converter converter = field.getConverter(this, ctx.getOperation());
-                if (converter != null) {
-                    try {
-                        values.put(field.getId(), converter.visualize(
-                                contextualEntity, field, object, id));
-                        fields.add(field);
-                    } catch (IgnoreConvertionException ex) {
-                    }
-                }
-            }
-        }
-        if (object != null) {
-            if (entity.isWeak(ctx.getEntityContext())) {
-                final Object ownerobject = entity.getOwner(ctx.getEntityContext()).getOwnerObject(ctx.getEntityContext(), object);
-                configureOwner(entity, ctx.getEntityContext(), ownerobject);
-            }
-            configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
-        }
+        setIobject(iobject, ctx);
     }
 
     public List<Operation> getOperations() {
@@ -136,8 +110,36 @@ public class EntityInstance {
         return iobject;
     }
 
-    public void setIobject(IdentifiedObject iobject) {
+    public void setIobject(IdentifiedObject iobject, JPMContext ctx) throws ConfigurationException, PMException {
         this.iobject = iobject;
+        final Object object = (iobject != null) ? iobject.getObject() : null;
+        final String id = (iobject != null) ? iobject.getId() : null;
+        values = new LinkedHashMap<>();
+        fields = new ArrayList<>();
+        operations = new ArrayList<>();
+        final Entity entity = contextualEntity.getEntity();
+        if (object != null) {
+            if (entity.isWeak(ctx.getEntityContext())) {
+                final Object ownerobject = entity.getOwner(ctx.getEntityContext()).getOwnerObject(ctx.getEntityContext(), object);
+                configureOwner(entity, ctx.getEntityContext(), ownerobject);
+            }
+        }
+        for (Field field : entity.getOrderedFields(contextualEntity.getContext())) {
+            if (field.shouldDisplay(ctx.getOperation().getId())) {
+                final Converter converter = field.getConverter(this, ctx.getOperation());
+                if (converter != null) {
+                    try {
+                        values.put(field.getId(), converter.visualize(
+                                contextualEntity, field, object, id));
+                        fields.add(field);
+                    } catch (IgnoreConvertionException ex) {
+                    }
+                }
+            }
+        }
+        if (object != null) {
+            configureItemOperations(entity, ctx.getEntityContext(), ctx.getOperation());
+        }
     }
 
     public EntityInstanceOwner getOwner() {

@@ -248,6 +248,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final Object ownerObject = owner.getDao(context).get(ownerId);
         final Object object = JPMUtils.newInstance(entity.getClazz());
         entity.getOwner(context).setOwnerObject(getContext().getEntityContext(), object, ownerObject);
+        entityInstance.setIobject(new IdentifiedObject(null, object), getContext());
         processFields(entity, operation, object, entityInstance, parameters);
         preExecute(operation, object);
         entity.getDao(context).save(object);
