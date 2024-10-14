@@ -7,8 +7,6 @@ import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
-import org.apache.commons.compress.utils.ByteUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

@@ -82,7 +82,7 @@ function addGraphic(groupField, groupFieldName, numericFields) {
     html += graphicId + ". " + groupFieldName + "<br/>";
     html += '<div id="' + graphicConfigId + '"></div>';
     var selectFormula = $("#select-formula").clone();
-    selectFormula.find("#search-dropdown").removeClass("btn-primary").addClass("btn-default");
+    selectFormula.find("#search-dropdown").removeClass("btn-primary").addClass("btn-secondary");
     selectFormula.find("a").each(function () {
         var hr = $(this).attr("href");
         $(this).prop("href", hr.replace("formulaZone", graphicConfigId).replace("general-formula", "graphic-formula"));

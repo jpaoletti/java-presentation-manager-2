@@ -23,7 +23,7 @@
                 </c:if>
                 <div class="row mt-2">
                     <div class="col-lg-1">
-                        <button type="submit" class="btn btn-warning"><spring:message code="jpm.form.submit" text="Submit" /></button>
+                        <button type="submit" class="btn btn-success"><spring:message code="jpm.form.submit" text="Submit" /></button>
                     </div>
                     <c:if test="${operation.repeatable}">
                         <div class="col-lg-11">

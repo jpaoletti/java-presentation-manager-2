@@ -41,7 +41,7 @@
                                                     <input type="text" class="form-control" name="mail" value="${user.mail}" />
                                                 </div>
                                             </div><br/>
-                                            <button type="submit" class="btn btn-warning"><spring:message code="jpm.form.submit" text="Submit" /></button>
+                                            <button type="submit" class="btn btn-success"><spring:message code="jpm.form.submit" text="Submit" /></button>
                                         </fieldset>
                                     </form>
                                 </div>
@@ -69,7 +69,7 @@
                                                 <div class='pwdwidgetdiv' id='thepwddivnewpass'></div>
                                             </div>
                                         </div><br/><br/>
-                                        <button type="submit" class="btn btn-warning"><spring:message code="jpm.form.submit" text="Submit" /></button>
+                                        <button type="submit" class="btn btn-success"><spring:message code="jpm.form.submit" text="Submit" /></button>
                                     </form>
                                 </div>
                             </div>

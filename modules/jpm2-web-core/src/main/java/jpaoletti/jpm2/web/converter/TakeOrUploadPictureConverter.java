@@ -10,6 +10,8 @@ import jpaoletti.jpm2.core.model.Field;
 public class TakeOrUploadPictureConverter extends BaseEditFileConverter {
 
     private String cropperAspectRatio = "Number.Nan";
+    private String cropperWidth = "Number.Nan";
+    private String cropperHeight = "Number.Nan";
     private String confirmBtnLabel = "Change";
     private String cancelBtnLabel = "Cancel";
 
@@ -19,6 +21,8 @@ public class TakeOrUploadPictureConverter extends BaseEditFileConverter {
                 + "?instanceId=" + instanceId
                 + "&entityId=" + contextualEntity.toString()
                 + "&cropperAspectRatio=" + cropperAspectRatio
+                + "&cropperWidth=" + cropperWidth
+                + "&cropperHeight=" + cropperHeight
                 + "&confirmBtnLabel=" + confirmBtnLabel
                 + "&cancelBtnLabel=" + cancelBtnLabel
                 + "&fieldId=" + field.getId() + "&";
@@ -46,6 +50,22 @@ public class TakeOrUploadPictureConverter extends BaseEditFileConverter {
 
     public void setCancelBtnLabel(String cancelBtnLabel) {
         this.cancelBtnLabel = cancelBtnLabel;
+    }
+
+    public String getCropperWidth() {
+        return cropperWidth;
+    }
+
+    public void setCropperWidth(String cropperWidth) {
+        this.cropperWidth = cropperWidth;
+    }
+
+    public String getCropperHeight() {
+        return cropperHeight;
+    }
+
+    public void setCropperHeight(String cropperHeight) {
+        this.cropperHeight = cropperHeight;
     }
 
 }

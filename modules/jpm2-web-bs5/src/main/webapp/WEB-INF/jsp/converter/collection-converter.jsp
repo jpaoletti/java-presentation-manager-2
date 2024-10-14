@@ -23,11 +23,14 @@
                 url: "${cp}jpm/${param.entityId}.json",
                 dataType: 'json',
                 data: function (params) {
+                    var related = ${not empty param.related?param.related:'null'};
                     return {
                         filter: "${param.filter}",
                         currentId: "${instance.id}",
                         ownerId: "${not empty owner?ownerId:''}",
-                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
+                        relatedValue: (related != null) ? related.map(function (i, sel) {
+                            return $("#field_" + i).val();
+                        }).join(',') : "",
                         textField: "${param.textField}",
                         query: params.term, // search term
                         pageSize: ${param.pageSize},

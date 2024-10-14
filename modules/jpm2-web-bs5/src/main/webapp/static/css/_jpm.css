@@ -118,3 +118,5 @@ a{text-decoration: none;}
 @media (max-width: 991px) {
     .dropdown-menu .dropdown-menu{margin-left:0.7rem; margin-right:0.7rem; margin-bottom: .5rem;}
 }
+tr.highligthed-instance-row td{border: 2px solid black !important;}
+tr.highligthed-instance-row th{border-right: 2px solid black !important;}

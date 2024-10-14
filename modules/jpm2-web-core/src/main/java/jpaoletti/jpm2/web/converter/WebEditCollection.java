@@ -32,9 +32,20 @@ public class WebEditCollection extends WebEditObject {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : getValue(object, field));
+        final String related = getRelated();
+        StringBuilder relatedValue = new StringBuilder("[");
+        if (related != null) {
+            String[] split = related.split("[,]");
+            final List<String> list = new ArrayList<>();
+            for (String s : split) {
+                list.add("'" + s + "'");
+            }
+            relatedValue.append(StringUtils.join(list, ","));
+        }
+        relatedValue.append("]");
         final String res = getBaseJsp()
                 + "?entityId=" + getEntity().getId()
-                + ((getRelated() != null) ? "&related=" + getRelated() : "")
+                + ((related != null) ? "&related=" + relatedValue.toString() : "")
                 + ((getFilter() != null) ? "&filter=" + getFilter().getId() : "")
                 + "&textField=" + getTextField()
                 + "&pageSize=" + getPageSize()

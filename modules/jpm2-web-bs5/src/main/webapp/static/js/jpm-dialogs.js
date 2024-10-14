@@ -22,6 +22,11 @@ function jpmDialogConfirm(params) {
             params.onShown();
         });
     }
+    if (params.onHide) {
+        wrapper.addEventListener('hidden.bs.modal', function () {
+            params.onHide();
+        });
+    }
     myModal.show();
 }
 

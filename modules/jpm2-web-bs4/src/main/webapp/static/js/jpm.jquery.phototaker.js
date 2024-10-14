@@ -58,7 +58,7 @@
                                                 maxWidth: 4000,
                                                 maxHeight: 4000
                                             });
-                                            original.src = canvas.toDataURL();
+                                            original.src = canvas.toDataURL("image/png", 1.0);
                                             canvas.toBlob(function (blob) {
                                                 var data = new FormData();
                                                 data.append(settings.postParam, blob);

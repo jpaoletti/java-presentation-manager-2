@@ -172,7 +172,11 @@ public class ExecutorsController extends BaseController implements Observer {
         if (getExecutor().immediateExecute() || preparation == null) {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {
-                getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+                if (response.getMessages().isEmpty()) {
+                    getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+                } else {
+                    getContext().setGlobalMessage(response.getMessages().get(0));
+                }
                 if (StringUtils.isNotEmpty(response.getNext())) {
                     return new ModelAndView("redirect:" + response.getNext());
                 } else {

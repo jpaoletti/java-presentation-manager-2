@@ -197,7 +197,7 @@
                             <input type="hidden" value="" name="content" id="newReportContent" />
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="jpm.reports.saveReport.closeBtn" text="Close" /></button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><spring:message code="jpm.reports.saveReport.closeBtn" text="Close" /></button>
                             <button type="submit" class="btn btn-primary"><spring:message code="jpm.reports.saveReport.saveBtn" text="Save" /></button>
                         </div>
                     </div>

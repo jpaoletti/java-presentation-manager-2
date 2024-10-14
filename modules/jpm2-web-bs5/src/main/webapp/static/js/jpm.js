@@ -78,6 +78,8 @@ function initConfirm() {
         var $href = $(this).attr("href");
         //@@ are SELECTED scoped operations
         if (!$href.includes("@@")) {
+            var _this = $(this);
+            _this.parents(".instance-row").addClass("highligthed-instance-row");
             jpmDialogConfirm({
                 callback: function () {
                     jpmBlock();
@@ -86,6 +88,9 @@ function initConfirm() {
                         processFormResponse(data);
                     }).submit();
                     return true;
+                },
+                onHide: function () {
+                    _this.parents(".instance-row").removeClass("highligthed-instance-row");
                 }
             });
         }
@@ -722,7 +727,7 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
     var downloadable = $(this).data("downloadable");
     var $textAndPic = $('<div id="attachmentPopup"></div>');
     var html = "";
-    if (ct.contains("image")) {
+    if (ct.includes("image")) {
         html = html + "<img id='attachmentImg' src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "'/>";
     } else if (ct.contains("pdf")) {
         html = html + "<iframe src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "' style='height:500px;width:100%;'></iframe>";
