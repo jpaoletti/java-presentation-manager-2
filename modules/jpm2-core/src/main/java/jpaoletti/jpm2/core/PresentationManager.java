@@ -190,16 +190,28 @@ public class PresentationManager implements Observer, Serializable {
     }
 
     public void audit(String s) {
-        audit(null, null, null, s);
+        audit(null, (String) null, null, s);
     }
 
     public void audit(Entity entity, Operation operation, IdentifiedObject iobject) {
+        if (getAuditService() != null) {
+            getAuditService().register(entity, operation.getId(), iobject);
+        }
+    }
+
+    public void audit(Entity entity, Operation operation, IdentifiedObject iobject, String s) {
+        if (getAuditService() != null) {
+            getAuditService().register(entity, operation.getId(), iobject, s);
+        }
+    }
+
+    public void audit(Entity entity, String operation, IdentifiedObject iobject) {
         if (getAuditService() != null) {
             getAuditService().register(entity, operation, iobject);
         }
     }
 
-    public void audit(Entity entity, Operation operation, IdentifiedObject iobject, String s) {
+    public void audit(Entity entity, String operation, IdentifiedObject iobject, String s) {
         if (getAuditService() != null) {
             getAuditService().register(entity, operation, iobject, s);
         }

@@ -8,7 +8,6 @@ import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.model.AuditRecord;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
-import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -32,7 +31,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     private AuditDAO dao;
 
     @Override
-    public void register(Entity entity, Operation operation, IdentifiedObject iobject, String observations) {
+    public void register(Entity entity, String operation, IdentifiedObject iobject, String observations) {
         try {
             final AuditRecord record = buildRecord(entity, operation, iobject, observations);
             if (getSessionFactory() != null && record != null) {
@@ -44,13 +43,13 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     }
 
     @Override
-    public AuditRecord buildRecord(Entity entity, Operation operation, IdentifiedObject iobject, String observations) {
+    public AuditRecord buildRecord(Entity entity, String operation, IdentifiedObject iobject, String observations) {
         if (entity != null && !entity.isAuditable()) {
             return null;
         }
-        if (operation != null && !operation.isAuditable()) {
-            return null;
-        }
+//        if (operation != null && !operation.isAuditable()) {
+//            return null;
+//        }
         final AuditRecord record = new AuditRecord();
         record.setDatetime(new Date());
         if (getAuthorizationService().getCurrentUsername() != null) {
@@ -63,7 +62,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
             }
         }
         if (operation != null) {
-            record.setOperation(operation.getId());
+            record.setOperation(operation);
         }
         if (observations != null && !observations.equals("")) {
             record.setObservations(observations);
@@ -74,7 +73,7 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     }
 
     @Override
-    public void register(Entity entity, Operation operation, IdentifiedObject iobject) {
+    public void register(Entity entity, String operation, IdentifiedObject iobject) {
         register(entity, operation, iobject, null);
     }
 
