@@ -553,6 +553,11 @@ var processFormResponse = function (data) {
             };
             if (!data.next || data.next === "" || data.next === "-") {
                 jpmUnBlock();
+            } else if (data.next === "EXECUTOR_RELOAD") {
+                params.closeTimeout = data.messageDelay;
+                params.callback = function () {
+                    document.location.reload();
+                };
             } else {
                 params.closeTimeout = data.messageDelay;
                 params.callback = function () {

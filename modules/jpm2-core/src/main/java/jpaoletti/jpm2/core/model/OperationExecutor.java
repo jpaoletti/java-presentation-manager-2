@@ -17,6 +17,7 @@ public interface OperationExecutor {
     public static final String OWNER_ENTITY = "OWNER_ENTITY";
     public static final String OWNER_ID = "OWNER_ID";
     public static final String JPM_CONFIRM = "jpm_confirm";
+    public static final String EXECUTOR_RELOAD = "EXECUTOR_RELOAD";
 
     public Map<String, Object> prepare(Entity owner, String ownerId, List<EntityInstance> instances) throws PMException;
 

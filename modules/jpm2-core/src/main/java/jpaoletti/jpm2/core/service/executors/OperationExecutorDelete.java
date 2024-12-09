@@ -29,7 +29,7 @@ public class OperationExecutorDelete extends OperationExecutorSimple {
             }
             progress.inc();
         }
-        return null;
+        return EXECUTOR_RELOAD;
     }
 
     @Override
