@@ -18,6 +18,7 @@
 <script type='text/javascript' src="${cp}static/js/jquery.min.js?v=${jpm.appversion}" ></script>
 <script type='text/javascript' src="${cp}static/js/jpm-head.js?v=${jpm.appversion}" ></script>
 <script type='text/javascript' src="${cp}static/js/jquery.blockUI.js?v=${jpm.appversion}" ></script>
+<script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
 <link rel="shortcut icon" href="${cp}static/favicon.ico?v=${jpm.appversion}">
 <link rel="icon" type="image/png" sizes="150x150" href="${cp}static/favicon.ico?v=${jpm.appversion}">
 <link rel="apple-touch-icon" sizes="150x150" href="${cp}static/favicon.ico?v=${jpm.appversion}">

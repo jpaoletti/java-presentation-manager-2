@@ -49,7 +49,6 @@
             </div>
         </div>
     </jpm:jpm-body>
-    <script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
     <script type="text/javascript">
         jpmLoad(function () {
             wrapToString();
