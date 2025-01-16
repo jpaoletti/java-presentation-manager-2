@@ -20,11 +20,11 @@ public class ShowCollection extends ShowObject {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
-        return visualizeValue(contextualEntity, field, value, instanceId);
+        return visualizeValue(contextualEntity, field, object, value, instanceId);
     }
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Object> value = (Collection<Object>) ((object == null) ? null : object);
         final StringBuilder sb = new StringBuilder("<ul class='show-collection-converter " + (isLinked() ? "show-collection-converter-linked" : "") + "'>");
         if (value != null) {

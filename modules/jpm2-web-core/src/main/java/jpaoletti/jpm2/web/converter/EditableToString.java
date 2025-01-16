@@ -15,7 +15,7 @@ public class EditableToString extends WebToString {
     private boolean always = false;
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
         String processed = process(value);
         if (always || getAuthorizationService().userHasRole("jpm.auth.operation." + contextualEntity + ".edit")) {
             final String originalValue = (value == null) ? "" : value.toString();

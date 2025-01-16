@@ -16,7 +16,7 @@ public class ShowBoolean extends Converter {
     private String nullValue = "";
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
         if (value == null) {
             return getJpm().getMessage(nullValue);
         } else {

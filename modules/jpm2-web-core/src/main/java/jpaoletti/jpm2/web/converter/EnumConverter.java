@@ -23,7 +23,7 @@ public class EnumConverter extends WebToString {
     private JPMContext context;
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
         try {
             final Class enumClass = getEnumClass(field);
             final List<String> options = new ArrayList<>();

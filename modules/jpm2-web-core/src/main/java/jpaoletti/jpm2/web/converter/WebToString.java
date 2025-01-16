@@ -15,7 +15,7 @@ public class WebToString extends ToStringConverter {
     private boolean useTitle = true;
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
         return wrap(field, process(value), value);
     }
 

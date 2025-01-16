@@ -16,7 +16,7 @@ public class WebShowDateTime extends WebToString {
     private String format = "yyyy-MM-dd";
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Date value = (Date) object;
         if (value != null) {
             return wrap(field, process(DateFormatUtils.format(value, format)), value);

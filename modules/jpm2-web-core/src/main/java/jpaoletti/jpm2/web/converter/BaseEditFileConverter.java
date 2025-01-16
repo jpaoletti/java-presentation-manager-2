@@ -23,7 +23,7 @@ public abstract class BaseEditFileConverter extends Converter {
     protected String filenameField = null;
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
             final byte[] value = (byte[]) object;
             if (value != null && value.length > 0) {

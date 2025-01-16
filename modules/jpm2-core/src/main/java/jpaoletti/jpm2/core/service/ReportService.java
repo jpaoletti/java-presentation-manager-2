@@ -149,7 +149,7 @@ public class ReportService extends JPMServiceBase {
                             item.add(String.valueOf(value));
                         } else {
                             JPMUtils.getLogger().debug("ReportService.getResult --- CONVERTING '" + value + "' WITH '" + descriptiveField.getField() + "' CONVERTER ");
-                            item.add(String.valueOf(descriptiveField.getConverter().visualizeValue(new ContextualEntity(report.getEntity(), null), field, value, null)));
+                            item.add(String.valueOf(descriptiveField.getConverter().visualizeValue(new ContextualEntity(report.getEntity(), null), field, null, value, null)));
                         }
                     } catch (Exception ex) {
                         item.add(String.valueOf(value));

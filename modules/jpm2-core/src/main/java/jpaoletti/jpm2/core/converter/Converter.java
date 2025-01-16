@@ -31,7 +31,7 @@ public class Converter extends PMCoreObject {
      */
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
-        return visualizeValue(contextualEntity, field, value, instanceId);
+        return visualizeValue(contextualEntity, field, object, value, instanceId);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Converter extends PMCoreObject {
      * @throws ConverterException
      * @throws jpaoletti.jpm2.core.exception.ConfigurationException
      */
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object value, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
         throw new IgnoreConvertionException();
     }
 

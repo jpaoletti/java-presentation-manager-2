@@ -26,7 +26,7 @@ public class EnumListConverter extends WebToString {
     private Class clazz;
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
             final Collection value = (Collection) ((object == null) ? null : object);
             final List<String> options = new ArrayList<>();

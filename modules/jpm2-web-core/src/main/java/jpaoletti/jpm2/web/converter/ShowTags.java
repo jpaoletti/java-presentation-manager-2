@@ -20,7 +20,7 @@ public class ShowTags extends Converter {
     private JPMContext ctx;
 
     @Override
-    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
+    public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Tag> value = (Collection<Tag>) ((object == null) ? null : object);
         if (value == null || value.isEmpty()) {
             return "";
