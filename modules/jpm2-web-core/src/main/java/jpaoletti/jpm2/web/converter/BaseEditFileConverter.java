@@ -10,7 +10,9 @@ import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.WithAttachment;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -25,7 +27,15 @@ public abstract class BaseEditFileConverter extends Converter {
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         try {
-            final byte[] value = (byte[]) object;
+            byte[] value = (byte[]) object;
+            if (value == null && instance instanceof WithAttachment) {
+                WithAttachment wa = (WithAttachment) instance;
+                try {
+                    value = FileUtils.readFileToByteArray(new File(wa.getInternalFileName()));
+                } catch (IOException ex) {
+                    value = null;
+                }
+            }
             if (value != null && value.length > 0) {
                 String len;
                 switch (getMeasure().charAt(0)) {
