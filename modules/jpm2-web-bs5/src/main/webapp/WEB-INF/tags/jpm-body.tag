@@ -28,13 +28,11 @@
                                 <input class="form-control me-2" type="search" id="search-menu" placeholder="<spring:message code="jpm.usernav.search" text="Search..." />" aria-label="Search">
                             </div>
                             <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
-                                <div class="btn-group dropleft">
-                                    <div  id="userNavFavorite" >
-                                        <button class="btn my-2 my-sm-0  dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
-                                            <i class="fa fa-star text-warning"></i>
-                                        </button>
-                                        <ul class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage"></ul>
-                                    </div>
+                                <div class="dropdown"   id="userNavFavorite">
+                                    <button class="btn my-2 my-sm-0  dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
+                                        <i class="fa fa-star text-warning"></i>
+                                    </button>
+                                    <ul class="dropdown-menu messages" style="left: auto; right: 0; position: absolute;" aria-labelledby="dropdownMenuMessage"></ul>
                                 </div>
                             </security:authorize>
                             <security:authorize access="hasAnyRole('ROLE_USER_RECENT')">
@@ -43,7 +41,7 @@
                                         <button class="btn my-2 my-sm-0 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
                                             <i class="fa fa-history text-info"></i>
                                         </button>
-                                        <ul class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage"></ul>
+                                        <ul class="dropdown-menu messages" style="left: auto; right: 0; position: absolute;" aria-labelledby="dropdownMenuMessage"></ul>
                                     </div>
                                 </div>
                             </security:authorize>
