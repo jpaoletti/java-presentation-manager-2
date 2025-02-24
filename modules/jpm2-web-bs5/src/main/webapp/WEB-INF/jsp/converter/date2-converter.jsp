@@ -6,6 +6,10 @@
 <script type="text/javascript" src="${cp}static/js/bootstrap-datetimepicker.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
-        $('[name="field_${field}"]').datetimepicker({format: "${param.format}", locale: "${pageContext.response.locale}"});
+        $('[name="field_${field}"]')
+                .on('focus', function () {
+                    $(this).select();
+                })
+                .datetimepicker({format: "${param.format}", locale: "${pageContext.response.locale}"});
     });
 </script>

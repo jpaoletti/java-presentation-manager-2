@@ -19,13 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author jpaoletti
  */
-@Transactional
+//@Transactional
 public class SecurityServiceImpl extends JPMServiceBase implements SecurityService {
 
     @Autowired
     private BCrypt encoder;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String string) throws UsernameNotFoundException {
         try {
             final User user = (User) getJpm().getEntity("jpm-entity-user").getDao().get(string);

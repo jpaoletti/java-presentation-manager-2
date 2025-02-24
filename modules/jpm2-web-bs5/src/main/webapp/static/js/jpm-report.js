@@ -23,6 +23,12 @@ function buildReportData() {
                 value: $(this).val()
             });
         });
+        $(this).find(".form-select").each(function () {
+            params.push({
+                name: $(this).attr("name"),
+                value: $(this).val()
+            });
+        });
         data.filters.push({
             field: $(this).data("field"),
             parameters: params

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -37,7 +38,7 @@ public class JPMReportController extends BaseController {
     public String saveReport(@PathVariable String reportId, @RequestParam String name, @RequestParam String content) throws PMException {
         final EntityReport report = getJpm().getReport(reportId);
         final EntityReportUserSave saveReport = reportService.saveReport(report, reportId, name, getUserDetails().getUsername(), content);
-        return "redirect:jpm/report/" + reportId + "?savedReportId=" + saveReport.getId();
+        return "redirect:/jpm/report/" + reportId + "?savedReportId=" + saveReport.getId();
     }
 
     @GetMapping(value = "/jpm/report/{reportId}")
@@ -103,11 +104,12 @@ public class JPMReportController extends BaseController {
         response.getOutputStream().write(xlsTobytes(wb));
     }
 
-    @GetMapping(value = "/jpm/report/{reportId}/{savedReportId}/delete")
-    public String deleteReport(@PathVariable String reportId, @PathVariable Long savedReportId) throws PMException {
+    @PostMapping(value = "/jpm/report/{reportId}/{savedReportId}/delete")
+    @ResponseBody
+    public JPMPostResponse deleteReport(@PathVariable String reportId, @PathVariable Long savedReportId) throws PMException {
         final EntityReport report = getJpm().getReport(reportId);
         reportService.deleteUserSave(savedReportId, getUserDetails().getUsername());
-        return "redirect:jpm/report/" + reportId;
+        return new JPMPostResponse(true, "redirect:/jpm/report/" + reportId);
     }
 
 }

@@ -47,7 +47,7 @@ public class ObjectSearcher implements Searcher {
         for (String value : values) {
             result.add(getEntity().getDao().get(value));
         }
-        return new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(result)), Restrictions.in(SearcherHelper.getSearchProperty(field), result));
+        return SearcherHelper.addAliases(new DescribedCriterion(MessageFactory.info(DESCRIPTION_KEY, String.valueOf(result)), Restrictions.in(SearcherHelper.getSearchProperty(field), result)), field);
     }
 
     public Entity getEntity() {
