@@ -6,6 +6,7 @@ import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
+import static jpaoletti.jpm2.web.converter.EditFileInMemoryConverter.CURRENT_FILE;
 
 /**
  *
@@ -19,6 +20,11 @@ public class ShowFileConverter extends Converter {
     private String measure = "k";
     private boolean downloadable = false;
     private String filenameField = null;
+
+    @Override
+    public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
+        return CURRENT_FILE;
+    }
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {

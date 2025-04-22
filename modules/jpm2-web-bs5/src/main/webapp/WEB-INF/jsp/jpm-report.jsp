@@ -179,8 +179,6 @@
             </c:forEach>
         </div>
         <!-- /SEARCHERS-->
-
-
         <div class="modal fade" id="saveReportModal" tabindex="-1" role="dialog" aria-labelledby="saveReportModalLabel">
             <form method="POST" action="${cp}jpm/report/${reportId}/save">
                 <div class="modal-dialog" role="document">

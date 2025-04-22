@@ -49,9 +49,8 @@
     <bean id="jpm-converter-edit-string" class="jpaoletti.jpm2.web.converter.WebEditString" />
     <bean id="jpm-converter-edit-int" class="jpaoletti.jpm2.web.converter.WebEditInteger" />
     <bean id="jpm-converter-edit-long" class="jpaoletti.jpm2.web.converter.WebEditLong" />
-    <bean id="jpm-converter-edit-date" class="jpaoletti.jpm2.web.converter.WebEditDate2">
+    <bean id="jpm-converter-edit-date" class="jpaoletti.jpm2.web.converter.WebEditDate3">
         <property name="format" value="dd/MM/yyyy" />
-        <property name="jsFormat" value="DD/MM/YYYY" />
     </bean>
     <bean id="jpm-converter-edit-decimal" class="jpaoletti.jpm2.web.converter.WebEditDecimal" />
     <bean id="jpm-converter-edit-bigstring" class="jpaoletti.jpm2.web.converter.EditBigString" />

@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class EditFileInMemoryConverter extends BaseEditFileConverter {
 
+    public static final byte[] CURRENT_FILE = new byte[0];
+
     @Autowired
     private HttpSession session;
     private String contentTypeField = null;
@@ -29,7 +31,7 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
     @Override
     public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue != null && newValue.equals("@current:")) {
-            throw new IgnoreConvertionException();
+            return CURRENT_FILE;
         }
         if (newValue == null || newValue.equals("")) {
             return null;

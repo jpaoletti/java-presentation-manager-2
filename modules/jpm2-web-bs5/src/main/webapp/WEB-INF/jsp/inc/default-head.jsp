@@ -26,6 +26,14 @@
 <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
 <script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
 
+<!--TODO Replace with local-->
+<script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
+<script src="${cp}static/js/jpm-datepicker-v6.js?v=${jpm.appversion}"></script>
+
+<script type="text/javascript" src="${cp}static/js/moment.min.js?v=${jpm.appversion}" charset="UTF-8"></script>
+<script type="text/javascript" src="${cp}static/js/bootstrap-datetimepicker.min.js?v=${jpm.appversion}"></script>
+
 <link rel="shortcut icon" href="${cp}static/favicon.ico?v=${jpm.appversion}">
 <link rel="icon" type="image/png" sizes="150x150" href="${cp}static/favicon.ico?v=${jpm.appversion}">
 <link rel="apple-touch-icon" sizes="150x150" href="${cp}static/favicon.ico?v=${jpm.appversion}">
