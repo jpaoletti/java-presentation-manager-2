@@ -168,7 +168,7 @@
     <repositories>
         <repository>
             <id>glassfish-repository</id>
-            <url>http://download.java.net/maven/glassfish</url>
+            <url>https://download.java.net/maven/glassfish</url>
         </repository>
     </repositories>
 </project>
