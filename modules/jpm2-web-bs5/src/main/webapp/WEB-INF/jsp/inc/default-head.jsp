@@ -10,6 +10,8 @@
 <meta name="author" content="">
 <meta name="version" content="${jpm.appversion}">
 <link href="${cp}static/css/all.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
+<link href="${cp}static/css/tempus-dominus.min.css?v=${jpm.appversion}" rel="stylesheet" type="text/css" />
+
 <script type='text/javascript' src="${cp}static/node_modules/jquery/dist/jquery.min.js?v=${jpm.appversion}" ></script>
 <script type='text/javascript' src="${cp}static/node_modules/@popperjs/core/dist/umd/popper.js?v=${jpm.appversion}" ></script>
 <script type='text/javascript' src="${cp}static/node_modules/jquery-blockui/jquery.blockUI.js?v=${jpm.appversion}" ></script>
@@ -27,9 +29,8 @@
 <script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
 
 <!--TODO Replace with local-->
-<script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
-<script src="${cp}static/js/jpm-datepicker-v6.js?v=${jpm.appversion}"></script>
+<script type="text/javascript"  src="${cp}static/js/tempus-dominus.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" src="${cp}static/js/jpm-datepicker-v6.js?v=${jpm.appversion}"></script>
 
 <script type="text/javascript" src="${cp}static/js/moment.min.js?v=${jpm.appversion}" charset="UTF-8"></script>
 <script type="text/javascript" src="${cp}static/js/bootstrap-datetimepicker.min.js?v=${jpm.appversion}"></script>
