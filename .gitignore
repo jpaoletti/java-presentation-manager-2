@@ -4,3 +4,4 @@ target/
 /modules/jpm2-core/src/main/resources/rebel.xml
 node_modules
 /modules/jpm2-rest
+.frontend
