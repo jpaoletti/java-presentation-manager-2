@@ -385,7 +385,7 @@ public class ListController extends BaseController {
             final Field field = entity.getFieldById(textField, getContext().getEntityContext());
             r.getResults().add(new ObjectConverterDataItem(
                     entity.getDao(getContext().getEntityContext()).getId(object).toString(),
-                    (useToString) ? object.toString() : JPMUtils.get(object, field.getProperty()).toString()));
+                    (useToString) ? object.toString() : String.valueOf(JPMUtils.get(object, field.getProperty()))));
         } else {
             final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
             String finalValue = textField;

@@ -114,18 +114,19 @@ function initTempusDominusField(input, dateFormat, locale) {
             }
         },
         localization: {
-            locale: locale,
+            locale: safeLocale(locale),
             format: (date) => formatDate(date, dateFormat)
         }
     });
 
-
+    input.tempusDominus = picker;
+    
     input.addEventListener("change.td", () => {
         const selected = picker.dates.lastPicked;
         if (selected instanceof Date) {
             input.value = formatDate(selected, dateFormat);
         }
     });
-    
-    
+
+
 }

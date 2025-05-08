@@ -1,3 +1,11 @@
+function safeLocale(locale) {
+    const supportedLocales = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru']; // los que sepas que tenés disponibles
+    if (!locale || typeof locale !== 'string')
+        return 'en';
+    const norm = locale.toLowerCase().split('-')[0]; // e.g. "es-AR" → "es"
+    return supportedLocales.includes(norm) ? norm : 'en';
+}
+
 function postToIframe(url, data, target) {
     $('body').append('<form action="' + url + '" method="post" target="' + target + '" id="postToIframe"></form>');
     $.each(data, function (n, v) {
