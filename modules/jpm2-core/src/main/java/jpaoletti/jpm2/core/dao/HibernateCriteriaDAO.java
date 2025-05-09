@@ -147,6 +147,11 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
                     c = c.createAlias(alias.getProperty(), alias.getAlias());
                 }
             }
+            if (!cfg.getOrders().isEmpty()) {
+                for (Order order : cfg.getOrders()) {
+                    c.addOrder(order);
+                }
+            }
             for (Criterion criterion : cfg.getRestrictions()) {
                 if (criterion != null) {
                     c.add(criterion);
