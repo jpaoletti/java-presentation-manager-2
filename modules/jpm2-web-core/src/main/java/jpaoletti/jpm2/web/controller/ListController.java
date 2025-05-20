@@ -1,11 +1,11 @@
 package jpaoletti.jpm2.web.controller;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
@@ -32,6 +32,7 @@ import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import static jpaoletti.jpm2.web.controller.ShowController.OP_SHOW;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
@@ -413,7 +414,8 @@ public class ListController extends BaseController {
         final ContextualEntity cowner = getJpm().getContextualEntity(owner);
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), cowner, ownerId);
         response.setContentType("application/vnd.ms-excel");
-        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getPluralTitle() + ".xls");
+        final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", ""); // "papa"
+        response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + ".xls");
         response.getOutputStream().write(xlsTobytes(wb));
     }
 
@@ -422,7 +424,8 @@ public class ListController extends BaseController {
         final Entity entity = getContext().getEntity();
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), null, null);
         response.setContentType("application/vnd.ms-excel");
-        response.addHeader("Content-Disposition", "attachment;filename=" + entity.getPluralTitle() + ".xls");
+        final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", ""); // "papa"
+        response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + ".xls");
         response.getOutputStream().write(xlsTobytes(wb));
     }
 

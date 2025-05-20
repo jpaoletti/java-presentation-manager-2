@@ -15,36 +15,36 @@
             escapeMarkup: function (m) {
                 return m;
             },
-            processResults: function (data, params) {
-                params.page = params.page || 1;
-                return {
-                    results: data.items,
-                    pagination: {
-                        more: (params.page * 30) < data.total_count
-                    }
-                };
-            },
             ajax: {
                 url: "${cp}jpm/${param.entityId}.json",
-                                dataType: 'json',
-                                data: function (params) {
-                                    return {
-                                        filter: "${param.filter}",
-                                        currentId: "${instance.id}",
-                                        ownerId: "${not empty owner?ownerId:''}",
-                                        relatedValue: ${(not empty param.related)?'$("#field_'.concat(param.related).concat('").val()'):'""'},
-                                        textField: "${param.textField}",
-                                        query: params.term, // search term
-                                        pageSize: ${param.pageSize},
-                                        page: params.page
-                                    };
-                                },
-                                results: function (data, page) {
-                                    return data;
-                                }
-                            }
-                        });
-                    });
+                dataType: 'json',
+                data: function (params) {
+                    var related = ${not empty param.related?param.related:'null'};
+                    return {
+                        filter: "${param.filter}",
+                        currentId: "${instance.id}",
+                        ownerId: "${not empty owner?ownerId:''}",
+                        relatedValue: (related != null) ? related.map(function (i, sel) {
+                            return $("#field_" + i).val();
+                        }).join(',') : "",
+                        textField: "${param.textField}",
+                        query: params.term, // search term
+                        pageSize: ${param.pageSize},
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.more
+                        }
+                    };
+                }
+            }
+        });
+    });
 </script>
 <c:if test="${param.addable}">
     <script type="text/javascript">
