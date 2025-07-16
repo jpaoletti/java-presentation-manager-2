@@ -33,31 +33,46 @@ function jpmDialogConfirm(params) {
 function jpmDialog(params) {
     var wrapper = document.createElement('div');
     wrapper.classList.add("modal");
-    var html = '<div class="modal-dialog ' + params.addClass + '"><div class="modal-content"><div class="modal-header ' + (params.titleBackground || "bg-info") + '"><h5 class="modal-title">' + (params.title || "") + '</h5>'
+    wrapper.setAttribute("tabindex", "-1");
+
+    var html = '<div class="modal-dialog ' + (params.addClass || '') + '"><div class="modal-content"><div class="modal-header ' + (params.titleBackground || "bg-info") + '">'
+            + '<h5 class="modal-title">' + (params.title || "") + '</h5>'
             + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body">' + (params.message || "") + '</div>'
             + '<div class="modal-footer">';
+
     if (!params.closeTimeout) {
-        html += '<button type="button" class="btn btn-primary btn-confirm">' + (params.okBtn || messages["jpm.modal.confirm.submit"]) + '</button>';
+        html += '<button type="button" class="btn btn-primary btn-confirm">' + (params.okBtn || messages["jpm.modal.confirm.submit"] || "Aceptar") + '</button>';
     }
+
     html += '</div></div></div>';
     wrapper.innerHTML = html;
+
     var myModal = new bootstrap.Modal(wrapper);
+    // Limpieza segura al cerrarse
+    wrapper.addEventListener('hidden.bs.modal', () => {
+        myModal.dispose();
+        wrapper.remove();
+    });
     if (!params.closeTimeout) {
         $(wrapper).find(".btn-confirm").on("click", function () {
-            myModal.hide();
-            myModal.dispose();
             if (params.callback) {
                 params.callback();
             }
+            myModal.hide();
         });
     } else {
         setTimeout(function () {
-            myModal.hide();
-            myModal.dispose();
             if (params.callback) {
                 params.callback();
             }
+            myModal.hide();
         }, params.closeTimeout);
+    }
+    // Ejecutar callback cuando se muestra el modal
+    if (typeof params.onshown === 'function') {
+        $(wrapper).on('shown.bs.modal', function () {
+            params.onshown(myModal);
+        });
     }
     myModal.show();
 }
