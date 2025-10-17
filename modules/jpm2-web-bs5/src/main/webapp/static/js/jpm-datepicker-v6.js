@@ -1,6 +1,9 @@
-function initTempusDominusField(input, dateFormat, locale) {
+function initTempusDominusField(input, dateFormat, locale, themeClass = "td-light") {
     if (!input || typeof tempusDominus === 'undefined')
         return;
+    if (!input.id)
+        input.id = 'td-' + Math.random().toString(36).slice(2);
+
     input.addEventListener('focus', function () {
         this.select();
     });
@@ -96,6 +99,28 @@ function initTempusDominusField(input, dateFormat, locale) {
 
         return parts;
     }
+    function toJsDate(dt) {
+        if (!dt)
+            return null;
+        if (dt instanceof Date)
+            return dt;
+        // TD DateTime (algunas builds exponen la fecha como .date)
+        if (typeof tempusDominus !== 'undefined' && dt instanceof tempusDominus.DateTime) {
+            if (dt.date instanceof Date)
+                return dt.date;
+        }
+        // Luxon u otros wrappers
+        if (typeof dt.toDate === 'function')
+            return dt.toDate();
+        if (typeof dt.toJSDate === 'function')
+            return dt.toJSDate();
+        // fallback si tiene getTime()
+        if (typeof dt.getTime === 'function')
+            return new Date(dt.getTime());
+        // último intento: parsear
+        const guess = new Date(dt);
+        return isNaN(guess) ? null : guess;
+    }
 
     const rawValue = input.value;
     const defaultDate = rawValue ? parseDate(rawValue, dateFormat) : null;
@@ -115,18 +140,39 @@ function initTempusDominusField(input, dateFormat, locale) {
         },
         localization: {
             locale: safeLocale(locale),
-            format: (date) => formatDate(date, dateFormat)
+            format: dateFormat // <-- IMPORTANTE: usar string, no función
         }
     });
+
+    picker.dates.parseInput = (value) => {
+        const jsDate = (typeof value === 'string') ? parseDate(value, dateFormat)
+                : (value instanceof Date) ? value
+                : toJsDate(value);
+        return jsDate ? new tempusDominus.DateTime(jsDate) : undefined;
+    };
+
+    picker.dates.formatInput = (dt) => {
+        const jsDate = toJsDate(dt);
+        return jsDate ? formatDate(jsDate, dateFormat) : '';
+    };
+
 
     input.tempusDominus = picker;
-    
-    input.addEventListener("change.td", () => {
-        const selected = picker.dates.lastPicked;
-        if (selected instanceof Date) {
-            input.value = formatDate(selected, dateFormat);
+
+    // Esperamos a que se muestre para agregar nuestra clase al widget
+    input.addEventListener('show.td', () => {
+        const widget = document.querySelector('.tempus-dominus-widget');
+        if (widget && !widget.classList.contains(themeClass)) {
+            widget.classList.add(themeClass);
         }
     });
-
+    input.addEventListener('change.td', (e) => {
+        const jsDate = toJsDate(e.detail?.date);
+        if (jsDate) {
+            const formatted = formatDate(jsDate, dateFormat);
+            if (input.value !== formatted)
+                input.value = formatted; // evita “re-escribir” igual a sí mismo
+        }
+    });
 
 }
