@@ -500,7 +500,9 @@ var initPage = function () {
                                         currentId: params.currentId || "",
                                         relatedValue: params.related
                                                 ? Array.isArray(params.related)
-                                                ? params.related.map(function (sel) {return sel.val();}).join(',')
+                                                ? params.related.map(function (sel) {
+                                                    return sel.val();
+                                                }).join(',')
                                                 : params.related.val()
                                                 : "",
                                         textField: params.textField || "",

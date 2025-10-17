@@ -50,11 +50,12 @@ public class ShowObject extends Converter {
             request.setAttribute(SHOW_OBJECT_FIELD_VALUE, new LinkedHashMap<String, String>());
         }
         final Map<String, String> values = (Map<String, String>) request.getAttribute(SHOW_OBJECT_FIELD_VALUE);
+        final Serializable realInstanceID = getContext().getEntity().getDao(getContext().getEntityContext()).getId(object);
 
         final String res = "@page:show-object-converter.jsp"
                 + "?entityId=" + getEntity().getId()
                 + "&fields=" + getFields()
-                + (object != null ? "&objectId=" + getContext().getEntity().getDao(getContext().getEntityContext()).getId(object) : "");
+                + (object != null ? "&objectId=" + realInstanceID : "");
         if (value == null) {
             return res;
         } else {
@@ -82,7 +83,7 @@ public class ShowObject extends Converter {
                     }
                 }
                 final String finalValue = HtmlUtils.htmlEscape(getFinalValue(value));
-                values.put(field.getId() + instanceId, finalValue);
+                values.put(field.getId() + realInstanceID, finalValue);
                 return res
                         // + "&value=" + finalValue
                         + "&instanceId=" + localId

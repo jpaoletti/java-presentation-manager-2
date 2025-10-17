@@ -22,7 +22,7 @@ public class ShowTags extends Converter {
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Collection<Tag> value = (Collection<Tag>) ((object == null) ? null : object);
-        if (value == null || value.isEmpty()) {
+        if (value == null || value.isEmpty() || ctx.getOperation() == null) {
             return "";
         } else {
             final StringBuilder sb = new StringBuilder("<div class='show-tags-converter'>");
@@ -45,4 +45,3 @@ public class ShowTags extends Converter {
         this.ctx = ctx;
     }
 }
-

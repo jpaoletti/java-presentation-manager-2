@@ -19,11 +19,11 @@
                 <div class="offcanvas-body">
                     <div>
                         <div class="input-group">
-                            <span style="width: 150px;" class="input-group-addon add-on"><spring:message code="jpm.reports.filter.from" text="First" /></span>
+                            <span style="width: 150px;" class="input-group-text"><spring:message code="jpm.reports.filter.from" text="First" /></span>
                             <input type="number" step="1" min="0" id="from" name="from" class="form-control" value="${(not empty savedReport)?savedReport.from:'0'}" style="text-align: right">
                         </div>
                         <div class="input-group">
-                            <span style="width: 150px;" class="input-group-addon add-on"><spring:message code="jpm.reports.filter.count" text="Count" /></span>
+                            <span style="width: 150px;" class="input-group-text"><spring:message code="jpm.reports.filter.count" text="Count" /></span>
                             <input type="number" step="10" min="50" id="count" name="from" class="form-control" value="${(not empty savedReport)?savedReport.max:'100'}" style="text-align: right">
                         </div>
                     </div>
