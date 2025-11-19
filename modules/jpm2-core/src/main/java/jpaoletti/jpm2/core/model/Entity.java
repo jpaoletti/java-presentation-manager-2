@@ -55,6 +55,11 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     private List<EntityContext> contexts;
 
+    public Entity(String id, String clazz) {
+        this.id = id;
+        this.clazz = clazz;
+    }
+
     public Entity() {
         super();
         this.fieldsbyid = null;

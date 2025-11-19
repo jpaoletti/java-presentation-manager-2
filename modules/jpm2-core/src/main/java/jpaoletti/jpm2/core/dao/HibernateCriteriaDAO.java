@@ -95,6 +95,11 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
     }
 
     @Override
+    public DAOListConfiguration build() {
+        return new DAOListConfiguration();
+    }
+
+    @Override
     public Long count(IDAOListConfiguration configuration) {
         final Criteria c = getBaseCriteria(configuration);
         c.setFirstResult(0);

@@ -21,6 +21,8 @@ import jpaoletti.jpm2.core.model.reports.EntityReportDataGraphic;
 import jpaoletti.jpm2.core.model.reports.EntityReportDescriptiveField;
 import jpaoletti.jpm2.core.model.reports.EntityReportResult;
 import jpaoletti.jpm2.core.model.reports.EntityReportUserSave;
+import jpaoletti.jpm2.core.search.ISearchResult;
+import jpaoletti.jpm2.core.search.ISearcher;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.util.XlsUtils;
@@ -78,9 +80,20 @@ public class ReportService extends JPMServiceBase {
         final SearchCriteria searchCriteria = new SearchCriteria();
         for (EntityReportDataFilter filter : reportData.getFilters()) {
             final Field field = report.getEntity().getFieldById(filter.getField(), null);
-            final Searcher.DescribedCriterion build = field.getSearcher().build(report.getEntity(), field, filter.getParameterMap());
-            searchCriteria.addDefinition(field.getId(), build);
-            JPMUtils.getLogger().debug("ReportService.getResult --- FILTER : " + field.getId() + " | " + build.getDescription());
+
+            // Handle both Hibernate Searcher and JPA ISearcher
+            final Object searcher = field.getSearcher();
+            if (searcher instanceof Searcher) {
+                // Hibernate Searcher (expected for reports)
+                final Searcher.DescribedCriterion build = ((Searcher) searcher).build(report.getEntity(), field, filter.getParameterMap());
+                if (build != null) {
+                    searchCriteria.addDefinition(field.getId(), build);
+                    JPMUtils.getLogger().debug("ReportService.getResult --- FILTER : " + field.getId() + " | " + build.getDescription());
+                }
+            } else if (searcher instanceof ISearcher) {
+                // JPA ISearcher (not typically used with reports, but handle it gracefully)
+                JPMUtils.getLogger().warn("ReportService.getResult --- JPA ISearcher not supported for reports. Field: " + field.getId());
+            }
         }
         final Criterion search = searchCriteria.getCriterion();
         if (search != null) {

@@ -3,6 +3,8 @@ package jpaoletti.jpm2.core.model;
 import java.io.Serializable;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.message.MessageFactory;
+import jpaoletti.jpm2.core.search.ISearchResult;
+import jpaoletti.jpm2.core.search.ISearcher;
 import jpaoletti.jpm2.core.search.Searcher;
 
 /**
@@ -27,9 +29,21 @@ public class SessionEntityData implements Serializable {
                 if (field == null) {
                     throw new PMException(MessageFactory.error("jpm.field.not.found", sd.getFieldId()));
                 }
-                final Searcher.DescribedCriterion build = field.getSearcher().build(entity, field, sd.getParametersForBuild());
-                if (build != null) {
-                    searchCriteria.addDefinition(sd.getFieldId(), build);
+
+                // Handle both Hibernate Searcher and JPA ISearcher
+                final Object searcher = field.getSearcher();
+                if (searcher instanceof Searcher) {
+                    // Hibernate Searcher (legacy)
+                    final Searcher.DescribedCriterion build = ((Searcher) searcher).build(entity, field, sd.getParametersForBuild());
+                    if (build != null) {
+                        searchCriteria.addDefinition(sd.getFieldId(), build);
+                    }
+                } else if (searcher instanceof ISearcher) {
+                    // JPA ISearcher (modern)
+                    final ISearchResult result = ((ISearcher) searcher).build(entity, field, sd.getParametersForBuild());
+                    if (result != null) {
+                        searchCriteria.addSearchResult(sd.getFieldId(), result);
+                    }
                 }
             }
         }

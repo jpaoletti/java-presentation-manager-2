@@ -24,6 +24,8 @@ import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.RelatedListFilter;
 import jpaoletti.jpm2.core.model.UserSearch;
+import jpaoletti.jpm2.core.search.ISearcher;
+import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.core.service.MiscEntityService;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -111,9 +113,9 @@ public class ListController extends BaseController {
                     final Field field = entity.getFieldById(textField, getContext().getEntityContext());
                     if (field.getSearcher() == null) {
                         restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
-                    } else {
+                    } else if (field.getSearcher() instanceof Searcher) {
                         try {
-                            final DescribedCriterion dc = field.getSearcher().build(entity, field, searcherParameters);
+                            final DescribedCriterion dc = ((Searcher) field.getSearcher()).build(entity, field, searcherParameters);
                             for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
                                 cl.withAlias(alias.getProperty(), alias.getAlias());
                             }
@@ -121,6 +123,9 @@ public class ListController extends BaseController {
                         } catch (Exception e) {
                             //We ignore any errors avoiding the filter
                         }
+                    } else {
+                        // JPA ISearcher not supported in this context (requires Hibernate Criteria)
+                        restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
                     }
                 } else {
                     final Disjunction disjunction = Restrictions.disjunction();
@@ -137,9 +142,9 @@ public class ListController extends BaseController {
                             }
                             if (field2.getSearcher() == null) {
                                 disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
-                            } else {
+                            } else if (field2.getSearcher() instanceof Searcher) {
                                 try {
-                                    final DescribedCriterion dc = field2.getSearcher().build(entity, field2, searcherParameters);
+                                    final DescribedCriterion dc = ((Searcher) field2.getSearcher()).build(entity, field2, searcherParameters);
                                     for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
                                         cl.withAlias(alias.getProperty(), alias.getAlias());
                                     }
@@ -147,6 +152,9 @@ public class ListController extends BaseController {
                                 } catch (Exception e) {
                                     //We ignore any errors avoiding the filter
                                 }
+                            } else {
+                                // JPA ISearcher not supported in this context (requires Hibernate Criteria)
+                                disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
                             }
                         }
                     }
@@ -284,10 +292,19 @@ public class ListController extends BaseController {
         final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
-            final DescribedCriterion build = field.getSearcher().build(entity, field, request.getParameterMap());
-            if (build != null) {
-                getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
-                params = PAGE1;
+            final Object searcher = field.getSearcher();
+            if (searcher instanceof Searcher) {
+                final DescribedCriterion build = ((Searcher) searcher).build(entity, field, request.getParameterMap());
+                if (build != null) {
+                    getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
+                    params = PAGE1;
+                }
+            } else if (searcher instanceof ISearcher) {
+                final jpaoletti.jpm2.core.search.ISearchResult result = ((ISearcher) searcher).build(entity, field, request.getParameterMap());
+                if (result != null) {
+                    getSessionEntityData(entity).getSearchCriteria().addSearchResult(fieldId, result);
+                    params = PAGE1;
+                }
             }
         }
         return buildRedirect(entity, null, OP_LIST, params);
@@ -303,10 +320,19 @@ public class ListController extends BaseController {
         final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
         String params = null;
         if (field.getSearcher() != null) {
-            final DescribedCriterion build = field.getSearcher().build(entity, field, request.getParameterMap());
-            if (build != null) {
-                getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
-                params = PAGE1;
+            final Object searcher = field.getSearcher();
+            if (searcher instanceof Searcher) {
+                final DescribedCriterion build = ((Searcher) searcher).build(entity, field, request.getParameterMap());
+                if (build != null) {
+                    getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
+                    params = PAGE1;
+                }
+            } else if (searcher instanceof ISearcher) {
+                final jpaoletti.jpm2.core.search.ISearchResult result = ((ISearcher) searcher).build(entity, field, request.getParameterMap());
+                if (result != null) {
+                    getSessionEntityData(entity).getSearchCriteria().addSearchResult(fieldId, result);
+                    params = PAGE1;
+                }
             }
         }
         return buildRedirect(owner, ownerId, entity, null, OP_LIST, params);

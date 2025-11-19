@@ -1,12 +1,14 @@
 package jpaoletti.jpm2.core.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import jpaoletti.jpm2.core.idtransformer.IdTransformer;
 import jpaoletti.jpm2.core.service.AuthorizationService;
@@ -38,9 +40,11 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
     private IdTransformer<ID> transformer;
 
     public JPADAO() {
-        Class<?>[] typeArguments = TypeResolver.resolveRawArguments(HibernateCriteriaDAO.class, getClass());
-        this.persistentClass = (Class<T>) typeArguments[0];
-        this.idClass = (Class<ID>) typeArguments[1];
+        Class<?>[] typeArguments = TypeResolver.resolveRawArguments(JPADAO.class, getClass());
+        if (typeArguments != null && typeArguments.length >= 2) {
+            this.persistentClass = (Class<T>) typeArguments[0];
+            this.idClass = (Class<ID>) typeArguments[1];
+        }
     }
 
     @Override
@@ -94,6 +98,7 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
         getSession().createQuery("DELETE FROM " + getPersistentClass().getName()).executeUpdate();
     }
 
+    @Override
     public JPADAOListConfiguration build() {
         final EntityManager em = getEntityManager();
         final JPADAOListConfiguration res = new JPADAOListConfiguration(em);
@@ -103,22 +108,41 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
     @Override
     public Long count(IDAOListConfiguration configuration) {
         final JPADAOListConfiguration cfg = (JPADAOListConfiguration) configuration;
-        final CriteriaBuilder cb = initCriteriaBuilder(cfg);
+        final EntityManager em = cfg.getEntityManager();
+        final CriteriaBuilder cb = cfg.getCriteriaBuilder();
 
-        final CriteriaQuery<Long> cq = cfg.getCriteriaBuilder().createQuery(Long.class);
+        final CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        final Root<T> root = cq.from(getPersistentClass());
 
-        cq.select(cfg.getCriteriaBuilder().count(cq.from(getPersistentClass())));
-        final ParameterExpression<Integer> p = cb.parameter(Integer.class);
-        cq.where(cb.equal(cq.from(getPersistentClass()).get("age"), p));
+        // Apply aliases/joins
+        for (JPADAOListConfiguration.JPAAlias alias : cfg.getAliases()) {
+            root.join(alias.getProperty(), alias.getJoinType()).alias(alias.getAlias());
+        }
 
-        return cfg.getEntityManager().createQuery(cq).getSingleResult();
+        // Apply predicates
+        if (!cfg.getPredicates().isEmpty()) {
+            List<Predicate> predicateList = new ArrayList<>();
+            for (java.util.function.BiFunction<CriteriaBuilder, javax.persistence.criteria.Root, Predicate> predicateFunc : cfg.getPredicates()) {
+                Predicate p = predicateFunc.apply(cb, root);
+                if (p != null) {
+                    predicateList.add(p);
+                }
+            }
+            if (!predicateList.isEmpty()) {
+                cq.where(cb.and(predicateList.toArray(new Predicate[0])));
+            }
+        }
 
+        cq.select(cb.count(root));
+
+        return em.createQuery(cq).getSingleResult();
     }
 
     @Override
     public List<T> list(IDAOListConfiguration configuration) {
         final JPADAOListConfiguration cfg = (JPADAOListConfiguration) configuration;
-        final TypedQuery query = getBaseCriteria(configuration);
+        final TypedQuery<T> query = buildQuery(cfg);
+
         if (configuration != null) {
             if (configuration.getMax() != null) {
                 query.setMaxResults(configuration.getMax());
@@ -127,100 +151,67 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
                 query.setFirstResult(configuration.getFrom());
             }
         }
-        /*final Root root = query.from(getPersistentClass());
-        final CriteriaBuilder cb = cfg.getCriteriaBuilder();
-        if (!cfg.getOrders().isEmpty()) {
-            for (DAOOrder order : cfg.getOrders()) {
-                if (order.isAsc()) {
-                    cq.orderBy(cb.asc(root.get(order.getOrder())));
-                } else {
-                    cq.orderBy(cb.desc(root.get(order.getOrder())));
-                }
-            }
-        }*/
- /*
-            if (!cfg.getProperties().isEmpty()) {
-                final ProjectionList projectionList = Projections.projectionList();
-                for (Map.Entry<String, String> entry : configuration.getProperties().entrySet()) {
-                    projectionList.add(Projections.property(entry.getKey()), entry.getValue());
-                }
-                c.setProjection(projectionList);
-            }*/
+
         return query.getResultList();
     }
 
-    public CriteriaBuilder initCriteriaBuilder(JPADAOListConfiguration cfg) {
+    /**
+     * Builds a typed query from the configuration applying all predicates, aliases, orders, and projections
+     *
+     * @param cfg JPA DAO list configuration
+     * @return TypedQuery ready to execute
+     */
+    protected TypedQuery<T> buildQuery(JPADAOListConfiguration cfg) {
+        final EntityManager em = cfg.getEntityManager();
         final CriteriaBuilder cb = cfg.getCriteriaBuilder();
-        final ParameterExpression<Integer> p = cb.parameter(Integer.class);
-        //cq.where(cb.equal(cq.from(getPersistentClass()).get("age"), p));
-        return cb;
-    }
+        final CriteriaQuery<T> cq = cb.createQuery(getPersistentClass());
+        final Root<T> root = cq.from(getPersistentClass());
 
-    public TypedQuery getBaseCriteria(IDAOListConfiguration configuration) {
-        final JPADAOListConfiguration cfg = (JPADAOListConfiguration) configuration;
-        final CriteriaQuery<T> cq = cfg.getCriteriaBuilder().createQuery(getPersistentClass());
-        cq.from(getPersistentClass());
-        final TypedQuery query = cfg.getEntityManager().createQuery(cq);
-        //c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+        // Apply aliases/joins
+        for (JPADAOListConfiguration.JPAAlias alias : cfg.getAliases()) {
+            root.join(alias.getProperty(), alias.getJoinType()).alias(alias.getAlias());
+        }
 
-        final Root root = cq.from(getPersistentClass());
-        final CriteriaBuilder cb = cfg.getCriteriaBuilder();
-
-        if (configuration != null) {
-            /*for (DAOListConfiguration.DAOListConfigurationAlias alias : cfg.getAliases()) {
-                    if (alias.getJoinType() != null) {
-                        cq = cq.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
-                    } else {
-                        cq = cq.createAlias(alias.getProperty(), alias.getAlias());
-                    }
-                }*/
- /*for (Criterion criterion : cfg.getRestrictions()) {
-                if (criterion != null) {
-                    cq.add(criterion);
+        // Apply predicates (restrictions)
+        if (!cfg.getPredicates().isEmpty()) {
+            List<Predicate> predicateList = new ArrayList<>();
+            for (java.util.function.BiFunction<CriteriaBuilder, javax.persistence.criteria.Root, Predicate> predicateFunc : cfg.getPredicates()) {
+                Predicate p = predicateFunc.apply(cb, root);
+                if (p != null) {
+                    predicateList.add(p);
                 }
             }
-            
-        ParameterExpression<String> paramTitle = cb.parameter(String.class);
-        cq.where(cb.like(books.get(Book_.title), paramTitle));
-        query.setParameter(paramTitle, "%Hibernate%");
-
-            
-            
-             */
+            if (!predicateList.isEmpty()) {
+                cq.where(cb.and(predicateList.toArray(new Predicate[0])));
+            }
         }
-        return query;
-    }
 
-    public CriteriaQuery getBaseCriteria2(IDAOListConfiguration configuration) {
-        final JPADAOListConfiguration cfg = (JPADAOListConfiguration) configuration;
-        final CriteriaQuery<T> cq = cfg.getCriteriaBuilder().createQuery(getPersistentClass());
-        cq.from(getPersistentClass());
-        final Root root = cq.from(getPersistentClass());
-        final CriteriaBuilder cb = cfg.getCriteriaBuilder();
-
-        if (configuration != null) {
-            /*for (DAOListConfiguration.DAOListConfigurationAlias alias : cfg.getAliases()) {
-                    if (alias.getJoinType() != null) {
-                        cq = cq.createAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
-                    } else {
-                        cq = cq.createAlias(alias.getProperty(), alias.getAlias());
-                    }
-                }*/
- /*for (Criterion criterion : cfg.getRestrictions()) {
-                if (criterion != null) {
-                    cq.add(criterion);
+        // Apply orders
+        if (!cfg.getOrders().isEmpty()) {
+            List<javax.persistence.criteria.Order> orders = new ArrayList<>();
+            for (DAOOrder order : cfg.getOrders()) {
+                if (order.isAsc()) {
+                    orders.add(cb.asc(root.get(order.getOrder())));
+                } else {
+                    orders.add(cb.desc(root.get(order.getOrder())));
                 }
             }
-            
-        ParameterExpression<String> paramTitle = cb.parameter(String.class);
-        cq.where(cb.like(books.get(Book_.title), paramTitle));
-        query.setParameter(paramTitle, "%Hibernate%");
-
-            
-            
-             */
+            cq.orderBy(orders);
         }
-        return cq;
+
+        // Apply projections if specified
+        if (!cfg.getProperties().isEmpty()) {
+            List<javax.persistence.criteria.Selection<?>> selections = new ArrayList<>();
+            for (Map.Entry<String, String> entry : cfg.getProperties().entrySet()) {
+                selections.add(root.get(entry.getKey()).alias(entry.getValue()));
+            }
+            cq.multiselect(selections);
+        } else {
+            // Select distinct root entity to avoid duplicates from joins
+            cq.select(root).distinct(true);
+        }
+
+        return em.createQuery(cq);
     }
 
     public SessionFactory getSessionFactory() {
@@ -269,6 +260,11 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     public EntityManager getEntityManager() {
         return getSession().getEntityManagerFactory().createEntityManager();
+    }
+
+    @Override
+    public void detach(Object object) {
+        getSession().evict(object);
     }
 
 }

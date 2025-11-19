@@ -5,10 +5,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
+import jpaoletti.jpm2.core.dao.DAOOrder;
+import jpaoletti.jpm2.core.dao.IDAOListConfiguration;
+import jpaoletti.jpm2.core.dao.JPADAOListConfiguration;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
@@ -20,6 +24,8 @@ import jpaoletti.jpm2.core.model.ListSort;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.SessionEntityData;
+import jpaoletti.jpm2.core.search.ISearcher;
+import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.util.JPMUtils;
 import static jpaoletti.jpm2.util.XlsUtils.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -44,12 +50,12 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     @Override
     public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak) throws PMException {
         final Object owner = entity.getDao().get(instanceId);
-        final DAOListConfiguration cfg = new DAOListConfiguration();
+        final IDAOListConfiguration cfg = weak.getDao().build();
         addOwnerRestriction(weak, cfg, entity, owner);
         if (weak.getEntity().getDefaultSortField(entity.getContext()) != null) {
             final Field sortField = weak.getEntity().getFieldById(weak.getEntity().getDefaultSortField(entity.getContext()), weak.getContext());
             final ListSort sort = new ListSort(sortField, weak.getEntity().getDefaultSortDirection(entity.getContext()));
-            cfg.withOrder(sort.getOrder());
+            addOrder(cfg, sort);
         }
         final List list = weak.getDao().list(cfg);
         final PaginatedList pl = new PaginatedList();
@@ -66,7 +72,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (operation != null) {
             operation.checkAuthorization();
         }
-        final DAOListConfiguration configuration = new DAOListConfiguration();
+        final IDAOListConfiguration configuration = entity.getDao().build();
         final PaginatedList pl = new PaginatedList();
         final Criterion search = sessionEntityData.getSearchCriteria().getCriterion();
         if (owner != null) {
@@ -74,18 +80,16 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             //configuration.getRestrictions().add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
             addOwnerRestriction(entity, configuration, owner, ownerObject);
         }
-        if (search != null) {
-            configuration.getRestrictions().add(search);
-            configuration.getAliases().addAll(sessionEntityData.getSearchCriteria().getAliases());
+        // Apply search criteria
+        if (sessionEntityData.getSearchCriteria().hasSearchResults()) {
+            // NEW: Use generic search results (works with both Hibernate and JPA)
+            sessionEntityData.getSearchCriteria().applyTo(configuration);
+        } else if (search != null) {
+            // LEGACY: Fallback to old Hibernate Criterion method
+            addSearchCriteria(configuration, search, sessionEntityData.getSearchCriteria().getAliases());
         }
         if (sessionEntityData.getSort().isSorted()) {
-            final Order order = sessionEntityData.getSort().getOrder();
-            final String property = order.getPropertyName();
-            if (property.contains(".")) { //need alias
-                final String alias = property.substring(0, property.indexOf("."));
-                configuration.withAlias(alias, alias);
-            }
-            configuration.withOrder(order);
+            addSort(configuration, sessionEntityData.getSort());
         }
         final DAO dao = entity.getDao();
         if (entity.getEntity().isPaginable()) {
@@ -105,7 +109,16 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             if (field.getSearcher() != null) {
                 try {
                     field.checkAuthorization();
-                    pl.getFieldSearchs().put(field, field.getSearcher().visualization(entity.getEntity(), field));
+                    final Object searcher = field.getSearcher();
+                    String visualization = null;
+                    if (searcher instanceof Searcher) {
+                        visualization = ((Searcher) searcher).visualization(entity.getEntity(), field);
+                    } else if (searcher instanceof ISearcher) {
+                        visualization = ((ISearcher) searcher).visualization(entity.getEntity(), field);
+                    }
+                    if (visualization != null) {
+                        pl.getFieldSearchs().put(field, visualization);
+                    }
                 } catch (NotAuthorizedException e) {
                 }
             }
@@ -259,12 +272,87 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         return iobject;
     }
 
-    private void addOwnerRestriction(ContextualEntity weak, final DAOListConfiguration cfg, ContextualEntity ownerEntity, final Object owner) {
+    /**
+     * Adds an order to the configuration. Detects the configuration type and applies the appropriate method.
+     *
+     * @param cfg the configuration (DAOListConfiguration or JPADAOListConfiguration)
+     * @param sort the ListSort to add
+     */
+    private void addOrder(IDAOListConfiguration cfg, ListSort sort) {
+        if (cfg instanceof DAOListConfiguration) {
+            ((DAOListConfiguration) cfg).withOrder(sort.getOrder());
+        } else if (cfg instanceof JPADAOListConfiguration) {
+            final Order hibernateOrder = sort.getOrder();
+            final String property = hibernateOrder.getPropertyName();
+            final boolean asc = sort.isAsc();
+            ((JPADAOListConfiguration) cfg).withOrder(new DAOOrder(property, asc));
+        }
+    }
+
+    /**
+     * Adds search criteria to the configuration. For Hibernate-based configurations, adds Criterion and aliases directly.
+     * For JPA-based configurations, this method should only be called with Hibernate DAOs (search criteria is Hibernate-specific).
+     *
+     * @param cfg the configuration
+     * @param criterion the Hibernate Criterion to add
+     * @param aliases the aliases to add
+     */
+    private void addSearchCriteria(IDAOListConfiguration cfg, Criterion criterion, Set<DAOListConfiguration.DAOListConfigurationAlias> aliases) {
+        if (cfg instanceof DAOListConfiguration) {
+            DAOListConfiguration dalCfg = (DAOListConfiguration) cfg;
+            dalCfg.getRestrictions().add(criterion);
+            dalCfg.getAliases().addAll(aliases);
+        }
+        // Note: JPA configurations don't support Hibernate Criterion directly.
+        // If using JPA DAOs, search criteria needs to be converted to predicates at the Entity/Field level.
+    }
+
+    /**
+     * Adds sort configuration. Detects the configuration type and applies the appropriate method.
+     *
+     * @param cfg the configuration
+     * @param sort the ListSort to add
+     */
+    private void addSort(IDAOListConfiguration cfg, ListSort sort) {
+        if (cfg instanceof DAOListConfiguration) {
+            DAOListConfiguration dalCfg = (DAOListConfiguration) cfg;
+            final Order order = sort.getOrder();
+            final String property = order.getPropertyName();
+            if (property.contains(".")) { //need alias
+                final String alias = property.substring(0, property.indexOf("."));
+                dalCfg.withAlias(alias, alias);
+            }
+            dalCfg.withOrder(order);
+        } else if (cfg instanceof JPADAOListConfiguration) {
+            JPADAOListConfiguration jpaoCfg = (JPADAOListConfiguration) cfg;
+            final Order hibernateOrder = sort.getOrder();
+            final String property = hibernateOrder.getPropertyName();
+            if (property.contains(".")) { //need alias
+                final String alias = property.substring(0, property.indexOf("."));
+                jpaoCfg.withAlias(alias, alias, javax.persistence.criteria.JoinType.INNER);
+            }
+            final boolean asc = sort.isAsc();
+            jpaoCfg.withOrder(new DAOOrder(property, asc));
+        }
+    }
+
+    /**
+     * Adds owner restriction to the configuration. Detects the configuration type and applies the appropriate method.
+     *
+     * @param weak the weak entity
+     * @param cfg the configuration (DAOListConfiguration or JPADAOListConfiguration)
+     * @param ownerEntity the owner entity
+     * @param owner the owner object
+     */
+    private void addOwnerRestriction(ContextualEntity weak, final IDAOListConfiguration cfg, ContextualEntity ownerEntity, final Object owner) {
         if (weak != null && weak.getOwner() != null) {
-            if (weak.getOwner().isOnlyId()) {
-                cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), ownerEntity.getDao().getId(owner)));
-            } else {
-                cfg.getRestrictions().add(Restrictions.eq(weak.getOwner().getLocalProperty(), owner));
+            final String localProperty = weak.getOwner().getLocalProperty();
+            final Object value = weak.getOwner().isOnlyId() ? ownerEntity.getDao().getId(owner) : owner;
+
+            if (cfg instanceof DAOListConfiguration) {
+                ((DAOListConfiguration) cfg).getRestrictions().add(Restrictions.eq(localProperty, value));
+            } else if (cfg instanceof JPADAOListConfiguration) {
+                ((JPADAOListConfiguration) cfg).withPredicate((cb, root) -> cb.equal(root.get(localProperty), value));
             }
         }
     }

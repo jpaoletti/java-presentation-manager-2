@@ -12,6 +12,8 @@ import jpaoletti.jpm2.core.model.reports.EntityReport;
 import jpaoletti.jpm2.core.model.reports.EntityReportData;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.reports.EntityReportUserSave;
+import jpaoletti.jpm2.core.search.ISearcher;
+import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.service.ReportService;
 import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -69,7 +71,16 @@ public class JPMReportController extends BaseController {
                 throw new PMException(MessageFactory.error("jpm.reports.field.not.found", reportId));
             }
             if (field.getSearcher() != null) {
-                fieldSearchs.put(field, field.getSearcher().visualization(report.getEntity(), field));
+                final Object searcher = field.getSearcher();
+                String visualization = null;
+                if (searcher instanceof Searcher) {
+                    visualization = ((Searcher) searcher).visualization(report.getEntity(), field);
+                } else if (searcher instanceof ISearcher) {
+                    visualization = ((ISearcher) searcher).visualization(report.getEntity(), field);
+                }
+                if (visualization != null) {
+                    fieldSearchs.put(field, visualization);
+                }
             }
         }
         mav.addObject("fieldSearchs", fieldSearchs);

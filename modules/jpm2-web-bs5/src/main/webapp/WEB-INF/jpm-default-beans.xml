@@ -25,11 +25,21 @@
     <bean id="jpm-validator-notNull" class="jpaoletti.jpm2.core.validator.NotNull" />
     <bean id="jpm-validator-notEmpty" class="jpaoletti.jpm2.core.validator.NotEmpty" />
 
-    <!-- SEARCHERS -->
+    <!-- SEARCHERS - HIBERNATE (Legacy) -->
     <bean id="jpm-searcher-int" class="jpaoletti.jpm2.core.search.IntegerSearcher" />
     <bean id="jpm-searcher-long" class="jpaoletti.jpm2.core.search.LongSearcher" />
     <bean id="jpm-searcher-string" class="jpaoletti.jpm2.core.search.StringSearcher" />
     <bean id="jpm-searcher-bool" class="jpaoletti.jpm2.core.search.BoolSearcher" />
+
+    <!-- SEARCHERS - JPA (Modern) -->
+    <bean id="jpm-searcher-int-jpa" class="jpaoletti.jpm2.core.search.jpa.IntegerJPASearcher" />
+    <bean id="jpm-searcher-long-jpa" class="jpaoletti.jpm2.core.search.jpa.LongJPASearcher" />
+    <bean id="jpm-searcher-string-jpa" class="jpaoletti.jpm2.core.search.jpa.StringJPASearcher" />
+    <bean id="jpm-searcher-bool-jpa" class="jpaoletti.jpm2.core.search.jpa.BoolJPASearcher" />
+    <bean id="jpm-searcher-bigdecimal-jpa" class="jpaoletti.jpm2.core.search.jpa.BigDecimalJPASearcher" />
+    <bean id="jpm-searcher-date-jpa" class="jpaoletti.jpm2.core.search.jpa.DateJPASearcher">
+        <property name="dateFormat" value="dd/MM/yyyy" />
+    </bean>
 
     <!-- CONVERTERS -->
     <bean id="default-converter"  class="jpaoletti.jpm2.web.converter.WebToString" />

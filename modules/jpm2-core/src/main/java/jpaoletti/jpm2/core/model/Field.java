@@ -9,6 +9,7 @@ import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.search.ISearcher;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -39,7 +40,7 @@ public class Field extends PMCoreObject {
     private String auth;
     private String defaultValue;
     private String align; //left right center, TODO
-    private Searcher searcher;
+    private Object searcher; // Can be either Searcher (Hibernate) or ISearcher (JPA)
     private boolean sortable;
     private boolean auditable=true;
     private List<FieldConfig> configs;
@@ -267,12 +268,61 @@ public class Field extends PMCoreObject {
         return null;
     }
 
-    public Searcher getSearcher() {
+    /**
+     * Gets the searcher for this field. Can be either Searcher (Hibernate) or ISearcher (JPA).
+     *
+     * @return The searcher object
+     */
+    public Object getSearcher() {
         return searcher;
     }
 
-    public void setSearcher(Searcher searcher) {
+    /**
+     * Sets the searcher for this field. Can be either Searcher (Hibernate) or ISearcher (JPA).
+     *
+     * @param searcher The searcher object
+     */
+    public void setSearcher(Object searcher) {
+        if (searcher != null && !(searcher instanceof Searcher) && !(searcher instanceof ISearcher)) {
+            throw new IllegalArgumentException("Searcher must be either Searcher or ISearcher type");
+        }
         this.searcher = searcher;
+    }
+
+    /**
+     * Checks if this field has a Hibernate Searcher.
+     *
+     * @return true if the searcher is a Hibernate Searcher
+     */
+    public boolean hasHibernateSearcher() {
+        return searcher instanceof Searcher;
+    }
+
+    /**
+     * Checks if this field has a JPA ISearcher.
+     *
+     * @return true if the searcher is a JPA ISearcher
+     */
+    public boolean hasJPASearcher() {
+        return searcher instanceof ISearcher;
+    }
+
+    /**
+     * Gets the searcher as a Hibernate Searcher.
+     *
+     * @return The Hibernate Searcher, or null if not a Hibernate Searcher
+     */
+    public Searcher getHibernateSearcher() {
+        return hasHibernateSearcher() ? (Searcher) searcher : null;
+    }
+
+    /**
+     * Gets the searcher as a JPA ISearcher.
+     *
+     * @return The JPA ISearcher, or null if not a JPA ISearcher
+     */
+    public ISearcher getJPASearcher() {
+        return hasJPASearcher() ? (ISearcher) searcher : null;
     }
 
     /**

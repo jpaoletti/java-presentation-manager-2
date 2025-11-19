@@ -11,6 +11,14 @@ import java.util.List;
  */
 public interface DAO<T, ID extends Serializable> {
 
+    /**
+     * Builds a new list configuration appropriate for this DAO implementation.
+     * HibernateCriteriaDAO will return DAOListConfiguration, JPADAO will return JPADAOListConfiguration.
+     *
+     * @return a new instance of the appropriate IDAOListConfiguration implementation
+     */
+    public IDAOListConfiguration build();
+
     public Long count(IDAOListConfiguration configuration);
 
     public void delete(Object object);

@@ -14,7 +14,7 @@
         <property name="basename" value="classpath:messages" />
         <property name="defaultEncoding" value="UTF-8"/>
         <property name="cacheSeconds" value="2" /> <!-- for easier development -->
-        <property name="fallbackToSystemLocale" value="false" />
+        <property name="fallbackToSystemLocale" value="true" />
     </bean>
  
     <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver" />
