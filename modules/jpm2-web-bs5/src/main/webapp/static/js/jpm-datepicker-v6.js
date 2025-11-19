@@ -125,9 +125,27 @@ function initTempusDominusField(input, dateFormat, locale, themeClass = "td-ligh
     const rawValue = input.value;
     const defaultDate = rawValue ? parseDate(rawValue, dateFormat) : null;
 
-    //console.log("Inicializando Tempus:", {rawValue, defaultDate});
+    // Leer restricciones de fecha desde atributos data-*
+    const minDateAttr = input.getAttribute('data-mindate');
+    const maxDateAttr = input.getAttribute('data-maxdate');
 
-    const picker = new tempusDominus.TempusDominus(input, {
+    let restrictions = {};
+    if (minDateAttr) {
+        const minDate = minDateAttr === 'now' ? new Date() : parseDate(minDateAttr, dateFormat);
+        if (minDate) {
+            restrictions.minDate = minDate;
+        }
+    }
+    if (maxDateAttr) {
+        const maxDate = maxDateAttr === 'now' ? new Date() : parseDate(maxDateAttr, dateFormat);
+        if (maxDate) {
+            restrictions.maxDate = maxDate;
+        }
+    }
+
+    //console.log("Inicializando Tempus:", {rawValue, defaultDate, restrictions});
+
+    const pickerConfig = {
         defaultDate: defaultDate instanceof Date && !isNaN(defaultDate) ? defaultDate : undefined,
         display: {
             components: {
@@ -142,7 +160,14 @@ function initTempusDominusField(input, dateFormat, locale, themeClass = "td-ligh
             locale: safeLocale(locale),
             format: dateFormat // <-- IMPORTANTE: usar string, no función
         }
-    });
+    };
+
+    // Agregar restricciones si existen
+    if (Object.keys(restrictions).length > 0) {
+        pickerConfig.restrictions = restrictions;
+    }
+
+    const picker = new tempusDominus.TempusDominus(input, pickerConfig);
 
     picker.dates.parseInput = (value) => {
         const jsDate = (typeof value === 'string') ? parseDate(value, dateFormat)
@@ -161,10 +186,28 @@ function initTempusDominusField(input, dateFormat, locale, themeClass = "td-ligh
 
     // Esperamos a que se muestre para agregar nuestra clase al widget
     input.addEventListener('show.td', () => {
-        const widget = document.querySelector('.tempus-dominus-widget');
-        if (widget && !widget.classList.contains(themeClass)) {
-            widget.classList.add(themeClass);
-        }
+        // Usar setTimeout para asegurar que el widget ya esté en el DOM
+        setTimeout(() => {
+            // Buscar el widget que esté visible (display no es none)
+            const widgets = document.querySelectorAll('.tempus-dominus-widget');
+            widgets.forEach(widget => {
+                // Solo procesar widgets visibles
+                const style = window.getComputedStyle(widget);
+                if (style.display !== 'none') {
+                    // Remover todas las clases de tema anteriores (td-light, td-dark, etc.)
+                    const classesToRemove = [];
+                    widget.classList.forEach(cls => {
+                        if (cls.startsWith('td-')) {
+                            classesToRemove.push(cls);
+                        }
+                    });
+                    classesToRemove.forEach(cls => widget.classList.remove(cls));
+
+                    // Agregar la clase de tema actual
+                    widget.classList.add(themeClass);
+                }
+            });
+        }, 10); // Pequeño delay para asegurar que el DOM está actualizado
     });
     input.addEventListener('change.td', (e) => {
         const jsDate = toJsDate(e.detail?.date);
