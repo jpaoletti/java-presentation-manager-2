@@ -32,7 +32,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         <c:forEach items="${item.operations}" var="o">
                                             <li><jpm:operation-link operation="${o}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="true" clazz="dropdown-item" /></li>
-                                        </c:forEach>
+                                            </c:forEach>
                                     </ul>
                                 </div>
                             </c:if>
@@ -63,6 +63,11 @@
                 name: $(this).attr("data-name")
             }
         });
+    });
+    $("a").each(function () {
+        if ($(this).attr("href")) {
+            $(this).attr("href", $(this).attr("href").replace("@cp@/", getContextPath()));
+        }
     });
     //<c:forEach items="${paginatedList.fields}" var="f"><c:if test="${not empty f.align}">
     $("td[data-field='${f.id}']").css("text-align", "${f.align}");
