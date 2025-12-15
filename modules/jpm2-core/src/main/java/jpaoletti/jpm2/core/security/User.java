@@ -199,4 +199,71 @@ public abstract class User implements Serializable, UserDetails {
     public String getUserGroups() {
         return getGroups().stream().map(Group::getName).collect(Collectors.joining(", "));
     }
+
+    /**
+     * Gets the maximum privilege level (minimum number) among all user groups.
+     * Lower numbers = higher privilege (1 = maximum, 999 = minimum).
+     * If user has no groups, returns maximum value (minimum privilege).
+     *
+     * @return The highest privilege level (lowest number) this user has
+     */
+    public Integer getMaxPrivilegeLevel() {
+        if (getGroups() == null || getGroups().isEmpty()) {
+            return Integer.MAX_VALUE; // No groups = minimum privilege
+        }
+        return getGroups().stream()
+                .map(Group::getLevel)
+                .min(Integer::compareTo) // MIN because lower = higher privilege
+                .orElse(Integer.MAX_VALUE);
+    }
+
+    /**
+     * Verifies if this user can manage another user based on privilege level.
+     * A user can manage another if their privilege level is LOWER OR EQUAL (higher privilege).
+     *
+     * @param otherUser The user to check
+     * @return true if this user has equal or higher privilege (can manage)
+     */
+    public boolean canManage(User otherUser) {
+        if (otherUser == null) {
+            return false;
+        }
+        return this.getMaxPrivilegeLevel() <= otherUser.getMaxPrivilegeLevel();
+    }
+
+    /**
+     * Verifies if this user can assign a specific group to another user.
+     * A user can assign a group if their privilege level is LOWER OR EQUAL to the group's level.
+     *
+     * @param group The group to check
+     * @return true if this user can assign this group
+     */
+    public boolean canAssignGroup(Group group) {
+        if (group == null) {
+            return false;
+        }
+        return this.getMaxPrivilegeLevel() <= group.getLevel();
+    }
+
+    /**
+     * Gets a human-readable description of the user's privilege level.
+     *
+     * @return Description like "Maximum Privilege", "High Privilege", etc.
+     */
+    public String getPrivilegeLevelDescription() {
+        Integer level = getMaxPrivilegeLevel();
+        if (level == null || level >= Integer.MAX_VALUE) {
+            return "No Privilege";
+        } else if (level <= Group.LEVEL_MAX_PRIVILEGE) {
+            return "Maximum Privilege";
+        } else if (level <= Group.LEVEL_HIGH_PRIVILEGE) {
+            return "High Privilege";
+        } else if (level <= Group.LEVEL_MEDIUM_PRIVILEGE) {
+            return "Medium Privilege";
+        } else if (level <= Group.LEVEL_LOW_PRIVILEGE) {
+            return "Low Privilege";
+        } else {
+            return "Minimum Privilege";
+        }
+    }
 }
