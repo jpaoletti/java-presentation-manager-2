@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.security;
 
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +50,8 @@ public abstract class User implements Serializable, UserDetails {
 
     @ManyToMany(targetEntity = Group.class)
     @JoinTable(name = "group_members", joinColumns
-        = @JoinColumn(name = "username"), inverseJoinColumns
-        = @JoinColumn(name = "group_id"))
+            = @JoinColumn(name = "username"), inverseJoinColumns
+            = @JoinColumn(name = "group_id"))
     private List<Group> groups;
 
     @Transient
@@ -94,6 +95,7 @@ public abstract class User implements Serializable, UserDetails {
         this.enabled = enabled;
     }
 
+    @XmlTransient
     public List<Group> getGroups() {
         return groups;
     }
@@ -111,6 +113,7 @@ public abstract class User implements Serializable, UserDetails {
     }
 
     @Override
+    @XmlTransient
     public List<Authority> getAuthorities() {
         return authorities;
     }
@@ -202,8 +205,8 @@ public abstract class User implements Serializable, UserDetails {
 
     /**
      * Gets the maximum privilege level (minimum number) among all user groups.
-     * Lower numbers = higher privilege (1 = maximum, 999 = minimum).
-     * If user has no groups, returns maximum value (minimum privilege).
+     * Lower numbers = higher privilege (1 = maximum, 999 = minimum). If user
+     * has no groups, returns maximum value (minimum privilege).
      *
      * @return The highest privilege level (lowest number) this user has
      */
@@ -218,8 +221,9 @@ public abstract class User implements Serializable, UserDetails {
     }
 
     /**
-     * Verifies if this user can manage another user based on privilege level.
-     * A user can manage another if their privilege level is LOWER OR EQUAL (higher privilege).
+     * Verifies if this user can manage another user based on privilege level. A
+     * user can manage another if their privilege level is LOWER OR EQUAL
+     * (higher privilege).
      *
      * @param otherUser The user to check
      * @return true if this user has equal or higher privilege (can manage)
@@ -232,8 +236,9 @@ public abstract class User implements Serializable, UserDetails {
     }
 
     /**
-     * Verifies if this user can assign a specific group to another user.
-     * A user can assign a group if their privilege level is LOWER OR EQUAL to the group's level.
+     * Verifies if this user can assign a specific group to another user. A user
+     * can assign a group if their privilege level is LOWER OR EQUAL to the
+     * group's level.
      *
      * @param group The group to check
      * @return true if this user can assign this group

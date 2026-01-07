@@ -38,6 +38,8 @@ function jpmDialogConfirm(params) {
 
     // Confirmar
     $(wrapper).find(".btn-confirm").on("click", function () {
+        // Quitar el foco del botón antes de cerrar para evitar warning de aria-hidden
+        this.blur();
         if (params.callback) {
             if (params.callback()) {
                 myModal.hide();
@@ -57,6 +59,13 @@ function jpmDialogConfirm(params) {
     wrapper.addEventListener('shown.bs.modal', function () {
         var btn = wrapper.querySelector('.btn-confirm');
         if (btn) btn.focus();
+    });
+
+    // Quitar foco antes de ocultar para evitar warning de aria-hidden
+    wrapper.addEventListener('hide.bs.modal', function () {
+        if (document.activeElement && wrapper.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
     });
 
     wrapper.addEventListener('hidden.bs.modal', function () {
@@ -110,6 +119,14 @@ function jpmDialog(params) {
 
     // Limpieza segura al cerrarse
     let timeoutId = null;
+
+    // Quitar foco antes de ocultar para evitar warning de aria-hidden
+    wrapper.addEventListener('hide.bs.modal', function () {
+        if (document.activeElement && wrapper.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
+    });
+
     wrapper.addEventListener('hidden.bs.modal', function () {
         if (timeoutId) clearTimeout(timeoutId);
         if (typeof params.onhide === 'function') params.onhide(myModal);
@@ -120,6 +137,8 @@ function jpmDialog(params) {
     // Botón confirmar (si existe)
     if (!params.closeTimeout) {
         $(wrapper).find(".btn-confirm").on("click", function () {
+            // Quitar el foco del botón antes de cerrar para evitar warning de aria-hidden
+            this.blur();
             if (typeof params.callback === 'function') {
                 params.callback();
             }
@@ -157,4 +176,48 @@ function jpmDialog(params) {
     });
 
     myModal.show();
+}
+
+/**
+ * Muestra un modal de alerta (warning)
+ * @param {string|object} message - Mensaje a mostrar o objeto con params
+ * @param {function} callback - (opcional) Función a ejecutar al cerrar
+ */
+function jpmAlert(message, callback) {
+    var params = {};
+
+    if (typeof message === 'string') {
+        params.message = message;
+        params.callback = callback;
+    } else if (typeof message === 'object') {
+        params = message;
+    }
+
+    params.title = params.title || (window.messages && messages["jpm.modal.alert.title"]) || "Warning";
+    params.titleBackground = params.titleBackground || "bg-warning text-dark";
+    params.addClass = params.addClass || "";
+
+    jpmDialog(params);
+}
+
+/**
+ * Muestra un modal de éxito
+ * @param {string|object} message - Mensaje a mostrar o objeto con params
+ * @param {function} callback - (opcional) Función a ejecutar al cerrar
+ */
+function jpmSuccess(message, callback) {
+    var params = {};
+
+    if (typeof message === 'string') {
+        params.message = message;
+        params.callback = callback;
+    } else if (typeof message === 'object') {
+        params = message;
+    }
+
+    params.title = params.title || (window.messages && messages["jpm.modal.success.title"]) || "Success";
+    params.titleBackground = params.titleBackground || "bg-success text-white";
+    params.addClass = params.addClass || "";
+
+    jpmDialog(params);
 }
