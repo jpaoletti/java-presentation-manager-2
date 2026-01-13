@@ -6,7 +6,7 @@
 <%@attribute name = "icon" required="false" type="java.lang.String" %>
 <%@attribute name = "separator" required="false" type="java.lang.Boolean" %>
 <c:set var="codeDot" value="${code.replace('!','.')}" />
-<security:authorize access="hasRole('jpm.auth.operation.${codeDot}.list')">
+<security:authorize access="hasAuthority('jpm.auth.operation.${codeDot}.list')">
     <c:choose>
         <c:when test = "${jpm.menuMode == 'top'}">
             <li><a href="${cp}jpm/${code}/list" id="menu-${codeDot}" class="jpm-menu-item dropdown-item"><span class="${icon}"></span>&nbsp;<spring:message code="top.menu.${codeDot}" text="${codeDot}" /></a></li>

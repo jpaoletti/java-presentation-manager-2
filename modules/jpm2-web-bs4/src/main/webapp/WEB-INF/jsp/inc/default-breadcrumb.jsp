@@ -21,7 +21,7 @@
                         </li>
                     </c:if>
                 </c:if>
-                <security:authorize access="hasRole('jpm.auth.operation.${owner.id}.show')">
+                <security:authorize access="hasAuthority('jpm.auth.operation.${owner.id}.show')">
                     <li class="breadcrumb-item">
                         <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show.exec">
                             <span class="fas fa-search"></span> <span class="d-none d-md-inline"><spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> </span>

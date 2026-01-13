@@ -4,7 +4,7 @@
     </li>
     <c:if test="${not empty owner}">
         <c:if test="${owner.containingListOperation}">
-            <security:authorize access="hasRole('jpm.auth.operation.${owner.id}.list')">
+            <security:authorize access="hasAuthority('jpm.auth.operation.${owner.id}.list')">
                 <c:if test="${empty instance.owner.owner}">
                     <li>
                         <a href="${cp}jpm/${owner.id}${entityContext}/list">
@@ -21,7 +21,7 @@
                 </c:if>
             </security:authorize>
         </c:if>
-        <security:authorize access="hasRole('jpm.auth.operation.${owner.id}.show')">
+        <security:authorize access="hasAuthority('jpm.auth.operation.${owner.id}.show')">
             <li>
                 <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show.exec">
                     <span class="glyphicon jpmicon-show"></span> <span class="hidden-xs"><spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> </span>

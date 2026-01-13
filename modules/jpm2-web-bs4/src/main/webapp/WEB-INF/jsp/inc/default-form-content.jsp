@@ -31,7 +31,7 @@
         <c:forEach items="${entity.panels}" var="row">
             <div class="row jpm-content-panels">
                 <c:forEach items="${row.panels}" var="panel">
-                    <security:authorize access="hasRole('${panel.auth}')">
+                    <security:authorize access="hasAuthority('${panel.auth}')">
                         <div class="col-lg-${panel.blocks}">
                             <div class="card">
                                 <div class="card-header d-flex align-items-center h-100">

@@ -25,7 +25,7 @@
         <intercept-url pattern="/favicon.ico" access="permitAll" />
         <intercept-url pattern="/jpmrest/**" access="permitAll" /> <!-- REST -->
         <intercept-url pattern="/jpm-websocket/**" access="permitAll" /> <!-- WEBSOCKET -->
-        <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+        <intercept-url pattern="/**" access="hasAuthority('ROLE_USER')" />
         <form-login login-page="/login" authentication-failure-url="/login?error=1" default-target-url="/index" />
         <logout logout-success-url="/login" delete-cookies="JSESSIONID,JPM_RECENT" invalidate-session="true" />
         <session-management>
