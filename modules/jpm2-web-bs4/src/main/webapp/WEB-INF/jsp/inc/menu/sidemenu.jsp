@@ -24,7 +24,7 @@
     <li class="header-menu">
         <span>Administration</span>
     </li>
-    <security:authorize access="hasAnyRole('jpm.auth.operation.jpm-entity-user.list','jpm.auth.operation.jpm-entity-group.list')">
+    <security:authorize access="hasAnyAuthority('jpm.auth.operation.jpm-entity-user.list','jpm.auth.operation.jpm-entity-group.list')">
     <li class="sidebar-dropdown">
         <a href="#">
             <i class="fa fa-user"></i>

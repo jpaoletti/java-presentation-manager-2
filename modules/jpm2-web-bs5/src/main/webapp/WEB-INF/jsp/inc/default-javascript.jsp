@@ -38,7 +38,7 @@
     }
     var ROLE_USER_FAVORITE = false;
 </script>
-<security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
+<security:authorize access="hasAnyAuthority('ROLE_USER_FAVORITE')">
     <script type="text/javascript">
         ROLE_USER_FAVORITE = true;
     </script>

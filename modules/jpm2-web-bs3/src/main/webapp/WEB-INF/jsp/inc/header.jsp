@@ -13,7 +13,7 @@
         <div class="collapse navbar-collapse">
             <%@include file="menu/top-menu.jsp" %>
             <ul class="nav navbar-nav navbar-right">
-                <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
+                <security:authorize access="hasAnyAuthority('ROLE_USER_FAVORITE')">
                     <li id="userNavFavorite">
                         <a id="userNavFavoriteLink"  href="javascript: void(0)" data-toggle="dropdown" data-target="#userNavFavorite" class="dropdown-toggle"><i class="glyphicon glyphicon-star"></i> <span class="text hidden-sm"><spring:message code="jpm.usernav.favorite" text="Favorites" /></span> <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -23,7 +23,7 @@
                         </ul>
                     </li>
                 </security:authorize>
-                <security:authorize access="hasAnyRole('ROLE_USER_RECENT')">
+                <security:authorize access="hasAnyAuthority('ROLE_USER_RECENT')">
                 <li id="userNavRecent">
                     <a id="userNavRecentLink"  href="javascript: void(0)" data-toggle="dropdown" data-target="#userNavRecent" class="dropdown-toggle"><i class="glyphicon glyphicon-time"></i> <span class="text hidden-sm"><spring:message code="jpm.usernav.recent" text="Recent" /></span> <b class="caret"></b></a>
                     <ul class="dropdown-menu"></ul>

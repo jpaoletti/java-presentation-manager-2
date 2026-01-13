@@ -1,7 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
-<security:authorize access="hasAnyRole('${param.weakAuth}', 'SPECIAL')">
+<security:authorize access="hasAnyAuthority('${param.weakAuth}', 'SPECIAL')">
     <c:if test="${param.showBtn}">
         <a id="weak${field}" class="btn btn-default btn-xs" href="${cp}jpm/${contextualEntity}/${param.ownerId}/${param.weakId}${param.context}/list"><i class="glyphicon ${param.btnIcon}"></i>&nbsp;<spring:message code='${param.btnText}' text='Change' /></a><br/>
     </c:if>
@@ -18,7 +18,7 @@
         </script>
     </c:if>
 </security:authorize>
-<security:authorize access="!hasAnyRole('${param.weakAuth}', 'SPECIAL')">
+<security:authorize access="!hasAnyAuthority('${param.weakAuth}', 'SPECIAL')">
     <div class="alert alert-danger">
         <b><spring:message code="jpm.access.denied" />:</b> ${param.weakAuth}
     </div>

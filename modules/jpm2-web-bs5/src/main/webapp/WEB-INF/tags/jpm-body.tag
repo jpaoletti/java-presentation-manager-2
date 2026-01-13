@@ -27,7 +27,7 @@
                             <div class="dropdown" id="searchDropdown">
                                 <input class="form-control me-2" type="search" id="search-menu" placeholder="<spring:message code="jpm.usernav.search" text="Search..." />" aria-label="Search">
                             </div>
-                            <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
+                            <security:authorize access="hasAnyAuthority('ROLE_USER_FAVORITE')">
                                 <div class="dropdown"   id="userNavFavorite">
                                     <button class="btn my-2 my-sm-0  dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
                                         <i class="fa fa-star text-warning"></i>
@@ -35,7 +35,7 @@
                                     <ul class="dropdown-menu messages" style="left: auto; right: 0; position: absolute;" aria-labelledby="dropdownMenuMessage"></ul>
                                 </div>
                             </security:authorize>
-                            <security:authorize access="hasAnyRole('ROLE_USER_RECENT')">
+                            <security:authorize access="hasAnyAuthority('ROLE_USER_RECENT')">
                                 <div class="btn-group dropleft">
                                     <div class="dropdown" id="userNavRecent">
                                         <button class="btn my-2 my-sm-0 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
@@ -62,7 +62,7 @@
     <c:when test = "${jpm.menuMode == 'left'}">
         <div class="page-wrapper ${jpm.menuTheme} sidebar-bg ${(empty showMenu or showMenu)?'toggled':''}">
             <c:if test="${empty showMenu or showMenu}">
-                <security:authorize access="hasAnyRole('ROLE_USER')">
+                <security:authorize access="hasAnyAuthority('ROLE_USER')">
                     <nav id="sidebar" class="sidebar-wrapper">
                         <span style="position: absolute; top: 3px; right: -25px;">
                             <button id="pin-sidebar" class="btn btn-sm btn-dark d-none d-sm-flex"><i class="fas fa-thumbtack"></i></button>&nbsp;
@@ -106,7 +106,7 @@
                                 </div><div id="mCSB_1_scrollbar_vertical" class="mCSB_scrollTools mCSB_1_scrollbar mCS-light mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 30px; height: 167px; top: 0px; display: block; max-height: 339px;"><div class="mCSB_dragger_bar" style="line-height: 30px;"></div></div><div class="mCSB_draggerRail"></div></div></div></div></div>
                         <!-- sidebar-footer  -->
                         <div class="sidebar-footer">
-                            <security:authorize access="hasAnyRole('ROLE_USER_FAVORITE')">
+                            <security:authorize access="hasAnyAuthority('ROLE_USER_FAVORITE')">
                                 <div class="dropdown" id="userNavFavorite">
                                     <a href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.favorite" text="Favorites" />">
                                         <i class="fa fa-star text-warning"></i>
@@ -114,7 +114,7 @@
                                     <ul class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage"></ul>
                                 </div>
                             </security:authorize>
-                            <security:authorize access="hasAnyRole('ROLE_USER_RECENT')">
+                            <security:authorize access="hasAnyAuthority('ROLE_USER_RECENT')">
                                 <div class="dropdown" id="userNavRecent">
                                     <a href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="<spring:message code="jpm.usernav.recent" text="Recent" />">
                                         <i class="fa fa-history text-info"></i>
