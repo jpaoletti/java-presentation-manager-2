@@ -56,8 +56,10 @@ public abstract class User implements Serializable, UserDetails {
 
     @Transient
     private String newPassword;
+
+    // NO es final para permitir correcta deserialización de sesión HTTP
     @Transient
-    private final List<Authority> authorities;
+    private List<Authority> authorities;
 
     public User() {
         this.enabled = true;
@@ -112,9 +114,23 @@ public abstract class User implements Serializable, UserDetails {
         this.newPassword = newPassword;
     }
 
+    /**
+     * Retorna las authorities del usuario. Si están vacías o null (después de
+     * deserialización de sesión HTTP), las recarga desde los grupos.
+     */
     @Override
     @XmlTransient
     public List<Authority> getAuthorities() {
+        // Inicializar si es null (después de deserialización)
+        if (authorities == null) {
+            authorities = new ArrayList<>();
+        }
+        // Recargar desde grupos si está vacía
+        if (authorities.isEmpty() && groups != null && !groups.isEmpty()) {
+            for (Group group : groups) {
+                authorities.addAll(group.getGrantedAuthority());
+            }
+        }
         return authorities;
     }
 
