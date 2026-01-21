@@ -259,7 +259,7 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
     }
 
     public EntityManager getEntityManager() {
-        return getSession().getEntityManagerFactory().createEntityManager();
+        return getSession().unwrap(EntityManager.class);
     }
 
     @Override
