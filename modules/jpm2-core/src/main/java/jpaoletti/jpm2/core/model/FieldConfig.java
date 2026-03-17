@@ -4,6 +4,7 @@ import java.util.List;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 
 /**
  * A field configuration item for one or more operations. Works also as a
@@ -79,9 +80,28 @@ public class FieldConfig extends PMCoreObject {
         this.converter = converter;
     }
 
+    @Override
+    public void checkAuthorization() throws NotAuthorizedException {
+        if (!matchesAuthorization()) {
+            throw new NotAuthorizedException(getAuth());
+        }
+    }
+
+    private boolean matchesAuthorization() {
+        if (getAuth() == null || getAuth().trim().isEmpty()) {
+            return true;
+        }
+        final String trimmedAuth = getAuth().trim();
+        if (trimmedAuth.startsWith("!")) {
+            final String role = trimmedAuth.substring(1).trim();
+            return !role.isEmpty() && !getAuthorizationService().userHasRole(role);
+        }
+        return getAuthorizationService().userHasRole(trimmedAuth);
+    }
+
     boolean match(EntityInstance instance, Operation operation) throws PMException {
         if (operation != null) {
-            final boolean prevalidation = includes(operation.getId()) && (getAuth() == null || getAuthorizationService().userHasRole(getAuth()));
+            final boolean prevalidation = includes(operation.getId()) && matchesAuthorization();
             if (prevalidation && getCondition() != null) {
                 return getCondition().check(instance, operation);
             }

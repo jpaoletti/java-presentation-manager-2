@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
+import jpaoletti.jpm2.core.dao.DAOOrder;
+import jpaoletti.jpm2.core.dao.IDAOListConfiguration;
+import jpaoletti.jpm2.core.dao.JPADAOListConfiguration;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
@@ -19,12 +22,15 @@ import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.JPAListFilter;
 import jpaoletti.jpm2.core.model.ListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.RelatedListFilter;
 import jpaoletti.jpm2.core.model.UserSearch;
+import jpaoletti.jpm2.core.search.ISearchResult;
 import jpaoletti.jpm2.core.search.ISearcher;
+import jpaoletti.jpm2.core.search.JPASearchResult;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.core.service.MiscEntityService;
@@ -52,6 +58,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -89,96 +99,171 @@ public class ListController extends BaseController {
         final ObjectConverterData r = new ObjectConverterData();
         r.setResults(new ArrayList<>());
         try {
-            final DAOListConfiguration cl = new DAOListConfiguration((page - 1) * ps, ps);
-            final List<Criterion> restrictions = new ArrayList<>();
-            if (filter != null && !"".equals(filter)) {
-                final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
-                synchronized (lfilter) {
-                    if (lfilter instanceof RelatedListFilter) {
-                        ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
-                    }
-                    final Criterion c = lfilter.getListFilter(cl, entity, getSessionEntityData(entity), currentId, owner, ownerId);
-                    if (c != null) {
-                        restrictions.add(c);
+            final IDAOListConfiguration cl = entity.getDao(getContext().getEntityContext()).build();
+            cl.setFrom((page - 1) * ps);
+            cl.setMax(ps);
+            if (cl instanceof DAOListConfiguration) {
+                final DAOListConfiguration hcl = (DAOListConfiguration) cl;
+                final List<Criterion> restrictions = new ArrayList<>();
+                if (filter != null && !"".equals(filter)) {
+                    final ListFilter lfilter = (ListFilter) ctx.getBean(filter);
+                    synchronized (lfilter) {
+                        if (lfilter instanceof RelatedListFilter) {
+                            ((RelatedListFilter) lfilter).setRelatedValue(relatedValue);
+                        }
+                        final Criterion c = lfilter.getListFilter(hcl, entity, getSessionEntityData(entity), currentId, owner, ownerId);
+                        if (c != null) {
+                            restrictions.add(c);
+                        }
                     }
                 }
-            }
-            if (!"".equals(query)) {
-                final Map<String, String[]> searcherParameters = new LinkedHashMap();
-                searcherParameters.put("value", new String[]{query});
-                searcherParameters.put("operator", new String[]{"li"});
-                //Field can be a conbintaion of fields like "[{code}] {description}"
-                //Old style is supported if there is no { in the textField
-                if (!textField.contains("{")) {
-                    final Field field = entity.getFieldById(textField, getContext().getEntityContext());
-                    if (field.getSearcher() == null) {
-                        restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
-                    } else if (field.getSearcher() instanceof Searcher) {
-                        try {
-                            final DescribedCriterion dc = ((Searcher) field.getSearcher()).build(entity, field, searcherParameters);
-                            for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
-                                cl.withAlias(alias.getProperty(), alias.getAlias());
+                if (!"".equals(query)) {
+                    final Map<String, String[]> searcherParameters = new LinkedHashMap();
+                    searcherParameters.put("value", new String[]{query});
+                    searcherParameters.put("operator", new String[]{"li"});
+                    if (!textField.contains("{")) {
+                        final Field field = entity.getFieldById(textField, getContext().getEntityContext());
+                        if (field.getSearcher() == null) {
+                            restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
+                        } else if (field.getSearcher() instanceof Searcher) {
+                            try {
+                                final DescribedCriterion dc = ((Searcher) field.getSearcher()).build(entity, field, searcherParameters);
+                                for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
+                                    hcl.withAlias(alias.getProperty(), alias.getAlias());
+                                }
+                                restrictions.add(dc.getCriterion());
+                            } catch (Exception e) {
                             }
-                            restrictions.add(dc.getCriterion());
-                        } catch (Exception e) {
-                            //We ignore any errors avoiding the filter
+                        } else {
+                            restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
                         }
                     } else {
-                        // JPA ISearcher not supported in this context (requires Hibernate Criteria)
-                        restrictions.add(Restrictions.ilike(field.getProperty(), query, MatchMode.ANYWHERE));
-                    }
-                } else {
-                    final Disjunction disjunction = Restrictions.disjunction();
-                    final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-                    while (matcher.find()) {
-                        final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                        //Starting with !, properties are ignored
-                        if (!_display_field.startsWith("!")) {
-                            final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
-                            final String property = field2.getProperty();
-                            if (property.contains(".")) {//need an alias
-                                final String alias = property.substring(0, property.indexOf("."));
-                                cl.withAlias(alias, alias);
-                            }
-                            if (field2.getSearcher() == null) {
-                                disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
-                            } else if (field2.getSearcher() instanceof Searcher) {
-                                try {
-                                    final DescribedCriterion dc = ((Searcher) field2.getSearcher()).build(entity, field2, searcherParameters);
-                                    for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
-                                        cl.withAlias(alias.getProperty(), alias.getAlias());
-                                    }
-                                    disjunction.add(dc.getCriterion());
-                                } catch (Exception e) {
-                                    //We ignore any errors avoiding the filter
+                        final Disjunction disjunction = Restrictions.disjunction();
+                        final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
+                        while (matcher.find()) {
+                            final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                            if (!_display_field.startsWith("!")) {
+                                final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
+                                final String property = field2.getProperty();
+                                if (property.contains(".")) {
+                                    final String alias = property.substring(0, property.indexOf("."));
+                                    hcl.withAlias(alias, alias);
                                 }
-                            } else {
-                                // JPA ISearcher not supported in this context (requires Hibernate Criteria)
-                                disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
+                                if (field2.getSearcher() == null) {
+                                    disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
+                                } else if (field2.getSearcher() instanceof Searcher) {
+                                    try {
+                                        final DescribedCriterion dc = ((Searcher) field2.getSearcher()).build(entity, field2, searcherParameters);
+                                        for (DAOListConfiguration.DAOListConfigurationAlias alias : dc.getAliases()) {
+                                            hcl.withAlias(alias.getProperty(), alias.getAlias());
+                                        }
+                                        disjunction.add(dc.getCriterion());
+                                    } catch (Exception e) {
+                                    }
+                                } else {
+                                    disjunction.add(Restrictions.ilike(property, query, MatchMode.ANYWHERE));
+                                }
+                            }
+                        }
+                        restrictions.add(disjunction);
+                    }
+                }
+                if (sortBy != null && !sortBy.equals("")) {
+                    if (sortBy.startsWith("-")) {
+                        hcl.withOrder(Order.desc(sortBy.substring(1)));
+                    } else {
+                        hcl.withOrder(Order.asc(sortBy));
+                    }
+                }
+                if (StringUtils.isNotEmpty(owner) && entity.getOwner() != null) {
+                    final ContextualEntity cowner = getJpm().getContextualEntity(owner);
+                    if (cowner != null) {
+                        final Object ownerObject = cowner.getDao().get(ownerId);
+                        restrictions.add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
+                    }
+                }
+                final List list = entity.getDao(getContext().getEntityContext()).list(hcl.withRestrictions(restrictions));
+                r.setMore(list.size() == ps);
+                for (Object object : list) {
+                    getObjectDisplay(r, entity, object, useToString, textField);
+                }
+            } else if (cl instanceof JPADAOListConfiguration) {
+                final JPADAOListConfiguration jcl = (JPADAOListConfiguration) cl;
+                if (filter != null && !"".equals(filter)) {
+                    final Object f = ctx.getBean(filter);
+                    synchronized (f) {
+                        if (f instanceof RelatedListFilter) {
+                            ((RelatedListFilter) f).setRelatedValue(relatedValue);
+                        }
+                        if (f instanceof JPAListFilter) {
+                            ((JPAListFilter) f).applyFilter(jcl, entity, getSessionEntityData(entity), currentId, owner, ownerId, relatedValue);
+                        }
+                    }
+                }
+                if (!"".equals(query)) {
+                    final Map<String, String[]> searcherParameters = new LinkedHashMap();
+                    searcherParameters.put("value", new String[]{query});
+                    searcherParameters.put("operator", new String[]{"li"});
+                    if (!textField.contains("{")) {
+                        final Field field = entity.getFieldById(textField, getContext().getEntityContext());
+                        if (field.getSearcher() instanceof ISearcher) {
+                            final ISearchResult sr = ((ISearcher) field.getSearcher()).build(entity, field, searcherParameters);
+                            if (sr != null) {
+                                sr.applyTo(jcl);
+                            }
+                        } else {
+                            jcl.withPredicate((cb, root) -> buildLikePredicate(cb, root, field.getProperty(), query));
+                        }
+                    } else {
+                        final List<JPASearchResult.JPAAlias> aliases = new ArrayList<>();
+                        final List<java.util.function.BiFunction<CriteriaBuilder, Root, Predicate>> preds = new ArrayList<>();
+                        final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
+                        while (matcher.find()) {
+                            final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+                            if (!_display_field.startsWith("!")) {
+                                final Field field2 = entity.getFieldById(_display_field, getContext().getEntityContext());
+                                if (field2.getSearcher() instanceof ISearcher) {
+                                    final ISearchResult sr = ((ISearcher) field2.getSearcher()).build(entity, field2, searcherParameters);
+                                    if (sr instanceof JPASearchResult) {
+                                        JPASearchResult jpaSr = (JPASearchResult) sr;
+                                        preds.add(jpaSr.getPredicate());
+                                        aliases.addAll(jpaSr.getAliases());
+                                    } else {
+                                        preds.add((cb, root) -> buildLikePredicate(cb, root, field2.getProperty(), query));
+                                    }
+                                } else {
+                                    preds.add((cb, root) -> buildLikePredicate(cb, root, field2.getProperty(), query));
+                                }
+                            }
+                        }
+                        if (!preds.isEmpty()) {
+                            jcl.withPredicate((cb, root) -> cb.or(preds.stream().map(p -> p.apply(cb, root)).toArray(Predicate[]::new)));
+                            for (JPASearchResult.JPAAlias alias : aliases) {
+                                jcl.withAlias(alias.getProperty(), alias.getAlias(), alias.getJoinType());
                             }
                         }
                     }
-                    restrictions.add(disjunction);
                 }
-            }
-            if (sortBy != null && !sortBy.equals("")) {
-                if (sortBy.startsWith("-")) {
-                    cl.withOrder(Order.desc(sortBy.substring(1)));
-                } else {
-                    cl.withOrder(Order.asc(sortBy));
+                if (sortBy != null && !sortBy.equals("")) {
+                    if (sortBy.startsWith("-")) {
+                        jcl.withOrder(new DAOOrder(sortBy.substring(1), false));
+                    } else {
+                        jcl.withOrder(new DAOOrder(sortBy, true));
+                    }
                 }
-            }
-            if (StringUtils.isNotEmpty(owner) && entity.getOwner() != null) {
-                final ContextualEntity cowner = getJpm().getContextualEntity(owner);
-                if (cowner != null) {
-                    final Object ownerObject = cowner.getDao().get(ownerId);
-                    restrictions.add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
+                if (StringUtils.isNotEmpty(owner) && entity.getOwner() != null) {
+                    final ContextualEntity cowner = getJpm().getContextualEntity(owner);
+                    if (cowner != null) {
+                        final Object ownerObject = cowner.getDao().get(ownerId);
+                        final String property = entity.getOwner().getLocalProperty();
+                        jcl.withPredicate((cb, root) -> cb.equal(getPath(root, property), ownerObject));
+                    }
                 }
-            }
-            final List list = entity.getDao(getContext().getEntityContext()).list(cl.withRestrictions(restrictions));
-            r.setMore(list.size() == ps);
-            for (Object object : list) {
-                getObjectDisplay(r, entity, object, useToString, textField);
+                final List list = entity.getDao(getContext().getEntityContext()).list(jcl);
+                r.setMore(list.size() == ps);
+                for (Object object : list) {
+                    getObjectDisplay(r, entity, object, useToString, textField);
+                }
             }
         } catch (FieldNotFoundException e) {
             r.getResults().add(new ObjectConverterDataItem("?", "¿¿ " + textField + " ??"));
@@ -213,6 +298,23 @@ public class ListController extends BaseController {
         instance.configureOwner(entity, getContext().getEntityContext(), cowner.getDao().get(ownerId));
         getContext().setEntityInstance(instance);
         return mav;
+    }
+
+    private Predicate buildLikePredicate(CriteriaBuilder cb, Root root, String property, String query) {
+        final Path path = getPath(root, property);
+        return cb.like(cb.lower(path.as(String.class)), "%" + query.toLowerCase() + "%");
+    }
+
+    private Path getPath(Root root, String property) {
+        if (property == null || property.isEmpty()) {
+            return root;
+        }
+        final String[] parts = property.split("\\\\.");
+        Path p = root.get(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            p = p.get(parts[i]);
+        }
+        return p;
     }
 
     /**

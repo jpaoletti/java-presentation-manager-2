@@ -35,4 +35,10 @@ public class IdentifiedObject {
     public void setObject(Object object) {
         this.object = object;
     }
+
+    @Override
+    public String toString() {
+        return "IdentifiedObject{" + "id=" + id + ", object=" + object + '}';
+    }
+
 }

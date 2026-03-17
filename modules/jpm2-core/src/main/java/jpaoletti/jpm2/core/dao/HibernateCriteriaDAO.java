@@ -112,17 +112,6 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
         final DAOListConfiguration cfg = (DAOListConfiguration) configuration;
         final Criteria c = getBaseCriteria(configuration);
         if (configuration != null) {
-            if (configuration.getMax() != null) {
-                c.setMaxResults(configuration.getMax());
-            }
-            if (configuration.getFrom() != null) {
-                c.setFirstResult(configuration.getFrom());
-            }
-            if (!cfg.getOrders().isEmpty()) {
-                for (Order order : cfg.getOrders()) {
-                    c.addOrder(order);
-                }
-            }
             if (!cfg.getProperties().isEmpty()) {
                 final ProjectionList projectionList = Projections.projectionList();
                 for (Map.Entry<String, String> entry : configuration.getProperties().entrySet()) {

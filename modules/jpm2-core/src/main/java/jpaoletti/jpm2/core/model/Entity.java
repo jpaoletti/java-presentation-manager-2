@@ -40,12 +40,12 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private boolean paginable; //Enable pagination on lists
     private String auth; //Needed authority to access any operation on this entity
     private String home; //default home if context one is not set.
-    private List<Field> fields;
-    private List<Entity> weaks;
-    private List<PanelRow> panels;
-    private List<Operation> operations;
-    private Map<String, Map<String, Field>> fieldsbyid;
-    private List<SearchDefinition> defaultSearchs;
+    private List<Field> fields = new ArrayList<>();
+    private List<Entity> weaks = new ArrayList<>();
+    private List<PanelRow> panels = new ArrayList<>();
+    private List<Operation> operations = new ArrayList<>();
+    private Map<String, Map<String, Field>> fieldsbyid = new LinkedHashMap<>();
+    private List<SearchDefinition> defaultSearchs = new ArrayList<>();
     private String defaultSortField;
     private ListSort.SortDirection defaultSortDirection;
     private Integer pageSize;
@@ -53,7 +53,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private String auditId; //Optional ID for auditoring
     private boolean detailedAudit = false; //In the update, logs every modified field.
 
-    private List<EntityContext> contexts;
+    private List<EntityContext> contexts = new ArrayList<>();
 
     public Entity(String id, String clazz) {
         this.id = id;
