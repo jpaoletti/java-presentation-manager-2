@@ -47,6 +47,9 @@ public class SecurityController extends BaseController {
     @Qualifier("jpm-dao-group")
     private DAO groupDAO;
 
+    @Autowired(required = false)
+    private List<AdditionalAuthorityProvider> additionalAuthorityProviders;
+
     @GetMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_RESET_PASSWORD + "}")
     public ModelAndView resetPassword(@PathVariable String instanceId) throws PMException {
         final UserDetails user = getSecurityService().resetPassword(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId);
@@ -132,6 +135,16 @@ public class SecurityController extends BaseController {
                 }
             }
         }
+        // Extension point: additional authority providers
+        if (additionalAuthorityProviders != null) {
+            for (AdditionalAuthorityProvider provider : additionalAuthorityProviders) {
+                final AuthoritiesResultGroup group = new AuthoritiesResultGroup();
+                group.setId(provider.getRootNodeId());
+                group.setName(provider.getRootNodeName());
+                group.setEntities(provider.getAuthorities(readonly, selected));
+                res.getAdditionalGroups().add(group);
+            }
+        }
         return res;
     }
 
@@ -166,6 +179,7 @@ public class SecurityController extends BaseController {
     public static class AuthoritiesResult {
 
         private List<AuthoritiesResultEntity> entities = new ArrayList<>();
+        private List<AuthoritiesResultGroup> additionalGroups = new ArrayList<>();
 
         public List<AuthoritiesResultEntity> getEntities() {
             return entities;
@@ -174,6 +188,27 @@ public class SecurityController extends BaseController {
         public void setEntities(List<AuthoritiesResultEntity> entities) {
             this.entities = entities;
         }
+
+        public List<AuthoritiesResultGroup> getAdditionalGroups() {
+            return additionalGroups;
+        }
+
+        public void setAdditionalGroups(List<AuthoritiesResultGroup> additionalGroups) {
+            this.additionalGroups = additionalGroups;
+        }
+    }
+
+    public static class AuthoritiesResultGroup {
+        private String id;
+        private String name;
+        private List<AuthoritiesResultEntity> entities = new ArrayList<>();
+
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public List<AuthoritiesResultEntity> getEntities() { return entities; }
+        public void setEntities(List<AuthoritiesResultEntity> entities) { this.entities = entities; }
     }
 
     public static class AuthoritiesResultEntity {
@@ -182,6 +217,15 @@ public class SecurityController extends BaseController {
         private String key; //jpm.auth.entity.eee
         private String name;
         private List<AuthoritiesResultOperation> operations = new ArrayList<>();
+
+        public AuthoritiesResultEntity() {
+        }
+
+        public AuthoritiesResultEntity(String id, String key, String name) {
+            this.id = id;
+            this.key = key;
+            this.name = name;
+        }
 
         public AuthoritiesResultEntity(Entity entity, EntityContext context, List<String> selected) {
             this.id = entity.getId();
@@ -240,6 +284,16 @@ public class SecurityController extends BaseController {
         private String name;
         private String icon;
         private List<AuthoritiesResultField> fields = new ArrayList<>();
+
+        public AuthoritiesResultOperation() {
+        }
+
+        public AuthoritiesResultOperation(String id, String key, String name, String icon) {
+            this.id = id;
+            this.key = key;
+            this.name = name;
+            this.icon = icon;
+        }
 
         public AuthoritiesResultOperation(Entity entity, Operation operation, EntityContext context, List<String> selected) {
             this.id = operation.getId();

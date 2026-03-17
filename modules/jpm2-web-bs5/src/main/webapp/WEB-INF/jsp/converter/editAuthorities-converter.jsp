@@ -83,6 +83,31 @@
                             });
                             auths.children.push(e);
                         });
+                        // Additional authority groups (API permissions, etc.)
+                        if (data.additionalGroups) {
+                            $.each(data.additionalGroups, function (i, group) {
+                                var groupNode = {'id': group.id, text: group.name, children: [], state: {'opened': true}};
+                                $.each(group.entities, function (j, item) {
+                                    var ge = {
+                                        'id': item.key,
+                                        'text': item.name + "<span class='authKey'> [" + item.key + "]</span>",
+                                        children: [],
+                                        state: {'opened': false},
+                                        'icon': "fas fa-plug"
+                                    };
+                                    $.each(item.operations, function (k, oper) {
+                                        ge.children.push({
+                                            'id': oper.key,
+                                            'text': oper.name + "<span class='authKey'> [" + oper.key + "]</span>",
+                                            'icon': (oper.icon === null ? "fas fa-leaf" : oper.icon),
+                                            'state': {selected: !readonly && $.inArray(oper.key, ids) >= 0}
+                                        });
+                                    });
+                                    groupNode.children.push(ge);
+                                });
+                                root.push(groupNode);
+                            });
+                        }
                     }
                 });
 
