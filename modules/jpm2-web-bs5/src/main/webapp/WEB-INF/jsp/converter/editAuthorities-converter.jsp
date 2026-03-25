@@ -89,11 +89,11 @@
                                 var groupNode = {'id': group.id, text: group.name, children: [], state: {'opened': true}};
                                 $.each(group.entities, function (j, item) {
                                     var ge = {
-                                        'id': item.key,
-                                        'text': item.name + "<span class='authKey'> [" + item.key + "]</span>",
+                                        'id': item.id || item.key || ('folder-' + i + '-' + j),
+                                        'text': item.name + (item.key ? "<span class='authKey'> [" + item.key + "]</span>" : ""),
                                         children: [],
                                         state: {'opened': false},
-                                        'icon': "fas fa-plug"
+                                        'icon': "fas fa-folder"
                                     };
                                     $.each(item.operations, function (k, oper) {
                                         ge.children.push({
