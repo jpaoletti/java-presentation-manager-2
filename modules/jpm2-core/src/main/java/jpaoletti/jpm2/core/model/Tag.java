@@ -55,6 +55,10 @@ public abstract class Tag {
         this.description = description;
     }
 
+    public String getText() {
+        return getDescription();
+    }
+
     public String getStyle() {
         return style;
     }

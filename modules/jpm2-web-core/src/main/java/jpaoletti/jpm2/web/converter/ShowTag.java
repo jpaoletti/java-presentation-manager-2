@@ -22,7 +22,7 @@ public class ShowTag extends Converter {
         }
         final StringBuilder sb = new StringBuilder("<div class='show-tags-converter'>");
         sb.append("<span data-id='").append(value.getId()).append("' style='").append(value.getStyle() != null ? value.getStyle() : "").append("' class='tag'>");
-        sb.append(value.getDescription());
+        sb.append(value.getText());
         sb.append("</span>");
         return sb.append("</div>").toString();
     }

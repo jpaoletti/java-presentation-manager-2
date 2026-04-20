@@ -29,7 +29,7 @@ public class ShowTags extends Converter {
             for (Tag o : value) {
                 if (o.getOperations().contains(ctx.getOperation().getId())) {
                     sb.append("<span data-id='").append(o.getId()).append("' style='").append(o.getStyle()).append("' class='tag'>");
-                    sb.append(o.getDescription());
+                    sb.append(o.getText());
                     sb.append("</span>&nbsp;");
                 }
             }
