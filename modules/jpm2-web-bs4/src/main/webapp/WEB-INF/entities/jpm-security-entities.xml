@@ -121,6 +121,12 @@
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="groups" />
+                    <property name="searcher">
+                        <bean class="jpaoletti.jpm2.core.search.CollectionSearcher2">
+                            <property name="entity" ref="jpm-entity-group" />
+                            <property name="textField" value="name" />
+                        </bean>
+                    </property>
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">

@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.DAOOrder;
@@ -144,13 +145,17 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             if (originalValues != null) {
                 final StringBuilder sb = new StringBuilder();
                 for (Field field : entity.getFields()) {
-                    final Object newValue = Converter.getValue(object, field);
+                    Object newValue;
+                    try {
+                        newValue = Converter.getValue(object, field);
+                    } catch (ConfigurationException ex) {
+                        newValue = null;
+                    }
                     final Object original = originalValues.get(field.getId());
-                    if (!Objects.equals(newValue, original)) {
-                        sb.append(String.format("<b>%s</b>: %s -&gt; %s",
+                    if (!JPMUtils.auditEquals(original, newValue)) {
+                        sb.append(String.format("<b>%s</b>: %s",
                                 field.getTitle(entity),
-                                Objects.toString(original),
-                                Objects.toString(newValue))
+                                JPMUtils.formatAuditDiff(original, newValue))
                         ).append("<br/>");
                     }
                 }

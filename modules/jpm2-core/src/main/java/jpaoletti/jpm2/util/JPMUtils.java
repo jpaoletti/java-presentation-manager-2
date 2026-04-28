@@ -5,10 +5,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.model.Entity;
@@ -160,12 +168,117 @@ public class JPMUtils implements ApplicationContextAware {
         final Map<String, Object> originalValues = new LinkedHashMap<>();
         for (Field field : entity.getFields()) {
             try {
-                originalValues.put(field.getId(), Converter.getValue(object, field));
+                originalValues.put(field.getId(), snapshotValue(Converter.getValue(object, field)));
             } catch (ConfigurationException ex) {
                 originalValues.put(field.getId(), null);
             }
         }
         return originalValues;
+    }
+
+    /**
+     * Returns a defensive snapshot of the given value, suitable for later
+     * comparison against a possibly mutated version of the same property.
+     * Collections and maps are shallow-copied so that in-place mutations on
+     * the original instance (e.g. clear/add cycles done by collection
+     * converters) do not silently invalidate the snapshot.
+     */
+    private static Object snapshotValue(Object value) {
+        if (value instanceof Set) {
+            return new LinkedHashSet<>((Set<?>) value);
+        }
+        if (value instanceof Collection) {
+            return new ArrayList<>((Collection<?>) value);
+        }
+        if (value instanceof Map) {
+            return new LinkedHashMap<>((Map<?, ?>) value);
+        }
+        return value;
+    }
+
+    /**
+     * Equality check tailored for detailed audit comparisons. Differs from
+     * {@link Objects#equals} in three ways: BigDecimals are compared by value
+     * ignoring scale, a null value is treated as equivalent to an empty
+     * collection/map, and collections are compared by content (Sets ignore
+     * order, other collections preserve order).
+     */
+    public static boolean auditEquals(Object a, Object b) {
+        if (a == b) {
+            return true;
+        }
+        if (a == null) {
+            return isEmptyContainer(b);
+        }
+        if (b == null) {
+            return isEmptyContainer(a);
+        }
+        if (a instanceof BigDecimal && b instanceof BigDecimal) {
+            return ((BigDecimal) a).compareTo((BigDecimal) b) == 0;
+        }
+        if (a instanceof Set && b instanceof Set) {
+            return a.equals(b);
+        }
+        if (a instanceof Collection && b instanceof Collection) {
+            final Collection<?> ca = (Collection<?>) a;
+            final Collection<?> cb = (Collection<?>) b;
+            if (ca.size() != cb.size()) {
+                return false;
+            }
+            return new ArrayList<>(ca).equals(new ArrayList<>(cb));
+        }
+        return Objects.equals(a, b);
+    }
+
+    private static boolean isEmptyContainer(Object o) {
+        if (o instanceof Collection) {
+            return ((Collection<?>) o).isEmpty();
+        }
+        if (o instanceof Map) {
+            return ((Map<?, ?>) o).isEmpty();
+        }
+        return false;
+    }
+
+    /**
+     * Renders an audit diff for the given pair of values. For collections,
+     * shows added and removed items; for everything else, shows the classic
+     * "old -&gt; new" form.
+     */
+    public static String formatAuditDiff(Object original, Object current) {
+        if (original instanceof Collection || current instanceof Collection) {
+            final Collection<?> oc = (original instanceof Collection) ? (Collection<?>) original : java.util.Collections.emptyList();
+            final Collection<?> nc = (current instanceof Collection) ? (Collection<?>) current : java.util.Collections.emptyList();
+            final List<Object> added = new ArrayList<>();
+            final List<Object> removed = new ArrayList<>();
+            final Set<Object> originalSet = new HashSet<>(oc);
+            final Set<Object> currentSet = new HashSet<>(nc);
+            for (Object o : nc) {
+                if (!originalSet.contains(o)) {
+                    added.add(o);
+                }
+            }
+            for (Object o : oc) {
+                if (!currentSet.contains(o)) {
+                    removed.add(o);
+                }
+            }
+            final StringBuilder sb = new StringBuilder();
+            if (!added.isEmpty()) {
+                sb.append("+").append(added);
+            }
+            if (!removed.isEmpty()) {
+                if (sb.length() > 0) {
+                    sb.append(" ");
+                }
+                sb.append("-").append(removed);
+            }
+            if (sb.length() == 0) {
+                sb.append(Objects.toString(original)).append(" -&gt; ").append(Objects.toString(current));
+            }
+            return sb.toString();
+        }
+        return Objects.toString(original) + " -&gt; " + Objects.toString(current);
     }
 
     @Override
