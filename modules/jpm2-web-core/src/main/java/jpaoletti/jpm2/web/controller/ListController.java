@@ -348,9 +348,24 @@ public class ListController extends BaseController {
         getContext().set(weak, operation);
         getContext().setEntityContext(cweak.getContext());
         mav.addObject("paginatedList", weakList);
+        final List<String> visibleColumns = miscEntityService.getVisibleColumns(getAuthorizationService().getCurrentUsername(), cweak);
+        mav.addObject("visibleColumns", visibleColumns);
         mav.addObject("showOperations", showOperations);
         mav.addObject("compactOperations", operation.isCompact());
+        mav.addObject("ownerEntityId", _entity);
+        mav.addObject("ownerInstanceId", instanceId);
+        mav.addObject("weakEntityId", _weak);
         return mav;
+    }
+
+    @PostMapping(value = "/jpm/{entity}/{instanceId}/{weak}/setWeakVisibleColumns")
+    @ResponseBody
+    public String setWeakVisibleColumns(
+            @PathVariable(value = "weak") String _weak,
+            @RequestParam List<String> column) throws PMException {
+        final ContextualEntity cweak = getJpm().getContextualEntity(_weak);
+        miscEntityService.setVisibleColumns(getAuthorizationService().getCurrentUsername(), cweak, column);
+        return "OK";
     }
 
     @PostMapping(value = "/jpm/{entity}/saveCurrentSearch")//WORK IN PROGESS
