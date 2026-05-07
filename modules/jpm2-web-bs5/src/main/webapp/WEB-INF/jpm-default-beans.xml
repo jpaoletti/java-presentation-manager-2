@@ -64,6 +64,7 @@
     </bean>
     <bean id="jpm-converter-edit-decimal" class="jpaoletti.jpm2.web.converter.WebEditDecimal" />
     <bean id="jpm-converter-edit-bigstring" class="jpaoletti.jpm2.web.converter.EditBigString" />
+    <bean id="jpm-converter-edit-rich-html" class="jpaoletti.jpm2.web.converter.WebEditRichHtmlConverter" />
 
     <bean id="jpm-converter-show-collection" class="jpaoletti.jpm2.web.converter.ShowCollection" />
     <bean id="jpm-converter-show-collection-size" class="jpaoletti.jpm2.web.converter.ShowCollectionSize" />

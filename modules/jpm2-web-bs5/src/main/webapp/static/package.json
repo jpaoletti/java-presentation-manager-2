@@ -20,7 +20,8 @@
         "jstree": "^3.3.11",
         "moment": "^2.29.2",
         "tempusdominus-bootstrap-4": "^5.39.0",
-        "tempusdominus-core": "^5.19.0"
+        "tempusdominus-core": "^5.19.0",
+        "trumbowyg": "^2.27.3"
     },
     "scripts": {
         "build": "echo 'No-op build script'"
