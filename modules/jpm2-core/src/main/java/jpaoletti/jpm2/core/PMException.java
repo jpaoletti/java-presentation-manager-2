@@ -8,7 +8,7 @@ import jpaoletti.jpm2.core.message.MessageFactory;
  *
  * @author jpaoletti
  */
-public class PMException extends Exception {
+public class PMException extends RuntimeException {
 
     private Message msg;
 
