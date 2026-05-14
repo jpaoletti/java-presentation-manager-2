@@ -7,6 +7,7 @@
 <%@attribute name = "instanceId"        required="false" type="java.lang.String" %>
 <%@attribute name = "contextualEntity"  required="true"  type="java.lang.String" %>
 <%@attribute name = "title"             required="false" type="java.lang.Boolean" description="Show title " %>
+<%@attribute name = "textClass"         required="false" type="java.lang.String" %>
 <a
     id="operation-${operation.id}"
     class="${clazz} operation-${operation.id}-${contextualEntity} confirm-${operation.confirm} ${operation.synchronic?'synchronic':'asynchronic'}" 
@@ -14,7 +15,7 @@
     href="${cp}jpm/${contextualEntity}/${not empty instanceId?instanceId.concat('/'):''}${operation.pathId}">
     <span class="${operation.icon}"></span>
     <c:if test="${not empty title and title}">
-        <span class="d-none d-sm-none d-lg-inline">
+        <span class="${not empty textClass?textClass:'d-none d-sm-none d-lg-inline'}">
             <spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />
         </span>
     </c:if>

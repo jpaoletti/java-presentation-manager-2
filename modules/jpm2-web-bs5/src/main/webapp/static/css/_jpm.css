@@ -31,12 +31,53 @@ main {padding-top: 65px;}
     display: flex;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: .5rem 1rem;
     padding: .75rem 1rem 0rem 1rem;
     margin-bottom: 1rem;
     background-color: #e9ecef;
     border-radius: .25rem;
 }
-#content-header h4{color: gray;margin-top: 10px;margin-left: 20px;}
+#content-header .content-header-main{
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+#content-header .content-header-main h3,
+#content-header .content-header-main h4{
+    margin-bottom: 0;
+    margin-right: 0;
+}
+#content-header h4{color: gray;margin-top: 10px;margin-left: 0;}
+#content-header .content-header-actions{
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-left: auto;
+    padding-top: .25rem;
+    white-space: nowrap;
+}
+#content-header .content-header-actions a{
+    color: gray;
+}
+@media (max-width: 767px) {
+    #content-header{
+        flex-wrap: nowrap;
+        align-items: flex-start;
+    }
+    #content-header .content-header-main{
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    #content-header .content-header-actions{
+        flex: 0 0 auto;
+        padding-top: 0;
+    }
+}
 .jpm-content-panels .card{margin-bottom: 5px;}
 
 .flyover {

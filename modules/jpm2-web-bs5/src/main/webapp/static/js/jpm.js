@@ -247,6 +247,85 @@ var initPage = function () {
         $('.tip-top').tooltip({placement: 'top'});
         $('.tip-bottom').tooltip({placement: 'bottom'});
 
+        function copyCurrentLocationToClipboard() {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(document.location.href);
+            }
+            return new Promise(function (resolve, reject) {
+                var $tempInput = $('<input type="text">');
+                $("body").append($tempInput);
+                $tempInput.val(document.location.href).trigger("select");
+                try {
+                    document.execCommand("copy");
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                } finally {
+                    $tempInput.remove();
+                }
+            });
+        }
+
+        function buildCopyPageLink() {
+            return '<a id="copyPageLink" href="#" title="' + messages["jpm.usernav.copylink"] + '"><i class="fas fa-link"></i></a>';
+        }
+
+        function buildOpenInNewTabLink() {
+            return '<a id="openInNewTabLink" href="' + document.location.href + '" target="_blank" rel="noopener noreferrer" title="' + messages["jpm.usernav.opennewtab"] + '"><i class="fas fa-external-link-alt"></i></a>';
+        }
+
+        function ensureContentHeaderActions() {
+            var $header = $("#content-header");
+            if ($header.length === 0) {
+                return $();
+            }
+            if ($header.children(".content-header-main").length === 0) {
+                var $main = $('<div class="content-header-main"></div>');
+                $header.children().not(".content-header-actions").appendTo($main);
+                $header.prepend($main);
+            }
+            var $actions = $header.children(".content-header-actions");
+            if ($actions.length === 0) {
+                $actions = $('<div class="content-header-actions"></div>');
+                $header.append($actions);
+            }
+            return $actions;
+        }
+
+        function appendCopyPageLink() {
+            var $actions = ensureContentHeaderActions();
+            if ($actions.length > 0 && $("#copyPageLink").length === 0) {
+                $actions.append(buildCopyPageLink());
+            }
+        }
+
+        function appendOpenInNewTabLink() {
+            var $actions = ensureContentHeaderActions();
+            if ($actions.length > 0 && $("#openInNewTabLink").length === 0) {
+                $actions.append(buildOpenInNewTabLink());
+            }
+        }
+
+        function appendFavoriteLink(html) {
+            var $actions = ensureContentHeaderActions();
+            if ($actions.length > 0) {
+                $actions.prepend(html);
+            }
+        }
+
+        function showCopyLinkFeedback(title, color) {
+            var $copyLink = $("#copyPageLink");
+            var $icon = $copyLink.find("i");
+            $copyLink.attr("title", title);
+            $copyLink.css("color", color);
+            $icon.removeClass("fa-link").addClass("fa-check");
+            setTimeout(function () {
+                $copyLink.attr("title", messages["jpm.usernav.copylink"]);
+                $copyLink.css("color", "gray");
+                $icon.removeClass("fa-check").addClass("fa-link");
+            }, 1500);
+        }
+
         if (currentUser && currentUser !== '') {
             if (ROLE_USER_FAVORITE) {
                 //Favorite navbar
@@ -262,10 +341,22 @@ var initPage = function () {
                         }
                     });
                     if (isFav) {
-                        $("#content-header").prepend('<a id="removeFavoriteLink" style="color: goldenrod" href="#" title="' + messages["jpm.usernav.removefavorite"] + '"><i class="fas fa-star"></i></a>&nbsp;');
+                        appendFavoriteLink('<a id="removeFavoriteLink" style="color: goldenrod" href="#" title="' + messages["jpm.usernav.removefavorite"] + '"><i class="fas fa-star"></i></a>');
                     } else {
-                        $("#content-header").prepend('<a id="addFavoriteLink"    style="color: gray" href="#" title="' + messages["jpm.usernav.addfavorite"] + '"><i class="fas fa-star"></i></a>&nbsp;');
+                        appendFavoriteLink('<a id="addFavoriteLink"    style="color: gray" href="#" title="' + messages["jpm.usernav.addfavorite"] + '"><i class="fas fa-star"></i></a>');
                     }
+                    appendOpenInNewTabLink();
+                    appendCopyPageLink();
+                });
+                $(document).on("click", "#copyPageLink", function (e) {
+                    e.preventDefault();
+                    copyCurrentLocationToClipboard()
+                            .then(function () {
+                                showCopyLinkFeedback(messages["jpm.usernav.copylink.copied"], "green");
+                            })
+                            .catch(function () {
+                                showCopyLinkFeedback(messages["jpm.usernav.copylink.error"], "firebrick");
+                            });
                 });
                 $(document).on("click", "#removeFavoriteLink", function (e) {
                     e.preventDefault();

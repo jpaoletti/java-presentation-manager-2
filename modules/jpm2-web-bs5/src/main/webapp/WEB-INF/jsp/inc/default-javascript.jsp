@@ -29,6 +29,10 @@
     messages["jpm.modal.confirm.close"] = "<spring:message code='jpm.modal.confirm.close' text='Close' />";
     messages["jpm.usernav.addfavorite"] = "<spring:message code='jpm.usernav.addfavorite' text='Add Fav' />";
     messages["jpm.usernav.removefavorite"] = "<spring:message code='jpm.usernav.removefavorite' text='Remove Fav' />";
+    messages["jpm.usernav.opennewtab"] = "<spring:message code='jpm.usernav.opennewtab' text='Open in new tab' />";
+    messages["jpm.usernav.copylink"] = "<spring:message code='jpm.usernav.copylink' text='Copy link' />";
+    messages["jpm.usernav.copylink.copied"] = "<spring:message code='jpm.usernav.copylink.copied' text='Link copied' />";
+    messages["jpm.usernav.copylink.error"] = "<spring:message code='jpm.usernav.copylink.error' text='Could not copy link' />";
     messages["jpm.addfavorite.popupTitle"] = "<spring:message code='jpm.addfavorite.popupTitle' text='' />";
     messages["jpm.modal.attachment.preview"] = "<spring:message code='jpm.modal.attachment.preview' text='' />";
     messages["jpm.modal.attachment.title"] = "<spring:message code='jpm.modal.attachment.title' text='' />";

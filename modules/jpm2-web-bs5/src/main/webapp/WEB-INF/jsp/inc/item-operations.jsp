@@ -5,13 +5,13 @@
         </c:forEach>
     </c:if>
     <c:if test="${operation.compact}">
-        <div class="dropdown">
-            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+        <div class="dropdown jpm-itemop-dropdown">
+            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle jpm-itemop-trigger" data-bs-toggle="dropdown">
                 <span class="fas fa-cog"></span> <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <ul class="dropdown-menu jpm-itemop-menu" aria-labelledby="dropdownMenuButton">
                 <c:forEach items="${itemOperations}" var="o">
-                    <li><jpm:operation-link operation="${o}" clazz="btn btn-sm dropdown-item ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${instance.id}" entityName="${entityName}" title="true" /></li>
+                    <li><jpm:operation-link operation="${o}" clazz="dropdown-item jpm-itemop-link" textClass="jpm-itemop-text" contextualEntity="${contextualEntity}" instanceId="${instance.id}" entityName="${entityName}" title="true" /></li>
                 </c:forEach>
             </ul>
         </div>
