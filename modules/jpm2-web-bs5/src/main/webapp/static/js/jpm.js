@@ -80,8 +80,14 @@ var delay = (function () {
     };
 })();
 
+var jpmShellInitialized = false;
+var jpmNavigator = {
+    enabled: true,
+    loading: false
+};
+
 function initConfirm() {
-    $("body").on("click", ".confirm-true", function (e) {
+    $("body").off("click.jpmConfirm", ".confirm-true").on("click.jpmConfirm", ".confirm-true", function (e) {
         e.preventDefault();
         var $href = $(this).attr("href");
         //@@ are SELECTED scoped operations
@@ -113,7 +119,7 @@ function initMenu() {
 //        $('.page-wrapper').toggleClass('toggled');
 //    });
     // Dropdown menu
-    $('.sidebar-dropdown > a').click(function () {
+    $('.sidebar-dropdown > a').off("click.jpmMenu").on("click.jpmMenu", function () {
         $('.sidebar-submenu').slideUp(200);
         if ($(this).parent().hasClass('active')) {
             $('.sidebar-dropdown').removeClass('active');
@@ -126,7 +132,7 @@ function initMenu() {
     });
 
     //toggle sidebar
-    $('#toggle-sidebar').click(function () {
+    $('#toggle-sidebar').off("click.jpmMenu").on("click.jpmMenu", function () {
         $('.page-wrapper').toggleClass('toggled');
         if (!isMobile()) {
             $("#search-menu").trigger("focus");
@@ -146,7 +152,7 @@ function initMenu() {
     }
 
     //Pin sidebar
-    $('#pin-sidebar').click(function () {
+    $('#pin-sidebar').off("click.jpmMenu").on("click.jpmMenu", function () {
         if ($('.page-wrapper').hasClass('pinned')) {
             // unpin sidebar when hovered
             $('.page-wrapper').removeClass('pinned');
@@ -166,7 +172,7 @@ function initMenu() {
     });
 
     //toggle sidebar overlay
-    $('#overlay').click(function () {
+    $('#overlay').off("click.jpmMenu").on("click.jpmMenu", function () {
         $('.page-wrapper').toggleClass('toggled');
     });
     //custom scroll bar is only used on desktop
@@ -226,18 +232,465 @@ var uniqBy = function (ary, key) {
     });
 };
 
+function normalizeUrl(url) {
+    return new URL(url, window.location.origin).toString();
+}
+
+function isJpmNavigableLink(link) {
+    if (!link || !link.href) {
+        return false;
+    }
+    var href = link.getAttribute("href");
+    if (!href || href === "#" || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+        return false;
+    }
+    if (link.dataset && link.dataset.jpmNoAjax === "true") {
+        return false;
+    }
+    if (link.hasAttribute("download")) {
+        return false;
+    }
+    if (link.target && link.target !== "" && link.target !== "_self") {
+        return false;
+    }
+    var url = new URL(link.href, window.location.origin);
+    if (url.origin !== window.location.origin) {
+        return false;
+    }
+    if (url.pathname === "/login" || url.pathname === "/logout" || url.pathname.endsWith("/login") || url.pathname.endsWith("/logout")) {
+        return false;
+    }
+    if (url.pathname.indexOf("/static/") >= 0 || url.pathname.indexOf("/download/") >= 0 || url.pathname.indexOf("downloadAttachment") >= 0) {
+        return false;
+    }
+    if (url.pathname.endsWith("/xls") || url.pathname.endsWith("/toExcel")) {
+        return false;
+    }
+    if (url.pathname.indexOf(getContextPath().replace(window.location.origin, "").replace(/\/$/, "")) !== 0) {
+        return false;
+    }
+    if (/\.(pdf|xls|xlsx|csv|zip|png|jpg|jpeg|gif)$/i.test(url.pathname)) {
+        return false;
+    }
+    return true;
+}
+
+function executeBodyScripts(doc) {
+    PM_onLoadFunctions = [];
+    $(document.body).find("#globalMessage").remove();
+    var importedGlobalMessage = doc.querySelector("#globalMessage");
+    if (importedGlobalMessage) {
+        document.body.appendChild(document.importNode(importedGlobalMessage, true));
+    }
+    $(doc.body).find("script").each(function () {
+        if (this.src) {
+            appendScript(this.src);
+        } else {
+            $.globalEval(this.text || this.textContent || this.innerHTML || "");
+        }
+    });
+}
+
+function refreshRecentMenu() {
+    if (!currentUser || currentUser === '') {
+        return;
+    }
+    var $recentMenu = $("#userNavRecent").find(".dropdown-menu");
+    if ($recentMenu.length === 0) {
+        return;
+    }
+    $recentMenu.empty();
+    var url = $(location).attr('href');
+    if (url.match(/#$/)) {
+        return;
+    }
+    var name = "JPM_RECENT";
+    var _recentArray = $.cookie(name);
+    var recentArray = new Array();
+    if (typeof _recentArray !== "undefined" && _recentArray !== "") {
+        recentArray = JSON.parse(_recentArray);
+    }
+    var array = Array.prototype.slice.call(recentArray);
+    if (array.length >= 10) {
+        array.shift();
+    }
+    var title = document.title;
+    title = title.indexOf("- ") >= 0 ? title.substring(title.indexOf("- ") + 1) : title;
+    array.push({'url': url, 'title': title});
+    var finalArray = uniqBy(array, JSON.stringify);
+    $.cookie(name, JSON.stringify(finalArray), {path: '/'});
+    $.each(finalArray, function (i, item) {
+        var html = '<li><a class="dropdown-item" href="' + item.url + '">';
+        html += '<div class="notification-content">';
+        html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
+        $recentMenu.append(html);
+    });
+}
+
+function refreshFavoriteMenu() {
+    $("#removeFavoriteLink,#addFavoriteLink,#copyPageLink,#openInNewTabLink").remove();
+    var $favoriteMenu = $("#userNavFavorite").find(".dropdown-menu");
+    if ($favoriteMenu.length > 0) {
+        $favoriteMenu.empty();
+    }
+    if (!currentUser || currentUser === '' || !ROLE_USER_FAVORITE) {
+        return;
+    }
+    $.getJSON(getContextPath() + "jpm/favorites", function (data) {
+        var isFav = false;
+        $.each(data, function (i, item) {
+            var html = '<li><a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
+            html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
+            if (item.link === document.location.href) {
+                isFav = true;
+            } else {
+                $favoriteMenu.append(html);
+            }
+        });
+        if (isFav) {
+            appendFavoriteLink('<a id="removeFavoriteLink" style="color: goldenrod" href="#" title="' + messages["jpm.usernav.removefavorite"] + '"><i class="fas fa-star"></i></a>');
+        } else {
+            appendFavoriteLink('<a id="addFavoriteLink" style="color: gray" href="#" title="' + messages["jpm.usernav.addfavorite"] + '"><i class="fas fa-star"></i></a>');
+        }
+        appendOpenInNewTabLink();
+        appendCopyPageLink();
+    });
+}
+
+function copyCurrentLocationToClipboard() {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(document.location.href);
+    }
+    return new Promise(function (resolve, reject) {
+        var $tempInput = $('<input type="text">');
+        $("body").append($tempInput);
+        $tempInput.val(document.location.href).trigger("select");
+        try {
+            document.execCommand("copy");
+            resolve();
+        } catch (error) {
+            reject(error);
+        } finally {
+            $tempInput.remove();
+        }
+    });
+}
+
+function buildCopyPageLink() {
+    return '<a id="copyPageLink" href="#" title="' + messages["jpm.usernav.copylink"] + '"><i class="fas fa-link"></i></a>';
+}
+
+function buildOpenInNewTabLink() {
+    return '<a id="openInNewTabLink" href="' + document.location.href + '" target="_blank" rel="noopener noreferrer" title="' + messages["jpm.usernav.opennewtab"] + '"><i class="fas fa-external-link-alt"></i></a>';
+}
+
+function ensureContentHeaderActions() {
+    var $header = $("#content-header");
+    if ($header.length === 0) {
+        return $();
+    }
+    if ($header.children(".content-header-main").length === 0) {
+        var $main = $('<div class="content-header-main"></div>');
+        $header.children().not(".content-header-actions").appendTo($main);
+        $header.prepend($main);
+    }
+    var $actions = $header.children(".content-header-actions");
+    if ($actions.length === 0) {
+        $actions = $('<div class="content-header-actions"></div>');
+        $header.append($actions);
+    }
+    return $actions;
+}
+
+function appendCopyPageLink() {
+    var $actions = ensureContentHeaderActions();
+    if ($actions.length > 0 && $("#copyPageLink").length === 0) {
+        $actions.append(buildCopyPageLink());
+    }
+}
+
+function appendOpenInNewTabLink() {
+    var $actions = ensureContentHeaderActions();
+    if ($actions.length > 0 && $("#openInNewTabLink").length === 0) {
+        $actions.append(buildOpenInNewTabLink());
+    }
+}
+
+function appendFavoriteLink(html) {
+    var $actions = ensureContentHeaderActions();
+    if ($actions.length > 0) {
+        $actions.prepend(html);
+    }
+}
+
+function showCopyLinkFeedback(title, color) {
+    var $copyLink = $("#copyPageLink");
+    var $icon = $copyLink.find("i");
+    $copyLink.attr("title", title);
+    $copyLink.css("color", color);
+    $icon.removeClass("fa-link").addClass("fa-check");
+    setTimeout(function () {
+        $copyLink.attr("title", messages["jpm.usernav.copylink"]);
+        $copyLink.css("color", "gray");
+        $icon.removeClass("fa-check").addClass("fa-link");
+    }, 1500);
+}
+
+function closeTransientUi() {
+    // Bootstrap popovers created from jQuery plugin calls.
+    $("[aria-describedby]").each(function () {
+        try {
+            $(this).popover('dispose');
+        } catch (e) {
+        }
+    });
+    $(".popover").remove();
+
+    // Dynamically created JPM modals and regular Bootstrap modals.
+    $(".modal.show").each(function () {
+        try {
+            var modal = bootstrap.Modal.getInstance(this) || new bootstrap.Modal(this);
+            modal.hide();
+        } catch (e) {
+        }
+    });
+    $(".modal-backdrop").remove();
+    $("body").removeClass("modal-open");
+    $("body").css("padding-right", "");
+
+    // Open offcanvas panels.
+    $(".offcanvas.show").each(function () {
+        try {
+            var offcanvas = bootstrap.Offcanvas.getInstance(this) || new bootstrap.Offcanvas(this);
+            offcanvas.hide();
+        } catch (e) {
+        }
+    });
+    $(".offcanvas-backdrop").remove();
+
+    // Open dropdown menus.
+    $(".dropdown-toggle.show").each(function () {
+        try {
+            var dropdown = bootstrap.Dropdown.getInstance(this) || new bootstrap.Dropdown(this);
+            dropdown.hide();
+        } catch (e) {
+        }
+    });
+    $(".dropdown-menu.show").removeClass("show");
+}
+
+function normalizeBodyOverlayState() {
+    $(".modal-backdrop").remove();
+    $(".offcanvas-backdrop").remove();
+    $("body").removeClass("modal-open");
+    $("body").css("padding-right", "");
+    $("body").css("overflow", "");
+}
+
+function resolveRenderedPageUrl(doc, fallbackUrl) {
+    var meta = doc.querySelector('meta[name="jpm-current-url"]');
+    if (meta && meta.content) {
+        return normalizeUrl(meta.content);
+    }
+    return normalizeUrl(fallbackUrl);
+}
+
+function initShell() {
+    if (jpmShellInitialized) {
+        return;
+    }
+    initConfirm();
+    initMenu();
+    $(document).off("click.jpmCopyLink", "#copyPageLink").on("click.jpmCopyLink", "#copyPageLink", function (e) {
+        e.preventDefault();
+        copyCurrentLocationToClipboard()
+                .then(function () {
+                    showCopyLinkFeedback(messages["jpm.usernav.copylink.copied"], "green");
+                })
+                .catch(function () {
+                    showCopyLinkFeedback(messages["jpm.usernav.copylink.error"], "firebrick");
+                });
+    });
+    $(document).off("click.jpmRemoveFavorite", "#removeFavoriteLink").on("click.jpmRemoveFavorite", "#removeFavoriteLink", function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            dataType: 'text',
+            url: getContextPath() + "jpm/removeFavorite?url=" + document.location.href,
+            success: function () {
+                refreshFavoriteMenu();
+            }
+        });
+    });
+    $(document).off("click.jpmAddFavorite", "#addFavoriteLink").on("click.jpmAddFavorite", "#addFavoriteLink", function (e) {
+        e.preventDefault();
+        var html = "";
+        html = html + '  <div class="form-group" id="note-group">';
+        html = html + '    <label for="title">' + messages["jpm.addfavorite.popupTitle"] + '</label>';
+        html = html + '    <input type="text" name="title" class="form-control" id="title" placeholder="...">';
+        html = html + '  </div>';
+        jpmDialogConfirm({
+            title: messages["jpm.usernav.addfavorite"],
+            message: html,
+            callback: function () {
+                if ($("#note").val() === "") {
+                    $("#note-group").addClass("has-error");
+                    $("#note").trigger('focus');
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: getContextPath() + "jpm/addFavorite?url=" + document.location.href + "&title=" + $("#title").val(),
+                        success: function () {
+                            refreshFavoriteMenu();
+                        }
+                    });
+                }
+                return true;
+            }
+        });
+    });
+    $(document).off("click.jpmLinkNav", "a").on("click.jpmLinkNav", "a", function (e) {
+        if (e.isDefaultPrevented() || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+            return;
+        }
+        if (!isJpmNavigableLink(this)) {
+            return;
+        }
+        e.preventDefault();
+        jpmNavigate(this.href);
+    });
+    $(document).off("submit.jpmFormNav", "#jpm-main-content form").on("submit.jpmFormNav", "#jpm-main-content form", function (e) {
+        var $form = $(this);
+        if ($form.attr("id") === "jpmForm") {
+            return;
+        }
+        if (($form.attr("enctype") || "").toLowerCase() === "multipart/form-data") {
+            return;
+        }
+        if ($form.attr("target")) {
+            return;
+        }
+        e.preventDefault();
+        jpmSubmitNavigationForm($form);
+    });
+    $(window).off("popstate.jpmNav").on("popstate.jpmNav", function () {
+        jpmNavigate(window.location.href, {push: false});
+    });
+    if (!window.history.state || !window.history.state.url) {
+        window.history.replaceState({url: window.location.href}, "", window.location.href);
+    }
+    jpmShellInitialized = true;
+}
+
+function renderPartialPage(html, url, options) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, "text/html");
+    var resolvedUrl = resolveRenderedPageUrl(doc, url);
+    var nextContent = doc.querySelector("#jpm-main-content");
+    if (!nextContent) {
+        window.location = resolvedUrl;
+        return;
+    }
+    var currentContent = document.querySelector("#jpm-main-content");
+    if (!currentContent) {
+        window.location = resolvedUrl;
+        return;
+    }
+    $(".jpm-menu-item").removeClass("active");
+    currentContent.innerHTML = nextContent.innerHTML;
+    normalizeBodyOverlayState();
+    document.title = doc.title || document.title;
+    executeBodyScripts(doc);
+    if (options && options.push === false) {
+        history.replaceState({url: resolvedUrl}, "", resolvedUrl);
+    } else if (!options || options.replace !== true) {
+        history.pushState({url: resolvedUrl}, "", resolvedUrl);
+    } else {
+        history.replaceState({url: resolvedUrl}, "", resolvedUrl);
+    }
+    normalizeBodyOverlayState();
+    initPage();
+}
+
+function jpmNavigate(url, options) {
+    if (jpmNavigator.loading) {
+        return;
+    }
+    jpmNavigator.loading = true;
+    closeTransientUi();
+    jpmBlock();
+    $.ajax({
+        url: normalizeUrl(url),
+        type: "GET",
+        cache: false,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-JPM-NAVIGATION": "partial"
+        },
+        success: function (html, textStatus, xhr) {
+            var finalUrl = xhr.responseURL ? xhr.responseURL : normalizeUrl(url);
+            renderPartialPage(html, finalUrl, options || {});
+        },
+        error: function () {
+            window.location = url;
+        },
+        complete: function () {
+            jpmNavigator.loading = false;
+            normalizeBodyOverlayState();
+            jpmUnBlock();
+        }
+    });
+}
+
+function jpmSubmitNavigationForm($form) {
+    var method = ($form.attr("method") || "GET").toUpperCase();
+    jpmNavigator.loading = true;
+    closeTransientUi();
+    jpmBlock();
+    $.ajax({
+        url: $form.attr("action") || window.location.href,
+        type: method,
+        data: $form.serialize(),
+        cache: method === "GET" ? false : undefined,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-JPM-NAVIGATION": "partial"
+        },
+        success: function (html, textStatus, xhr) {
+            var finalUrl = xhr.responseURL ? xhr.responseURL : normalizeUrl($form.attr("action") || window.location.href);
+            renderPartialPage(html, finalUrl, {replace: false});
+        },
+        error: function () {
+            HTMLFormElement.prototype.submit.call($form[0]);
+        },
+        complete: function () {
+            jpmNavigator.loading = false;
+            normalizeBodyOverlayState();
+            jpmUnBlock();
+        }
+    });
+}
+
 var initPage = function () {
     try {
+        initShell();
         //Clean empty help-blocks
         $(".help-block:empty").remove();
         $(".card-body:not(:has(*))").parent(".card").parent().remove();
         $(".row-fluid:not(:has(div))").remove();
-        $(".sortable").on("click", function () {
-            window.location = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field");
+        $(".sortable").off("click.jpmSort").on("click.jpmSort", function () {
+            var currentHeader = $(this);
+            var nextDirection = "ASC";
+            if (currentHeader.hasClass("sorted")) {
+                if (currentHeader.find(".sort-icon").hasClass("fa-sort-alpha-down")) {
+                    nextDirection = "DESC";
+                } else {
+                    nextDirection = "ASC";
+                }
+            }
+            var nextUrl = $(this).attr("data-cp") + $(this).attr("data-entity") + "/sort?fieldId=" + $(this).attr("data-field") + "&direction=" + nextDirection;
+            jpmNavigate(nextUrl);
         });
-        initConfirm();
-        // === Sidebar navigation === //
-        initMenu();
 
         // === Tooltips === //
         //TODO repleace with something lighter
@@ -247,206 +700,30 @@ var initPage = function () {
         $('.tip-top').tooltip({placement: 'top'});
         $('.tip-bottom').tooltip({placement: 'bottom'});
 
-        function copyCurrentLocationToClipboard() {
-            if (navigator.clipboard && window.isSecureContext) {
-                return navigator.clipboard.writeText(document.location.href);
-            }
-            return new Promise(function (resolve, reject) {
-                var $tempInput = $('<input type="text">');
-                $("body").append($tempInput);
-                $tempInput.val(document.location.href).trigger("select");
-                try {
-                    document.execCommand("copy");
-                    resolve();
-                } catch (error) {
-                    reject(error);
-                } finally {
-                    $tempInput.remove();
-                }
-            });
-        }
-
-        function buildCopyPageLink() {
-            return '<a id="copyPageLink" href="#" title="' + messages["jpm.usernav.copylink"] + '"><i class="fas fa-link"></i></a>';
-        }
-
-        function buildOpenInNewTabLink() {
-            return '<a id="openInNewTabLink" href="' + document.location.href + '" target="_blank" rel="noopener noreferrer" title="' + messages["jpm.usernav.opennewtab"] + '"><i class="fas fa-external-link-alt"></i></a>';
-        }
-
-        function ensureContentHeaderActions() {
-            var $header = $("#content-header");
-            if ($header.length === 0) {
-                return $();
-            }
-            if ($header.children(".content-header-main").length === 0) {
-                var $main = $('<div class="content-header-main"></div>');
-                $header.children().not(".content-header-actions").appendTo($main);
-                $header.prepend($main);
-            }
-            var $actions = $header.children(".content-header-actions");
-            if ($actions.length === 0) {
-                $actions = $('<div class="content-header-actions"></div>');
-                $header.append($actions);
-            }
-            return $actions;
-        }
-
-        function appendCopyPageLink() {
-            var $actions = ensureContentHeaderActions();
-            if ($actions.length > 0 && $("#copyPageLink").length === 0) {
-                $actions.append(buildCopyPageLink());
-            }
-        }
-
-        function appendOpenInNewTabLink() {
-            var $actions = ensureContentHeaderActions();
-            if ($actions.length > 0 && $("#openInNewTabLink").length === 0) {
-                $actions.append(buildOpenInNewTabLink());
-            }
-        }
-
-        function appendFavoriteLink(html) {
-            var $actions = ensureContentHeaderActions();
-            if ($actions.length > 0) {
-                $actions.prepend(html);
-            }
-        }
-
-        function showCopyLinkFeedback(title, color) {
-            var $copyLink = $("#copyPageLink");
-            var $icon = $copyLink.find("i");
-            $copyLink.attr("title", title);
-            $copyLink.css("color", color);
-            $icon.removeClass("fa-link").addClass("fa-check");
-            setTimeout(function () {
-                $copyLink.attr("title", messages["jpm.usernav.copylink"]);
-                $copyLink.css("color", "gray");
-                $icon.removeClass("fa-check").addClass("fa-link");
-            }, 1500);
-        }
-
-        if (currentUser && currentUser !== '') {
-            if (ROLE_USER_FAVORITE) {
-                //Favorite navbar
-                $.getJSON(getContextPath() + "jpm/favorites", function (data) {
-                    var isFav = false;
-                    $.each(data, function (i, item) {
-                        var html = '<li><a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
-                        html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
-                        if (item.link === document.location.href) {
-                            isFav = true;
-                        } else {
-                            $("#userNavFavorite").find(".dropdown-menu").append(html);
-                        }
-                    });
-                    if (isFav) {
-                        appendFavoriteLink('<a id="removeFavoriteLink" style="color: goldenrod" href="#" title="' + messages["jpm.usernav.removefavorite"] + '"><i class="fas fa-star"></i></a>');
-                    } else {
-                        appendFavoriteLink('<a id="addFavoriteLink"    style="color: gray" href="#" title="' + messages["jpm.usernav.addfavorite"] + '"><i class="fas fa-star"></i></a>');
+        $("#search-menu").off("keyup.jpmSearch").on("keyup.jpmSearch", function (e) {
+            let value = e.target.value;
+            var normalizedValue = value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            $("#searchDropdown .dropdown-menu").remove();
+            $("#searchDropdown").append('<ul class="dropdown-menu"></ul>');
+            if (value.length >= 2) {
+                let empty = true;
+                $(".jpm-menu-item").each(function () {
+                    if ($(this).last().text().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedValue)) {
+                        let html = '<li><a class="dropdown-item" href="' + $(this).attr("href") + '">' + $(this).html() + '</a></li>';
+                        $("#searchDropdown .dropdown-menu").append(html);
+                        empty = false;
                     }
-                    appendOpenInNewTabLink();
-                    appendCopyPageLink();
                 });
-                $(document).on("click", "#copyPageLink", function (e) {
-                    e.preventDefault();
-                    copyCurrentLocationToClipboard()
-                            .then(function () {
-                                showCopyLinkFeedback(messages["jpm.usernav.copylink.copied"], "green");
-                            })
-                            .catch(function () {
-                                showCopyLinkFeedback(messages["jpm.usernav.copylink.error"], "firebrick");
-                            });
-                });
-                $(document).on("click", "#removeFavoriteLink", function (e) {
-                    e.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        dataType: 'text',
-                        url: getContextPath() + "jpm/removeFavorite?url=" + document.location.href,
-                        success: function (data) {
-                            document.location.reload();
-                        }
-                    });
-                });
-                $(document).on("click", "#addFavoriteLink", function (e) {
-                    e.preventDefault();
-                    var html = "";
-                    html = html + '  <div class="form-group" id="note-group">';
-                    html = html + '    <label for="title">' + messages["jpm.addfavorite.popupTitle"] + '</label>';
-                    html = html + '    <input type="text" name="title" class="form-control" id="title" placeholder="...">';
-                    html = html + '  </div>';
-                    jpmDialogConfirm({
-                        title: messages["jpm.usernav.addfavorite"],
-                        message: html,
-                        callback: function () {
-                            if ($("#note").val() === "") {
-                                $("#note-group").addClass("has-error");
-                                $("#note").trigger('focus');
-                            } else {
-                                $.ajax({
-                                    type: "POST",
-                                    url: getContextPath() + "jpm/addFavorite?url=" + document.location.href + "&title=" + $("#title").val(),
-                                    success: function (data) {
-                                        document.location.reload();
-                                    }
-                                });
-                            }
-                            return true;
-                        }
-                    });
-                });
+                if (empty) {
+                    $("#searchDropdown .dropdown-menu").append('<li><a class="dropdown-item disabled" href="javascript:;"><span class="fa fa-eye-slash"></span></a></li>');
+                }
+                $("#searchDropdown .dropdown-menu").toggle();
             }
-//            $("#content-header").prepend('<button id="pin-sidebar" class="btn btn-sm btn-dark d-none d-sm-flex" style="width: 35px;"><i class="fas fa-thumbtack"></i></button>&nbsp;');
-            $("#search-menu").on("keyup", function (e) {
-                let value = e.target.value;
-                var normalizedValue = value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-                $("#searchDropdown .dropdown-menu").remove();
-                $("#searchDropdown").append('<ul class="dropdown-menu"></ul>');
-                if (value.length >= 2) {
-                    let empty = true;
-                    $(".jpm-menu-item").each(function () {
-                        if ($(this).last().text().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedValue)) {
-                            let html = '<li><a class="dropdown-item" href="' + $(this).attr("href") + '">' + $(this).html() + '</a></li>';
-                            $("#searchDropdown .dropdown-menu").append(html);
-                            empty = false;
-                        }
-                    });
-                    if (empty) {
-                        $("#searchDropdown .dropdown-menu").append('<li><a class="dropdown-item disabled" href="javascript:;"><span class="fa fa-eye-slash"></span></a></li>');
-                    }
-                    $("#searchDropdown .dropdown-menu").toggle();
-                }
-            });
+        });
+        refreshFavoriteMenu();
+        refreshRecentMenu();
 
-            //Recent navbar
-            var url = $(location).attr('href');
-            if (!url.match(/#$/)) {
-                var name = "JPM_RECENT";
-                var _recentArray = $.cookie(name);
-                var recentArray = new Array();
-                if (typeof _recentArray !== "undefined" && _recentArray !== "") {
-                    recentArray = JSON.parse(_recentArray);
-                }
-                var array = Array.prototype.slice.call(recentArray);
-                if (array.length >= 10) {
-                    array.shift();
-                }
-                var title = document.title;
-                title = title.substring(title.indexOf("- ") + 1);
-                array.push({'url': url, 'title': title});
-                var finalArray = uniqBy(array, JSON.stringify);
-                $.cookie(name, JSON.stringify(finalArray), {path: '/'});
-                $.each(finalArray, function (i, item) {
-                    var html = '<li><a class="dropdown-item" href="' + item.url + '">';
-                    html += '<div class="notification-content">';
-                    html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
-                    $("#userNavRecent").find(".dropdown-menu").append(html);
-                });
-            }
-        }
-
-        $(document).on("click", ".inline-boolean", function () {
+        $(document).off("click.jpmInlineBoolean", ".inline-boolean").on("click.jpmInlineBoolean", ".inline-boolean", function () {
             var instanceId = $(this).attr("data-id");
             var field = $(this).attr("data-field-name");
             var entity = $(this).attr("data-entity-id");
@@ -482,7 +759,7 @@ var initPage = function () {
             }
         });
 
-        $(".selected-operation").on("click", function (e) {
+        $(".selected-operation").off("click.jpmSelectedOperation").on("click.jpmSelectedOperation", function (e) {
             e.preventDefault();
             var instanceIds = $.map($('.selectable:checked'), function (n, i) {
                 return $(n).attr("data-id");
@@ -504,7 +781,7 @@ var initPage = function () {
                     });
                 } else {
                     jpmBlock();
-                    document.location = $href;
+                    jpmNavigate($href);
                 }
             }
         });
@@ -642,12 +919,12 @@ var processFormResponse = function (data) {
             } else if (data.next === "EXECUTOR_RELOAD") {
                 params.closeTimeout = data.messageDelay;
                 params.callback = function () {
-                    document.location.reload();
+                    jpmNavigate(window.location.href, {push: false, replace: true});
                 };
             } else {
                 params.closeTimeout = data.messageDelay;
                 params.callback = function () {
-                    document.location = getContextPath() + (data.next.startsWith("/") ? data.next.substr(1) : data.next);
+                    jpmNavigate(getContextPath() + (data.next.startsWith("/") ? data.next.substr(1) : data.next));
                 };
             }
             jpmDialog(params);
@@ -793,11 +1070,11 @@ function asynchronicOperationProgress(id) {
                             jpmDialogConfirm({
                                 message: status,
                                 callback: function () {
-                                    document.location.reload();
+                                    jpmNavigate(window.location.href, {push: false, replace: true});
                                 }
                             });
                             setTimeout(function () {
-                                document.location.reload();
+                                jpmNavigate(window.location.href, {push: false, replace: true});
                             }, 2000);
                         }
                     }

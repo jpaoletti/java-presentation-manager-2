@@ -2,10 +2,13 @@ package jpaoletti.jpm2.web.controller;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
@@ -24,9 +27,12 @@ import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.JPAListFilter;
 import jpaoletti.jpm2.core.model.ListFilter;
+import jpaoletti.jpm2.core.model.ListSort;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.PaginatedList;
 import jpaoletti.jpm2.core.model.RelatedListFilter;
+import jpaoletti.jpm2.core.model.SearchDefinition;
+import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.core.model.UserSearch;
 import jpaoletti.jpm2.core.search.ISearchResult;
 import jpaoletti.jpm2.core.search.ISearcher;
@@ -72,6 +78,7 @@ public class ListController extends BaseController {
 
     public static final String PAGE1 = "page=1";
     public static final String OP_LIST = "list";
+    private static final Pattern FILTER_INDEX_PATTERN = Pattern.compile("^_f\\.(\\d+)\\..+$");
 
     @Autowired
     private MiscEntityService miscEntityService;
@@ -406,25 +413,11 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String fieldId,
             HttpServletRequest request) throws PMException {
-        final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
-        String params = null;
-        if (field.getSearcher() != null) {
-            final Object searcher = field.getSearcher();
-            if (searcher instanceof Searcher) {
-                final DescribedCriterion build = ((Searcher) searcher).build(entity, field, request.getParameterMap());
-                if (build != null) {
-                    getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
-                    params = PAGE1;
-                }
-            } else if (searcher instanceof ISearcher) {
-                final jpaoletti.jpm2.core.search.ISearchResult result = ((ISearcher) searcher).build(entity, field, request.getParameterMap());
-                if (result != null) {
-                    getSessionEntityData(entity).getSearchCriteria().addSearchResult(fieldId, result);
-                    params = PAGE1;
-                }
-            }
+        final SessionEntityData sessionEntityData = getSessionEntityData(entity);
+        if (sessionEntityData.addSearchDefinition(buildSearchDefinition(fieldId, request.getParameterMap()), getContext().getEntityContext())) {
+            return buildCanonicalListRedirect(null, null, entity, 1);
         }
-        return buildRedirect(entity, null, OP_LIST, params);
+        return buildRedirect(entity, null, OP_LIST, PAGE1);
     }
 
     @PostMapping(value = "/jpm/{owner}/{ownerId}/{entity}/addSearch")
@@ -434,33 +427,19 @@ public class ListController extends BaseController {
             @PathVariable Entity entity,
             @RequestParam String fieldId,
             HttpServletRequest request) throws PMException {
-        final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
-        String params = null;
-        if (field.getSearcher() != null) {
-            final Object searcher = field.getSearcher();
-            if (searcher instanceof Searcher) {
-                final DescribedCriterion build = ((Searcher) searcher).build(entity, field, request.getParameterMap());
-                if (build != null) {
-                    getSessionEntityData(entity).getSearchCriteria().addDefinition(fieldId, build);
-                    params = PAGE1;
-                }
-            } else if (searcher instanceof ISearcher) {
-                final jpaoletti.jpm2.core.search.ISearchResult result = ((ISearcher) searcher).build(entity, field, request.getParameterMap());
-                if (result != null) {
-                    getSessionEntityData(entity).getSearchCriteria().addSearchResult(fieldId, result);
-                    params = PAGE1;
-                }
-            }
+        final SessionEntityData sessionEntityData = getSessionEntityData(entity);
+        if (sessionEntityData.addSearchDefinition(buildSearchDefinition(fieldId, request.getParameterMap()), getContext().getEntityContext())) {
+            return buildCanonicalListRedirect(owner, ownerId, entity, 1);
         }
-        return buildRedirect(owner, ownerId, entity, null, OP_LIST, params);
+        return buildRedirect(owner, ownerId, entity, null, OP_LIST, PAGE1);
     }
 
     @GetMapping(value = "/jpm/{entity}/removeSearch")
     public String removeSearch(
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
-        getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return buildRedirect(entity, null, OP_LIST, PAGE1);
+        getSessionEntityData(entity).removeSearchDefinition(i);
+        return buildCanonicalListRedirect(null, null, entity, 1);
     }
 
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeSearch")
@@ -469,26 +448,26 @@ public class ListController extends BaseController {
             @PathVariable String ownerId,
             @PathVariable Entity entity,
             @RequestParam Integer i) throws PMException {
-        getSessionEntityData(entity).getSearchCriteria().removeDefinition(i);
-        return buildRedirect(owner, ownerId, entity, null, OP_LIST, PAGE1);
+        getSessionEntityData(entity).removeSearchDefinition(i);
+        return buildCanonicalListRedirect(owner, ownerId, entity, 1);
     }
 
     @GetMapping(value = "/jpm/{entity}/removeAllSearch")
     public String removeAllSearch(@PathVariable Entity entity) throws PMException {
-        getSessionEntityData(entity).getSearchCriteria().clear();
-        return buildRedirect(entity, null, OP_LIST, PAGE1);
+        getSessionEntityData(entity).clearSearchDefinitions();
+        return buildCanonicalListRedirect(null, null, entity, 1);
     }
 
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/removeAllSearch")
     public String removeAllSearchWeak(@PathVariable Entity owner, @PathVariable String ownerId, @PathVariable Entity entity) throws PMException {
-        getSessionEntityData(entity).getSearchCriteria().clear();
-        return buildRedirect(owner, ownerId, entity, null, OP_LIST, PAGE1);
+        getSessionEntityData(entity).clearSearchDefinitions();
+        return buildCanonicalListRedirect(owner, ownerId, entity, 1);
     }
 
     @GetMapping(value = "/jpm/{entity}/sort")
-    public String sort(@PathVariable Entity entity, @RequestParam String fieldId) throws PMException {
-        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId, getContext().getEntityContext()));
-        return buildRedirect(entity, null, OP_LIST, null);
+    public String sort(@PathVariable Entity entity, @RequestParam String fieldId, @RequestParam(required = false) String direction) throws PMException {
+        applySort(entity, getSessionEntityData(entity), fieldId, direction);
+        return buildCanonicalListRedirect(null, null, entity, null);
     }
 
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/sort")
@@ -496,24 +475,124 @@ public class ListController extends BaseController {
             @PathVariable Entity owner,
             @PathVariable String ownerId,
             @PathVariable Entity entity,
-            @RequestParam String fieldId) throws PMException {
-        getSessionEntityData(entity).getSort().set(entity.getFieldById(fieldId, getContext().getEntityContext()));
-        return buildRedirect(owner, ownerId, entity, null, OP_LIST, null);
+            @RequestParam String fieldId,
+            @RequestParam(required = false) String direction) throws PMException {
+        applySort(entity, getSessionEntityData(entity), fieldId, direction);
+        return buildCanonicalListRedirect(owner, ownerId, entity, null);
     }
 
     protected ModelAndView generalList(Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException {
         final Entity entity = getContext().getEntity();
+        applyExplicitListStateFromRequest(entity);
+        final SessionEntityData sessionEntityData = getSessionEntityData(entity);
         final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
         final PaginatedList paginatedList = getService().getPaginatedList(
                 getContext().getContextualEntity(),
                 getContext().getOperation(),
-                getSessionEntityData(entity), page, pageSize, owner, ownerId);
+                sessionEntityData, page, pageSize, owner, ownerId);
         mav.addObject("paginatedList", paginatedList);
         mav.addObject("compactOperations", getContext().getOperation().isCompact());
-        mav.addObject("sessionEntityData", getSessionEntityData(entity));
+        mav.addObject("sessionEntityData", sessionEntityData);
+        final boolean explicitListState = hasExplicitListState(getRequest());
+        mav.addObject("listStateHiddenParameters", explicitListState ? buildListStateHiddenParameters(sessionEntityData) : Collections.emptyMap());
+        mav.addObject("listStateExtraQuery", explicitListState ? buildQueryString(buildListStateHiddenParameters(sessionEntityData)) : "");
         final List<String> visibleColumns = miscEntityService.getVisibleColumns(getAuthorizationService().getCurrentUsername(), getContext().getContextualEntity());
         mav.addObject("visibleColumns", visibleColumns);
         return mav;
+    }
+
+    private void applyExplicitListStateFromRequest(Entity entity) throws PMException {
+        if (!hasExplicitListState(getRequest())) {
+            return;
+        }
+        final SessionEntityData sessionEntityData = new SessionEntityData(entity, getContext().getEntityContext());
+        sessionEntityData.clearSearchDefinitions();
+        sessionEntityData.replaceSearchDefinitions(readSearchDefinitionsFromRequest(), getContext().getEntityContext());
+        applySortFromRequest(entity, sessionEntityData);
+        setSessionEntityData(entity, sessionEntityData);
+    }
+
+    private boolean hasExplicitListState(HttpServletRequest request) {
+        return request.getParameter(LIST_STATE_PARAM) != null;
+    }
+
+    private void applySortFromRequest(Entity entity, SessionEntityData sessionEntityData) throws PMException {
+        final String sortFieldId = getRequest().getParameter(SORT_FIELD_PARAM);
+        if (StringUtils.isBlank(sortFieldId)) {
+            return;
+        }
+        final Field sortField = entity.getFieldById(sortFieldId, getContext().getEntityContext());
+        if (sortField == null) {
+            return;
+        }
+        final ListSort sort = new ListSort();
+        sort.setField(sortField);
+        final String sortDirection = getRequest().getParameter(SORT_DIRECTION_PARAM);
+        if ("DESC".equalsIgnoreCase(sortDirection)) {
+            sort.setDirection(ListSort.SortDirection.DESC);
+        } else {
+            sort.setDirection(ListSort.SortDirection.ASC);
+        }
+        sessionEntityData.setSort(sort);
+    }
+
+    private void applySort(Entity entity, SessionEntityData sessionEntityData, String fieldId, String direction) throws PMException {
+        final Field field = entity.getFieldById(fieldId, getContext().getEntityContext());
+        if (field == null) {
+            return;
+        }
+        if (StringUtils.isNotBlank(direction)) {
+            final ListSort sort = new ListSort();
+            sort.setField(field);
+            if ("DESC".equalsIgnoreCase(direction)) {
+                sort.setDirection(ListSort.SortDirection.DESC);
+            } else {
+                sort.setDirection(ListSort.SortDirection.ASC);
+            }
+            sessionEntityData.setSort(sort);
+        } else {
+            sessionEntityData.getSort().set(field);
+        }
+    }
+
+    private List<SearchDefinition> readSearchDefinitionsFromRequest() {
+        final Map<Integer, SearchDefinition> definitions = new TreeMap<>();
+        for (Object rawEntry : getRequest().getParameterMap().entrySet()) {
+            final Map.Entry entry = (Map.Entry) rawEntry;
+            final String parameterName = String.valueOf(entry.getKey());
+            final Matcher matcher = FILTER_INDEX_PATTERN.matcher(parameterName);
+            if (!matcher.matches()) {
+                continue;
+            }
+            final Integer index = Integer.valueOf(matcher.group(1));
+            final SearchDefinition definition = definitions.computeIfAbsent(index, key -> new SearchDefinition());
+            final String suffix = parameterName.substring((FILTER_PARAM_PREFIX + index + ".").length());
+            if (("fieldId").equals(suffix)) {
+                final String[] rawValues = (String[]) entry.getValue();
+                if (rawValues != null && rawValues.length > 0) {
+                    definition.setFieldId(rawValues[0]);
+                }
+            } else if (suffix.startsWith("p.")) {
+                if (definition.getParameters() == null) {
+                    definition.setParameters(new LinkedHashMap<>());
+                }
+                final List<String> values = definition.getParameters().computeIfAbsent(suffix.substring(2), key -> new ArrayList<>());
+                final String[] rawValues = (String[]) entry.getValue();
+                if (rawValues != null) {
+                    Collections.addAll(values, rawValues);
+                }
+            }
+        }
+        final List<SearchDefinition> result = new ArrayList<>();
+        for (SearchDefinition definition : definitions.values()) {
+            if (StringUtils.isNotBlank(definition.getFieldId())) {
+                if (definition.getParameters() == null) {
+                    definition.setParameters(new LinkedHashMap<>());
+                }
+                result.add(definition);
+            }
+        }
+        return result;
     }
 
     public WebApplicationContext getCtx() {

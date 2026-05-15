@@ -2,6 +2,11 @@
     <div class="inline-block float-start">
         <c:if test="${not entity.countable}">
             <form action="" class="form-inline d-flex flex-nowrap float-start" role="form">
+                <c:forEach items="${listStateHiddenParameters}" var="entry">
+                    <c:forEach items="${entry.value}" var="paramValue">
+                        <input type="hidden" name="${entry.key}" value="${paramValue}" />
+                    </c:forEach>
+                </c:forEach>
                 <div class="input-group mb-0 mr-sm-2">
                     <input class="form-control page-size form-control-sm" type="number" min="1" ${(paginatedList.more)?'':("max='".concat(paginatedList.page).concat("'"))} value="${paginatedList.page}" name="page" style="width:60px;" />
                     <button type="submit" class="btn btn-secondary btn-sm"><span class="fas fa-arrow-right"></span></button>
@@ -10,6 +15,11 @@
         </c:if>
         <c:if test="${entity.countable and paginatedList.pages > 20}">
             <form action="" class="form-inline d-flex flex-nowrap float-start" role="form">
+                <c:forEach items="${listStateHiddenParameters}" var="entry">
+                    <c:forEach items="${entry.value}" var="paramValue">
+                        <input type="hidden" name="${entry.key}" value="${paramValue}" />
+                    </c:forEach>
+                </c:forEach>
                 <div class="form-group">
                     <div class="input-group mb-0 mr-sm-2">
                         <input class="form-control page-size form-control-sm" type="number" min="1" max="${paginatedList.pages}" value="${paginatedList.page}" name="page" style="width:60px;" />
@@ -20,26 +30,31 @@
         </c:if>
         <div class="pagination pagination-sm">
             <li class="page-item ${(paginatedList.page > 1)?'':"disabled"}">
-                <a href="?page=${paginatedList.page-1}" class="page-link">&laquo; </a>
+                <a href="?page=${paginatedList.page-1}${not empty listStateExtraQuery ? '&'.concat(listStateExtraQuery) : ''}" class="page-link">&laquo; </a>
             </li>
             <c:if test="${entity.countable}">
                 <c:if test="${paginatedList.pages > 20}">
-                    <jpm:pagination-link paginatedList='${paginatedList}' i="${1}" />
-                    <jpm:pagination-link paginatedList='${paginatedList}' i="${paginatedList.pages}" />
+                    <jpm:pagination-link paginatedList='${paginatedList}' i="${1}" extraQuery="${listStateExtraQuery}" />
+                    <jpm:pagination-link paginatedList='${paginatedList}' i="${paginatedList.pages}" extraQuery="${listStateExtraQuery}" />
                 </c:if>
                 <c:if test="${paginatedList.pages <= 20}">
                     <c:forEach var="i" items="${paginatedList.pageRange}" >
-                        <jpm:pagination-link paginatedList='${paginatedList}'  i="${i}" />
+                        <jpm:pagination-link paginatedList='${paginatedList}'  i="${i}" extraQuery="${listStateExtraQuery}" />
                     </c:forEach>
                 </c:if>
             </c:if>
             <li class="page-item ${paginatedList.more?'':"disabled"}">
-                <a href="?page=${paginatedList.page+1}" class="page-link">&raquo;</a>
+                <a href="?page=${paginatedList.page+1}${not empty listStateExtraQuery ? '&'.concat(listStateExtraQuery) : ''}" class="page-link">&raquo;</a>
             </li>
         </div>
     </div>
     <div class="inline-block float-end" >
         <form action="" class="form-inline d-flex flex-nowrap float-end" role="form" id="pagination-pages-form">
+            <c:forEach items="${listStateHiddenParameters}" var="entry">
+                <c:forEach items="${entry.value}" var="paramValue">
+                    <input type="hidden" name="${entry.key}" value="${paramValue}" />
+                </c:forEach>
+            </c:forEach>
             <input type="hidden" name="entityId" value="${entityId}" />
             <input type="hidden" name="page" value="${paginatedList.page}" />
             <div class="input-group mb-0 mr-sm-2">

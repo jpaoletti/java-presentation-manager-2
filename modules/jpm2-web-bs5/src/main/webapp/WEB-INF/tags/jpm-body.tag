@@ -53,11 +53,13 @@
             </nav>
         </header>
         <main role="main" class="flex-shrink-0">
-            <div class="container-fluid container-if-fixed-footer">
+            <div id="jpm-main-content" class="container-fluid container-if-fixed-footer">
                 <jsp:doBody />
             </div>
         </main>
-        <%@include  file="../jsp/inc/footer.jsp" %>
+        <div id="jpm-layout-footer">
+            <%@include  file="../jsp/inc/footer.jsp" %>
+        </div>
     </c:when>
     <c:when test = "${jpm.menuMode == 'left'}">
         <div class="page-wrapper ${jpm.menuTheme} sidebar-bg ${(empty showMenu or showMenu)?'toggled':''}">
@@ -144,7 +146,7 @@
                 <c:if test="${empty showMenu or showMenu}">
                     <div id="overlay" class="overlay"></div>
                 </c:if>
-                <div class="container-fluid p-1 pl-4 pr-4">
+                <div id="jpm-main-content" class="container-fluid p-1 pl-4 pr-4">
                     <jsp:doBody />
                 </div>
             </main>

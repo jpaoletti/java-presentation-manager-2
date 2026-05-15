@@ -6,6 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<c:set var="jpmForwardUri" value="${requestScope['javax.servlet.forward.request_uri']}" />
+<c:set var="jpmForwardQuery" value="${requestScope['javax.servlet.forward.query_string']}" />
+<meta name="jpm-current-url" content="${not empty jpmForwardUri ? jpmForwardUri : pageContext.request.requestURI}${not empty jpmForwardQuery ? '?'.concat(jpmForwardQuery) : (empty jpmForwardUri and not empty pageContext.request.queryString ? '?'.concat(pageContext.request.queryString) : '')}">
 <meta name="description" content="">
 <meta name="author" content="">
 <meta name="version" content="${jpm.appversion}">
