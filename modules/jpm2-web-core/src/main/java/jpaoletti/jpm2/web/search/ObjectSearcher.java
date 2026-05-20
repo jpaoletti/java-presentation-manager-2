@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
-import jpaoletti.jpm2.core.model.ListFilter;
+import jpaoletti.jpm2.core.model.IdentifiableListFilter;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.SearcherHelper;
 import org.hibernate.criterion.Restrictions;
@@ -22,7 +22,7 @@ public class ObjectSearcher implements Searcher {
     public static final String DESCRIPTION_KEY = "jpm.searcher.objectSearcher";
 
     private Entity entity;
-    private ListFilter filter;
+    private IdentifiableListFilter filter;
     private String textField;
 
     @Autowired
@@ -58,11 +58,11 @@ public class ObjectSearcher implements Searcher {
         this.entity = entity;
     }
 
-    public ListFilter getFilter() {
+    public IdentifiableListFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(ListFilter filter) {
+    public void setFilter(IdentifiableListFilter filter) {
         this.filter = filter;
     }
 

@@ -66,10 +66,11 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     @Override
     public T find(IDAOListConfiguration configuration) {
-        Integer max = configuration.getMax();
-        configuration.setMax(1);
-        final List<T> list = list(configuration);
-        configuration.setMax(max);
+        final IDAOListConfiguration effectiveConfiguration = configuration != null ? configuration : build();
+        Integer max = effectiveConfiguration.getMax();
+        effectiveConfiguration.setMax(1);
+        final List<T> list = list(effectiveConfiguration);
+        effectiveConfiguration.setMax(max);
         if (list.isEmpty()) {
             return null;
         }
@@ -140,16 +141,15 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     @Override
     public List<T> list(IDAOListConfiguration configuration) {
-        final JPADAOListConfiguration cfg = (JPADAOListConfiguration) configuration;
+        final IDAOListConfiguration effectiveConfiguration = configuration != null ? configuration : build();
+        final JPADAOListConfiguration cfg = (JPADAOListConfiguration) effectiveConfiguration;
         final TypedQuery<T> query = buildQuery(cfg);
 
-        if (configuration != null) {
-            if (configuration.getMax() != null) {
-                query.setMaxResults(configuration.getMax());
-            }
-            if (configuration.getFrom() != null) {
-                query.setFirstResult(configuration.getFrom());
-            }
+        if (effectiveConfiguration.getMax() != null) {
+            query.setMaxResults(effectiveConfiguration.getMax());
+        }
+        if (effectiveConfiguration.getFrom() != null) {
+            query.setFirstResult(effectiveConfiguration.getFrom());
         }
 
         return query.getResultList();

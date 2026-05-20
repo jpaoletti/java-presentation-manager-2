@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.core.model;
 
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,10 +12,12 @@ import java.util.Map;
  */
 public class SearchDefinition {
 
+    private String id;
     private String fieldId;
     private Map<String, List<String>> parameters;
 
     public SearchDefinition() {
+        this.id = UUID.randomUUID().toString();
     }
 
     /**
@@ -25,6 +28,7 @@ public class SearchDefinition {
      * @param paramValue
      */
     public SearchDefinition(String fieldId, String paramName, String paramValue) {
+        this();
         this.fieldId = fieldId;
         this.parameters = new LinkedHashMap<>();
         final List<String> params = new ArrayList<>();
@@ -33,8 +37,17 @@ public class SearchDefinition {
     }
 
     public SearchDefinition(String fieldId, Map<String, List<String>> parameters) {
+        this();
         this.fieldId = fieldId;
         this.parameters = parameters;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFieldId() {

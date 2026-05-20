@@ -12,7 +12,7 @@ import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
-import jpaoletti.jpm2.core.model.ListFilter;
+import jpaoletti.jpm2.core.model.IdentifiableListFilter;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WebEditObject extends Converter {
 
     private Entity entity;
-    private ListFilter filter;
+    private IdentifiableListFilter filter;
     private String textField;
     private String textFieldDetails;
     private String textFieldDetailsOperation;
@@ -153,11 +153,11 @@ public class WebEditObject extends Converter {
         this.minSearch = minSearch;
     }
 
-    public ListFilter getFilter() {
+    public IdentifiableListFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(ListFilter filter) {
+    public void setFilter(IdentifiableListFilter filter) {
         this.filter = filter;
     }
 

@@ -437,8 +437,13 @@ public class ListController extends BaseController {
     @GetMapping(value = "/jpm/{entity}/removeSearch")
     public String removeSearch(
             @PathVariable Entity entity,
-            @RequestParam Integer i) throws PMException {
-        getSessionEntityData(entity).removeSearchDefinition(i);
+            @RequestParam(required = false) Integer i,
+            @RequestParam(required = false) String searchId) throws PMException {
+        if (StringUtils.isNotBlank(searchId)) {
+            getSessionEntityData(entity).removeSearchDefinition(searchId);
+        } else {
+            getSessionEntityData(entity).removeSearchDefinition(i);
+        }
         return buildCanonicalListRedirect(null, null, entity, 1);
     }
 
@@ -447,8 +452,13 @@ public class ListController extends BaseController {
             @PathVariable Entity owner,
             @PathVariable String ownerId,
             @PathVariable Entity entity,
-            @RequestParam Integer i) throws PMException {
-        getSessionEntityData(entity).removeSearchDefinition(i);
+            @RequestParam(required = false) Integer i,
+            @RequestParam(required = false) String searchId) throws PMException {
+        if (StringUtils.isNotBlank(searchId)) {
+            getSessionEntityData(entity).removeSearchDefinition(searchId);
+        } else {
+            getSessionEntityData(entity).removeSearchDefinition(i);
+        }
         return buildCanonicalListRedirect(owner, ownerId, entity, 1);
     }
 
@@ -505,7 +515,10 @@ public class ListController extends BaseController {
         if (!hasExplicitListState(getRequest())) {
             return;
         }
+        final SessionEntityData currentSessionEntityData = getSessionEntityData(entity);
         final SessionEntityData sessionEntityData = new SessionEntityData(entity, getContext().getEntityContext());
+        sessionEntityData.setPage(currentSessionEntityData.getPage());
+        sessionEntityData.setPageSize(currentSessionEntityData.getPageSize());
         sessionEntityData.clearSearchDefinitions();
         sessionEntityData.replaceSearchDefinitions(readSearchDefinitionsFromRequest(), getContext().getEntityContext());
         applySortFromRequest(entity, sessionEntityData);

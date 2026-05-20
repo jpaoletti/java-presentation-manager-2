@@ -79,6 +79,9 @@ public class SessionEntityData implements Serializable {
         if (searchDefinition == null || searchDefinition.getFieldId() == null) {
             return false;
         }
+        if (searchDefinition.getId() == null || searchDefinition.getId().trim().isEmpty()) {
+            searchDefinition.setId(java.util.UUID.randomUUID().toString());
+        }
         final Field field = entity.getFieldById(searchDefinition.getFieldId(), context);
         if (field == null) {
             throw new PMException(MessageFactory.error("jpm.field.not.found", searchDefinition.getFieldId()));
@@ -88,14 +91,14 @@ public class SessionEntityData implements Serializable {
         if (searcher instanceof Searcher) {
             final Searcher.DescribedCriterion build = ((Searcher) searcher).build(entity, field, searchDefinition.getParametersForBuild());
             if (build != null) {
-                searchCriteria.addDefinition(searchDefinition.getFieldId(), build);
+                searchCriteria.addDefinition(searchDefinition.getId(), searchDefinition.getFieldId(), build);
                 searchDefinitions.add(copySearchDefinition(searchDefinition));
                 return true;
             }
         } else if (searcher instanceof ISearcher) {
             final ISearchResult result = ((ISearcher) searcher).build(entity, field, searchDefinition.getParametersForBuild());
             if (result != null) {
-                searchCriteria.addSearchResult(searchDefinition.getFieldId(), result);
+                searchCriteria.addSearchResult(searchDefinition.getId(), searchDefinition.getFieldId(), result);
                 searchDefinitions.add(copySearchDefinition(searchDefinition));
                 return true;
             }
@@ -112,6 +115,13 @@ public class SessionEntityData implements Serializable {
         searchCriteria.removeDefinition(index);
         if (index != null && index >= 0 && index < searchDefinitions.size()) {
             searchDefinitions.remove(index.intValue());
+        }
+    }
+
+    public void removeSearchDefinition(String definitionId) {
+        searchCriteria.removeDefinitionById(definitionId);
+        if (definitionId != null) {
+            searchDefinitions.removeIf(definition -> definitionId.equals(definition.getId()));
         }
     }
 
@@ -139,6 +149,8 @@ public class SessionEntityData implements Serializable {
                 copiedParameters.put(entry.getKey(), entry.getValue() == null ? new ArrayList<>() : new ArrayList<>(entry.getValue()));
             }
         }
-        return new SearchDefinition(searchDefinition.getFieldId(), copiedParameters);
+        final SearchDefinition copy = new SearchDefinition(searchDefinition.getFieldId(), copiedParameters);
+        copy.setId(searchDefinition.getId());
+        return copy;
     }
 }

@@ -9,14 +9,7 @@ import org.hibernate.criterion.Criterion;
  * @author jpaoletti
  *
  */
-public interface ListFilter {
-
-    /**
-     * Returns a unique id for the filter;
-     *
-     * @return
-     */
-    public String getId();
+public interface ListFilter extends IdentifiableListFilter {
 
     /**
      * @param dlc Dao configuration list being configured

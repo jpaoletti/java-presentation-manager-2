@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.IDAOListConfiguration;
 import jpaoletti.jpm2.core.message.Message;
@@ -64,7 +65,11 @@ public class SearchCriteria implements Serializable {
      * @param describedCriterion the described criterion
      */
     public void addDefinition(String fieldId, Searcher.DescribedCriterion describedCriterion) {
-        getDefinitions().add(new SearchCriteriaField(fieldId, describedCriterion));
+        addDefinition(UUID.randomUUID().toString(), fieldId, describedCriterion);
+    }
+
+    public void addDefinition(String definitionId, String fieldId, Searcher.DescribedCriterion describedCriterion) {
+        getDefinitions().add(new SearchCriteriaField(definitionId, fieldId, describedCriterion));
         getAliases().addAll(describedCriterion.getAliases());
         addCriterion(describedCriterion.getCriterion());
     }
@@ -76,7 +81,11 @@ public class SearchCriteria implements Serializable {
      * @param searchResult the search result (can be HibernateSearchResult or JPASearchResult)
      */
     public void addSearchResult(String fieldId, ISearchResult searchResult) {
-        getDefinitions().add(new SearchCriteriaField(fieldId, searchResult));
+        addSearchResult(UUID.randomUUID().toString(), fieldId, searchResult);
+    }
+
+    public void addSearchResult(String definitionId, String fieldId, ISearchResult searchResult) {
+        getDefinitions().add(new SearchCriteriaField(definitionId, fieldId, searchResult));
         getSearchResults().add(searchResult);
     }
 
@@ -92,6 +101,21 @@ public class SearchCriteria implements Serializable {
         }
         if (toRemove != null) {
             removeDefinition(i);
+        }
+    }
+
+    public void removeDefinitionById(String definitionId) {
+        int i = 0;
+        Integer toRemove = null;
+        for (SearchCriteriaField definition : getDefinitions()) {
+            if (definitionId != null && definitionId.equals(definition.getId())) {
+                toRemove = i;
+                break;
+            }
+            i++;
+        }
+        if (toRemove != null) {
+            removeDefinition(toRemove);
         }
     }
 
@@ -160,18 +184,37 @@ public class SearchCriteria implements Serializable {
 
     public static class SearchCriteriaField {
 
+        private String id;
         private String fieldId;
         private DescribedCriterion describedCriterion;
         private ISearchResult searchResult;
 
         public SearchCriteriaField(String fieldId, DescribedCriterion describedCriterion) {
+            this(UUID.randomUUID().toString(), fieldId, describedCriterion);
+        }
+
+        public SearchCriteriaField(String id, String fieldId, DescribedCriterion describedCriterion) {
+            this.id = id;
             this.fieldId = fieldId;
             this.describedCriterion = describedCriterion;
         }
 
         public SearchCriteriaField(String fieldId, ISearchResult searchResult) {
+            this(UUID.randomUUID().toString(), fieldId, searchResult);
+        }
+
+        public SearchCriteriaField(String id, String fieldId, ISearchResult searchResult) {
+            this.id = id;
             this.fieldId = fieldId;
             this.searchResult = searchResult;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
         public Message getDescription() {
@@ -206,4 +249,3 @@ public class SearchCriteria implements Serializable {
         }
     }
 }
-
