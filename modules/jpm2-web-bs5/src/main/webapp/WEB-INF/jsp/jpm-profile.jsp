@@ -63,10 +63,33 @@
                                                 <input class="form-control" type="password" name="current" value="">
                                             </div>
                                         </div>
+                                        <spring:message var="pwdShow" code="jpm.converter.password_converter.show" />
+                                        <spring:message var="pwdMask" code="jpm.converter.password_converter.mask" />
+                                        <spring:message var="pwdGenerate" code="jpm.converter.password_converter.generate" />
+                                        <spring:message var="pwdWeak" code="jpm.converter.password_converter.weak" />
+                                        <spring:message var="pwdMedium" code="jpm.converter.password_converter.medium" />
+                                        <spring:message var="pwdGood" code="jpm.converter.password_converter.good" />
                                         <div id="d_newpass" class="control-group mb-2">
                                             <label class="control-label col-form-label"><spring:message text="New Password" code="jpm.profile.chpass.newpass" /></label>
                                             <div class="controls">
-                                                <div class='pwdwidgetdiv' id='thepwddivnewpass'></div>
+                                                <div class="input-group">
+                                                    <input autocomplete="off" type="password" class="form-control"
+                                                           name="newpass" id="f_newpass" value="" />
+                                                    <button type="button" class="btn btn-outline-secondary"
+                                                            id="f_newpass_toggle"
+                                                            data-show-text="${pwdShow}" data-mask-text="${pwdMask}">
+                                                        <i class="fas fa-eye"></i> <span class="pwd-toggle-text">${pwdShow}</span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary"
+                                                            id="f_newpass_generate">
+                                                        <i class="fas fa-key"></i> ${pwdGenerate}
+                                                    </button>
+                                                </div>
+                                                <div class="progress mt-1" style="height: 4px;">
+                                                    <div id="f_newpass_strength" class="progress-bar" role="progressbar"
+                                                         style="width: 0%;" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small id="f_newpass_strength_text" class="form-text text-muted"></small>
                                             </div>
                                         </div><br/><br/>
                                         <button type="submit" class="btn btn-success"><spring:message code="jpm.form.submit" text="Submit" /></button>
@@ -78,18 +101,23 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript" src="${cp}static/js/pwdwidget.js"></script>
+        <script type="text/javascript" src="${cp}static/js/pwd-converter.js"></script>
         <script type="text/javascript">
             jpmLoad(function () {
                 buildAjaxJpmForm();
-                var pwdwidget = new PasswordWidget('thepwddivnewpass', 'newpass');
-                pwdwidget.txtShow = "<spring:message code='jpm.converter.password_converter.show' />";
-                pwdwidget.txtMask = "<spring:message code='jpm.converter.password_converter.mask' />";
-                pwdwidget.txtGenerate = "<spring:message code='jpm.converter.password_converter.generate' />";
-                pwdwidget.txtWeak = "<spring:message code='jpm.converter.password_converter.weak' />";
-                pwdwidget.txtMedium = "<spring:message code='jpm.converter.password_converter.medium' />";
-                pwdwidget.txtGood = "<spring:message code='jpm.converter.password_converter.good' />";
-                pwdwidget.MakePWDWidget();
+                JpmPwdConverter.init({
+                    inputId: 'f_newpass',
+                    toggleId: 'f_newpass_toggle',
+                    generateId: 'f_newpass_generate',
+                    strengthBarId: 'f_newpass_strength',
+                    strengthTextId: 'f_newpass_strength_text',
+                    disableFormAutocomplete: false,
+                    labels: {
+                        weak: "${pwdWeak}",
+                        medium: "${pwdMedium}",
+                        good: "${pwdGood}"
+                    }
+                });
             });
         </script>
     </jpm:jpm-body>
