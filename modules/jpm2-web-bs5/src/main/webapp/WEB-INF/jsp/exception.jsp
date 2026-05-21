@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-11 col-lg-offset-1">
+            <div class="col-lg-11 offset-lg-1">
                 <br /><br /><br />
                 <a href="javascript:history.back();" class="btn btn-secondary"><span class="fas fa-arrow-left"></span> <spring:message code="jpm.back" text="Back" /></a>
                 <br /><br /><br />

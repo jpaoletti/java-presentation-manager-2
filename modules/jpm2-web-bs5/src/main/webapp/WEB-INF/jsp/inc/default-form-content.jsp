@@ -15,7 +15,7 @@
                             ${convertedValue}
                         </c:if>
                         <c:if test="${not empty fieldMessages[field]}">
-                            <p class="help-block">
+                            <p class="help-block form-text text-danger mb-0">
                             <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
                             <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
                                 * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
@@ -35,7 +35,7 @@
                         <div class="col-lg-${panel.blocks}">
                             <div class="card">
                                 <div class="card-header d-flex align-items-center h-100">
-                                    <h5 class="card-title my-0 font-weight-normal flex-grow-1">
+                                    <h5 class="card-title my-0 fw-normal flex-grow-1">
                                         <span class="${panel.icon}"></span> &nbsp;
                                         <spring:message code="${panel.title}" text="${panel.title}" />
                                     </h5>
@@ -53,7 +53,7 @@
                                                     ${convertedValue}
                                                 </c:if>
                                                 <c:if test="${not empty fieldMessages[field]}">
-                                                    <p class="help-block">
+                                                    <p class="help-block form-text text-danger mb-0">
                                                     <c:set var="messages" value="${fieldMessages[field]}" scope='request' />
                                                     <c:forEach var="m" items="${fieldMessages[field]}" varStatus="st">
                                                         * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}

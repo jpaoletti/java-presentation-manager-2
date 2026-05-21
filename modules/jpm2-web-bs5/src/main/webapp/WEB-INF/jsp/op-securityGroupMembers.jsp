@@ -12,12 +12,12 @@
         <div class="container-fluid" id="container-${fn:replace(contextualEntity,'!', '-')}-${operation.id}">
             <div class="row"><br/>
                 <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                    <div class="card">
+                        <div class="card-header">
                             <%@include file="inc/item-operations.jsp" %>
                         </div>
-                        <div class="panel-body">
-                            <table class="table table-bordered table-compact">
+                        <div class="card-body">
+                            <table class="table table-bordered table-sm">
                                 <tbody>
                                     <c:forEach var="user" items="${members}">
                                         <tr>

@@ -14,8 +14,8 @@
                     <form class="form-horizontal" role="form" action="#">
                         <div class="row jpm-content-panels">
                             <div class="col-sm-6">
-                                <div id="control-group-${key}" class="form-group">
-                                    <label class="col-lg-4 control-label" for="f_${key}">
+                                <div id="control-group-${key}" class="form-group row mb-2">
+                                    <label class="col-lg-4 control-label col-form-label" for="f_${key}">
                                         <spring:message code="jpm.security.generatedpassword" text="Generated Passowrd"/>
                                     </label>
                                     <div class="col-lg-8">

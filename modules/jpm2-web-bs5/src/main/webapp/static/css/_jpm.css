@@ -78,7 +78,28 @@ main {padding-top: 65px;}
         padding-top: 0;
     }
 }
-.jpm-content-panels .card{margin-bottom: 5px;}
+.jpm-content-panels .card{margin-bottom: 4px;}
+.jpm-content-panels .card-body,
+form.form-horizontal .card-body{
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+form.form-horizontal .form-group,
+form.form-horizontal .control-group,
+.jpm-content-panels .form-group{
+    margin-bottom: 0.35rem !important;
+}
+form.form-horizontal .col-form-label,
+form.form-horizontal .control-label{
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+}
+form.form-horizontal .show-collection-converter,
+form.form-horizontal .form-control{
+    min-height: 34px;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
 
 .flyover {
     left: 150%;

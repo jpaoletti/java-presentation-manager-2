@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@include file="inc/default-taglibs.jsp" %>
-<table class="table table-compact table-bordered">
+<table class="table table-sm table-bordered">
     <thead>
         <tr>
             <c:if test="${empty reportData.groups and empty reportData.formulas and not empty report.descriptiveFieldList and report.allowDetail}">

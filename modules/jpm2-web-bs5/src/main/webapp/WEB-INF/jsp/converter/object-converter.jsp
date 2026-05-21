@@ -22,7 +22,7 @@
                     content = content + "<a href='${cp}${param.operationLink}'><i class='${param.operationIcon}'></i> ${param.operationTitle}</a>";
                     //</c:if>
                     content = content + "</div>";
-                    content = content + "<button onclick=\"$(this).parents('div.popover').popover('dispose');\" class='float-end btn btn-sm close'  type='button' ><i class='fas fa-times'></i></button>";
+                    content = content + "<button onclick=\"$(this).parents('div.popover').popover('dispose');\" class='float-end btn-close' type='button' aria-label='Close'></button>";
                     content = content + "</div>";
                     _this.popover({html: true, content: $(content)}).popover('show');
                 });

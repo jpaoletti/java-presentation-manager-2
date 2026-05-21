@@ -42,10 +42,10 @@
                     <hr class="hr-sm"/>
 
                     <div class="dropdown">
-                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                            <spring:message code="jpm.reports.filter.btn" text="Add Filter" /> <span class="caret"></span>
+                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="report-filter-dropdown" data-bs-toggle="dropdown">
+                            <spring:message code="jpm.reports.filter.btn" text="Add Filter" />
                         </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <ul class="dropdown-menu" aria-labelledby="report-filter-dropdown">
                             <c:forEach items="${fieldSearchs}" var="fs" varStatus="st">
                                 <li>
                                     <a id="search-link-${st.index+1}" class="dropdown-item" data-field='${fs.key.id}' href="javascript:addSearch('${fs.key.id}');">${st.index+1}. <jpm:field-title entity="${report.entity}" fieldId="${fs.key.id}" /></a>
@@ -63,12 +63,12 @@
 
 
                             <div class="dropdown">
-                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                            <spring:message code="jpm.reports.group.btn" text="Add Group" /> <span class="caret"></span>
+                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="report-group-dropdown" data-bs-toggle="dropdown">
+                            <spring:message code="jpm.reports.group.btn" text="Add Group" />
                         </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <ul class="dropdown-menu" aria-labelledby="report-group-dropdown">
                             <li><a  class="dropdown-item" data-field='${fs}' href="javascript:addGroup('', '<spring:message code="jpm.reports.group.all" text="All" />');"><spring:message code="jpm.reports.group.all" text="All" /></a></li>
-                            <li class="divider"></li>
+                            <li><hr class="dropdown-divider"></li>
                                 <c:forEach items="${report.groupableFieldList}" var="fs" varStatus="st">
                                 <li ><a  class="dropdown-item" data-field='${fs}' href="javascript:addGroup('${fs}', '<jpm:field-title entity="${report.entity}" fieldId="${fs}"  />');"><jpm:field-title entity="${report.entity}" fieldId="${fs}"/></a></li>
                                 </c:forEach>
@@ -88,8 +88,8 @@
 
                     <c:if test="${not empty report.numericFieldList}">
                         <div class="btn-group" id='select-formula'>
-                            <button id="search-dropdown" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
-                                <spring:message code="jpm.reports.formula.btn" text="Add Formula" /> <span class="caret"></span>
+                            <button id="search-dropdown" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <spring:message code="jpm.reports.formula.btn" text="Add Formula" />
                             </button>
                             <ul class="dropdown-menu" role="menu">
                                 <c:forEach items="${report.numericFieldList}" var="fs" varStatus="st">
@@ -120,8 +120,8 @@
                     <!--
                     <hr class="hr-sm"/>
                                     <div class="btn-group">
-                                        <button id="search-dropdown" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
-                    <spring:message code="jpm.reports.graphics.btn" text="Add Graphic" /> <span class="caret"></span>
+                                        <button id="search-dropdown" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                    <spring:message code="jpm.reports.graphics.btn" text="Add Graphic" />
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <c:forEach items="${report.groupableFieldList}" var="fs" varStatus="st">
@@ -143,12 +143,12 @@
                     <!--<button class="btn btn-danger"  id="btnPdf">PDF</button>-->
                     
                 <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                        <spring:message code="jpm.reports.savedReport.btn" text="Save Report" /> <span class="caret"></span>
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="report-save-dropdown" data-bs-toggle="dropdown">
+                        <spring:message code="jpm.reports.savedReport.btn" text="Save Report" />
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <li><a  class="dropdown-item" href="javascript: void(0)" id="saveReportBtn" data-toggle="modal" data-target="#saveReportModal"><spring:message code="jpm.reports.saveReport.btn" text="Save Report" /></a></li>
-                        <li class="divider"></li>
+                    <ul class="dropdown-menu" aria-labelledby="report-save-dropdown">
+                        <li><a  class="dropdown-item" href="javascript: void(0)" id="saveReportBtn"><spring:message code="jpm.reports.saveReport.btn" text="Save Report" /></a></li>
+                        <li><hr class="dropdown-divider"></li>
 
                         <c:forEach items="${savedReports}" var="fs" varStatus="st">
                             <li>
@@ -165,7 +165,7 @@
             </div>
         </div>
         <!-- SEARCHERS-->
-        <div class="hide" id='fieldSearchForms'>
+        <div class="d-none" id='fieldSearchForms'>
             <c:forEach items="${fieldSearchs}" var="fs">
                 <div id='fieldSearchForm_${fs.key.id}'>
                     <jpm:field-title entity="${report.entity}" fieldId="${fs.key.id}" /><br/>
@@ -184,18 +184,18 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             <h4 class="modal-title" id="saveReportModalLabel"><spring:message code="jpm.reports.saveReport.title" text="New Report" /></h4>
                         </div>
                         <div class="modal-body">
-                            <div class="form-group" id="note-group">
+                            <div class="form-group mb-2" id="note-group">
                                 <label for="note"><spring:message code="jpm.reports.saveReport.nameLabel" text="New Report Name" /></label>
                                 <input type="text" class="form-control" name="name" id="newReportName" required="">
                             </div>
                             <input type="hidden" value="" name="content" id="newReportContent" />
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><spring:message code="jpm.reports.saveReport.closeBtn" text="Close" /></button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><spring:message code="jpm.reports.saveReport.closeBtn" text="Close" /></button>
                             <button type="submit" class="btn btn-primary"><spring:message code="jpm.reports.saveReport.saveBtn" text="Save" /></button>
                         </div>
                     </div>

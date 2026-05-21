@@ -51,7 +51,7 @@
         </c:if>
     </ol>
 </nav>
-<div class="asynchronicProgress hide" id="asynchronicProgress">
+<div class="asynchronicProgress d-none" id="asynchronicProgress">
     <div class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" ></div><br/>
     <div id="asynchronicProgress_status" class="asynchronicProgressStatus"></div>
 </div>

@@ -30,6 +30,8 @@
 <script type="text/javascript" src="${cp}static/js/custom.js?v=${jpm.appversion}"></script>
 <script type='text/javascript' src="${cp}static/js/jquery.jeditable.min.js?v=${jpm.appversion}" ></script>
 <script type="text/javascript" src="${cp}static/js/jquery.form.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" src="${cp}static/js/locale/select2/${locale.language}.js?v=${jpm.appversion}"></script>
 
 <!--TODO Replace with local-->
 <script type="text/javascript"  src="${cp}static/js/tempus-dominus.min.js?v=${jpm.appversion}"></script>

@@ -13,7 +13,7 @@
                                 content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
                             });
                             content = content + "</tbody></table></div>";
-                            content = content + "<button onclick=\"$(this).parents('div.popover').popover('hide');\" class='float-end btn btn-sm close'  type='button' ><i class='fas fa-times'></i></button>";
+                            content = content + "<button onclick=\"$(this).parents('div.popover').popover('hide');\" class='float-end btn-close' type='button' aria-label='Close'></button>";
                             //<c:if test="${not empty param.operationLink}">
                             content = content + "<a href='${cp}${param.operationLink}'><i class='${param.operationIcon}'></i> ${param.operationTitle}</a>";
                             //</c:if>

@@ -16,14 +16,14 @@
                 <div class="col-lg-3 col-sm-12">
                     <div class="card" style="max-width: 340px">
                         <div class="card-header">
-                            <p class="h4 mb-0 font-weight-normal"><spring:message code="jpm.login.title" text="Enter username and password to continue." /></p>
+                            <p class="h4 mb-0 fw-normal"><spring:message code="jpm.login.title" text="Enter username and password to continue." /></p>
                         </div>
                         <div class="card-body">
                             <form class="" id="loginform" action="login" method="POST">
                                 <center>
                                     <img class="mb-4 mx-auto" src="<c:url value='/static/img/login.png'/>" alt="Login" id="loginLogo" style="width: 90%;">
                                 </center>
-                                <label for="j_username" class="sr-only"><spring:message code="jpm.login.username" text="Username" /></label>
+                                <label for="j_username" class="visually-hidden"><spring:message code="jpm.login.username" text="Username" /></label>
                                 <div class="input-group mb-1">
                                     <div class="input-group-text">
                                         <i class="fa fa-user"></i>
@@ -31,8 +31,8 @@
                                     <input class="form-control" id="j_username" name="username" type="text" placeholder="<spring:message code="jpm.login.username" text="Username" />" autocorrect="off" autocapitalize="off" spellcheck="false" required/>
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="password" class="sr-only">Password</label>
+                                <div class="form-group mb-2">
+                                    <label for="password" class="visually-hidden">Password</label>
                                     <div class="input-group mb-2">
                                         <div class="input-group-text">
                                             <i class="fa fa-key"></i>

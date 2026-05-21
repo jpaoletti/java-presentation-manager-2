@@ -52,19 +52,19 @@
             </div>
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="panel-group" id="accordion">
+                    <div class="accordion" id="accordion">
                         <c:forEach var="entry" items="${jpm.entities}" varStatus="st">
                             <c:set var="e" value="${entry.value}" />
                             <c:if test="${not empty e.clazz}">
                                 <div class="card">
                                     <div class="card-header">
                                         <h4 class="card-title">
-                                            <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse${st.index}">
+                                            <a class="accordion-toggle collapsed" data-bs-toggle="collapse" data-bs-parent="#accordion" href="#collapse${st.index}">
                                                 <h5>${e.clazz}</h5>
                                             </a>
                                         </h4>
                                     </div>
-                                    <div id="collapse${st.index}" class="panel-body collapse ${st.first?'in':''}">
+                                    <div id="collapse${st.index}" class="collapse ${st.first?'show':''}">
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-lg-6">

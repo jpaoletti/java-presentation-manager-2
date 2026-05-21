@@ -16,6 +16,6 @@
             </c:when>
         </c:choose>
         <c:if test="separator">
-        <div class="dropdown-divider"></div>
+        <li><hr class="dropdown-divider"></li>
     </c:if>
 </security:authorize>

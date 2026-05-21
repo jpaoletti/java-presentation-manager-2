@@ -8,7 +8,7 @@
     <thead class="table-secondary">
         <tr>
             <th>
-                <button class="btn btn-primary btn-xs float-end weak-columns-modal-show" type="button" data-target="#weak-columns-modal-${weakListDomId}">
+                <button class="btn btn-primary btn-sm float-end weak-columns-modal-show" type="button" data-bs-target="#weak-columns-modal-${weakListDomId}">
                     <span class="fas fa-eye"></span>
                 </button>
             </th>
@@ -36,7 +36,7 @@
                             <c:if test="${compactOperations}">
                                 <div class="dropdown">
                                     <button type="button" class="btn  btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
-                                        <span class="fas fa-cog"></span> <span class="caret"></span>
+                                        <span class="fas fa-cog"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
                                         <c:forEach items="${item.operations}" var="o">
@@ -92,35 +92,58 @@
     </div>
 </div>
 <script type="text/javascript">
-    $("#weak-list-wrapper-${weakListDomId} .inline-edit").each(function () {
-        $(this).editable('${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit', {
-            placeholder: "-",
-            submitdata: {
-                name: $(this).attr("data-name")
+    (function () {
+        var weakColumnsModalId = "weak-columns-modal-${weakListDomId}";
+        var weakColumnsModalElement = document.getElementById(weakColumnsModalId);
+
+        $(document.body).children("#" + weakColumnsModalId).not(weakColumnsModalElement).each(function () {
+            var staleModal = bootstrap.Modal.getInstance(this);
+            if (staleModal) {
+                staleModal.dispose();
+            }
+            $(this).remove();
+        });
+        if (weakColumnsModalElement && weakColumnsModalElement.parentElement !== document.body) {
+            document.body.appendChild(weakColumnsModalElement);
+        }
+
+        $("#weak-list-wrapper-${weakListDomId} .inline-edit").each(function () {
+            $(this).editable('${cp}jpm/${contextualEntity}/' + $(this).closest("tr").attr("data-id") + '/iledit', {
+                placeholder: "-",
+                submitdata: {
+                    name: $(this).attr("data-name")
+                }
+            });
+        });
+        $("#weak-list-wrapper-${weakListDomId} a").each(function () {
+            if ($(this).attr("href")) {
+                $(this).attr("href", $(this).attr("href").replace("@cp@/", getContextPath()));
             }
         });
-    });
-    $("#weak-list-wrapper-${weakListDomId} a").each(function () {
-        if ($(this).attr("href")) {
-            $(this).attr("href", $(this).attr("href").replace("@cp@/", getContextPath()));
-        }
-    });
-    $(".weak-columns-modal-show[data-target='#weak-columns-modal-${weakListDomId}']").off("click").on("click", function () {
-        $("#weak-columns-modal-${weakListDomId}").modal("show");
-    });
-    $("#weak-columns-modal-${weakListDomId} .weak-visible-columns-form").off("submit").on("submit", function (e) {
-        e.preventDefault();
-        var form = $(this);
-        var container = $("#weak-list-wrapper-${weakListDomId}").parent();
-        $.post(form.attr("action"), form.serialize(), function () {
-            container.load(form.data("reload-url"));
-        }).done(function () {
-            $("#weak-columns-modal-${weakListDomId}").modal("hide");
+        $(".weak-columns-modal-show[data-bs-target='#weak-columns-modal-${weakListDomId}']").off("click").on("click", function () {
+            bootstrap.Modal.getOrCreateInstance(weakColumnsModalElement).show();
         });
-    });
-    //<c:forEach items="${paginatedList.fields}" var="f"><c:if test="${not empty f.align}">
-    $("#weak-list-wrapper-${weakListDomId} td[data-field='${f.id}']").css("text-align", "${f.align}");
-    //</c:if><c:if test="${not empty f.width}">
-    $("#weak-list-wrapper-${weakListDomId} td[data-field='${f.id}'], #weak-list-wrapper-${weakListDomId} th[data-field='${f.id}']").css("width", "${f.width}");
-    //</c:if></c:forEach>
+        $("#weak-columns-modal-${weakListDomId} .weak-visible-columns-form").off("submit").on("submit", function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var container = $("#weak-list-wrapper-${weakListDomId}").parent();
+            $.post(form.attr("action"), form.serialize(), function () {
+                var weakColumnsModal = bootstrap.Modal.getOrCreateInstance(weakColumnsModalElement);
+                $(weakColumnsModalElement).off("hidden.bs.modal.jpmWeakReload").on("hidden.bs.modal.jpmWeakReload", function () {
+                    weakColumnsModal.dispose();
+                    $(weakColumnsModalElement).remove();
+                    $(".modal-backdrop").remove();
+                    $("body").removeClass("modal-open");
+                    $("body").css("padding-right", "");
+                    container.load(form.data("reload-url"));
+                });
+                weakColumnsModal.hide();
+            });
+        });
+        //<c:forEach items="${paginatedList.fields}" var="f"><c:if test="${not empty f.align}">
+        $("#weak-list-wrapper-${weakListDomId} td[data-field='${f.id}']").css("text-align", "${f.align}");
+        //</c:if><c:if test="${not empty f.width}">
+        $("#weak-list-wrapper-${weakListDomId} td[data-field='${f.id}'], #weak-list-wrapper-${weakListDomId} th[data-field='${f.id}']").css("width", "${f.width}");
+        //</c:if></c:forEach>
+    })();
 </script>

@@ -7,7 +7,7 @@
 <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
-        $("#control-group-${field} label").append('<button class="btn btn-outline-secondary btn-xs" type="button" id="field_${field}_clear">×</button>');
+        $("#control-group-${field} label").append('<button class="btn btn-outline-secondary btn-sm ms-2" type="button" id="field_${field}_clear">&times;</button>');
         $(document).on("click", "#field_${field}_clear", function () {
             $("#field_${field}").val(null).trigger("change");
         });

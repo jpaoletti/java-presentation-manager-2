@@ -16,37 +16,40 @@
         <div class="row" id="container-${fn:replace(contextualEntity,'!', '-')}-${operation.id}">
             <div class="col-12">
                 <!-- Filter list-->
-                <div class="row">
-                    <div class="col-10">
-                        <!--<div class="btn-group filter-list">-->
-                        <a class="btn btn-sm btn-secondary dropdown-toggle dropright" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="fas fa-filter"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <c:forEach items="${paginatedList.fieldSearchs}" var="fs" varStatus="st">
-                                <li>
-                                    <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" var="searchTitle" />
-                                    <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}', '${searchTitle}');">${st.index+1}. ${searchTitle}</a>
-                                <li>
-                                </c:forEach>
-                        </ul>
+                <div class="row align-items-center">
+                    <div class="col-md-6 col-sm-12 mb-2 mb-md-0">
                         <div class="btn-group">
+                            <a class="btn btn-sm btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="fas fa-filter"></span>
+                                <span class="d-none d-lg-inline">&nbsp;<spring:message code="jpm.list.modalsearch.title" text="Add Search" /></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <c:forEach items="${paginatedList.fieldSearchs}" var="fs" varStatus="st">
+                                    <li>
+                                        <spring:message code="jpm.field.${entity.id}.${fs.key.id}" text="${fs.key.id}" var="searchTitle" />
+                                        <a class="dropdown-item" id="search-link-${st.index+1}" data-field='${fs.key.id}' href="javascript:openSearchModal('${fs.key.id}', '${searchTitle}');">${st.index+1}. ${searchTitle}</a>
+                                    <li>
+                                    </c:forEach>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="btn-group float-md-end">
                             <c:forEach items="${generalOperations}" var="o">
                                 <c:if test="${empty owner}">
-                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" title="${o.showTitle}" />
+                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" entityName="${entityName}" title="true" />
                                 </c:if>
                                 <c:if test="${not empty owner}">
-                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" instanceId="${item.id}" entityName="${entityName}"  title="${o.showTitle}" />
+                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${owner.id}${entityContext}/${ownerId}/${contextualEntity}" entityName="${entityName}"  title="true" />
                                 </c:if>
                             </c:forEach>
                         </div>
-                        <!--</div>-->
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-lg-12">
                         <c:if test="${not empty sessionEntityData.searchCriteria.definitions}">
-                            <a type="button" href="${cp}jpm/${contextualEntity}/removeAllSearch" class="badge bg-info removeSearchBtn">
+                            <a type="button" href="${cp}jpm/${contextualEntity}/removeAllSearch" class="badge bg-info removeSearchBtn me-1 mb-1">
                                 <spring:message code="jpm.removeAllSearch" text="Clear"/>
                                 <span class="fa fa-times-circle"></span>
                             </a>
@@ -56,14 +59,14 @@
                             <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
                             <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" />
                             <c:if test="${empty owner}">
-                                <a href="${cp}jpm/${contextualEntity}/removeSearch?i=${st.index}" class="badge bg-secondary removeSearchBtn">
+                                <a href="${cp}jpm/${contextualEntity}/removeSearch?searchId=${d.id}" class="badge bg-secondary removeSearchBtn me-1 mb-1">
                                     "${fieldTitle}" ${text} &nbsp;&nbsp;
                                     <span class="fa fa-times"></span>
                                 </a>
                             </c:if>
                             <c:if test="${not empty owner}">
                                 <!--BUG NEED OWNER CONTEXT--> 
-                                <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/removeSearch?i=${st.index}" class="badge bg-secondary removeSearchBtn">
+                                <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/removeSearch?searchId=${d.id}" class="badge bg-secondary removeSearchBtn me-1 mb-1">
                                     "${fieldTitle}" ${text} &nbsp;&nbsp;
                                     <span class="fa fa-times"></span>
                                 </a>
@@ -81,9 +84,9 @@
                                 <!-- GENERAL Operations -->
                                 <th id='operation-column-header' class="list-operation-heading" >
                                     <c:if test="${not empty selectedOperations}">
-                                        <input type="checkbox" class="pull-left" id="select_unselect_all" />
+                                        <input type="checkbox" class="float-start" id="select_unselect_all" />
                                     </c:if>
-                                    <button class="btn btn-primary btn-xs float-end" id="columnsModalShow"><span class="fas fa-eye"></span></button>
+                                    <button class="btn btn-primary btn-sm float-end" id="columnsModalShow"><span class="fas fa-eye"></span></button>
 
                                 </th>
                                 <c:forEach items="${paginatedList.fields}" var="field" varStatus="st">
@@ -92,7 +95,7 @@
                                             data-cp="${cp}jpm/${(empty owner)?'':(owner.id.concat("/").concat(ownerId).concat("/"))}"
                                             class="data list-operation-heading ${ (sessionEntityData.sort.field.id == field.id)?'sorted':''} ${field.sortable?'sortable':''}">
                                             <c:if test="${field.sortable}">
-                                                <span class="sort-icon fas ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'fa-sort-alpha-down':'fa-sort-alpha-up'):'fa-sort'} pull-right"></span>
+                                                <span class="sort-icon fas ${(sessionEntityData.sort.field.id == field.id) ? (sessionEntityData.sort.asc?'fa-sort-alpha-down':'fa-sort-alpha-up'):'fa-sort'} float-end"></span>
                                             </c:if>
                                             <jpm:field-title entity="${entity}" fieldId="${field.id}" />
                                         </th>
@@ -110,13 +113,13 @@
                                         <div class="btn-group">
                                             <c:if test="${not compactOperations}">
                                                 <c:forEach items="${item.operations}" var="o">
-                                                    <jpm:operation-link operation="${o}" clazz="btn btn-xs ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
+                                                    <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-secondary'}" contextualEntity="${contextualEntity}" instanceId="${item.id}" entityName="${entityName}" />
                                                 </c:forEach>
                                             </c:if>
                                             <c:if test="${compactOperations}">
                                                 <div class="dropdown">
-                                                    <button type="button" class="btn btn-xs btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        <span class="fas fa-cog"></span> <span class="caret"></span>
+                                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <span class="fas fa-cog"></span>
                                                     </button>
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         <c:forEach items="${item.operations}" var="o">
@@ -148,9 +151,9 @@
                             <tbody>
                                 <tr>
                                     <td colspan="100">
-                                        <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="pull-left" />
+                                        <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="float-start" />
                                         <c:forEach var="o" items="${selectedOperations}">
-                                            <jpm:operation-link operation="${o}" clazz="btn btn-xs ${not empty o.color?o.color:'btn-warning'} selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
+                                            <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-warning'} selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
                                         </c:forEach>
                                     </td>
                                 </tr>
@@ -163,7 +166,7 @@
                                         <%@include file="inc/default-paginator.jsp" %>
                                     </div>
                                     <c:if test="${entity.countable}">
-                                        <div class="float-end mt-1 mr-1">
+                                        <div class="float-end mt-1 me-1">
                                             <span class="badge bg-secondary"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
                                         </div>
                                     </c:if>
@@ -251,14 +254,16 @@
                 if (size) {
                     $("#searchModal .modal-dialog").addClass(size);
                 }
-                $("#searchModal").modal("show").on("shown.bs.modal", function () {
+                const searchModalElement = document.getElementById("searchModal");
+                bootstrap.Modal.getOrCreateInstance(searchModalElement).show();
+                $(searchModalElement).off("shown.bs.modal.jpmSearchFocus").on("shown.bs.modal.jpmSearchFocus", function () {
                     $("#searchModal .modal-body").find("input").trigger('focus');
                 });
             }
             var sorting = false;
             jpmLoad(function () {
                 $("#columnsModalShow").on("click", function () {
-                    $("#columnsModal").modal("show");
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById("columnsModal")).show();
                 });
                 $("#pageSizeSubmit").on("click", function () {
                     $(this).parents("form").trigger('submit');

@@ -23,20 +23,20 @@
                                 <div class="card-body">
                                     <form class="form-horizontal" role="form" action="${cp}jpm/user/${user.username}/updateProfile">
                                         <fieldset>
-                                            <div class="control-group">
-                                                <label class="control-label" for="input01"><spring:message text="Username" code="jpm.profile.username" /></label>
+                                            <div class="control-group mb-2">
+                                                <label class="control-label col-form-label" for="input01"><spring:message text="Username" code="jpm.profile.username" /></label>
                                                 <div class="controls">
                                                     <input type="text" class="form-control" value="${user.username}" disabled="disabled"/>
                                                 </div>
                                             </div>
-                                            <div class="control-group">
-                                                <label class="control-label" for="name"><spring:message text="?" code="profile.edit.name" /></label>
+                                            <div class="control-group mb-2">
+                                                <label class="control-label col-form-label" for="name"><spring:message text="?" code="profile.edit.name" /></label>
                                                 <div class="controls">
                                                     <input type="text" class="form-control" name="nombre" value="${user.name}" />
                                                 </div>
                                             </div>
-                                            <div class="control-group">
-                                                <label class="control-label" for="email"><spring:message text="?" code="profile.edit.mail" /></label>
+                                            <div class="control-group mb-2">
+                                                <label class="control-label col-form-label" for="email"><spring:message text="?" code="profile.edit.mail" /></label>
                                                 <div class="controls">
                                                     <input type="text" class="form-control" name="mail" value="${user.mail}" />
                                                 </div>
@@ -57,14 +57,14 @@
                                 </div>
                                 <div class="card-body">
                                     <form class="form-horizontal" role="form" action="" id="jpmForm" method="POST">
-                                        <div class="control-group">
-                                            <label class="control-label"><spring:message text="current Password" code="jpm.profile.chpass.current" /></label>
+                                        <div class="control-group mb-2">
+                                            <label class="control-label col-form-label"><spring:message text="current Password" code="jpm.profile.chpass.current" /></label>
                                             <div class="controls">
                                                 <input class="form-control" type="password" name="current" value="">
                                             </div>
                                         </div>
-                                        <div id="d_newpass" class="control-group">
-                                            <label class="control-label"><spring:message text="New Password" code="jpm.profile.chpass.newpass" /></label>
+                                        <div id="d_newpass" class="control-group mb-2">
+                                            <label class="control-label col-form-label"><spring:message text="New Password" code="jpm.profile.chpass.newpass" /></label>
                                             <div class="controls">
                                                 <div class='pwdwidgetdiv' id='thepwddivnewpass'></div>
                                             </div>

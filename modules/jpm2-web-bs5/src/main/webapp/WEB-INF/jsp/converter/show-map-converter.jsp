@@ -2,8 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:if test="${not empty wsjsonc_values}">
     <c:forEach var="e" items="${wsjsonc_values}">
-        <div id="control-group-address" class="form-group row ">
-            <label class="col-md-4 control-label" for="address">
+        <div id="control-group-address" class="form-group row mb-2">
+            <label class="col-md-4 control-label col-form-label" for="address">
                 ${e.key}
             </label>
             <div class="col-md-8 converted-field-container">

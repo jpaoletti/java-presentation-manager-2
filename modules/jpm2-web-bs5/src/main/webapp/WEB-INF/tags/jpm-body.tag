@@ -146,7 +146,7 @@
                 <c:if test="${empty showMenu or showMenu}">
                     <div id="overlay" class="overlay"></div>
                 </c:if>
-                <div id="jpm-main-content" class="container-fluid p-1 pl-4 pr-4">
+                <div id="jpm-main-content" class="container-fluid p-1 ps-4 pe-4">
                     <jsp:doBody />
                 </div>
             </main>

@@ -7,7 +7,7 @@
     <c:if test="${operation.compact}">
         <div class="dropdown jpm-itemop-dropdown">
             <button type="button" class="btn btn-sm btn-secondary dropdown-toggle jpm-itemop-trigger" data-bs-toggle="dropdown">
-                <span class="fas fa-cog"></span> <span class="caret"></span>
+                <span class="fas fa-cog"></span>
             </button>
             <ul class="dropdown-menu jpm-itemop-menu" aria-labelledby="dropdownMenuButton">
                 <c:forEach items="${itemOperations}" var="o">

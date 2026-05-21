@@ -9,12 +9,12 @@
 <%@attribute name = "fieldId" required="false" type="java.lang.String" %>
 <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${fieldId}" text="${fieldId}" />
 <%@attribute name = "displayTitle" required="false" type="java.lang.Boolean" %>
-<div id="control-group-${id}" class="form-group row ${clazz}">
+<div id="control-group-${id}" class="form-group row mb-2 ${clazz}">
     <c:if test="${empty displayTitle or displayTitle}">
         <c:if test="${not empty label}">
-            <label class="col-md-4 control-label" for="${id}">
+            <label class="col-md-4 control-label col-form-label" for="${id}">
                 <c:if test="${not empty help}">
-                    <a class='tip-top' data-toggle='tooltip' title='${help}' href='#' >${label}</a>
+                    <a class='tip-top' data-bs-toggle='tooltip' title='${help}' href='#' >${label}</a>
                 </c:if>
                 <c:if test="${empty help}">
                     ${label}
@@ -22,7 +22,7 @@
             </label>
         </c:if>
         <c:if test="${empty label}">
-            <label class="col-md-4 control-label" for="${id}">
+            <label class="col-md-4 control-label col-form-label" for="${id}">
                 <jpm:field-title entity="${entity}" fieldId="${fieldId}" />
             </label>
         </c:if>

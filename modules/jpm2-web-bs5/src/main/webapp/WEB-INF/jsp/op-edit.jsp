@@ -12,7 +12,7 @@
                 <%@include file="inc/default-form-content.jsp" %>
                 <c:if test="${not empty entityMessages}">
                     <div class="row">
-                        <div class="col-lg-offset-2 col-lg-10">
+                        <div class="offset-lg-2 col-lg-10">
                             <div class="alert alert-danger">
                                 <c:forEach items="${entityMessages}" var="m">
                                     * <spring:message code="${m.key}" text="${m.key}" arguments="${m.arguments}" argumentSeparator=";" />${!st.last ? '<br/>':''}
