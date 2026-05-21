@@ -42,18 +42,18 @@ public class EnumListConverter extends WebToString {
 
     @Override
     public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException, ConfigurationException {
-        if (newValue == null || "".equals(newValue)) {
-            return null;
-        } else {
-            final Collection c = (Collection) getValue(object, field);
-            c.clear();
-            final String[] values = ((newValue instanceof String) ? (new String[]{newValue.toString()}) : (String[]) newValue);
-            final List<Object> result = new ArrayList<>();
-            for (String value : values) {
-                result.add(valueOf(getClazz(), value));
-            }
-            return result;
+        Collection c = (Collection) getValue(object, field);
+        if (c == null) {
+            c = EnumSet.noneOf(getClazz());
         }
+        c.clear();
+        if (newValue != null && !"".equals(newValue)) {
+            final String[] values = ((newValue instanceof String) ? (new String[]{newValue.toString()}) : (String[]) newValue);
+            for (String value : values) {
+                c.add(valueOf(getClazz(), value));
+            }
+        }
+        return c;
     }
 
     public JPMContext getContext() {
