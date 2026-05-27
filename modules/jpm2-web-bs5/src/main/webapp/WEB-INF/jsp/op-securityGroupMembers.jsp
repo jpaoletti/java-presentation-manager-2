@@ -22,8 +22,8 @@
                                     <c:forEach var="user" items="${members}">
                                         <tr>
                                             <td style="width: 180px;">${user.username}</td>
-                                            <td>${user.name}</td>
-                                            <td style="width: 180px;">${user.mail}</td>
+                                            <td><c:out value="${user.name}"/></td>
+                                            <td style="width: 180px;"><c:out value="${user.mail}"/></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>

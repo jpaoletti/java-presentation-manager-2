@@ -88,8 +88,8 @@
                                             <img class="img-responsive img-rounded mCS_img_loaded" src="${cp}static/img/user.jpg" alt="" id="userPicture">
                                         </div>
                                         <div class="user-info">
-                                            <span class="user-name">${user.name}</span>
-                                            <span class="user-role">${user.userGroups}</span>
+                                            <span class="user-name"><c:out value="${user.name}"/></span>
+                                            <span class="user-role"><c:out value="${user.userGroups}"/></span>
                                         </div>
                                     </div>
                                     <!-- sidebar-search  -->

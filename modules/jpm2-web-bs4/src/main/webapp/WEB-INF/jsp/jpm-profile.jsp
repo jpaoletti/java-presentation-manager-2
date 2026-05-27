@@ -32,7 +32,7 @@
                                             <div class="control-group">
                                                 <label class="control-label" for="name"><spring:message text="?" code="profile.edit.name" /></label>
                                                 <div class="controls">
-                                                    <input type="text" class="form-control" name="nombre" value="${user.name}" />
+                                                    <input type="text" class="form-control" name="nombre" value="<c:out value='${user.name}'/>" />
                                                 </div>
                                             </div>
                                             <div class="control-group">

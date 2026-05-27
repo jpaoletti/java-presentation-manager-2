@@ -2,6 +2,6 @@
 <c:if test="${not empty operation}">
     <div id="content-header">
         <h3><span class="${operation.icon}"></span>  ${operationName}</h3>
-        <h4>${entity.title} <i>${instance.iobject.object}</i></h4>
+        <h4>${entity.title} <i><c:out value="${instance.iobject.object}"/></i></h4>
     </div>
 </c:if>

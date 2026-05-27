@@ -8,7 +8,7 @@
             </small>
             <small class="float-right">
                 <i class="fa fa-user"></i>
-                ${user.name}
+                <c:out value="${user.name}"/>
             </small>
         </span>
     </div>

@@ -25,7 +25,7 @@
                     <li class="breadcrumb-item">
                         <a href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/show.exec">
                             <span class="fas fa-search"></span> <span class="d-none d-md-inline"><spring:message code="jpm.operation.show" text="Show" arguments="${owner.title}" /> </span>
-                            ${instance.owner.iobject.object}
+                            <c:out value="${instance.owner.iobject.object}"/>
                         </a>
                     </li>
                 </security:authorize>
@@ -46,7 +46,7 @@
                 </li>
             </c:if>
             <li class="breadcrumb-item active" aria-current="page">
-                <span class="${operation.icon}"></span> <span class="d-none d-md-inline">${operationName} ${instance.iobject.object}</span>
+                <span class="${operation.icon}"></span> <span class="d-none d-md-inline">${operationName} <c:out value="${instance.iobject.object}"/></span>
             </li>
         </c:if>
     </ol>
