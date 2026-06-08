@@ -45,8 +45,11 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(UnsupportedOperationException.class)
-    public String handleUnsupportedOperationException(UnsupportedOperationException ex, HttpServletRequest req, HttpServletResponse resp) {
-        return "not-implemented";
+    public ModelAndView handleUnsupportedOperationException(UnsupportedOperationException ex, HttpServletRequest req, HttpServletResponse resp) {
+        final ModelAndView mav = new ModelAndView("exception");
+        mav.addObject("message", MessageFactory.error("unexpected.exception", ex.getMessage()));
+        JPMUtils.getLogger().fatal("Unsupported operation at " + req.getRequestURL() + (req.getQueryString() == null ? "" : "?" + req.getQueryString()), ex);
+        return mav;
     }
 
     @ExceptionHandler(NotAuthorizedException.class)

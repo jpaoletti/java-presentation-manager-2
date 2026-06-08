@@ -141,6 +141,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             processFields(entity, operation, object, instance, parameters);
             preExecute(operation, object);
             entity.getDao(context).update(object);
+            final String newId = String.valueOf(entity.getDao(context).getId(object));
+            instance.getIobject().setId(newId);
             postExecute(operation, object);
             if (originalValues != null) {
                 final StringBuilder sb = new StringBuilder();
@@ -163,7 +165,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             } else {
                 getJpm().audit(entity, operation, instance.getIobject());
             }
-            return new IdentifiedObject(instanceId, object);
+            return new IdentifiedObject(newId, object);
         } catch (PMException e) {
             entity.getDao(context).detach(object);
             throw e;
