@@ -623,16 +623,9 @@ public class ListController extends BaseController {
                     entity.getDao(getContext().getEntityContext()).getId(object).toString(),
                     (useToString) ? object.toString() : String.valueOf(JPMUtils.get(object, field.getProperty()))));
         } else {
-            final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-            String finalValue = textField;
-            while (matcher.find()) {
-                final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""), getContext().getEntityContext());
-                finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
-            }
             r.getResults().add(new ObjectConverterDataItem(
                     entity.getDao(getContext().getEntityContext()).getId(object).toString(),
-                    (useToString) ? object.toString() : finalValue));
+                    (useToString) ? object.toString() : ObjectConverterData.renderTextField(textField, entity, getContext().getEntityContext(), object)));
         }
     }
 

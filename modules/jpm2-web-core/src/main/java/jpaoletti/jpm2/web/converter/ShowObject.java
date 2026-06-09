@@ -3,12 +3,10 @@ package jpaoletti.jpm2.web.converter;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
-import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
@@ -19,6 +17,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.ObjectConverterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.util.HtmlUtils;
 
@@ -145,13 +144,7 @@ public class ShowObject extends Converter {
                 final Field field = getEntity().getFieldById(getTextField(), getContext().getEntityContext());
                 return String.valueOf(JPMUtils.get(value, field.getProperty()));
             } else {
-                final Matcher matcher = DISPLAY_PATTERN.matcher(getTextField());
-                finalValue = getTextField();
-                while (matcher.find()) {
-                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = getEntity().getFieldById(_display_field, getContext().getEntityContext());
-                    finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(value, field2.getProperty())));
-                }
+                finalValue = ObjectConverterData.renderTextField(getTextField(), getEntity(), getContext().getEntityContext(), value);
             }
         } else {
             finalValue = String.valueOf(value);

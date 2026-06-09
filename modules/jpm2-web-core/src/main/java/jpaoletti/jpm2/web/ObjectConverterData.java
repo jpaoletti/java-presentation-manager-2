@@ -40,19 +40,36 @@ public class ObjectConverterData {
                 final Field field = entity.getFieldById(textField, entityContext);
                 return new ObjectConverterDataItem(instanceId, String.valueOf(JPMUtils.get(object, field.getProperty())));
             } else {
-                final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
-                String finalValue = textField;
-                while (matcher.find()) {
-                    final String _display_field = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
-                    final Field field2 = entity.getFieldById(_display_field.replaceAll("\\!", ""), entityContext);
-                    finalValue = finalValue.replace("{" + _display_field + "}", String.valueOf(JPMUtils.get(object, field2.getProperty())));
-                }
-                result = new ObjectConverterDataItem(instanceId, finalValue);
+                result = new ObjectConverterDataItem(instanceId, renderTextField(textField, entity, entityContext, object));
             }
         } else {
             result = new ObjectConverterDataItem(instanceId, object.toString());
         }
         return result;
+    }
+
+    public static String renderTextField(String textField, Entity entity, final String entityContext, final Object object) throws ConfigurationException {
+        final Matcher matcher = DISPLAY_PATTERN.matcher(textField);
+        String finalValue = textField;
+        while (matcher.find()) {
+            final String displayField = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "");
+            finalValue = finalValue.replace("{" + displayField + "}", resolveDisplayValue(displayField, entity, entityContext, object));
+        }
+        return finalValue;
+    }
+
+    private static String resolveDisplayValue(String displayField, Entity entity, final String entityContext, final Object object) throws ConfigurationException {
+        final String cleanField = displayField.replace("!", "");
+        final int defaultSeparator = cleanField.indexOf('|');
+        final String fieldId = defaultSeparator >= 0 ? cleanField.substring(0, defaultSeparator) : cleanField;
+        final String defaultValue = defaultSeparator >= 0 ? cleanField.substring(defaultSeparator + 1) : null;
+        final Field field = entity.getFieldById(fieldId, entityContext);
+        final Object value = JPMUtils.get(object, field.getProperty());
+        if (value == null) {
+            return defaultValue == null ? "null" : defaultValue;
+        }
+        final String stringValue = String.valueOf(value);
+        return "null".equals(stringValue) && defaultValue != null ? defaultValue : stringValue;
     }
 
     public static class ObjectConverterDataItem {
