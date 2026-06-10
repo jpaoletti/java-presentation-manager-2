@@ -1,6 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <select name="value" id="fieldSearcher_${param.field}" multiple="multiple" class="jpm-collection-converter form-control"></select>
-<script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" charset="UTF-8" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     $("#searchModal").on("shown.bs.modal", function () {
         $("#fieldSearcher_${param.field}").select2({

@@ -4,7 +4,7 @@
         <option value="${v.id}" selected="selected">${v.text}</option>
     </c:forEach>    
 </select>
-<script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" charset="UTF-8" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
         $("#field_${field}").select2({

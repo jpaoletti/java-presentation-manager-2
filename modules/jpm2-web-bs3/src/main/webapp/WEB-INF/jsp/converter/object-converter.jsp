@@ -4,8 +4,8 @@
         <option value="${param.value}">${param.valueText}</option>
     </c:if>
 </select>
-<script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
-<script type="text/javascript" src="${cp}static/js/locale/select2/${locale.language}.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" charset="UTF-8" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" charset="UTF-8" src="${cp}static/js/locale/select2/${locale.language}.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
         $("#field_${field}").buildJpmSelect2({

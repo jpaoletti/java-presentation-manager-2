@@ -4,7 +4,7 @@
     <head>
         <%@include file="inc/default-head.jsp" %>
         <script type='text/javascript' src="${cp}static/js/jpm-report.js?v=${jpm.appversion}" ></script>
-        <script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+        <script type="text/javascript" charset="UTF-8" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
     </head>
     <c:set var="entityName" value="${entity.title}" />
     <jpm:jpm-body showMenu="false">

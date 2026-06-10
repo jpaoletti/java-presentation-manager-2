@@ -4,7 +4,8 @@
         <option value="${v.id}" selected="selected">${v.text}</option>
     </c:forEach>    
 </select>
-<script type="text/javascript" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" charset="UTF-8" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>
+<script type="text/javascript" charset="UTF-8" src="${cp}static/js/locale/select2/${locale.language}.js?v=${jpm.appversion}"></script>
 <script type="text/javascript">
     jpmLoad(function () {
         $("#control-group-${field} label").append('<button class="btn btn-outline-secondary btn-sm ms-2" type="button" id="field_${field}_clear">&times;</button>');

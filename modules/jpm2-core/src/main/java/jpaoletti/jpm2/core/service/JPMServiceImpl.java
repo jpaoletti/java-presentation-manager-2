@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import javax.persistence.criteria.JoinType;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
@@ -280,9 +280,11 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     /**
-     * Adds an order to the configuration. Detects the configuration type and applies the appropriate method.
+     * Adds an order to the configuration. Detects the configuration type and
+     * applies the appropriate method.
      *
-     * @param cfg the configuration (DAOListConfiguration or JPADAOListConfiguration)
+     * @param cfg the configuration (DAOListConfiguration or
+     * JPADAOListConfiguration)
      * @param sort the ListSort to add
      */
     private void addOrder(IDAOListConfiguration cfg, ListSort sort) {
@@ -297,8 +299,10 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     /**
-     * Adds search criteria to the configuration. For Hibernate-based configurations, adds Criterion and aliases directly.
-     * For JPA-based configurations, this method should only be called with Hibernate DAOs (search criteria is Hibernate-specific).
+     * Adds search criteria to the configuration. For Hibernate-based
+     * configurations, adds Criterion and aliases directly. For JPA-based
+     * configurations, this method should only be called with Hibernate DAOs
+     * (search criteria is Hibernate-specific).
      *
      * @param cfg the configuration
      * @param criterion the Hibernate Criterion to add
@@ -315,7 +319,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     /**
-     * Adds sort configuration. Detects the configuration type and applies the appropriate method.
+     * Adds sort configuration. Detects the configuration type and applies the
+     * appropriate method.
      *
      * @param cfg the configuration
      * @param sort the ListSort to add
@@ -336,7 +341,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             final String property = hibernateOrder.getPropertyName();
             if (property.contains(".")) { //need alias
                 final String alias = property.substring(0, property.indexOf("."));
-                jpaoCfg.withAlias(alias, alias, javax.persistence.criteria.JoinType.INNER);
+                jpaoCfg.withAlias(alias, alias, JoinType.INNER);
             }
             final boolean asc = sort.isAsc();
             jpaoCfg.withOrder(new DAOOrder(property, asc));
@@ -344,10 +349,12 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     }
 
     /**
-     * Adds owner restriction to the configuration. Detects the configuration type and applies the appropriate method.
+     * Adds owner restriction to the configuration. Detects the configuration
+     * type and applies the appropriate method.
      *
      * @param weak the weak entity
-     * @param cfg the configuration (DAOListConfiguration or JPADAOListConfiguration)
+     * @param cfg the configuration (DAOListConfiguration or
+     * JPADAOListConfiguration)
      * @param ownerEntity the owner entity
      * @param owner the owner object
      */
