@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.dao.DAOListConfiguration;
-import jpaoletti.jpm2.core.dao.UserVisibleColumnDAO;
+import jpaoletti.jpm2.core.dao.UserVisibleColumnJpaDAO;
 import jpaoletti.jpm2.core.exception.EntityNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
@@ -13,7 +12,6 @@ import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.UserVisibleColumn;
 import static org.apache.commons.lang3.StringUtils.join;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MiscEntityService extends JPMServiceBase {
 
     @Autowired
-    private UserVisibleColumnDAO userVisibleColumnDAO;
+    private UserVisibleColumnJpaDAO userVisibleColumnDAO;
 
     /**
      *
@@ -39,10 +37,9 @@ public class MiscEntityService extends JPMServiceBase {
      */
     @Transactional
     public List<String> getVisibleColumns(String username, ContextualEntity entity) throws EntityNotFoundException, OperationNotFoundException, NotAuthorizedException, PMException {
-        final UserVisibleColumn find = userVisibleColumnDAO.find(new DAOListConfiguration(
-                Restrictions.eq("entity", entity.toString()),
-                Restrictions.eq("username", username))
-        );
+        final UserVisibleColumn find = userVisibleColumnDAO.find(userVisibleColumnDAO.build()
+                .withPredicate((cb, root) -> cb.equal(root.get("entity"), entity.toString()))
+                .withPredicate((cb, root) -> cb.equal(root.get("username"), username)));
         if (find == null) {
             final List<String> res = new ArrayList<>();
             for (Field field : entity.getEntity().getOrderedFields(entity.getContext())) {
@@ -61,10 +58,9 @@ public class MiscEntityService extends JPMServiceBase {
 
     @Transactional
     public void setVisibleColumns(String username, ContextualEntity entity, List<String> columns) throws PMException {
-        UserVisibleColumn find = userVisibleColumnDAO.find(new DAOListConfiguration(
-                Restrictions.eq("entity", entity.toString()),
-                Restrictions.eq("username", username))
-        );
+        UserVisibleColumn find = userVisibleColumnDAO.find(userVisibleColumnDAO.build()
+                .withPredicate((cb, root) -> cb.equal(root.get("entity"), entity.toString()))
+                .withPredicate((cb, root) -> cb.equal(root.get("username"), username)));
         if (find == null) {
             find = new UserVisibleColumn();
             find.setEntity(entity.toString());
