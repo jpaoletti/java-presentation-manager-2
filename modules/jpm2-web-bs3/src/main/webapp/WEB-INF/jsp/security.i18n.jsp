@@ -6,4 +6,14 @@ authMessages["jpm.security.authority.title"] = "<spring:message code='jpm.securi
 authMessages["jpm.security.authority.jpmauth.title"] = "<spring:message code='jpm.security.authority.jpmauth.title' text="Authorizations" javaScriptEscape='true' />";
 <c:forEach var="key" items="${keys}">authMessages["jpm.security.authority.${key.id}"] = "<spring:message code='jpm.security.authority.${key.id}' text="${key.id}" javaScriptEscape='true' />";
 </c:forEach>
-function sec_i18n(key) {return authMessages[key];}
+function sec_i18n(key) {
+    var value = authMessages[key];
+    if (value !== undefined) {
+        return value;
+    }
+    var prefix = "jpm.security.authority.";
+    if (key.indexOf(prefix) === 0) {
+        return key.substring(prefix.length);
+    }
+    return key;
+}
