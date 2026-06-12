@@ -30,18 +30,21 @@ public class AuditRecord implements Serializable {
     private String operation;
     @Column(nullable = true)
     private String item;
+    @Column(name = "item_owner", nullable = true)
+    private String itemOwner;
     @Column(nullable = true)
     private String observations;
 
     public AuditRecord() {
     }
 
-    public AuditRecord(Long id, String username, String entity, String operation, String item, String observations) {
+    public AuditRecord(Long id, String username, String entity, String operation, String item, String itemOwner, String observations) {
         this.id = id;
         this.username = username;
         this.entity = entity;
         this.operation = operation;
         this.item = item;
+        this.itemOwner = itemOwner;
         this.observations = observations;
         this.datetime = new Date();
     }
@@ -76,6 +79,14 @@ public class AuditRecord implements Serializable {
 
     public void setItem(String item) {
         this.item = item;
+    }
+
+    public String getItemOwner() {
+        return itemOwner;
+    }
+
+    public void setItemOwner(String itemOwner) {
+        this.itemOwner = itemOwner;
     }
 
     public String getObservations() {

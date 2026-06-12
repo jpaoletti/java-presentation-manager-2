@@ -21,4 +21,6 @@ public interface AuditService {
     public List<AuditRecord> getItemRecords(Entity entity, String instanceId);
 
     public List<AuditRecord> getGeneralRecords(Entity entity);
+
+    public List<AuditRecord> getGeneralRecords(Entity entity, String ownerId);
 }
