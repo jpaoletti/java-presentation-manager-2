@@ -185,3 +185,9 @@ a{text-decoration: none;}
 }
 tr.highligthed-instance-row td{border: 2px solid black !important;}
 tr.highligthed-instance-row th{border-right: 2px solid black !important;}
+/* El highlighter pinta background-color en el <tr> via style inline (color del style de la etiqueta).
+   En Bootstrap 5, ".table>:not(caption)>*>*" setea background-color: var(--bs-table-bg) en cada celda
+   y tapa el fondo del <tr>. Hacemos transparentes las celdas de las filas con highlight para que el
+   color de la fila vuelva a verse. Solo afecta filas con style inline (tr.instance-row[style]). */
+.jpm-list-table > tbody > tr.instance-row[style] > td,
+.jpm-list-table > tbody > tr.instance-row[style] > th{background-color: transparent !important;}

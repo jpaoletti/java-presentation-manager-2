@@ -13,12 +13,20 @@
                                 content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
                             });
                             content = content + "</tbody></table></div>";
-                            content = content + "<button onclick=\"$(this).parents('div.popover').popover('hide');\" class='float-end btn-close' type='button' aria-label='Close'></button>";
+                            content = content + "<button class='float-end btn-close' type='button' aria-label='Close'></button>";
                             //<c:if test="${not empty param.operationLink}">
                             content = content + "<a href='${cp}${param.operationLink}'><i class='${param.operationIcon}'></i> ${param.operationTitle}</a>";
                             //</c:if>
                             content = content + "</div>";
-                            _this.popover({html: true, content: $(content)}).popover('show');
+                            // El popover se crea sobre _this (el trigger), que es donde vive la instancia.
+                            // La cruz debe cerrarlo llamando dispose() sobre _this, NO sobre el div.popover
+                            // (ahi no hay instancia: por eso no cerraba). dispose() ademas deja el contenido
+                            // fresco en cada reapertura.
+                            var $content = $(content);
+                            $content.find("button.btn-close").on("click", function () {
+                                _this.popover("dispose");
+                            });
+                            _this.popover({html: true, content: $content}).popover('show');
                         });
                     });
             </script>
