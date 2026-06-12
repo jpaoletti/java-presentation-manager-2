@@ -108,7 +108,7 @@ public class SecurityController extends BaseController {
     @GetMapping(value = "/jpm/security/i18n.js")
     public ModelAndView i18n() {
         final ModelAndView res = new ModelAndView("security.i18n");
-        res.addObject("keys", getAuthDAO().list(new DAOListConfiguration()));
+        res.addObject("keys", getAuthDAO().list(null));
         return res;
     }
 
