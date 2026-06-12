@@ -193,11 +193,13 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
         if (!cfg.getOrders().isEmpty()) {
             List<javax.persistence.criteria.Order> orders = new ArrayList<>();
             for (DAOOrder order : cfg.getOrders()) {
-                if (order.isAsc()) {
-                    orders.add(cb.asc(root.get(order.getOrder())));
-                } else {
-                    orders.add(cb.desc(root.get(order.getOrder())));
+                // navegar propiedad (posiblemente anidada "a.b") encadenando get();
+                // root.get("a.b") con punto genera SQL malformado ("order by . asc").
+                javax.persistence.criteria.Path<?> p = root;
+                for (String part : order.getOrder().split("[.]")) {
+                    p = p.get(part);
                 }
+                orders.add(order.isAsc() ? cb.asc(p) : cb.desc(p));
             }
             cq.orderBy(orders);
         }

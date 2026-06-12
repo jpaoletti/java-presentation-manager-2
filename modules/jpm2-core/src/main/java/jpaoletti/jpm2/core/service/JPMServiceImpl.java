@@ -339,10 +339,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             JPADAOListConfiguration jpaoCfg = (JPADAOListConfiguration) cfg;
             final Order hibernateOrder = sort.getOrder();
             final String property = hibernateOrder.getPropertyName();
-            if (property.contains(".")) { //need alias
-                final String alias = property.substring(0, property.indexOf("."));
-                jpaoCfg.withAlias(alias, alias, JoinType.INNER);
-            }
+            // El ORDER BY navega la propiedad anidada con get() encadenado (en
+            // JPADAO.buildQuery), que ya crea el join implícito -> no agregar alias
+            // (evitaba join duplicado / SQL malformado "order by . asc").
             final boolean asc = sort.isAsc();
             jpaoCfg.withOrder(new DAOOrder(property, asc));
         }

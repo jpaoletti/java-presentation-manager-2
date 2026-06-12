@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author jpaoletti
  */
-public abstract class FilteredJpaDAO extends DefaultJpaDAO {
+public abstract class FilteredJpaDAO extends DefaultJPADAO {
 
     @Override
     public Object get(String id) {
