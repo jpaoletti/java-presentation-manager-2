@@ -33,10 +33,10 @@ public class BoolJPASearcher implements ISearcher {
             MessageFactory.info("jpm.searcher.boolSearcher.eq.false");
 
         JPASearchResult result = new JPASearchResult(description, (cb, root) ->
-            cb.equal(root.get(searchProperty), value)
+            cb.equal(JPASearcherHelper.path(root, searchProperty), value)
         );
 
-        return JPASearcherHelper.addAliases(result, field);
+        return result;
     }
 
     public String getLabel() {

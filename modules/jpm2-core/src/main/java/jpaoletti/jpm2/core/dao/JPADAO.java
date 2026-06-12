@@ -134,7 +134,10 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
             }
         }
 
-        cq.select(cb.count(root));
+        // countDistinct: si algun predicado JOINea una coleccion (ej. filtro por tag),
+        // count(root) duplicaria; countDistinct cuenta entidades unicas (consistente
+        // con el distinct(true) que usa la query de lista).
+        cq.select(cb.countDistinct(root));
 
         return em.createQuery(cq).getSingleResult();
     }

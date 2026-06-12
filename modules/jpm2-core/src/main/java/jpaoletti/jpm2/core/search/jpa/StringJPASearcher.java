@@ -37,34 +37,34 @@ public class StringJPASearcher implements ISearcher {
         switch (operator) {
             case "li": // LIKE (case insensitive)
                 result = new JPASearchResult(info, (cb, root) ->
-                    cb.like(cb.lower(root.get(searchProperty)), "%" + value.toLowerCase() + "%")
+                    cb.like(cb.lower(JPASearcherHelper.path(root, searchProperty)), "%" + value.toLowerCase() + "%")
                 );
                 break;
 
             case "nli": // NOT LIKE (case insensitive)
                 result = new JPASearchResult(info, (cb, root) ->
-                    cb.not(cb.like(cb.lower(root.get(searchProperty)), "%" + value.toLowerCase() + "%"))
+                    cb.not(cb.like(cb.lower(JPASearcherHelper.path(root, searchProperty)), "%" + value.toLowerCase() + "%"))
                 );
                 break;
 
             case "ne": // NOT EQUAL
                 result = new JPASearchResult(info, (cb, root) ->
-                    cb.notEqual(root.get(searchProperty), value)
+                    cb.notEqual(JPASearcherHelper.path(root, searchProperty), value)
                 );
                 break;
 
             case "null": // IS NULL
                 result = new JPASearchResult(info, (cb, root) ->
-                    cb.isNull(root.get(searchProperty))
+                    cb.isNull(JPASearcherHelper.path(root, searchProperty))
                 );
                 break;
 
             default: // EQUAL
                 result = new JPASearchResult(info, (cb, root) ->
-                    cb.equal(root.get(searchProperty), value)
+                    cb.equal(JPASearcherHelper.path(root, searchProperty), value)
                 );
         }
 
-        return JPASearcherHelper.addAliases(result, field);
+        return result;
     }
 }

@@ -35,16 +35,31 @@ public class JPASearcherHelper {
     }
 
     /**
-     * Gets the search property path, handling nested properties correctly
+     * Gets the search property path (full path, possibly nested with dots).
+     * Use together with {@link #path} to navigate nested properties.
      *
      * @param field the field
      * @return the property path to use in predicates
      */
     public static String getSearchProperty(Field field) {
-        if (field.getProperty().contains(".")) {
-            final String[] split = field.getProperty().split("[.]");
-            return split[split.length - 2] + "." + split[split.length - 1];
-        }
         return field.getProperty();
+    }
+
+    /**
+     * Navega una propiedad (posiblemente anidada con puntos) encadenando get(),
+     * lo que crea los joins implícitos necesarios. Reemplaza a {@code root.get("a.b")}
+     * que falla en JPA con propiedades anidadas.
+     *
+     * @param from raíz/path de partida
+     * @param property propiedad simple o anidada ("a", "a.b", "a.b.c")
+     * @return el Path navegado
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static javax.persistence.criteria.Path path(javax.persistence.criteria.Path from, String property) {
+        javax.persistence.criteria.Path p = from;
+        for (String part : property.split("[.]")) {
+            p = p.get(part);
+        }
+        return p;
     }
 }

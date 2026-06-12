@@ -23,17 +23,17 @@
                 <ref bean="id-invisible" />
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="description" />
-                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
                     <property name="configs" ref="editable-string-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="style" />
-                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
                     <property name="configs" ref="editable-string-config" />
                 </bean>
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="operations" />
-                    <property name="searcher" ref="jpm-searcher-string" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
                     <property name="configs" ref="editable-string-config" />
                 </bean>
             </list>

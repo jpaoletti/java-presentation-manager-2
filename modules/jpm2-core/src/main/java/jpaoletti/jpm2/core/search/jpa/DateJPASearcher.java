@@ -44,42 +44,42 @@ public class DateJPASearcher implements ISearcher {
                 switch (operator) {
                     case "ne": // NOT EQUAL
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.notEqual(root.get(searchProperty), value)
+                            cb.notEqual(JPASearcherHelper.path(root, searchProperty), value)
                         );
                         break;
 
                     case ">": // GREATER THAN (after)
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.greaterThan(root.get(searchProperty), value)
+                            cb.greaterThan(JPASearcherHelper.path(root, searchProperty), value)
                         );
                         break;
 
                     case ">=": // GREATER THAN OR EQUAL (on or after)
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.greaterThanOrEqualTo(root.get(searchProperty), value)
+                            cb.greaterThanOrEqualTo(JPASearcherHelper.path(root, searchProperty), value)
                         );
                         break;
 
                     case "<": // LESS THAN (before)
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.lessThan(root.get(searchProperty), value)
+                            cb.lessThan(JPASearcherHelper.path(root, searchProperty), value)
                         );
                         break;
 
                     case "<=": // LESS THAN OR EQUAL (on or before)
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.lessThanOrEqualTo(root.get(searchProperty), value)
+                            cb.lessThanOrEqualTo(JPASearcherHelper.path(root, searchProperty), value)
                         );
                         break;
 
                     case "eq": // EQUAL (explicit)
                     default: // EQUAL (default)
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.equal(root.get(searchProperty), value)
+                            cb.equal(JPASearcherHelper.path(root, searchProperty), value)
                         );
                 }
 
-                return JPASearcherHelper.addAliases(result, field);
+                return result;
             } else {
                 return null;
             }

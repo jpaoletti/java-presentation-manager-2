@@ -6,7 +6,6 @@ import java.util.Map;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
-import jpaoletti.jpm2.core.search.jpa.JPASearcherHelper;
 
 /**
  * JPA Criteria API implementation of CollectionSearcher2.
@@ -32,12 +31,21 @@ public class CollectionSearcher2JPA implements ISearcher {
     @Override
     public ISearchResult build(Entity entity, Field field, Map<String, String[]> parameters) {
         final List<Object> values = getValues(parameters);
-        final String searchProperty = JPASearcherHelper.getSearchProperty(field);
-        final JPASearchResult result = new JPASearchResult(
+        // El campo es una coleccion (ej. tags, groups): hay que JOINear la coleccion
+        // y filtrar el elemento IN values. Usar root.get(coleccion).in(...) genera
+        // SQL invalido ("No value specified for parameter 1").
+        final String property = field.getProperty();
+        return new JPASearchResult(
             MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
-            (cb, root) -> root.get(searchProperty).in(values)
+            (cb, root) -> {
+                final String[] path = property.split("[.]");
+                javax.persistence.criteria.From<?, ?> from = root;
+                for (int i = 0; i < path.length - 1; i++) {
+                    from = from.join(path[i]);
+                }
+                return from.join(path[path.length - 1]).in(values);
+            }
         );
-        return JPASearcherHelper.addAliases(result, field);
     }
 
     protected List<Object> getValues(Map<String, String[]> parameters) {

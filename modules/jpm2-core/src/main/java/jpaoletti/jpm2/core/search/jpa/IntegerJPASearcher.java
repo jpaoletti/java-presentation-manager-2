@@ -38,41 +38,41 @@ public class IntegerJPASearcher implements ISearcher {
                 switch (operator) {
                     case "ne": // NOT EQUAL
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.notEqual(root.get(searchProperty), value)
+                            cb.notEqual(JPASearcherHelper.path(root, searchProperty), value)
                         );
                         break;
 
                     case ">": // GREATER THAN
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.gt(root.get(searchProperty), (Number) value)
+                            cb.gt(JPASearcherHelper.path(root, searchProperty), (Number) value)
                         );
                         break;
 
                     case ">=": // GREATER THAN OR EQUAL
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.ge(root.get(searchProperty), (Number) value)
+                            cb.ge(JPASearcherHelper.path(root, searchProperty), (Number) value)
                         );
                         break;
 
                     case "<": // LESS THAN
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.lt(root.get(searchProperty), (Number) value)
+                            cb.lt(JPASearcherHelper.path(root, searchProperty), (Number) value)
                         );
                         break;
 
                     case "<=": // LESS THAN OR EQUAL
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.le(root.get(searchProperty), (Number) value)
+                            cb.le(JPASearcherHelper.path(root, searchProperty), (Number) value)
                         );
                         break;
 
                     default: // EQUAL
                         result = new JPASearchResult(description, (cb, root) ->
-                            cb.equal(root.get(searchProperty), value)
+                            cb.equal(JPASearcherHelper.path(root, searchProperty), value)
                         );
                 }
 
-                return JPASearcherHelper.addAliases(result, field);
+                return result;
             } else {
                 return null;
             }
