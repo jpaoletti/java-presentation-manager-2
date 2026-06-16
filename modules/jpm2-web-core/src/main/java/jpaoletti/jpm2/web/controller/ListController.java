@@ -316,7 +316,7 @@ public class ListController extends BaseController {
         if (property == null || property.isEmpty()) {
             return root;
         }
-        final String[] parts = property.split("\\\\.");
+        final String[] parts = property.split("\\.");
         Path p = root.get(parts[0]);
         for (int i = 1; i < parts.length; i++) {
             p = p.get(parts[i]);
