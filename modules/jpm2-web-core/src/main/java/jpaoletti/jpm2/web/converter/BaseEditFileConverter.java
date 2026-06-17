@@ -68,6 +68,15 @@ public abstract class BaseEditFileConverter extends Converter {
             return null;
         }
         final File file = new File(String.valueOf(newValue)); //Tmp path
+        // Security: newValue must be a temp file produced by the upload endpoint
+        // (/jpm/uploadFileConverter), never an arbitrary server path supplied by the
+        // client. Without this check a form field can point to any readable file on
+        // the server (e.g. /opt/.../database.properties) and exfiltrate its content
+        // through the image blob. See JPMController.uploadFileConverter.
+        if (!isUploadedTempFile(file)) {
+            JPMUtils.getLogger().error("Rejected file path outside upload temp dir in file converter: " + newValue);
+            throw new ConverterException("jpm.error.uploading.file");
+        }
         if (!file.exists()) {
             JPMUtils.getLogger().error("File not exists in file converter");
             throw new ConverterException("jpm.error.uploading.file");
@@ -87,6 +96,29 @@ public abstract class BaseEditFileConverter extends Converter {
             throw new ConverterException("jpm.error.uploading.file");
         }
         return bFile;
+    }
+
+    /**
+     * Validates that the given file is one that was just uploaded through the JPM
+     * upload endpoint. {@code JPMController.uploadFileConverter} stores uploads as
+     * {@code <java.io.tmpdir>/jpm<random>/<originalFilename>}, so a legitimate value
+     * is always a file whose parent directory name starts with {@code "jpm"} and
+     * lives directly under the system temp directory. The path is canonicalized
+     * first so {@code ..} segments and symlinks cannot be used to escape the temp
+     * directory and read arbitrary files on the server.
+     */
+    protected boolean isUploadedTempFile(File file) {
+        try {
+            final File tmpRoot = new File(System.getProperty("java.io.tmpdir")).getCanonicalFile();
+            final File canonical = file.getCanonicalFile();
+            final File parent = canonical.getParentFile();
+            return parent != null
+                    && parent.getName().startsWith("jpm")
+                    && tmpRoot.equals(parent.getParentFile());
+        } catch (IOException ex) {
+            JPMUtils.getLogger().error("Cannot resolve uploaded file path", ex);
+            return false;
+        }
     }
 
     public String getMeasure() {
