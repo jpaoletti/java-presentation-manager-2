@@ -1,7 +1,8 @@
 <%@include file="inc/default-taglibs.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="weakListDomId" value="${fn:replace(ownerEntityId, '!', '_')}_${ownerInstanceId}_${fn:replace(weakEntityId, '!', '_')}" />
-<c:set var="weakListLoadUrl" value="${cp}jpm/${ownerEntityId}/${ownerInstanceId}/${weakEntityId}/weaklist?showOperations=${showOperations}" />
+<c:set var="weakListBaseUrl" value="${not empty weakListBaseUrl ? weakListBaseUrl : cp.concat('jpm/').concat(ownerEntityId).concat('/').concat(ownerInstanceId).concat('/').concat(weakEntityId).concat('/weaklist?showOperations=').concat(showOperations).concat('&paginated=').concat(weakListPaginated)}" />
+<c:set var="weakListLoadUrl" value="${not empty weakListLoadUrl ? weakListLoadUrl : weakListBaseUrl}" />
 <c:set var="setVisibleColumnsUrl" value="${cp}jpm/${ownerEntityId}/${ownerInstanceId}/${weakEntityId}/setWeakVisibleColumns" />
 <div id="weak-list-wrapper-${weakListDomId}">
 <table class="table table-bordered table-sm jpm-list-table w-auto">
@@ -68,6 +69,22 @@
             </tr>
         </c:forEach>
     </tbody>
+    <c:if test="${weakListPaginated}">
+        <tfoot>
+            <tr>
+                <td colspan="${paginatedList.fields.size() + 1}">
+                    <div class="weak-pagination list-pagination">
+                        <%@include file="inc/default-paginator.jsp" %>
+                    </div>
+                    <c:if test="${entity.countable}">
+                        <div class="float-end mt-1 me-1">
+                            <span class="badge bg-secondary"><spring:message code="jpm.list.total" text="Total: ${paginatedList.total}" arguments="${paginatedList.total}" /></span>
+                        </div>
+                    </c:if>
+                </td>
+            </tr>
+        </tfoot>
+    </c:if>
 </table>
 </div>
 <div class="modal fade" id="weak-columns-modal-${weakListDomId}" tabindex="-1">
@@ -95,6 +112,15 @@
     (function () {
         var weakColumnsModalId = "weak-columns-modal-${weakListDomId}";
         var weakColumnsModalElement = document.getElementById(weakColumnsModalId);
+        var weakListBaseUrl = "${weakListBaseUrl}";
+
+        function reloadWeakList(extraQuery) {
+            var url = weakListBaseUrl;
+            if (extraQuery) {
+                url += (url.indexOf("?") === -1 ? "?" : "&") + extraQuery.replace(/^\?/, "");
+            }
+            $("#weak-list-wrapper-${weakListDomId}").parent().load(url);
+        }
 
         $(document.body).children("#" + weakColumnsModalId).not(weakColumnsModalElement).each(function () {
             var staleModal = bootstrap.Modal.getInstance(this);
@@ -119,6 +145,19 @@
             if ($(this).attr("href")) {
                 $(this).attr("href", $(this).attr("href").replace("@cp@/", getContextPath()));
             }
+        });
+        $("#weak-list-wrapper-${weakListDomId} .weak-pagination a").off("click").on("click", function (e) {
+            var href = $(this).attr("href");
+            if (!href || href === "#" || $(this).closest(".disabled").length) {
+                e.preventDefault();
+                return;
+            }
+            e.preventDefault();
+            reloadWeakList(href);
+        });
+        $("#weak-list-wrapper-${weakListDomId} .weak-pagination form").off("submit").on("submit", function (e) {
+            e.preventDefault();
+            reloadWeakList($(this).serialize());
         });
         $(".weak-columns-modal-show[data-bs-target='#weak-columns-modal-${weakListDomId}']").off("click").on("click", function () {
             bootstrap.Modal.getOrCreateInstance(weakColumnsModalElement).show();

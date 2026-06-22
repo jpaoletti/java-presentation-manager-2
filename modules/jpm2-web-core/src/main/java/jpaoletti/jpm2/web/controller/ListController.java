@@ -102,6 +102,8 @@ public class ListController extends BaseController {
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "2147483647") Integer pageSize) throws PMException {
 
+        LOG.debug("listObject IN entity={} textField={} filter={} query={} owner={} ownerId={} page={} pageSize={}",
+                entity, textField, filter, query, owner, ownerId, page, pageSize);
         final Integer ps = (pageSize == null) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
         r.setResults(new ArrayList<>());
@@ -275,6 +277,7 @@ public class ListController extends BaseController {
         } catch (FieldNotFoundException e) {
             r.getResults().add(new ObjectConverterDataItem("?", "¿¿ " + textField + " ??"));
         }
+        LOG.debug("listObject OUT entity={} results={} more={}", entity, r.getResults().size(), r.isMore());
         return r;
     }
 
@@ -339,14 +342,17 @@ public class ListController extends BaseController {
             @PathVariable(value = "entity") String _entity,
             @PathVariable String instanceId,
             @PathVariable(value = "weak") String _weak,
-            @RequestParam(required = false, defaultValue = "false") boolean showOperations) throws PMException {
+            @RequestParam(required = false, defaultValue = "false") boolean showOperations,
+            @RequestParam(required = false, defaultValue = "false") boolean paginated,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-list-weak");
         final ContextualEntity centity = getJpm().getContextualEntity(_entity);
         final ContextualEntity cweak = getJpm().getContextualEntity(_weak);
         final Entity entity = centity.getEntity();
         final Entity weak = cweak.getEntity();
 
-        final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak);
+        final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak, paginated ? page : null, paginated ? pageSize : null);
 
         final Operation operation = weak.getOperation(OP_LIST); //fixme
         getContext().set(entity, entity.isContainingListOperation() ? entity.getOperation(OP_LIST, getContext().getContext()) : entity.getOperation(OP_SHOW, getContext().getContext())); //fixme
@@ -358,10 +364,18 @@ public class ListController extends BaseController {
         final List<String> visibleColumns = miscEntityService.getVisibleColumns(getAuthorizationService().getCurrentUsername(), cweak);
         mav.addObject("visibleColumns", visibleColumns);
         mav.addObject("showOperations", showOperations);
+        mav.addObject("weakListPaginated", paginated);
         mav.addObject("compactOperations", operation.isCompact());
         mav.addObject("ownerEntityId", _entity);
         mav.addObject("ownerInstanceId", instanceId);
         mav.addObject("weakEntityId", _weak);
+        final String weakListBaseUrl = getRequest().getContextPath() + "/jpm/" + _entity + "/" + instanceId + "/" + _weak + "/weaklist?showOperations=" + showOperations + "&paginated=" + paginated;
+        mav.addObject("weakListBaseUrl", weakListBaseUrl);
+        String weakListLoadUrl = weakListBaseUrl;
+        if (paginated) {
+            weakListLoadUrl += "&page=" + weakList.getPage() + "&pageSize=" + weakList.getPageSize();
+        }
+        mav.addObject("weakListLoadUrl", weakListLoadUrl);
         return mav;
     }
 
@@ -493,6 +507,8 @@ public class ListController extends BaseController {
 
     protected ModelAndView generalList(Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException {
         final Entity entity = getContext().getEntity();
+        LOG.debug("generalList IN entity={} op={} page={} pageSize={} owner={} ownerId={}",
+                entity, getContext().getOperation(), page, pageSize, owner, ownerId);
         applyExplicitListStateFromRequest(entity);
         final SessionEntityData sessionEntityData = getSessionEntityData(entity);
         final ModelAndView mav = new ModelAndView("jpm-" + OP_LIST);
@@ -508,6 +524,8 @@ public class ListController extends BaseController {
         mav.addObject("listStateExtraQuery", explicitListState ? buildQueryString(buildListStateHiddenParameters(sessionEntityData)) : "");
         final List<String> visibleColumns = miscEntityService.getVisibleColumns(getAuthorizationService().getCurrentUsername(), getContext().getContextualEntity());
         mav.addObject("visibleColumns", visibleColumns);
+        LOG.debug("generalList OUT entity={} total={} listSize={}", entity, paginatedList.getTotal(),
+                paginatedList.getContents() != null ? paginatedList.getContents().size() : 0);
         return mav;
     }
 

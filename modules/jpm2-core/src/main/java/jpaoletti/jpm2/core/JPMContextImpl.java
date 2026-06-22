@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
 public class JPMContextImpl implements JPMContext {
 
+    private static final org.apache.logging.log4j.Logger LOG = jpaoletti.jpm2.util.JPMUtils.getLogger(jpaoletti.jpm2.util.JPMUtils.WEB);
+
     private Entity entity;
     private String entityContext;
     private Operation operation;
@@ -102,6 +104,7 @@ public class JPMContextImpl implements JPMContext {
 
     @Override
     public void set(Entity entity, Operation operation) {
+        LOG.debug("context.set entity={} op={}", entity, operation);
         this.entity = entity;
         this.operation = operation;
     }
@@ -123,6 +126,7 @@ public class JPMContextImpl implements JPMContext {
 
     @Override
     public void setEntityContext(String entityContext) {
+        LOG.debug("context.setEntityContext entityContext={}", entityContext);
         this.entityContext = entityContext;
     }
 
@@ -143,6 +147,7 @@ public class JPMContextImpl implements JPMContext {
 
     @Override
     public void setOwnerId(String ownerId) {
+        LOG.debug("context.setOwnerId ownerId={}", ownerId);
         this.ownerId = ownerId;
     }
 

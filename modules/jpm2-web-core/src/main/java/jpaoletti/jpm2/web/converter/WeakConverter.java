@@ -17,8 +17,12 @@ import jpaoletti.jpm2.web.controller.ListController;
  */
 public class WeakConverter extends Converter {
 
+    public static final String SHOW_LIST_FALSE = "false";
+    public static final String SHOW_LIST_TRUE = "true";
+    public static final String SHOW_LIST_PAGINATED = "paginated";
+
     private Entity entity;
-    private boolean showList;
+    private String showList;
     private boolean showBtn;
     private String btnText;
     private String btnIcon;
@@ -27,7 +31,7 @@ public class WeakConverter extends Converter {
 
     public WeakConverter() {
         this.showBtn = true;
-        this.showList = true;
+        this.showList = SHOW_LIST_TRUE;
         this.btnIcon = "fas fa-th-list";
         this.showOperations = false;
     }
@@ -35,7 +39,7 @@ public class WeakConverter extends Converter {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final StringBuilder res = new StringBuilder("@page:weak-converter.jsp");
-        res.append("?showList=").append(isShowList());
+        res.append("?showList=").append(getShowList());
         res.append("&showBtn=").append(isShowBtn());
         res.append("&btnText=").append(getBtnText());
         res.append("&btnIcon=").append(getBtnIcon());
@@ -67,12 +71,26 @@ public class WeakConverter extends Converter {
         this.entity = entity;
     }
 
-    public boolean isShowList() {
+    public String getShowList() {
         return showList;
     }
 
-    public void setShowList(boolean showList) {
-        this.showList = showList;
+    public boolean shouldShowList() {
+        return !SHOW_LIST_FALSE.equalsIgnoreCase(showList);
+    }
+
+    public boolean isShowListPaginated() {
+        return SHOW_LIST_PAGINATED.equalsIgnoreCase(showList);
+    }
+
+    public void setShowList(String showList) {
+        if (showList == null || showList.trim().isEmpty()) {
+            this.showList = SHOW_LIST_TRUE;
+        } else if (SHOW_LIST_PAGINATED.equalsIgnoreCase(showList.trim())) {
+            this.showList = SHOW_LIST_PAGINATED;
+        } else {
+            this.showList = Boolean.parseBoolean(showList.trim()) ? SHOW_LIST_TRUE : SHOW_LIST_FALSE;
+        }
     }
 
     public boolean isShowBtn() {

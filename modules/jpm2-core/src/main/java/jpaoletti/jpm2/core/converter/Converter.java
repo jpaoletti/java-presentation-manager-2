@@ -18,6 +18,8 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class Converter extends PMCoreObject {
 
+    private static final org.apache.logging.log4j.Logger LOG = JPMUtils.getLogger(JPMUtils.CONVERTER);
+
     /**
      * This method transforms the field value of an object to visualize it
      *
@@ -31,7 +33,24 @@ public class Converter extends PMCoreObject {
      */
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
-        return visualizeValue(contextualEntity, field, object, value, instanceId);
+        final Object visualized = visualizeValue(contextualEntity, field, object, value, instanceId);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("visualize field={} instanceId={} converter={} out={}",
+                    field.getId(), instanceId, getClass().getSimpleName(), truncate(visualized));
+        }
+        return visualized;
+    }
+
+    /**
+     * Truncates a value's string form so debug logs stay readable when a
+     * converter returns large HTML/strings.
+     */
+    private static String truncate(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        final String s = value.toString();
+        return s.length() > 120 ? s.substring(0, 120) + "…(" + s.length() + ")" : s;
     }
 
     /**

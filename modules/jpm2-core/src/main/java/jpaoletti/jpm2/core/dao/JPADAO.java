@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
 
+    private static final org.apache.logging.log4j.Logger LOG = JPMUtils.getLogger(JPMUtils.DAO);
+
     @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
@@ -49,14 +51,19 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     @Override
     public T get(String id) {
+        LOG.debug("get IN class={} id={}", getPersistentClass().getSimpleName(), id);
         if (id == null) {
             return null;
         }
         if (id.getClass().equals(idClass)) {
-            return (T) getSession().get(getPersistentClass(), id);
+            final T result = (T) getSession().get(getPersistentClass(), id);
+            LOG.debug("get OUT class={} id={} found={}", getPersistentClass().getSimpleName(), id, result != null);
+            return result;
         } else {
             try {
-                return (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+                final T result = (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+                LOG.debug("get OUT class={} id={} (transformed) found={}", getPersistentClass().getSimpleName(), id, result != null);
+                return result;
             } catch (Exception e) {
                 JPMUtils.getLogger().warn("Invalid ID transformation", e);
                 return null;
@@ -79,16 +86,19 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
 
     @Override
     public void update(final Object object) {
+        LOG.debug("update class={}", getPersistentClass().getSimpleName());
         getSession().update(object);
     }
 
     @Override
     public void save(Object object) {
+        LOG.debug("save class={}", getPersistentClass().getSimpleName());
         getSession().save(object);
     }
 
     @Override
     public void delete(Object object) {
+        LOG.debug("delete class={}", getPersistentClass().getSimpleName());
         getSession().delete(object);
     }
 
@@ -139,7 +149,9 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
         // con el distinct(true) que usa la query de lista).
         cq.select(cb.countDistinct(root));
 
-        return em.createQuery(cq).getSingleResult();
+        final Long total = em.createQuery(cq).getSingleResult();
+        LOG.debug("count class={} total={}", getPersistentClass().getSimpleName(), total);
+        return total;
     }
 
     @Override
@@ -155,7 +167,12 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
             query.setFirstResult(effectiveConfiguration.getFrom());
         }
 
-        return query.getResultList();
+        final List<T> result = query.getResultList();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("list class={} from={} max={} size={}", getPersistentClass().getSimpleName(),
+                    effectiveConfiguration.getFrom(), effectiveConfiguration.getMax(), result.size());
+        }
+        return result;
     }
 
     /**

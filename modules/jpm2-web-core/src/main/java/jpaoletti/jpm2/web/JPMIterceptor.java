@@ -24,6 +24,8 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class JPMIterceptor implements HandlerInterceptor {
 
+    private static final org.apache.logging.log4j.Logger LOG = jpaoletti.jpm2.util.JPMUtils.getLogger(jpaoletti.jpm2.util.JPMUtils.WEB);
+
     @Autowired
     private JPMContext context;
     @Autowired
@@ -32,6 +34,9 @@ public class JPMIterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse hsr1, Object o) throws Exception {
         final Map pathVariables = (Map) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("preHandle IN method={} uri={} pathVars={}", request.getMethod(), request.getRequestURI(), pathVariables);
+        }
         if (pathVariables != null && !pathVariables.isEmpty()) {
             if (pathVariables.containsKey("entity")) {
                 final String entityId = (String) pathVariables.get("entity");
@@ -49,6 +54,7 @@ public class JPMIterceptor implements HandlerInterceptor {
                 getContext().setOwnerId((String) pathVariables.get("ownerId"));
             }
         }
+        LOG.debug("preHandle OUT entity={} op={}", getContext().getEntity(), getContext().getOperation());
         return true;
     }
 
@@ -62,6 +68,7 @@ public class JPMIterceptor implements HandlerInterceptor {
         if (ctx != null) {
             final Entity entity = ctx.getEntity();
             final Operation operation = ctx.getOperation();
+            LOG.debug("postHandle entity={} op={} view={}", entity, operation, mav != null ? mav.getViewName() : null);
             if (mav != null) {
                 mav.addObject("locale", LocaleContextHolder.getLocale());
                 if (entity != null) {

@@ -9,6 +9,20 @@
         <Logger name="org.apache.log4j.xml" level="info"/>
         <Logger name="org.springframework.beans.factory" level="info"/>
         <Logger name="jpaoletti.jpm2" level="info"/>
+        <!--
+            Logging debug modular de JPM2. El logger padre "jpaoletti.jpm2" controla
+            todo a la vez; cada subsistema cuelga de el y puede activarse por separado
+            (entradas/salidas de parametros con JPMUtils.getLogger por categoria).
+            Descomentar el que se quiera seguir en debug:
+
+            <Logger name="jpaoletti.jpm2.service"    level="debug"/>
+            <Logger name="jpaoletti.jpm2.controller" level="debug"/>
+            <Logger name="jpaoletti.jpm2.dao"        level="debug"/>
+            <Logger name="jpaoletti.jpm2.converter"  level="debug"/>
+            <Logger name="jpaoletti.jpm2.auth"       level="debug"/>
+            <Logger name="jpaoletti.jpm2.web"        level="debug"/>
+            <Logger name="jpaoletti.jpm2.model"      level="debug"/>
+        -->
         <Logger name="org.hibernate" level="error"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>

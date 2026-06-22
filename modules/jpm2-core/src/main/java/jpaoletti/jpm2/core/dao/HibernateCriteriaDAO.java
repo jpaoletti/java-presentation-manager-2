@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
  */
 public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implements DAO<T, ID> {
 
+    private static final org.apache.logging.log4j.Logger LOG = JPMUtils.getLogger(JPMUtils.DAO);
+
     @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
@@ -45,14 +47,19 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
 
     @Override
     public T get(String id) {
+        LOG.debug("get IN class={} id={}", getPersistentClass().getSimpleName(), id);
         if (id == null) {
             return null;
         }
         if (id.getClass().equals(idClass)) {
-            return (T) getSession().get(getPersistentClass(), id);
+            final T result = (T) getSession().get(getPersistentClass(), id);
+            LOG.debug("get OUT class={} id={} found={}", getPersistentClass().getSimpleName(), id, result != null);
+            return result;
         } else {
             try {
-                return (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+                final T result = (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+                LOG.debug("get OUT class={} id={} (transformed) found={}", getPersistentClass().getSimpleName(), id, result != null);
+                return result;
             } catch (Exception e) {
                 JPMUtils.getLogger().warn("Invalid ID transformation", e);
                 return null;
@@ -74,16 +81,19 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
 
     @Override
     public void update(final Object object) {
+        LOG.debug("update class={}", getPersistentClass().getSimpleName());
         getSession().update(object);
     }
 
     @Override
     public void save(Object object) {
+        LOG.debug("save class={}", getPersistentClass().getSimpleName());
         getSession().save(object);
     }
 
     @Override
     public void delete(Object object) {
+        LOG.debug("delete class={}", getPersistentClass().getSimpleName());
         getSession().delete(object);
     }
 
@@ -104,7 +114,9 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
         final Criteria c = getBaseCriteria(configuration);
         c.setFirstResult(0);
         c.setProjection(Projections.rowCount());
-        return (Long) c.uniqueResult();
+        final Long total = (Long) c.uniqueResult();
+        LOG.debug("count class={} total={}", getPersistentClass().getSimpleName(), total);
+        return total;
     }
 
     @Override
@@ -120,7 +132,13 @@ public abstract class HibernateCriteriaDAO<T, ID extends Serializable> implement
                 c.setProjection(projectionList);
             }
         }
-        return c.list();
+        final List<T> result = c.list();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("list class={} from={} max={} size={}", getPersistentClass().getSimpleName(),
+                    configuration != null ? configuration.getFrom() : null,
+                    configuration != null ? configuration.getMax() : null, result.size());
+        }
+        return result;
     }
 
     public Criteria getBaseCriteria(IDAOListConfiguration configuration) {

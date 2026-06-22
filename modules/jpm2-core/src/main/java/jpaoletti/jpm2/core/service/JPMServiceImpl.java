@@ -48,26 +48,45 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
+    private static final org.apache.logging.log4j.Logger LOG = JPMUtils.getLogger(JPMUtils.SERVICE);
+
     @Override
-    public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak) throws PMException {
+    public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak, Integer page, Integer pageSize) throws PMException {
+        LOG.debug("getWeakList IN owner={} ownerId={} weak={} page={} pageSize={}",
+                entity, instanceId, weak, page, pageSize);
         final Object owner = entity.getDao().get(instanceId);
         final IDAOListConfiguration cfg = weak.getDao().build();
+        final Entity weakEntity = weak.getEntity();
         addOwnerRestriction(weak, cfg, entity, owner);
-        if (weak.getEntity().getDefaultSortField(entity.getContext()) != null) {
-            final Field sortField = weak.getEntity().getFieldById(weak.getEntity().getDefaultSortField(entity.getContext()), weak.getContext());
-            final ListSort sort = new ListSort(sortField, weak.getEntity().getDefaultSortDirection(entity.getContext()));
+        if (weakEntity.getDefaultSortField(entity.getContext()) != null) {
+            final Field sortField = weakEntity.getFieldById(weakEntity.getDefaultSortField(entity.getContext()), weak.getContext());
+            final ListSort sort = new ListSort(sortField, weakEntity.getDefaultSortDirection(entity.getContext()));
             addOrder(cfg, sort);
         }
-        final List list = weak.getDao().list(cfg);
         final PaginatedList pl = new PaginatedList();
         getContext().setEntity(entity.getEntity());
-        pl.setTotal((long) list.size());
+        if (weakEntity.isPaginable()) {
+            pl.setPageSize(pageSize != null ? pageSize : weakEntity.getPageSize());
+            pl.setPage(page != null ? page : 1);
+            cfg.setFrom(pl.from());
+            cfg.setMax(pl.getPageSize());
+            if (weakEntity.isCountable()) {
+                pl.setTotal(weak.getDao().count(cfg));
+            }
+        }
+        final List list = weak.getDao().list(cfg);
+        if (!weakEntity.isPaginable()) {
+            pl.setTotal((long) list.size());
+        }
         pl.getContents().load(list, weak, weak.getEntity().getOperation("list"));
+        LOG.debug("getWeakList OUT weak={} total={} listSize={}", weak, pl.getTotal(), list.size());
         return pl;
     }
 
     @Override
     public PaginatedList getPaginatedList(ContextualEntity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException {
+        LOG.debug("getPaginatedList IN entity={} op={} page={} pageSize={} owner={} ownerId={}",
+                entity, operation, page, pageSize, owner, ownerId);
         getContext().setOwnerId(ownerId);
         entity.checkAuthorization();
         if (operation != null) {
@@ -125,12 +144,17 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             }
         }
         //getJpm().audit(); //not for now
+        LOG.debug("getPaginatedList OUT entity={} total={} listSize={}", entity, pl.getTotal(), list.size());
         return pl;
     }
 
     @Override
     public IdentifiedObject update(Entity entity, String context, Operation operation, EntityInstance instance, Map<String, String[]> parameters) throws PMException {
         final String instanceId = instance.getIobject().getId();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("update IN entity={} ctx={} op={} instanceId={} params={}",
+                    entity.getId(), context, operation, instanceId, JPMUtils.formatParams(parameters));
+        }
         final Object object = entity.getDao(context).get(instanceId);
         Map<String, Object> originalValues = null;
         instance.getIobject().setObject(object);
@@ -165,8 +189,10 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             } else {
                 getJpm().audit(entity, operation, instance.getIobject());
             }
+            LOG.debug("update OUT entity={} newId={} class={}", entity.getId(), newId, object.getClass().getSimpleName());
             return new IdentifiedObject(newId, object);
         } catch (PMException e) {
+            LOG.debug("update FAIL entity={} instanceId={} error={}", entity.getId(), instanceId, e.getMessage());
             entity.getDao(context).detach(object);
             throw e;
         }
@@ -228,20 +254,24 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     @Override
     public IdentifiedObject delete(Entity entity, String context, Operation operation, String instanceId) throws PMException {
+        LOG.debug("delete IN entity={} ctx={} op={} instanceId={}", entity.getId(), context, operation, instanceId);
         final Object object = entity.getDao(context).get(instanceId); //current object
         preExecute(operation, object);
         entity.getDao(context).delete(object);
         postExecute(operation, object);
         final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
         getJpm().audit(entity, operation, iobject);
+        LOG.debug("delete OUT entity={} instanceId={}", entity.getId(), instanceId);
         return iobject;
     }
 
     @Override
     public IdentifiedObject get(Entity entity, String context, Operation operation, String instanceId) throws PMException {
         //preExecute(operation, null);
+        LOG.debug("get IN entity={} ctx={} op={} instanceId={}", entity.getId(), context, operation, instanceId);
         final Object object = entity.getDao(context).get(instanceId); //current object
         //postExecute(operation, object);
+        LOG.debug("get OUT entity={} instanceId={} found={}", entity.getId(), instanceId, object != null);
         return new IdentifiedObject(instanceId, object);
     }
 
@@ -252,6 +282,10 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     @Override
     public IdentifiedObject save(Entity entity, String context, Operation operation, EntityInstance instance, Map<String, String[]> parameters) throws PMException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("save IN entity={} ctx={} op={} params={}",
+                    entity.getId(), context, operation, JPMUtils.formatParams(parameters));
+        }
         final Object object = JPMUtils.newInstance(entity.getClazz());
         processFields(entity, operation, object, instance, parameters);
         preExecute(operation, object);
@@ -260,11 +294,16 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final String instanceId = entity.getDao(context).getId(object).toString();
         final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
         getJpm().audit(entity, operation, iobject);
+        LOG.debug("save OUT entity={} newId={} class={}", entity.getId(), instanceId, object.getClass().getSimpleName());
         return iobject;
     }
 
     @Override
     public IdentifiedObject save(Entity owner, String ownerId, Entity entity, String context, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("save(weak) IN owner={} ownerId={} entity={} ctx={} op={} params={}",
+                    owner.getId(), ownerId, entity.getId(), context, operation, JPMUtils.formatParams(parameters));
+        }
         final Object ownerObject = owner.getDao(context).get(ownerId);
         final Object object = JPMUtils.newInstance(entity.getClazz());
         entity.getOwner(context).setOwnerObject(getContext().getEntityContext(), object, ownerObject);
@@ -276,6 +315,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         final String instanceId = entity.getDao(context).getId(object).toString();
         final IdentifiedObject iobject = new IdentifiedObject(instanceId, object);
         getJpm().audit(entity, operation, iobject);
+        LOG.debug("save(weak) OUT entity={} newId={} owner={} ownerId={}", entity.getId(), instanceId, owner.getId(), ownerId);
         return iobject;
     }
 

@@ -40,6 +40,7 @@ public class AddController extends BaseController {
     public ModelAndView addPrepare(
             @RequestParam(required = false) String lastId,
             @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
+        LOG.debug("addPrepare IN entity={} op={} lastId={} close={}", getContext().getEntity(), getContext().getOperation(), lastId, close);
         //If there is a "lastId" , the object values are used as defaults
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
         final Operation operation = getContext().getOperation();
@@ -65,6 +66,7 @@ public class AddController extends BaseController {
      */
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}")
     public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
+        LOG.debug("addWeakPrepare IN entity={} op={} ownerId={} lastId={}", getContext().getEntity(), getContext().getOperation(), ownerId, lastId);
         final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
         IdentifiedObject iobjectOwner = null;
         if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
@@ -96,10 +98,12 @@ public class AddController extends BaseController {
     public JPMPostResponse addCommit(@RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
+        LOG.debug("addCommit IN entity={} op={} repeat={}", entity, operation, repeat);
         try {
             final IdentifiedObject newObject = getService().save(entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
+            LOG.debug("addCommit OUT entity={} newId={} repeat={}", entity, newObject.getId(), repeat);
             if (repeat) {
                 if (operation.getConfig("clear-on-repeat", "false").equalsIgnoreCase("true")) {
                     return new JPMPostResponse(true, buildRedirect(entity, null, OP_ADD, "repeated=true"), MessageFactory.success(getSuccessMsg(operation)));
@@ -110,6 +114,7 @@ public class AddController extends BaseController {
                 return new JPMPostResponse(true, next(entity, operation, newObject.getId(), ShowController.OP_SHOW).getViewName(), MessageFactory.success(getSuccessMsg(operation)));
             }
         } catch (ValidationException e) {
+            LOG.debug("addCommit entity={} VALIDATION FAILED fieldMsgs={}", entity, getContext().getFieldMessages().keySet());
             if (e.getMsg() != null) {
                 getContext().getEntityMessages().add(e.getMsg());
             }
@@ -153,6 +158,7 @@ public class AddController extends BaseController {
             @RequestParam(required = false, defaultValue = "false") boolean repeat) throws PMException {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
+        LOG.debug("addWeakCommit IN owner={} ownerId={} entity={} op={} repeat={}", owner, ownerId, entity, operation, repeat);
         try {
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));

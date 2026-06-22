@@ -10,12 +10,16 @@ import jpaoletti.jpm2.util.JPMUtils;
  */
 public class DefaultDAO extends HibernateCriteriaDAO<Object, Long> {
 
+    private static final org.apache.logging.log4j.Logger LOG = JPMUtils.getLogger(JPMUtils.DAO);
+
     private String className;
 
     @Override
     public Long getId(Object object) {
         try {
-            return (Long) JPMUtils.get(object, "id");
+            final Long id = (Long) JPMUtils.get(object, "id");
+            LOG.debug("getId className={} id={}", className, id);
+            return id;
         } catch (ConfigurationException ex) {
             JPMUtils.getLogger().error(ex);
             return null;

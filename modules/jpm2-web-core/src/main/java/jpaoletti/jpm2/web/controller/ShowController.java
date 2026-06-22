@@ -34,6 +34,7 @@ public final class ShowController extends BaseController {
             @PathVariable Entity entity,
             @PathVariable String instanceId,
             @RequestParam(required = false) String textField) throws PMException {
+        LOG.debug("listObject(show) IN entity={} instanceId={} textField={}", entity, instanceId, textField);
         try {
             final String entityContext = getContext().getEntityContext();
             final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
@@ -50,6 +51,7 @@ public final class ShowController extends BaseController {
     @GetMapping(value = "/jpm/{entity}/{instanceId}/{operationId:" + OP_SHOW + "}.json", headers = "Accept=application/json")
     @ResponseBody
     public Map<String, Object> showJSON(@PathVariable String instanceId, @RequestParam(required = false) String fields) {
+        LOG.debug("showJSON IN entity={} instanceId={} fields={}", getContext().getEntity(), instanceId, fields);
         final Map<String, Object> values = new LinkedHashMap<>();
         try {
             final Object object = getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId).getObject();
@@ -72,6 +74,7 @@ public final class ShowController extends BaseController {
         } catch (PMException e) {
             values.put("ERROR", e.getMessage());
         }
+        LOG.debug("showJSON OUT instanceId={} valuesCount={}", instanceId, values.size());
         return values;
     }
 

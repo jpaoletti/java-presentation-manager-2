@@ -36,6 +36,10 @@ public class EditController extends BaseController {
         @PathVariable String instanceId,
         @RequestParam() String name,
         @RequestParam() String value) throws PMException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ileditCommit IN entity={} instanceId={} name={} value={}",
+                    entity, instanceId, name, jpaoletti.jpm2.util.JPMUtils.maskValue(name, value));
+        }
         final Operation operation = entity.getOperation(OP_EDIT, getContext().getContext());
         getContext().set(entity, operation);
         try {
@@ -47,6 +51,7 @@ public class EditController extends BaseController {
             instance.getValues().clear();
             instance.getValues().put(name, tmp);
             getJpm().getService().update(entity, getContext().getEntityContext(), operation, instance, params);
+            LOG.debug("ileditCommit OUT entity={} instanceId={} name={} status=200", entity, instanceId, name);
             return new ResponseEntity<>(value, HttpStatus.OK);
         } catch (ValidationException e) {
             final StringBuilder sb = new StringBuilder();
@@ -55,6 +60,7 @@ public class EditController extends BaseController {
                     sb.append(getInternationalizedMessage(message)).append(". ");
                 }
             }
+            LOG.debug("ileditCommit OUT entity={} instanceId={} name={} status=400 msg={}", entity, instanceId, name, sb);
             return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
     }

@@ -97,7 +97,9 @@ function initConfirm() {
             jpmDialogConfirm({
                 callback: function () {
                     jpmBlock();
-                    var form = $('<form method="POST" action="' + $href + '" id="tmpjpmForm"></form>');
+                    $("#tmpjpmForm").remove();
+                    var form = $('<form method="POST" action="' + $href + '" id="tmpjpmForm" style="display:none"></form>');
+                    $("body").append(form);
                     buildAjaxJpmFormObject(form, function (data) {
                         processFormResponse(data);
                     }).submit();
@@ -772,7 +774,9 @@ var initPage = function () {
                     jpmDialogConfirm({
                         callback: function () {
                             jpmBlock();
-                            var form = $('<form method="POST" action="' + $href + '" id="tmpjpmForm"></form>');
+                            $("#tmpjpmForm").remove();
+                            var form = $('<form method="POST" action="' + $href + '" id="tmpjpmForm" style="display:none"></form>');
+                            $("body").append(form);
                             buildAjaxJpmFormObject(form, function (data) {
                                 processFormResponse(data);
                             }).submit();
@@ -936,7 +940,10 @@ var processFormResponse = function (data) {
             jpmDialogConfirm({
                 message: data.confirmation.text,
                 callback: function () {
-                    var form = $('#jpmForm'); //TODO
+                    var form = $('#jpmForm');
+                    if (form.length === 0) {
+                        form = $('#tmpjpmForm');
+                    }
                     form.append("<input type='hidden' name='jpm_confirm' value='true' id='jpm_confirm' />");
                     var extraInputs = $("<div style='display: none;'></div>");
                     $(".jpm-dialog-confirm").find("input,select,textarea").each(function () {

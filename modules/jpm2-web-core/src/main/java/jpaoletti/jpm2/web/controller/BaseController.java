@@ -39,6 +39,13 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class BaseController {
 
+    /**
+     * Shared controller-category logger. All controllers log under
+     * {@code jpaoletti.jpm2.controller} so the whole web layer can be toggled
+     * to debug from a single log4j line.
+     */
+    protected static final org.apache.logging.log4j.Logger LOG = jpaoletti.jpm2.util.JPMUtils.getLogger(jpaoletti.jpm2.util.JPMUtils.CONTROLLER);
+
     public static final String CURRENT_HOME = "currentHome";
     protected static final String LIST_STATE_PARAM = "_ls";
     protected static final String SORT_FIELD_PARAM = "_sf";
@@ -211,6 +218,7 @@ public class BaseController {
 
     protected IdentifiedObject initItemControllerOperation(String instanceId) throws PMException {
         final Operation operation = getContext().getOperation();
+        LOG.debug("initItemControllerOperation entity={} op={} instanceId={}", getContext().getEntity(), operation, instanceId);
         final IdentifiedObject iobject = getJpm().getService().get(getContext().getEntity(), getContext().getEntityContext(), operation, instanceId);
         if (operation.getContext() != null) {
             operation.getContext().preConversion(iobject.getObject());

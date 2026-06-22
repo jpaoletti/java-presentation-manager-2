@@ -20,6 +20,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
  */
 public abstract class PMCoreObject implements PMCoreConstants, Serializable {
 
+    private static final org.apache.logging.log4j.Logger AUTH_LOG = JPMUtils.getLogger(JPMUtils.AUTH);
+
     @Autowired
     @JsonIgnore
     private PresentationManager jpm;
@@ -38,7 +40,7 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
      */
     public void debug(String s) {
         if (getDebug()) {
-            JPMUtils.getLogger().debug(debug);
+            JPMUtils.getLogger().debug(s);
         }
     }
 
@@ -60,9 +62,13 @@ public abstract class PMCoreObject implements PMCoreConstants, Serializable {
     }
 
     public void checkAuthorization() throws NotAuthorizedException {
-        if (getAuth() != null && !getAuthorizationService().userHasRole(getAuth())) {
-            throw new NotAuthorizedException(getAuth());
+        final String auth = getAuth();
+        if (auth != null && !getAuthorizationService().userHasRole(auth)) {
+            AUTH_LOG.debug("checkAuthorization DENIED target={} requiredRole={} user={}",
+                    this, auth, getAuthorizationService().getCurrentUsername());
+            throw new NotAuthorizedException(auth);
         }
+        AUTH_LOG.debug("checkAuthorization OK target={} requiredRole={}", this, auth);
     }
 
     public String getAuth() {

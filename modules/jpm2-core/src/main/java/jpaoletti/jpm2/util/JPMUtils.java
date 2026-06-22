@@ -46,6 +46,26 @@ public class JPMUtils implements ApplicationContextAware {
 
     public static final String LOGGER_NAME = "jpaoletti.jpm2";
 
+    /**
+     * Logging categories. Each one is a child logger of {@link #LOGGER_NAME},
+     * so they can be enabled/disabled independently from log4j (e.g.
+     * {@code <Logger name="jpaoletti.jpm2.service" level="debug"/>}) while the
+     * parent {@code jpaoletti.jpm2} logger still controls all of them at once.
+     */
+    public static final String SERVICE = LOGGER_NAME + ".service";
+    public static final String CONTROLLER = LOGGER_NAME + ".controller";
+    public static final String DAO = LOGGER_NAME + ".dao";
+    public static final String MODEL = LOGGER_NAME + ".model";
+    public static final String CONVERTER = LOGGER_NAME + ".converter";
+    public static final String AUTH = LOGGER_NAME + ".auth";
+    public static final String WEB = LOGGER_NAME + ".web";
+
+    /**
+     * Parameter keys whose value must never be logged in clear text. Matched
+     * case-insensitively as a substring of the key.
+     */
+    private static final String[] SENSITIVE_KEYS = {"password", "pass", "secret", "token", "csrf"};
+
     private static ApplicationContext context;
 
     /**
@@ -117,6 +137,75 @@ public class JPMUtils implements ApplicationContextAware {
 
     public static Logger getLogger() {
         return LogManager.getLogger(LOGGER_NAME);
+    }
+
+    /**
+     * Returns the logger for the given category. Use the category constants
+     * declared in this class ({@link #SERVICE}, {@link #CONTROLLER},
+     * {@link #DAO}, {@link #MODEL}, {@link #CONVERTER}, {@link #AUTH},
+     * {@link #WEB}) so each subsystem can be tuned independently from log4j.
+     *
+     * @param category the logger name (typically one of the category constants)
+     * @return the log4j logger for that category
+     */
+    public static Logger getLogger(String category) {
+        return LogManager.getLogger(category);
+    }
+
+    /**
+     * Renders a request parameter map for debug logging, masking the values of
+     * sensitive keys (see {@link #SENSITIVE_KEYS}). Each entry is shown as
+     * {@code key=[v1, v2]}. Intended to be called only behind an
+     * {@code isDebugEnabled()} guard.
+     *
+     * @param parameters the raw request parameters (may be null)
+     * @return a single-line, safe-to-log representation
+     */
+    public static String formatParams(Map<String, String[]> parameters) {
+        if (parameters == null) {
+            return "null";
+        }
+        final StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+            if (!first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(entry.getKey()).append("=");
+            if (isSensitive(entry.getKey())) {
+                sb.append("[***]");
+            } else {
+                sb.append(java.util.Arrays.toString(entry.getValue()));
+            }
+        }
+        return sb.append("}").toString();
+    }
+
+    /**
+     * Masks the given value if the key denotes sensitive data, otherwise
+     * returns it unchanged. Useful for single field name/value pairs (e.g.
+     * inline editing).
+     *
+     * @param key the parameter/field name
+     * @param value the value
+     * @return the value, or {@code ***} when the key is sensitive
+     */
+    public static String maskValue(String key, String value) {
+        return isSensitive(key) ? "***" : value;
+    }
+
+    private static boolean isSensitive(String key) {
+        if (key == null) {
+            return false;
+        }
+        final String lower = key.toLowerCase();
+        for (String s : SENSITIVE_KEYS) {
+            if (lower.contains(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
