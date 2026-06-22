@@ -161,13 +161,13 @@ public class JPMUtils implements ApplicationContextAware {
      * @param parameters the raw request parameters (may be null)
      * @return a single-line, safe-to-log representation
      */
-    public static String formatParams(Map<String, String[]> parameters) {
+    public static String formatParams(Map<String, ?> parameters) {
         if (parameters == null) {
             return "null";
         }
         final StringBuilder sb = new StringBuilder("{");
         boolean first = true;
-        for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+        for (Map.Entry<String, ?> entry : parameters.entrySet()) {
             if (!first) {
                 sb.append(", ");
             }
@@ -176,10 +176,44 @@ public class JPMUtils implements ApplicationContextAware {
             if (isSensitive(entry.getKey())) {
                 sb.append("[***]");
             } else {
-                sb.append(java.util.Arrays.toString(entry.getValue()));
+                sb.append(formatParamValue(entry.getValue()));
             }
         }
         return sb.append("}").toString();
+    }
+
+    private static String formatParamValue(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        if (value instanceof Object[]) {
+            return java.util.Arrays.deepToString((Object[]) value);
+        }
+        if (value instanceof int[]) {
+            return java.util.Arrays.toString((int[]) value);
+        }
+        if (value instanceof long[]) {
+            return java.util.Arrays.toString((long[]) value);
+        }
+        if (value instanceof double[]) {
+            return java.util.Arrays.toString((double[]) value);
+        }
+        if (value instanceof float[]) {
+            return java.util.Arrays.toString((float[]) value);
+        }
+        if (value instanceof boolean[]) {
+            return java.util.Arrays.toString((boolean[]) value);
+        }
+        if (value instanceof byte[]) {
+            return java.util.Arrays.toString((byte[]) value);
+        }
+        if (value instanceof short[]) {
+            return java.util.Arrays.toString((short[]) value);
+        }
+        if (value instanceof char[]) {
+            return java.util.Arrays.toString((char[]) value);
+        }
+        return String.valueOf(value);
     }
 
     /**
