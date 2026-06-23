@@ -49,6 +49,9 @@ public class JPMServiceBase {
                 final Object convertedValue;
                 try {
                     convertedValue = converter != null ? converter.build(getContext().getContextualEntity(), field, object, newValue) : null;
+                } catch (IgnoreConvertionException ice) {
+                    // Do not log: will happen for any readonly property
+                    throw ice;
                 } catch (Exception e) {
                     LOG.error("processFields conversion error entity={} op={} field={} property={} rawValue={}",
                             entity.getId(), operation, field.getId(), field.getProperty(), newValue, e);
