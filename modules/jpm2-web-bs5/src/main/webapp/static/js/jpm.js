@@ -2,7 +2,7 @@ function safeLocale(locale) {
     const supportedLocales = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru']; // los que sepas que tenés disponibles
     if (!locale || typeof locale !== 'string')
         return 'en';
-    const norm = locale.toLowerCase().split('-')[0]; // e.g. "es-AR" → "es"
+    const norm = locale.toLowerCase().split(/[-_]/)[0]; // e.g. "es-AR" / "es_AR" → "es"
     return supportedLocales.includes(norm) ? norm : 'en';
 }
 
@@ -479,6 +479,8 @@ function closeTransientUi() {
         }
     });
     $(".dropdown-menu.show").removeClass("show");
+    $("#searchDropdown .dropdown-menu").remove();
+    $("#search-menu").val("");
 }
 
 function normalizeBodyOverlayState() {
@@ -720,6 +722,17 @@ var initPage = function () {
                     $("#searchDropdown .dropdown-menu").append('<li><a class="dropdown-item disabled" href="javascript:;"><span class="fa fa-eye-slash"></span></a></li>');
                 }
                 $("#searchDropdown .dropdown-menu").toggle();
+            }
+        });
+        $("#search-menu").off("input.jpmSearchCleanup").on("input.jpmSearchCleanup", function () {
+            if (!$(this).val()) {
+                $("#searchDropdown .dropdown-menu").remove();
+            }
+        });
+        $("#search-menu").off("keydown.jpmSearchCleanup").on("keydown.jpmSearchCleanup", function (e) {
+            if (e.key === "Escape") {
+                $("#searchDropdown .dropdown-menu").remove();
+                $(this).val("").blur();
             }
         });
         refreshFavoriteMenu();
