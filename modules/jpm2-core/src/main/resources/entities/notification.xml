@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+    <bean id="dao-notification" class="jpaoletti.jpm2.core.dao.NotificationDAO">
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.Notification" />
+    </bean>
+    <bean id="notification" class="jpaoletti.jpm2.core.model.Entity">
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.Notification" />
+        <property name="dao" ref="dao-notification" />
+        <property name="operations" >
+            <list>
+                <ref bean="default-list-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-delete-operation" />
+                <ref bean="default-deleteSelected-operation" />
+            </list>
+        </property>
+        <property name="defaultSortDirection" value="DESC" />
+        <property name="defaultSortField" value="id" />
+        <property name="defaultSearchs">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.SearchDefinition">
+                    <constructor-arg value="read" />
+                    <constructor-arg value="value" />
+                    <constructor-arg value="false" />
+                </bean>
+            </list>
+        </property>
+        <property name="fields">
+            <list>
+                <ref bean="default-id-field-jpa" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="type" />
+                    <property name="width" value="110px" />
+                    <property name="searcher" ref="searcher-enum-jpa" />
+                    <property name="configs" ref="default-enum-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="description" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs">
+                        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                            <property name="operations" value="show list"/>
+                            <property name="converter" ref="jpm-converter-show-html" />
+                        </bean>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="createdAt" />
+                    <property name="width" value="240px" />
+                    <property name="searcher" ref="jpm-searcher-date-jpa" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show" />
+                                <property name="converter" ref="jpm-converter-show-datetime" />
+                            </bean>
+                            <ref bean="xls-config" />
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="read" />
+                    <property name="width" value="55px" />
+                    <property name="align" value="center" />
+                    <property name="searcher" ref="jpm-searcher-bool-jpa" />
+                    <property name="configs" ref="inline-bool-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="fa-solid fa-bell" />
+                                <property name="title" value="jpm.notification.center.title" />
+                                <property name="blocks" value="4" />
+                                <property name="fields" value="id type createdAt read description" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <util:list id="select-notification" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="show" />
+            <property name="converter" ref="jpm-converter-show" />
+        </bean>
+    </util:list>
+</beans>

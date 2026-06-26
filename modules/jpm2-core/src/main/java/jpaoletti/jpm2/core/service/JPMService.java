@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface JPMService {
 
-    public PaginatedList getWeakList(ContextualEntity centity, String instanceId, ContextualEntity weak, Integer page, Integer pageSize) throws PMException;
+    public PaginatedList getWeakList(ContextualEntity centity, String instanceId, ContextualEntity weak, boolean paginated, Integer page, Integer pageSize) throws PMException;
 
     @Transactional
     public PaginatedList getPaginatedList(ContextualEntity entity, Operation operation, SessionEntityData sessionEntityData, Integer page, Integer pageSize, ContextualEntity owner, String ownerId) throws PMException;

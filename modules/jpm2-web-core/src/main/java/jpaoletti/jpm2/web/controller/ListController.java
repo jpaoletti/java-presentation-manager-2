@@ -352,7 +352,7 @@ public class ListController extends BaseController {
         final Entity entity = centity.getEntity();
         final Entity weak = cweak.getEntity();
 
-        final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak, paginated ? page : null, paginated ? pageSize : null);
+        final PaginatedList weakList = getService().getWeakList(centity, instanceId, cweak, paginated, paginated ? page : null, paginated ? pageSize : null);
 
         final Operation operation = weak.getOperation(OP_LIST); //fixme
         getContext().set(entity, entity.isContainingListOperation() ? entity.getOperation(OP_LIST, getContext().getContext()) : entity.getOperation(OP_SHOW, getContext().getContext())); //fixme

@@ -51,9 +51,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     private static final org.apache.logging.log4j.Logger LOG = JPMUtils.getLogger(JPMUtils.SERVICE);
 
     @Override
-    public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak, Integer page, Integer pageSize) throws PMException {
-        LOG.debug("getWeakList IN owner={} ownerId={} weak={} page={} pageSize={}",
-                entity, instanceId, weak, page, pageSize);
+    public PaginatedList getWeakList(ContextualEntity entity, String instanceId, ContextualEntity weak, boolean paginated, Integer page, Integer pageSize) throws PMException {
+        LOG.debug("getWeakList IN owner={} ownerId={} weak={} paginated={} page={} pageSize={}",
+                entity, instanceId, weak, paginated, page, pageSize);
         final Object owner = entity.getDao().get(instanceId);
         final IDAOListConfiguration cfg = weak.getDao().build();
         final Entity weakEntity = weak.getEntity();
@@ -65,7 +65,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         }
         final PaginatedList pl = new PaginatedList();
         getContext().setEntity(entity.getEntity());
-        if (weakEntity.isPaginable()) {
+        final boolean applyPagination = paginated && weakEntity.isPaginable();
+        if (applyPagination) {
             pl.setPageSize(pageSize != null ? pageSize : weakEntity.getPageSize());
             pl.setPage(page != null ? page : 1);
             cfg.setFrom(pl.from());
@@ -75,7 +76,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             }
         }
         final List list = weak.getDao().list(cfg);
-        if (!weakEntity.isPaginable()) {
+        if (!applyPagination) {
             pl.setTotal((long) list.size());
         }
         pl.getContents().load(list, weak, weak.getEntity().getOperation("list"));

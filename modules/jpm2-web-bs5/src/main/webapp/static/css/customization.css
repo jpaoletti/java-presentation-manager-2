@@ -1,1 +1,10 @@
 /*override in controller*/
+.notification-list-shell {
+    max-height: min(56vh, calc(100vh - 11rem));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+#notificationCenter .dropdown-menu {
+    max-height: min(70vh, calc(100vh - 7rem));
+}
