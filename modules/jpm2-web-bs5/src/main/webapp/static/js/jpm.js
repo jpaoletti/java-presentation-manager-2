@@ -651,17 +651,31 @@ function jpmSubmitNavigationForm($form) {
     jpmNavigator.loading = true;
     closeTransientUi();
     jpmBlock();
+    var serializedData = $form.serialize();
+    var requestUrl = $form.attr("action") || window.location.href;
+    var requestData = serializedData;
+    if (method === "GET") {
+        // Mirror native GET form semantics: the form fields REPLACE the whole
+        // query string. If we let jQuery append serialized data to the current
+        // URL (which already carries page/_ls/... from prior navigation), the
+        // params accumulate (e.g. ?page=4&_ls=1&page=20&_ls=1...) and the server
+        // binds the wrong (duplicated) page. Build the query from the form alone.
+        var base = new URL(requestUrl, window.location.href);
+        base.search = "";
+        requestUrl = base.toString() + (serializedData ? "?" + serializedData : "");
+        requestData = undefined;
+    }
     $.ajax({
-        url: $form.attr("action") || window.location.href,
+        url: requestUrl,
         type: method,
-        data: $form.serialize(),
+        data: requestData,
         cache: method === "GET" ? false : undefined,
         headers: {
             "X-Requested-With": "XMLHttpRequest",
             "X-JPM-NAVIGATION": "partial"
         },
         success: function (html, textStatus, xhr) {
-            var finalUrl = xhr.responseURL ? xhr.responseURL : normalizeUrl($form.attr("action") || window.location.href);
+            var finalUrl = xhr.responseURL ? xhr.responseURL : normalizeUrl(requestUrl);
             renderPartialPage(html, finalUrl, {replace: false});
         },
         error: function () {
