@@ -22,6 +22,16 @@ import org.apache.commons.lang3.StringUtils;
 public class DateJPASearcher implements ISearcher {
 
     public static final String DESCRIPTION_KEY = "jpm.searcher.dateSearcher";
+    /**
+     * Format submitted by the HTML5 {@code <input type="date">} used in
+     * date-searcher.jsp. This value is always ISO (yyyy-MM-dd) regardless of the
+     * browser locale, so it must be used to parse the incoming value.
+     */
+    private static final String INPUT_FORMAT = "yyyy-MM-dd";
+    /**
+     * Format used only to render the human readable description of the applied
+     * filter (not to parse the submitted value).
+     */
     private String dateFormat = "dd/MM/yyyy";
 
     @Override
@@ -100,11 +110,20 @@ public class DateJPASearcher implements ISearcher {
         final String v = parameters.get("value")[0];
         if (StringUtils.isEmpty(v)) {
             return null;
-        } else {
-            SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
-            sdf.setLenient(false);
-            return sdf.parse(v);
         }
+        // The <input type="date"> submits ISO (yyyy-MM-dd). Fall back to the
+        // configured dateFormat for any view that submits localized text.
+        try {
+            return parse(INPUT_FORMAT, v);
+        } catch (ParseException e) {
+            return parse(getDateFormat(), v);
+        }
+    }
+
+    private Date parse(String format, String value) throws ParseException {
+        final SimpleDateFormat sdf = new SimpleDateFormat(format);
+        sdf.setLenient(false);
+        return sdf.parse(value);
     }
 
     public String getDateFormat() {
