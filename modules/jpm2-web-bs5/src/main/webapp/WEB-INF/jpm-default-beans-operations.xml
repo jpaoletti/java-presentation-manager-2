@@ -96,6 +96,20 @@
         <property name="icon" value="fas fa-file-excel" />
         <property name="color" value="btn-success" />
     </bean>
+    <bean id="default-toPdf-operation" class="jpaoletti.jpm2.core.model.Operation">
+        <property name="id" value="toPdf" />
+        <property name="display" value="show list" />
+        <property name="scope" value="GENERAL" />
+        <property name="icon" value="fas fa-file-pdf" />
+        <property name="color" value="btn-danger" />
+        <property name="executor" ref="operationExecutorToPdf" />
+        <property name="properties">
+            <props>
+                <prop key="orientation">portrait</prop>
+                <prop key="size">A4</prop>
+            </props>
+        </property>
+    </bean>
     <bean id="repeatable-clear-add-operation" class="jpaoletti.jpm2.core.model.Operation">
         <property name="id" value="add" />
         <property name="repeatable" value="true" />

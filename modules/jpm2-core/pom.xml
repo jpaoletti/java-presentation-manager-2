@@ -114,6 +114,15 @@
         </dependency>
         <!-- /Excel support -->
 
+        <!-- PDF support (Apache FOP, XSL-FO rendering). Version aligned with the
+             consuming apps (e.g. trekker uses 2.6) to avoid duplicate FOP jars. -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>fop</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <!-- /PDF support -->
+
         <!-- MySQL database driver -->
         <dependency>
             <groupId>com.mysql</groupId>

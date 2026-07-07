@@ -2,6 +2,7 @@ package jpaoletti.jpm2.web.controller;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -673,6 +674,53 @@ public class ListController extends BaseController {
         final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", ""); // "papa"
         response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + ".xls");
         response.getOutputStream().write(xlsTobytes(wb));
+    }
+
+    @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:toPdf}"})
+    public void toPdf(@PathVariable String owner, @PathVariable String ownerId,
+            @RequestParam(required = false) String fields,
+            @RequestParam(required = false) String orientation,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false, defaultValue = "false") boolean download,
+            HttpServletResponse response) throws Exception {
+        final Entity entity = getContext().getEntity();
+        if (!entity.isWeak(getContext().getEntityContext())) {
+            throw new NotAuthorizedException();
+        }
+        final ContextualEntity cowner = getJpm().getContextualEntity(owner);
+        writePdf(entity, cowner, ownerId, fields, orientation, size, title, download, response);
+    }
+
+    @GetMapping(value = {"/jpm/{entity}/{operationId:toPdf}"})
+    public void toPdf(@RequestParam(required = false) String fields,
+            @RequestParam(required = false) String orientation,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false, defaultValue = "false") boolean download,
+            HttpServletResponse response) throws Exception {
+        writePdf(getContext().getEntity(), null, null, fields, orientation, size, title, download, response);
+    }
+
+    private void writePdf(Entity entity, ContextualEntity owner, String ownerId, String fields,
+            String orientation, String size, String title, boolean download, HttpServletResponse response) throws Exception {
+        final Operation op = getContext().getOperation();
+        final String orient = orientation != null ? orientation : op.getConfig("orientation", "portrait");
+        final boolean landscape = "landscape".equalsIgnoreCase(orient);
+        final String pageSize = size != null ? size : op.getConfig("size", "A4");
+        String ttl = title;
+        if (ttl == null || ttl.trim().isEmpty()) {
+            final String titleCfg = op.getConfig("title");
+            ttl = titleCfg != null ? getMessageSource().getMessage(titleCfg, null, titleCfg, getLocale()) : entity.getPluralTitle();
+        }
+        final List<String> order = (fields == null || fields.isEmpty()) ? null : Arrays.asList(fields.split(","));
+        final byte[] pdf = getService().toPdf(entity, getSessionEntityData(entity), owner, ownerId, order, landscape, pageSize, ttl);
+        response.setContentType("application/pdf");
+        if (download) {
+            final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(ttl), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+            response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + ".pdf");
+        }
+        response.getOutputStream().write(pdf);
     }
 
 }

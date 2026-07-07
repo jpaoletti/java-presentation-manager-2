@@ -59,6 +59,17 @@ public class FieldConfig extends PMCoreObject {
         }
     }
 
+    /**
+     * The raw operations string as configured, without defaulting a null value
+     * to {@link #ALL}. Useful to tell an explicit config (e.g. "toPdf") apart
+     * from the implicit "all" fallback.
+     *
+     * @return the configured operations, or null when none was set
+     */
+    public String getRawOperations() {
+        return operations;
+    }
+
     public void setOperations(String operations) {
         this.operations = operations;
     }

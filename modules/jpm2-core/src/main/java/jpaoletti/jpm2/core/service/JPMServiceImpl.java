@@ -1,7 +1,11 @@
 package jpaoletti.jpm2.core.service;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -251,6 +255,91 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             }
         }
         return xlsStrechColumns(wb);
+    }
+
+    @Override
+    public byte[] toPdf(Entity entity, SessionEntityData sed, ContextualEntity owner, String ownerId,
+            List<String> fieldOrder, boolean landscape, String pageSize, String title) throws PMException {
+        final Integer page = sed.getPage();
+        final Integer pageSize2 = sed.getPageSize();
+        final PaginatedList paginatedList = getJpm().getService().getPaginatedList(getContext().getContextualEntity(), getContext().getOperation(), sed, 1, Integer.MAX_VALUE, owner, ownerId);
+        sed.setPageSize(pageSize2);
+        sed.setPage(page);
+        final EntityInstanceList list = paginatedList.getContents();
+        if (list == null || list.isEmpty()) {
+            throw new PMException("jpm.toPdf.noData");
+        }
+        // Resolve the columns to render, their headers and their alignments.
+        final List<Field> columns = resolvePdfColumns(paginatedList.getFields(), fieldOrder);
+        final List<String> headers = new ArrayList<>();
+        final List<String> alignments = new ArrayList<>();
+        for (Field field : columns) {
+            headers.add(replaceHtmlCodeAccents(field.getTitle(entity)));
+            alignments.add(field.getAlign());
+        }
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        final NumberFormat numberFormat = NumberFormat.getNumberInstance(LocaleContextHolder.getLocale());
+        numberFormat.setGroupingUsed(true);
+        numberFormat.setMinimumFractionDigits(2);
+        numberFormat.setMaximumFractionDigits(4);
+        final List<List<String>> rows = new ArrayList<>();
+        for (EntityInstance entityInstance : list) {
+            final List<String> row = new ArrayList<>();
+            for (Field field : columns) {
+                final Object value = entityInstance.getValues().get(field.getId());
+                if (value == null) {
+                    row.add("");
+                } else if (value instanceof Date) {
+                    row.add(dateFormat.format((Date) value));
+                } else if (value instanceof BigDecimal || value instanceof Double || value instanceof Float) {
+                    row.add(numberFormat.format(value));
+                } else {
+                    row.add(jpaoletti.jpm2.util.PdfUtils.stripHtml(value.toString()));
+                }
+            }
+            rows.add(row);
+        }
+        final String documentTitle = (title == null || title.trim().isEmpty()) ? entity.getPluralTitle() : title;
+        try {
+            return jpaoletti.jpm2.util.PdfUtils.foToPdf(
+                    jpaoletti.jpm2.util.PdfUtils.buildFo(documentTitle, headers, rows, alignments, landscape, pageSize));
+        } catch (Exception e) {
+            LOG.error("toPdf FAIL entity={} error={}", entity.getId(), e.getMessage(), e);
+            throw new PMException("jpm.toPdf.error");
+        }
+    }
+
+    /**
+     * Resolve which fields become PDF columns. When an explicit order is given
+     * those field ids are used (intersected with the visible/exportable fields
+     * and in that order). Otherwise the default is the exportable fields that
+     * have an explicit "toPdf" config, falling back to all exportable fields
+     * when none was marked.
+     */
+    private List<Field> resolvePdfColumns(List<Field> visibleFields, List<String> fieldOrder) {
+        if (fieldOrder != null && !fieldOrder.isEmpty()) {
+            final Map<String, Field> byId = new LinkedHashMap<>();
+            for (Field field : visibleFields) {
+                byId.put(field.getId(), field);
+            }
+            final List<Field> ordered = new ArrayList<>();
+            for (String id : fieldOrder) {
+                final Field field = byId.get(id.trim());
+                if (field != null) {
+                    ordered.add(field);
+                }
+            }
+            if (!ordered.isEmpty()) {
+                return ordered;
+            }
+        }
+        final List<Field> marked = new ArrayList<>();
+        for (Field field : visibleFields) {
+            if (field.hasConfigFor("toPdf")) {
+                marked.add(field);
+            }
+        }
+        return marked.isEmpty() ? visibleFields : marked;
     }
 
     @Override

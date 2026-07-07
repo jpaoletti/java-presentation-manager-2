@@ -265,7 +265,7 @@ function isJpmNavigableLink(link) {
     if (url.pathname.indexOf("/static/") >= 0 || url.pathname.indexOf("/download/") >= 0 || url.pathname.indexOf("downloadAttachment") >= 0) {
         return false;
     }
-    if (url.pathname.endsWith("/xls") || url.pathname.endsWith("/toExcel")) {
+    if (url.pathname.endsWith("/xls") || url.pathname.endsWith("/toExcel") || url.pathname.endsWith("/toPdf")) {
         return false;
     }
     if (url.pathname.indexOf(getContextPath().replace(window.location.origin, "").replace(/\/$/, "")) !== 0) {

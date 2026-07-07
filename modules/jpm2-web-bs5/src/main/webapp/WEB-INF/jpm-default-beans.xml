@@ -87,6 +87,12 @@
             <ref bean="plainConverter" />
         </property>
     </bean>
+    <bean id="pdf-config" class="jpaoletti.jpm2.core.model.FieldConfig">
+        <property name="operations" value="toPdf"/>
+        <property name="converter">
+            <ref bean="plainConverter" />
+        </property>
+    </bean>
     <bean id="xls-config-bool" class="jpaoletti.jpm2.core.model.FieldConfig">
         <property name="operations" value="toExcel"/>
         <property name="converter">

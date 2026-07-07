@@ -157,6 +157,38 @@ public class Field extends PMCoreObject {
     }
 
     /**
+     * Indicates whether this field has a {@link FieldConfig} that explicitly
+     * names the given operation id. Unlike {@link #shouldDisplay(String)}, this
+     * does NOT match the implicit/"all" fallback: only a config whose raw
+     * operations literally lists the operation (and does not negate it) counts.
+     * Used to decide, by default, which fields participate in operations such
+     * as "toPdf".
+     *
+     * @param operationId the operation id
+     * @return true if some config explicitly declares the operation
+     */
+    public boolean hasConfigFor(String operationId) {
+        if (operationId == null || configs == null) {
+            return false;
+        }
+        for (FieldConfig config : configs) {
+            final String raw = config.getRawOperations();
+            if (raw == null) {
+                continue; // implicit "all" -> not an explicit config
+            }
+            for (String op : raw.trim().split("[ ]")) {
+                if (op.equalsIgnoreCase("!" + operationId)) {
+                    break; // explicit exclusion in this config
+                }
+                if (op.equalsIgnoreCase(operationId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      *
      * @param defaultValue
      */
