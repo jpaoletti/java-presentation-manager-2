@@ -238,6 +238,20 @@ function normalizeUrl(url) {
     return new URL(url, window.location.origin).toString();
 }
 
+// Removes jQuery's "_=<timestamp>" cache-busting parameter (added by ajax
+// requests with cache:false). Without this it leaks into the pushState URL,
+// polluting document.location.href and breaking exact-match comparisons such
+// as the favorite detection (item.link === document.location.href).
+function stripCacheBuster(url) {
+    try {
+        var u = new URL(url, window.location.origin);
+        u.searchParams.delete("_");
+        return u.toString();
+    } catch (e) {
+        return url;
+    }
+}
+
 function isJpmNavigableLink(link) {
     if (!link || !link.href) {
         return false;
@@ -340,10 +354,11 @@ function refreshFavoriteMenu() {
     }
     $.getJSON(getContextPath() + "jpm/favorites", function (data) {
         var isFav = false;
+        var currentHref = stripCacheBuster(document.location.href);
         $.each(data, function (i, item) {
             var html = '<li><a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
             html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
-            if (item.link === document.location.href) {
+            if (stripCacheBuster(item.link) === currentHref) {
                 isFav = true;
             } else {
                 $favoriteMenu.append(html);
@@ -494,9 +509,9 @@ function normalizeBodyOverlayState() {
 function resolveRenderedPageUrl(doc, fallbackUrl) {
     var meta = doc.querySelector('meta[name="jpm-current-url"]');
     if (meta && meta.content) {
-        return normalizeUrl(meta.content);
+        return stripCacheBuster(normalizeUrl(meta.content));
     }
-    return normalizeUrl(fallbackUrl);
+    return stripCacheBuster(normalizeUrl(fallbackUrl));
 }
 
 function initShell() {
@@ -520,7 +535,7 @@ function initShell() {
         $.ajax({
             type: "POST",
             dataType: 'text',
-            url: getContextPath() + "jpm/removeFavorite?url=" + document.location.href,
+            url: getContextPath() + "jpm/removeFavorite?url=" + stripCacheBuster(document.location.href),
             success: function () {
                 refreshFavoriteMenu();
             }
@@ -543,7 +558,7 @@ function initShell() {
                 } else {
                     $.ajax({
                         type: "POST",
-                        url: getContextPath() + "jpm/addFavorite?url=" + document.location.href + "&title=" + $("#title").val(),
+                        url: getContextPath() + "jpm/addFavorite?url=" + stripCacheBuster(document.location.href) + "&title=" + $("#title").val(),
                         success: function () {
                             refreshFavoriteMenu();
                         }
