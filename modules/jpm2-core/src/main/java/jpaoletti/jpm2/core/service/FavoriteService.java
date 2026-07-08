@@ -2,10 +2,9 @@ package jpaoletti.jpm2.core.service;
 
 import java.util.List;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.FavoriteDAO;
+import jpaoletti.jpm2.core.dao.JPADAOListConfiguration;
 import jpaoletti.jpm2.core.model.UserFavorite;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,19 +22,22 @@ public class FavoriteService {
     /**
      * Get favorite list
      *
+     * @param username
      * @return
      */
     @Transactional
     public List<UserFavorite> getFavorites(String username) {
-        return favoriteDAO.list(new DAOListConfiguration(Restrictions.eq("username", username)));
+        final JPADAOListConfiguration cfg = favoriteDAO.build();
+        cfg.withPredicate((cb, root) -> cb.equal(root.get("username"), username));
+        return favoriteDAO.list(cfg);
     }
 
     @Transactional
     public void removeFavorite(String username, String url) throws PMException {
-        final UserFavorite fav = favoriteDAO.find(new DAOListConfiguration(
-                Restrictions.eq("username", username),
-                Restrictions.eq("link", url)
-        ));
+        final JPADAOListConfiguration cfg = favoriteDAO.build();
+        cfg.withPredicate((cb, root) -> cb.equal(root.get("username"), username));
+        cfg.withPredicate((cb, root) -> cb.equal(root.get("link"), url));
+        final UserFavorite fav = favoriteDAO.find(cfg);
         if (fav != null) {
             favoriteDAO.delete(fav);
         }
