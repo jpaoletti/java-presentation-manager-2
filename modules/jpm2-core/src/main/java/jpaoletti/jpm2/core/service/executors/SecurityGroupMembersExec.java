@@ -4,11 +4,10 @@ import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAO;
-import jpaoletti.jpm2.core.dao.DAOListConfiguration;
+import jpaoletti.jpm2.core.dao.JPADAOListConfiguration;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.security.Group;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,9 @@ public class SecurityGroupMembersExec extends OperationExecutorSimple {
         final Map<String, Object> prepare = super.prepare(owner, ownerId, instances);
         for (EntityInstance instance : instances) {
             final Group group = (Group) instance.getIobject().getObject();
-            prepare.put("members", userDAO.list(new DAOListConfiguration(Restrictions.eq("group.id", group.getId())).withAlias("groups", "group")));
+            final JPADAOListConfiguration cfg = (JPADAOListConfiguration) userDAO.build();
+            cfg.withPredicate((cb, root) -> cb.equal(root.join("groups").get("id"), group.getId()));
+            prepare.put("members", userDAO.list(cfg));
         }
         return prepare;
     }
