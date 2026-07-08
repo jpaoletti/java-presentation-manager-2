@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean id="dao-customization" class="jpaoletti.jpm2.core.dao.DefaultJPADAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.Customization" />
+    </bean>
+    <bean id="customization" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.Customization" />
+        <property name="dao" ref="dao-customization" />
+        <property name="pageSize" value="50" />
+        <property name="operations" >
+            <list>
+                <ref bean="default-list-operation" />
+                <ref bean="default-add-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <ref bean="default-id-field" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="loginLogo" />
+                    <property name="sortable" value="false" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter" />
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowFileConverter" />
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EditFileConverter" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="logo" />
+                    <property name="sortable" value="false" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter" />
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowFileConverter" />
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EditFileConverter" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="favicon" />
+                    <property name="sortable" value="false" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter" />
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowFileConverter" />
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="edit"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EditFileConverter" />
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="style" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="messages" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
