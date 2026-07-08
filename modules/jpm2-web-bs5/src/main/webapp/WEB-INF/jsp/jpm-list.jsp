@@ -49,10 +49,18 @@
                 <div class="row mt-2">
                     <div class="col-lg-12">
                         <c:if test="${not empty sessionEntityData.searchCriteria.definitions}">
-                            <a type="button" href="${cp}jpm/${contextualEntity}/removeAllSearch" class="badge bg-info removeSearchBtn me-1 mb-1">
-                                <spring:message code="jpm.removeAllSearch" text="Clear"/>
-                                <span class="fa fa-times-circle"></span>
-                            </a>
+                            <c:if test="${empty owner}">
+                                <a type="button" href="${cp}jpm/${contextualEntity}/removeAllSearch" class="badge bg-info removeSearchBtn me-1 mb-1">
+                                    <spring:message code="jpm.removeAllSearch" text="Clear"/>
+                                    <span class="fa fa-times-circle"></span>
+                                </a>
+                            </c:if>
+                            <c:if test="${not empty owner}">
+                                <a type="button" href="${cp}jpm/${owner.id}${entityContext}/${ownerId}/${contextualEntity}/removeAllSearch" class="badge bg-info removeSearchBtn me-1 mb-1">
+                                    <spring:message code="jpm.removeAllSearch" text="Clear"/>
+                                    <span class="fa fa-times-circle"></span>
+                                </a>
+                            </c:if>
                         </c:if>
 
                         <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
