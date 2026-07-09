@@ -36,14 +36,17 @@ public class MailSenderService extends JPMServiceBase {
 
     public void init() {
         JPMUtils.getLogger().info("Iniciando servicio de envio de mails");
+        senders = new LinkedHashMap<>();
         final Session session = getSessionFactory().openSession();
         TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
         try {
             final List list = mailSenderDAO.list(null);
-            senders = new LinkedHashMap<>();
             list.stream().forEach(o -> {
                 reload((MailSender) o);
             });
+        } catch (Exception e) {
+            JPMUtils.getLogger().warn("No se pudieron cargar los enviadores de mails. "
+                    + "El servicio queda sin enviadores hasta ejecutar la migracion y recargar.", e);
         } finally {
             TransactionSynchronizationManager.unbindResourceIfPossible(getSessionFactory());// Without this the second invocation fails?
             session.close();

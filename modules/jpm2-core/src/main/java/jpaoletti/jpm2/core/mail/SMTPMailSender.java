@@ -30,6 +30,7 @@ public class SMTPMailSender extends GeneralMailSender {
         final MailConfig config = new MailConfig();
         config.setFromName(getParameter("from-name", ""));
         config.setFrom(getParameter("from", ""));
+        config.setReplyTo(getParameter("reply-to", (String) null));
         config.setUser(getParameter("user", ""));
         config.setPassword(getParameter("password", ""));
         config.setHost(getParameter("host", "smtp.gmail.com"));
