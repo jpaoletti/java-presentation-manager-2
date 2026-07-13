@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <bean id="dao-syslog" class="jpaoletti.jpm2.core.dao.DefaultJPADAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.Syslog" />
+    </bean>
+
+    <bean id="syslog" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.Syslog" />
+        <property name="dao" ref="dao-syslog" />
+        <property name="home" value="index" />
+        <property name="defaultSortField" value="id" />
+        <property name="defaultSortDirection" value="DESC" />
+        <property name="pageSize" value="50" />
+        <property name="operations" >
+            <list>
+                <ref bean="default-list-operation" />
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="severity" />
+                    <property name="width" value="100px" />
+                    <property name="searcher" ref="enumJPASearcher" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="eventDatetime" />
+                    <property name="width" value="160px" />
+                    <property name="configs" ref="ro-full-datetime-config"/>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="username" />
+                    <property name="width" value="100px" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="message" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
