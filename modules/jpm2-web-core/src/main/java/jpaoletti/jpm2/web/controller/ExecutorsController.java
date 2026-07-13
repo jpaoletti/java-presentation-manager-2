@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,8 +10,10 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.AsynchronicOperationExecutor;
 import jpaoletti.jpm2.core.model.Entity;
@@ -45,8 +49,49 @@ public class ExecutorsController extends BaseController implements Observer {
     public static final String HTTP_SERVLET_REQUEST = "HTTP_SERVLET_REQUEST";
     public static final String LAST_ACCESSED = "LAST_ACCESSED_";
 
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
     @Autowired
     private SimpMessagingTemplate template;
+
+    /**
+     * True when the request is a JPM partial (AJAX) navigation. Such requests
+     * cannot follow a server 302 reliably (a cross-origin/scheme redirect makes
+     * the XHR fail and the client falls back to a full-page GET that re-runs the
+     * operation), so immediate operations answer with a JPMPostResponse instead.
+     */
+    private boolean isPartialNavigation(HttpServletRequest request) {
+        return "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))
+                || "partial".equalsIgnoreCase(request.getHeader("X-JPM-NAVIGATION"));
+    }
+
+    /**
+     * Resolves the URL the client must navigate to after an immediate operation,
+     * preferring the executor's explicit result and falling back to the operation
+     * "follows"/default next.
+     */
+    private String resolveNextUrl(JPMPostResponse response, String instanceIds) throws PMException {
+        if (StringUtils.isNotEmpty(response.getNext())) {
+            return response.getNext();
+        }
+        final String viewName = next(getContext().getEntity(), getContext().getOperation(), instanceIds, getExecutor().getDefaultNextOperationId()).getViewName();
+        return viewName == null ? null : viewName.replaceFirst("^redirect:", "");
+    }
+
+    /**
+     * Writes the given response as JSON and returns a null ModelAndView so Spring
+     * treats the response as already handled.
+     */
+    private ModelAndView writeJsonResponse(HttpServletResponse httpResponse, JPMPostResponse body) throws PMException {
+        try {
+            httpResponse.setContentType("application/json;charset=UTF-8");
+            JSON_MAPPER.writeValue(httpResponse.getWriter(), body);
+            httpResponse.flushBuffer();
+            return null;
+        } catch (IOException e) {
+            throw new PMException(e);
+        }
+    }
 
     /**
      * GET method prepares form.
@@ -56,16 +101,31 @@ public class ExecutorsController extends BaseController implements Observer {
      * @throws PMException
      */
     @GetMapping(value = {"/jpm/{entity}/{operationId}.exec"})
-    public ModelAndView executorsGeneralPrepare(HttpServletRequest request) throws PMException {
-        return executorsGeneralPrepare(request, null, null);
+    public ModelAndView executorsGeneralPrepare(HttpServletRequest request, HttpServletResponse httpResponse) throws PMException {
+        return executorsGeneralPrepare(request, httpResponse, null, null);
     }
 
     @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId}.exec"})
-    public ModelAndView executorsGeneralPrepare(HttpServletRequest request, @PathVariable Entity owner, @PathVariable String ownerId) throws PMException {
+    public ModelAndView executorsGeneralPrepare(HttpServletRequest request, HttpServletResponse httpResponse, @PathVariable Entity owner, @PathVariable String ownerId) throws PMException {
         final Map<String, Object> preparation = getExecutor().prepare(owner, ownerId, new ArrayList<>());
         if (getExecutor().immediateExecute() || preparation == null) {
-            executorsCommit(request, new ArrayList<>(), false);
-            getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
+            final JPMPostResponse response = executorsCommit(request, new ArrayList<>(), false);
+            final Message message = response.getMessages().isEmpty()
+                    ? MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success")
+                    : response.getMessages().get(0);
+            // For partial (AJAX) navigation, answer with a JPMPostResponse (JSON)
+            // carrying the destination and the (localized) message instead of a
+            // redirect: the client navigates there directly (avoiding a full-page
+            // redirect that would re-run the immediate operation) and shows the
+            // message as a flyover.
+            if (isPartialNavigation(request)) {
+                if (response.isOk()) {
+                    final String nextUrl = resolveNextUrl(response, "");
+                    return writeJsonResponse(httpResponse, new JPMPostResponse(true, nextUrl, message));
+                }
+                return writeJsonResponse(httpResponse, response);
+            }
+            getContext().setGlobalMessage(message);
             return next(getContext().getEntity(), getContext().getOperation(), "", getExecutor().getDefaultNextOperationId());
         } else {
 //            final ModelAndView mav = new ModelAndView("op-" + getContext().getOperation().getId());
@@ -165,7 +225,7 @@ public class ExecutorsController extends BaseController implements Observer {
      * @throws PMException
      */
     @GetMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec")
-    public ModelAndView executorsPrepare(HttpServletRequest request, @PathVariable List<String> instanceIds) throws PMException {
+    public ModelAndView executorsPrepare(HttpServletRequest request, HttpServletResponse httpResponse, @PathVariable List<String> instanceIds) throws PMException {
         final List<EntityInstance> instances = new ArrayList<>();
         for (String instanceId : instanceIds) {
             initItemControllerOperation(instanceId);
@@ -176,17 +236,24 @@ public class ExecutorsController extends BaseController implements Observer {
         if (getExecutor().immediateExecute() || preparation == null) {
             final JPMPostResponse response = executorsCommit(request, instanceIds, false);
             if (response.isOk()) {
-                if (response.getMessages().isEmpty()) {
-                    getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success"));
-                } else {
-                    getContext().setGlobalMessage(response.getMessages().get(0));
+                final Message message = response.getMessages().isEmpty()
+                        ? MessageFactory.success("jpm." + getContext().getOperation().getId() + ".success")
+                        : response.getMessages().get(0);
+                final String nextUrl = resolveNextUrl(response, StringUtils.join(instanceIds, ","));
+                // For partial (AJAX) navigation, answer with a JPMPostResponse (JSON)
+                // carrying the destination and the (localized) message instead of a
+                // redirect: the client navigates there directly (avoiding a full-page
+                // redirect that would re-run the immediate operation) and shows the
+                // message as a flyover.
+                if (isPartialNavigation(request)) {
+                    return writeJsonResponse(httpResponse, new JPMPostResponse(true, nextUrl, message));
                 }
-                if (StringUtils.isNotEmpty(response.getNext())) {
-                    return new ModelAndView("redirect:" + response.getNext());
-                } else {
-                    return next(getContext().getEntity(), getContext().getOperation(), StringUtils.join(instanceIds, ","), getExecutor().getDefaultNextOperationId());
-                }
+                getContext().setGlobalMessage(message);
+                return new ModelAndView("redirect:" + nextUrl);
             } else {
+                if (isPartialNavigation(request)) {
+                    return writeJsonResponse(httpResponse, response);
+                }
                 if (response.getMessages().isEmpty()) {
                     getContext().setGlobalMessage(MessageFactory.success("jpm." + getContext().getOperation().getId() + ".error"));
                 } else {

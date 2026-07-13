@@ -83,7 +83,11 @@ var delay = (function () {
 var jpmShellInitialized = false;
 var jpmNavigator = {
     enabled: true,
-    loading: false
+    loading: false,
+    // While true, the current navigation is handing off to a follow-up
+    // navigation (immediate-operation result): keep the page blocked so there is
+    // no interactive gap between the two requests.
+    handoff: false
 };
 
 function initConfirm() {
@@ -647,6 +651,22 @@ function jpmNavigate(url, options) {
             "X-JPM-NAVIGATION": "partial"
         },
         success: function (html, textStatus, xhr) {
+            // Immediate operations answer with a JPMPostResponse (JSON) instead of
+            // a redirect, so we never fall back to a full-page GET that would re-run
+            // the operation.
+            var contentType = xhr.getResponseHeader("Content-Type") || "";
+            if (contentType.indexOf("application/json") >= 0) {
+                // Show the standard confirmation dialog (the "cartel"). For the
+                // success+navigate case, flag handoff so the block overlay is kept
+                // while the dialog is shown (hidden behind it), removing the
+                // interactive gap where a double click could fire a second
+                // navigation and drop this one.
+                if (html && html.ok && html.next && html.next !== "-" && html.next !== "EXECUTOR_RELOAD" && !html.confirmation) {
+                    jpmNavigator.handoff = true;
+                }
+                processFormResponse(html);
+                return;
+            }
             var finalUrl = xhr.responseURL ? xhr.responseURL : normalizeUrl(url);
             renderPartialPage(html, finalUrl, options || {});
         },
@@ -654,9 +674,18 @@ function jpmNavigate(url, options) {
             window.location = url;
         },
         complete: function () {
-            jpmNavigator.loading = false;
             normalizeBodyOverlayState();
-            jpmUnBlock();
+            if (jpmNavigator.handoff) {
+                // The success dialog is shown and will navigate when it auto-closes:
+                // free the loading flag so that follow-up navigation can start, but
+                // keep the block overlay (hidden behind the dialog) so the page
+                // stays non-clickable meanwhile — no gap for a double click.
+                jpmNavigator.handoff = false;
+                jpmNavigator.loading = false;
+            } else {
+                jpmNavigator.loading = false;
+                jpmUnBlock();
+            }
         }
     });
 }

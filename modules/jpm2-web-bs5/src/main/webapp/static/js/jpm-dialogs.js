@@ -112,8 +112,11 @@ function jpmDialog(params) {
     document.body.appendChild(wrapper);
 
     var myModal = new bootstrap.Modal(wrapper, {
-        keyboard: true,                     // permite cerrar con Escape
-        backdrop: params.backdrop ?? true,  // true | 'static'
+        // Auto-close dialogs (closeTimeout) can't be dismissed manually so their
+        // callback always runs (e.g. the post-operation navigation that also
+        // releases the page block); the rest keep Escape / backdrop dismissal.
+        keyboard: params.closeTimeout ? false : true,
+        backdrop: params.closeTimeout ? 'static' : (params.backdrop ?? true),
         focus: true                         // fuerza foco dentro del modal
     });
 
