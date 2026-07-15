@@ -151,10 +151,10 @@ public class EntityInstance {
     }
 
     public String getOwnerId() throws NotAuthorizedException {
-        if (getOwner().getIobject() == null && (contextualEntity == null || contextualEntity.getOwner() == null || !contextualEntity.getOwner().isOptional())) {
+        if ((getOwner() == null || getOwner().getIobject() == null) && contextualEntity != null && contextualEntity.getOwner() != null && !contextualEntity.getOwner().isOptional()) {
             throw new NotAuthorizedException();
         }
-        if (getOwner().getIobject() == null) {
+        if (getOwner() == null || getOwner().getIobject() == null) {
             return "";
         }
         return getOwner().getIobject().getId();
