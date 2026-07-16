@@ -81,6 +81,9 @@
         <property name="format" value="dd/MM/yyyy HH:mm:ss"/>
     </bean>
     <bean id="jpm-converter-show-html" class="jpaoletti.jpm2.web.converter.ShowHtml" />
+    <bean id="jpm-converter-show-json" class="jpaoletti.jpm2.web.converter.WebShowJSonConverter" />
+    <bean id="jpm-converter-show-json-nice" class="jpaoletti.jpm2.web.converter.WebShowJSonNiceConverter" />
+    <bean id="jpm-converter-edit-json-nice" class="jpaoletti.jpm2.web.converter.WebEditJSonNiceConverter" />
     <bean id="xls-config" class="jpaoletti.jpm2.core.model.FieldConfig">
         <property name="operations" value="toExcel"/>
         <property name="converter">

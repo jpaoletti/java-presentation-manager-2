@@ -191,3 +191,99 @@ tr.highligthed-instance-row th{border-right: 2px solid black !important;}
    color de la fila vuelva a verse. Solo afecta filas con style inline (tr.instance-row[style]). */
 .jpm-list-table > tbody > tr.instance-row[style] > td,
 .jpm-list-table > tbody > tr.instance-row[style] > th{background-color: transparent !important;}
+/* Converter WebShowJSonNiceConverter: JSON "nice" (pretty-printed) */
+pre.jpm-json-nice{
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: .375rem;
+    padding: .75rem 1rem;
+    margin: 0;
+    max-height: 30rem;
+    overflow: auto;
+    font-size: .85em;
+    line-height: 1.4;
+    white-space: pre;
+    tab-size: 2;
+}
+pre.jpm-json-nice code{
+    color: #212529;
+    background: transparent;
+    padding: 0;
+    white-space: pre;
+}
+
+/* Converter WebEditJSonNiceConverter: JSON "nice" edit (highlight + auto-tab) */
+.jpm-json-editor{
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: .375rem;
+    overflow: hidden;
+    background-color: var(--bs-body-bg, #fff);
+}
+.jpm-json-editor.is-invalid-json{
+    border-color: #dc3545;
+}
+.jpm-json-toolbar{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .35rem .5rem;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+.jpm-json-status{ font-size: .8em; color: #6c757d; }
+.jpm-json-status-ok{ color: #198754; }
+.jpm-json-status-error{ color: #dc3545; }
+/* The highlight <pre> and the <textarea> must share identical metrics so the
+   colored text sits exactly under the (transparent) editable text. */
+.jpm-json-body{ position: relative; }
+.jpm-json-highlight,
+.jpm-json-input{
+    margin: 0;
+    border: 0;
+    padding: .6rem .75rem;
+    font-family: var(--bs-font-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: .85rem;
+    line-height: 1.5;
+    tab-size: 2;
+    white-space: pre;
+    overflow: auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 16rem;
+}
+.jpm-json-highlight{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden; /* mirrors the textarea scroll programmatically, no own bars */
+    pointer-events: none;
+    color: #212529;
+    background: transparent;
+}
+.jpm-json-highlight code{ font: inherit; white-space: pre; }
+.jpm-json-input{
+    position: relative;
+    z-index: 2;
+    resize: vertical;
+    background: transparent;
+    color: transparent;
+    caret-color: #212529;
+    outline: none;
+}
+.jpm-json-input::selection{ background: rgba(13,110,253,.25); }
+/* JSON token colors (light / default) — high contrast on white background.
+   NOTE: bound to the app theme via [data-bs-theme="dark"], NOT to the OS
+   prefers-color-scheme, because the app always renders on a white background. */
+.jpm-json-highlight{ color: #1b1f24; }
+.jpm-json-highlight .jt-key{ color: #003d99; }
+.jpm-json-highlight .jt-str{ color: #067d3a; }
+.jpm-json-highlight .jt-num{ color: #9a4b00; }
+.jpm-json-highlight .jt-bool{ color: #6f42c1; }
+.jpm-json-highlight .jt-null{ color: #c1121f; }
+[data-bs-theme="dark"] .jpm-json-highlight{ color: #e6edf3; }
+[data-bs-theme="dark"] .jpm-json-input{ caret-color: #e6edf3; }
+[data-bs-theme="dark"] .jpm-json-highlight .jt-key{ color: #79c0ff; }
+[data-bs-theme="dark"] .jpm-json-highlight .jt-str{ color: #7ee787; }
+[data-bs-theme="dark"] .jpm-json-highlight .jt-num{ color: #ffa657; }
+[data-bs-theme="dark"] .jpm-json-highlight .jt-bool{ color: #d2a8ff; }
+[data-bs-theme="dark"] .jpm-json-highlight .jt-null{ color: #ff7b72; }
