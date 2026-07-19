@@ -205,6 +205,50 @@ public class PresentationManager implements Observer, Serializable {
         }
     }
 
+    /**
+     * Detailed-audit aware overload. When the entity opts in via
+     * {@link Entity#isDetailedAudit()} and a pre-mutation snapshot is provided,
+     * a field-by-field diff is computed and stored as observations; otherwise it
+     * falls back to a plain audit. This centralizes the detailed-audit branch so
+     * any caller of {@code audit(...)} gets the behavior, not only the standard
+     * {@code JPMService.update} flow.
+     */
+    public void audit(Entity entity, Operation operation, IdentifiedObject iobject, Map<String, Object> originalValues) {
+        audit(entity, operation, iobject, originalValues, null, null);
+    }
+
+    /**
+     * Detailed-audit aware overload with a free-text prefix. On a detailed audit
+     * the resulting observations are {@code observations + "<br/>" + diff};
+     * otherwise the plain {@code observations} (if any) are recorded.
+     */
+    public void audit(Entity entity, Operation operation, IdentifiedObject iobject,
+            Map<String, Object> originalValues, String observations) {
+        audit(entity, operation, iobject, originalValues, observations, null);
+    }
+
+    /**
+     * Detailed-audit aware overload with a free-text prefix and an explicit
+     * username. The username is meant for contexts without a Spring Security
+     * authentication (e.g. token-based APIs), where the acting user is known by
+     * the caller but absent from the SecurityContext; when null/empty the
+     * current authenticated username (if any) is used.
+     */
+    public void audit(Entity entity, Operation operation, IdentifiedObject iobject,
+            Map<String, Object> originalValues, String observations, String username) {
+        if (getAuditService() == null) {
+            return;
+        }
+        if (entity != null && entity.isDetailedAudit() && originalValues != null) {
+            final String diff = JPMUtils.buildAuditDiff(entity, iobject.getObject(), originalValues);
+            final String text = (observations != null && !observations.isEmpty())
+                    ? observations + "<br/>" + diff : diff;
+            getAuditService().register(entity, operation.getId(), iobject, text, username);
+        } else {
+            getAuditService().register(entity, operation.getId(), iobject, observations, username);
+        }
+    }
+
     public void audit(Entity entity, String operation, IdentifiedObject iobject) {
         if (getAuditService() != null) {
             getAuditService().register(entity, operation, iobject);

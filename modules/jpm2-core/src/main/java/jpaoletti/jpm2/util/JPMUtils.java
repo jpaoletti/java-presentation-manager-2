@@ -289,7 +289,7 @@ public class JPMUtils implements ApplicationContextAware {
 
     public static Map<String, Object> getOriginalValues(Entity entity, Object object) {
         final Map<String, Object> originalValues = new LinkedHashMap<>();
-        for (Field field : entity.getFields()) {
+        for (Field field : entity.getAllFields(null)) {
             try {
                 originalValues.put(field.getId(), snapshotValue(Converter.getValue(object, field)));
             } catch (ConfigurationException ex) {
@@ -402,6 +402,31 @@ public class JPMUtils implements ApplicationContextAware {
             return sb.toString();
         }
         return Objects.toString(original) + " -&gt; " + Objects.toString(current);
+    }
+
+    /**
+     * Builds the detailed audit diff for an updated object: iterates the entity
+     * fields, compares each current value against the pre-update snapshot in
+     * {@code originalValues} and renders the changed ones as
+     * {@code <b>Field</b>: old -> new<br/>}. Returns an empty string when
+     * nothing changed.
+     */
+    public static String buildAuditDiff(Entity entity, Object object, Map<String, Object> originalValues) {
+        final StringBuilder sb = new StringBuilder();
+        for (Field field : entity.getAllFields(null)) {
+            Object newValue;
+            try {
+                newValue = Converter.getValue(object, field);
+            } catch (ConfigurationException ex) {
+                newValue = null;
+            }
+            final Object original = originalValues.get(field.getId());
+            if (!auditEquals(original, newValue)) {
+                sb.append(String.format("<b>%s</b>: %s",
+                        field.getTitle(entity), formatAuditDiff(original, newValue))).append("<br/>");
+            }
+        }
+        return sb.toString();
     }
 
     @Override

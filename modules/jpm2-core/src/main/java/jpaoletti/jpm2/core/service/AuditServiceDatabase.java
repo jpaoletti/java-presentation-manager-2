@@ -38,6 +38,21 @@ public class AuditServiceDatabase extends PMCoreObject implements AuditService {
     }
 
     @Override
+    public void register(Entity entity, String operation, IdentifiedObject iobject, String observations, String username) {
+        try {
+            final AuditRecord record = buildRecord(entity, operation, iobject, observations);
+            if (record != null && StringUtils.isNotEmpty(username)) {
+                record.setUsername(username);
+            }
+            if (getDao() != null && record != null) {
+                getDao().save(record);
+            }
+        } catch (Exception ex) {
+            JPMUtils.getLogger().error(ex);
+        }
+    }
+
+    @Override
     public AuditRecord buildRecord(Entity entity, String operation, IdentifiedObject iobject, String observations) {
         if (entity != null && !entity.isAuditable()) {
             return null;

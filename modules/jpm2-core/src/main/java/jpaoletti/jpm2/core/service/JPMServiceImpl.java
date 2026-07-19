@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.persistence.criteria.JoinType;
 import jpaoletti.jpm2.core.PMException;
-import jpaoletti.jpm2.core.converter.Converter;
-import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.dao.DAO;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.DAOOrder;
@@ -173,27 +171,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             final String newId = String.valueOf(entity.getDao(context).getId(object));
             instance.getIobject().setId(newId);
             postExecute(operation, object);
-            if (originalValues != null) {
-                final StringBuilder sb = new StringBuilder();
-                for (Field field : entity.getFields()) {
-                    Object newValue;
-                    try {
-                        newValue = Converter.getValue(object, field);
-                    } catch (ConfigurationException ex) {
-                        newValue = null;
-                    }
-                    final Object original = originalValues.get(field.getId());
-                    if (!JPMUtils.auditEquals(original, newValue)) {
-                        sb.append(String.format("<b>%s</b>: %s",
-                                field.getTitle(entity),
-                                JPMUtils.formatAuditDiff(original, newValue))
-                        ).append("<br/>");
-                    }
-                }
-                getJpm().audit(entity, operation, instance.getIobject(), sb.toString());
-            } else {
-                getJpm().audit(entity, operation, instance.getIobject());
-            }
+            getJpm().audit(entity, operation, instance.getIobject(), originalValues);
             LOG.debug("update OUT entity={} newId={} class={}", entity.getId(), newId, object.getClass().getSimpleName());
             return new IdentifiedObject(newId, object);
         } catch (PMException e) {
