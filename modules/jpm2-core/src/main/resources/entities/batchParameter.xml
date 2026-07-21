@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean id="dao-batchParameter" class="jpaoletti.jpm2.core.dao.DefaultJPADAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.BatchParameter" />
+    </bean>
+    <bean id="batchParameter" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.BatchParameter" />
+        <property name="dao" ref="dao-batchParameter" />
+        <property name="owner">
+            <bean class="jpaoletti.jpm2.core.model.EntityOwner">
+                <property name="owner" ref="batch" />
+                <property name="localProperty" value="batch" />
+            </bean>
+        </property>
+        <property name="operations" >
+            <list>
+                <ref bean="default-list-operation" />
+                <ref bean="repeatable-add-operation" />
+                <ref bean="default-generalAudit-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+                <ref bean="default-itemAudit-operation" />
+                <ref bean="default-delete-operation" />
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="name" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="value" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="" />
+                                <property name="title" value="" />
+                                <property name="blocks" value="6" />
+                                <property name="fields" value="id name value"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
