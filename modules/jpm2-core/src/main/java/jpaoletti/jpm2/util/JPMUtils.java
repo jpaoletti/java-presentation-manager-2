@@ -438,6 +438,47 @@ public class JPMUtils implements ApplicationContextAware {
         return context;
     }
 
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public static org.hibernate.SessionFactory getSessionFactory() {
+        return getApplicationContext().getBean("sessionFactory", org.hibernate.SessionFactory.class);
+    }
+
+    public static interface ExecutableInNewSession {
+
+        public void execute(org.hibernate.Session session, org.hibernate.Transaction tx);
+    }
+
+    public static interface ExecutableInNewSessionOnError {
+
+        public void onError(Exception e);
+    }
+
+    /**
+     * Runs the given block within a fresh Hibernate session bound to the current
+     * thread (no transaction). Meant for background threads that have no Spring-managed
+     * session (e.g. ThreadRunner instances).
+     */
+    public static void executeInNewSessionNoTx(org.hibernate.SessionFactory sessionFactory, ExecutableInNewSession executable, ExecutableInNewSessionOnError onError) {
+        try (org.hibernate.Session session = sessionFactory.openSession()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.bindResource(sessionFactory, new org.springframework.orm.hibernate5.SessionHolder(session));
+            executable.execute(session, null);
+        } catch (Exception e) {
+            getLogger().error("Error en ejecucion de executeInNewSession", e);
+            if (onError != null) {
+                onError.onError(e);
+            }
+        } finally {
+            org.springframework.transaction.support.TransactionSynchronizationManager.unbindResource(sessionFactory);
+        }
+    }
+
     public static <T> T initializeAndUnproxy(T entity) {
         if (entity == null) {
             throw new NullPointerException("Entity passed for initialization is null");

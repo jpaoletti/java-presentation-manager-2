@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean id="dao-threadRunner" class="jpaoletti.jpm2.core.dao.DefaultJPADAO" >
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.ThreadRunner" />
+    </bean>
+    <bean id="threadRunner" class="jpaoletti.jpm2.core.model.Entity" >
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.ThreadRunner" />
+        <property name="dao" ref="dao-threadRunner" />
+        <property name="pageSize" value="30" />
+        <property name="operations" >
+            <list>
+                <ref bean="compact-list-operation" />
+                <ref bean="repeatable-add-operation" />
+                <ref bean="default-generalAudit-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="import" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="list" />
+                    <property name="follows" value="list" />
+                    <property name="executor" >
+                        <bean  class="jpaoletti.jpm2.web.executors.ImportExec"/>
+                    </property>
+                    <property name="color" value="btn-success" />
+                    <property name="icon" value="fas fa-file-import" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="showThreadStatus" />
+                    <property name="display" value="list show" />
+                    <property name="follows" value="show" />
+                    <property name="executor" >
+                        <bean  class="jpaoletti.jpm2.core.service.executors.ShowThreadStatusExec"/>
+                    </property>
+                    <property name="color" value="btn-info text-light" />
+                    <property name="icon" value="fas fa-info-circle" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="export" />
+                    <property name="display" value="list show" />
+                    <property name="follows" value="show" />
+                    <property name="executor" >
+                        <bean  class="jpaoletti.jpm2.web.executors.ExportExec"/>
+                    </property>
+                    <property name="color" value="btn-secondary" />
+                    <property name="icon" value="fas fa-file-export" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="exportSelected" />
+                    <property name="scope" value="SELECTED" />
+                    <property name="display" value="list" />
+                    <property name="follows" value="list" />
+                    <property name="executor" >
+                        <bean  class="jpaoletti.jpm2.web.executors.ExportExec"/>
+                    </property>
+                    <property name="color" value="btn-secondary" />
+                    <property name="icon" value="fas fa-file-download" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="threadRunnerItemExec" />
+                    <property name="display" value="list show" />
+                    <property name="follows" value="show" />
+                    <property name="confirm" value="true" />
+                    <property name="executor" >
+                        <bean  class="jpaoletti.jpm2.core.service.executors.ThreadRunnerExec"/>
+                    </property>
+                    <property name="color" value="btn-primary" />
+                    <property name="icon" value="fas fa-play" />
+                </bean>
+                <ref bean="default-itemAudit-operation" />
+                <ref bean="default-delete-operation" />
+            </list>
+        </property>
+        <property name="fields" >
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="name" />
+                    <property name="width" value="200px" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="description" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="clazz" />
+                    <property name="width" value="100px" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="doWork" />
+                    <property name="width" value="100px" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="parameters" />
+                    <property name="width" value="100px" />
+                    <property name="sortable" value="false" />
+                    <property name="displayTitle" value="false" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                        <property name="entity" ref="threadRunnerParameter" />
+                                        <property name="btnText" value="jpm.field.threadRunner.parameters" />
+                                        <property name="btnIcon" value="fas fa-cog" />
+                                        <property name="showList" value="false" />
+                                    </bean>
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                        <property name="entity" ref="threadRunnerParameter" />
+                                        <property name="btnText" value="jpm.field.threadRunner.parameters" />
+                                        <property name="btnIcon" value="fas fa-cog" />
+                                        <property name="showOperations" value="true" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="debug" />
+                    <property name="searcher" ref="jpm-searcher-bool-jpa" />
+                    <property name="width" value="55px" />
+                    <property name="align" value="center" />
+                    <property name="configs" ref="inline-bool-config" />
+                </bean>
+                <ref bean="default-enabled-field" />
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="" />
+                                <property name="title" value="" />
+                                <property name="blocks" value="6" />
+                                <property name="fields" value="id name description clazz doWork debug enabled"/>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="" />
+                                <property name="title" value="" />
+                                <property name="blocks" value="6" />
+                                <property name="fields" value="parameters"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
