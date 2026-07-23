@@ -12,6 +12,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.model.Exportable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * User group. Just for CRUD operations.
@@ -20,7 +24,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "jpm_groups")
-public class Group implements Serializable {
+public class Group implements Serializable, Exportable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -117,5 +121,51 @@ public class Group implements Serializable {
             return false;
         }
         return this.level <= otherGroup.getLevel();
+    }
+
+    /**
+     * Exports this group as a JSON array with a single object holding its name,
+     * hierarchy level and the list of authority ids. The id is intentionally
+     * omitted so imports always create new groups.
+     */
+    @Override
+    public String export() throws PMException {
+        final JSONArray items = new JSONArray();
+        final JSONObject item = new JSONObject();
+        item.put("name", getName() != null ? getName() : JSONObject.NULL);
+        item.put("level", getLevel() != null ? getLevel() : JSONObject.NULL);
+
+        final JSONArray exportedAuthorities = new JSONArray();
+        if (getAuthorities() != null) {
+            for (String authority : getAuthorities()) {
+                exportedAuthorities.put(authority);
+            }
+        }
+        item.put("authorities", exportedAuthorities);
+        items.put(item);
+        return items.toString(2);
+    }
+
+    /**
+     * Rebuilds this group from the JSON of a single exported object.
+     */
+    @Override
+    public void importData(String json) throws PMException {
+        try {
+            final JSONObject item = new JSONObject(json);
+            setName(item.isNull("name") ? null : item.optString("name", null));
+            setLevel(item.isNull("level") ? LEVEL_MIN_PRIVILEGE : item.getInt("level"));
+
+            final List<String> importedAuthorities = new ArrayList<>();
+            final JSONArray authoritiesArray = item.optJSONArray("authorities");
+            if (authoritiesArray != null) {
+                for (int i = 0; i < authoritiesArray.length(); i++) {
+                    importedAuthorities.add(authoritiesArray.getString(i));
+                }
+            }
+            setAuthorities(importedAuthorities);
+        } catch (Exception e) {
+            throw new PMException("Error importing Group: " + e.getMessage());
+        }
     }
 }
