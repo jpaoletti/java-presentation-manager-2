@@ -1,6 +1,8 @@
 package jpaoletti.jpm2.core.i18n;
 
+import jpaoletti.jpm2.core.model.persistent.Customization;
 import jpaoletti.jpm2.core.service.CustomizationService;
+import jpaoletti.jpm2.util.JPMUtils;
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.AbstractMessageSource;
@@ -21,6 +23,11 @@ public class DbMessageSource extends AbstractMessageSource implements Hierarchic
 
     private static final String DEFAULT_PREFIX = "**";
 
+    /**
+     * Minimum delay between two attempts while the messages could not be loaded yet.
+     */
+    private static final long RETRY_MILLIS = 10000L;
+
     private MessageSource parentMessageSource;
     private CustomizationService customizationService;
 
@@ -30,6 +37,7 @@ public class DbMessageSource extends AbstractMessageSource implements Hierarchic
     private final Map<Locale, Properties> cacheByLocale = new ConcurrentHashMap<>();
     private int cacheSeconds = -1; // <=0: never expires
     private final AtomicLong lastReload = new AtomicLong(0);
+    private volatile boolean loaded = false;
 
     public void setCacheSeconds(int cacheSeconds) {
         this.cacheSeconds = cacheSeconds;
@@ -100,14 +108,18 @@ public class DbMessageSource extends AbstractMessageSource implements Hierarchic
     }
 
     private void maybeReload() {
-        if (cacheSeconds <= 0) {
+        // While the messages could not be loaded (typically because the first
+        // attempt happened during context refresh, when the DB is not reachable
+        // through the ambient session yet) keep retrying, regardless of cacheSeconds:
+        // otherwise the DB messages would stay missing for the whole life of the app.
+        if (loaded && cacheSeconds <= 0) {
             return;
         }
+        final long expiration = loaded ? cacheSeconds * 1000L : RETRY_MILLIS;
         long now = System.currentTimeMillis();
         long last = lastReload.get();
-        if (now - last >= cacheSeconds * 1000L) {
+        if (now - last >= expiration) {
             if (lastReload.compareAndSet(last, now)) {
-                cacheByLocale.clear();
                 loadAllLocales();
             }
         }
@@ -115,22 +127,40 @@ public class DbMessageSource extends AbstractMessageSource implements Hierarchic
 
     @Override
     public void afterPropertiesSet() {
+        lastReload.set(System.currentTimeMillis());
         loadAllLocales();
     }
 
+    /**
+     * Loads (or reloads) every locale from the DB. It never throws: when the
+     * customization cannot be read the current cache is left untouched and
+     * {@link #loaded} stays false so {@link #maybeReload()} retries later.
+     */
     private void loadAllLocales() {
         // 1) If you have a per-Locale record in Customization:
         // Map<Locale, String> map = customizationService.fetchMessagesByLocale();
         // for (Map.Entry<Locale, String> e : map.entrySet()) putProps(e.getKey(), e.getValue());
 
         // 2) If you have a single "messages" text (mix of keys per language):
-        String all = customizationService.getCustomization().getMessages();
-        if (StringUtils.hasText(all)) {
+        try {
+            final Customization customization = customizationService.findCustomization();
+            if (customization == null) {
+                return; // not readable yet: keep whatever we have and retry later
+            }
+            final String all = customization.getMessages();
             // Option A: if it is split into per-locale blocks, parse them here.
             // Option B: if they come as standard properties including a .es, .en, etc. suffix,
             //          you can distribute them into different Properties per locale:
-            Map<Locale, Properties> distributed = distributeByLocale(all);
+            final Map<Locale, Properties> distributed = StringUtils.hasText(all)
+                    ? distributeByLocale(all)
+                    : Collections.<Locale, Properties>emptyMap();
+            // Replace without ever leaving the cache empty: drop the locales that
+            // are gone and overwrite the rest.
+            cacheByLocale.keySet().retainAll(distributed.keySet());
             cacheByLocale.putAll(distributed);
+            loaded = true;
+        } catch (Exception e) {
+            JPMUtils.getLogger().warn("DbMessageSource could not load the messages from database, will retry", e);
         }
     }
 

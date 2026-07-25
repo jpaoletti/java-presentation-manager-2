@@ -60,12 +60,19 @@ public abstract class JPADAO<T, ID extends Serializable> implements DAO<T, ID> {
             LOG.debug("get OUT class={} id={} found={}", getPersistentClass().getSimpleName(), id, result != null);
             return result;
         } else {
+            final Serializable transformedId;
             try {
-                final T result = (T) getSession().get(getPersistentClass(), (Serializable) getTransformer().transform(id));
+                transformedId = (Serializable) getTransformer().transform(id);
+            } catch (Exception e) {
+                JPMUtils.getLogger().warn("Invalid ID transformation for class=" + getPersistentClass().getSimpleName() + " id=" + id, e);
+                return null;
+            }
+            try {
+                final T result = (T) getSession().get(getPersistentClass(), transformedId);
                 LOG.debug("get OUT class={} id={} (transformed) found={}", getPersistentClass().getSimpleName(), id, result != null);
                 return result;
             } catch (Exception e) {
-                JPMUtils.getLogger().warn("Invalid ID transformation", e);
+                JPMUtils.getLogger().warn("Could not get class=" + getPersistentClass().getSimpleName() + " id=" + id, e);
                 return null;
             }
         }

@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -47,16 +49,43 @@ public class BatchService extends JPMServiceBase implements ApplicationContextAw
 
     private ApplicationContext context;
 
+    private volatile boolean contextRefreshed = false;
+
     public boolean isPrimaryInstance() {
         return instanceType == null || !instanceType.equalsIgnoreCase("SECONDARY");
     }
 
+    /**
+     * Schedules everything once the context is fully refreshed.
+     *
+     * Apps usually declare this service with {@code init-method="scheduleAll"},
+     * which runs while the context is still being built (and even earlier if some
+     * other bean created during the refresh autowires this service). Batch jobs
+     * with no {@code hour} run 5 seconds after being scheduled, so on a slow
+     * startup they could fire against a half built context. Waiting for the
+     * refresh avoids that; see {@link ThreadRunnerService}, which does the same.
+     */
+    @EventListener(ContextRefreshedEvent.class)
+    public void onContextRefreshed(ContextRefreshedEvent ev) {
+        if (ev.getApplicationContext().getParent() != null) {
+            return; // the child (servlet) context event is propagated to the root: ignore it
+        }
+        contextRefreshed = true;
+        scheduleAll();
+    }
+
     public void scheduleAll() {
+        if (!contextRefreshed) {
+            JPMUtils.getLogger().info("Programacion de tareas diferida hasta que el contexto este listo");
+            return;
+        }
         if (isPrimaryInstance()) {
             JPMUtils.getLogger().info("Iniciando programacion de tareas");
             try {
                 tasks.entrySet().stream().forEach((entry) -> {
-                    entry.getValue().cancel();
+                    if (entry.getValue() != null) {
+                        entry.getValue().cancel();
+                    }
                 });
             } catch (Exception e) {
                 JPMUtils.getLogger().info("Error iniciando programacion de tareas", e);
@@ -72,7 +101,11 @@ public class BatchService extends JPMServiceBase implements ApplicationContextAw
                             batch.setParameters(s.createQuery("FROM BatchParameter WHERE batch = :batch", BatchParameter.class).setParameter("batch", batch).list());
                             final Timer timer = schedule(batch, batch.getHour());
                             tasks.put(batch.getId(), timer);
-                            JPMUtils.getLogger().info("Iniciada tarea " + batch.getDescription());
+                            if (timer != null) {
+                                JPMUtils.getLogger().info("Iniciada tarea " + batch.getDescription());
+                            } else {
+                                JPMUtils.getLogger().warn("Tarea NO iniciada: " + batch.getName() + " (" + batch.getDescription() + ")");
+                            }
                             executed.add(batch.getId());
                         }
                     });

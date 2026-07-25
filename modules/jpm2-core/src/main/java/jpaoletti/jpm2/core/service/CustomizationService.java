@@ -4,8 +4,12 @@ import java.io.InputStream;
 import jpaoletti.jpm2.core.dao.JPADAO;
 import jpaoletti.jpm2.core.model.persistent.Customization;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.orm.hibernate5.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StreamUtils;
 
 /**
@@ -17,30 +21,82 @@ import org.springframework.util.StreamUtils;
  * property (default 1). It replaces the old configService.getLong("customization-id", 1L),
  * since JPM2 does not provide a generic ConfigService.
  *
+ * It deliberately does NOT extend {@link JPMServiceBase}: this service is a
+ * dependency of {@link jpaoletti.jpm2.core.i18n.DbMessageSource}, which Spring
+ * instantiates inside {@code initMessageSource()}, very early in the context
+ * refresh. Inheriting the {@code @Autowired PresentationManager} of the base
+ * class made that early instantiation drag in the whole JPM bean graph (the
+ * PresentationManager autowires {@code Map<String, Entity>}, so every entity and
+ * every executor they reference got created too, e.g. ScheduleAllExec ->
+ * batchService, whose init-method scheduled all the batch jobs while the context
+ * was still refreshing).
+ *
  * @author jpaoletti
  */
-public class CustomizationService extends JPMServiceBase {
+public class CustomizationService {
 
     @Autowired
     @Qualifier(value = "dao-customization")
     private JPADAO customizationDAO;
+
+    @Autowired
+    @Qualifier("sessionFactory")
+    private SessionFactory sessionFactory;
 
     private long customizationId = 1L;
 
     private byte[] defaultLogo;
 
     /**
-     * Retrieves the customization. It is intentionally NOT {@code @Transactional}:
-     * it relies on the ambient session (OpenSessionInView) just like the original
-     * implementation, and tolerates the absence of a session (e.g. during
-     * DbMessageSource initialization) by returning defaults.
+     * Retrieves the persisted customization row, or {@code null} when it does not
+     * exist or cannot be read.
+     *
+     * It is intentionally NOT {@code @Transactional}: it uses the ambient session
+     * (OpenSessionInView / active transaction) when there is one, and opens a
+     * short-lived session of its own when there is none. The latter is the case
+     * when it is called during context refresh (e.g. from
+     * {@link jpaoletti.jpm2.core.i18n.DbMessageSource}, which Spring initializes
+     * long before any request or transaction exists): asking for
+     * {@code getCurrentSession()} there fails with
+     * "Could not obtain transaction-synchronized Session for current thread".
+     *
+     * @return the persisted customization or null
+     */
+    public Customization findCustomization() {
+        try {
+            if (sessionFactory == null
+                    || TransactionSynchronizationManager.hasResource(sessionFactory)
+                    || TransactionSynchronizationManager.isSynchronizationActive()) {
+                return (Customization) customizationDAO.get(String.valueOf(customizationId));
+            }
+            return findInOwnSession();
+        } catch (Exception e) {
+            JPMUtils.getLogger().debug("Customization could not be read", e);
+            return null;
+        }
+    }
+
+    /**
+     * Reads the customization binding a brand new session to the thread, so any
+     * DAO down the line can still rely on {@code getCurrentSession()}.
+     */
+    private Customization findInOwnSession() {
+        final Session session = sessionFactory.openSession();
+        TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
+        try {
+            return (Customization) customizationDAO.get(String.valueOf(customizationId));
+        } finally {
+            TransactionSynchronizationManager.unbindResourceIfPossible(sessionFactory);
+            session.close();
+        }
+    }
+
+    /**
+     * Retrieves the customization, never null: when there is no persisted row (or
+     * it cannot be read) a transient one carrying the default logos is returned.
      */
     public Customization getCustomization() {
-        Customization c = null;
-        try {
-            c = (Customization) customizationDAO.get(String.valueOf(customizationId));
-        } catch (Exception e) {
-        }
+        Customization c = findCustomization();
         if (defaultLogo == null) {
             try (InputStream is = getClass().getResourceAsStream("/defaultLogo.png")) {
                 if (is != null) {
@@ -76,5 +132,13 @@ public class CustomizationService extends JPMServiceBase {
     @SuppressWarnings("unchecked")
     public JPADAO<Customization, Long> getCustomizationDAO() {
         return customizationDAO;
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 }
