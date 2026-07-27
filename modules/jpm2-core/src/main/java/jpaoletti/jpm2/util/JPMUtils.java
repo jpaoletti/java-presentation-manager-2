@@ -412,6 +412,8 @@ public class JPMUtils implements ApplicationContextAware {
      * nothing changed.
      */
     public static String buildAuditDiff(Entity entity, Object object, Map<String, Object> originalValues) {
+        final String mask = "••••••";
+        final boolean maskable = object instanceof jpaoletti.jpm2.core.model.AuditMaskable;
         final StringBuilder sb = new StringBuilder();
         for (Field field : entity.getAllFields(null)) {
             Object newValue;
@@ -422,8 +424,14 @@ public class JPMUtils implements ApplicationContextAware {
             }
             final Object original = originalValues.get(field.getId());
             if (!auditEquals(original, newValue)) {
+                Object shownOld = original;
+                Object shownNew = newValue;
+                if (maskable && ((jpaoletti.jpm2.core.model.AuditMaskable) object).maskInAudit(field.getId())) {
+                    shownOld = (original == null) ? null : mask;
+                    shownNew = (newValue == null) ? null : mask;
+                }
                 sb.append(String.format("<b>%s</b>: %s",
-                        field.getTitle(entity), formatAuditDiff(original, newValue))).append("<br/>");
+                        field.getTitle(entity), formatAuditDiff(shownOld, shownNew))).append("<br/>");
             }
         }
         return sb.toString();
