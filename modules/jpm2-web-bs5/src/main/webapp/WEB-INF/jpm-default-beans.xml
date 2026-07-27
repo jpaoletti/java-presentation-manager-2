@@ -243,5 +243,51 @@
         </bean>
         <ref bean="xls-config" />
     </util:list>
+    <!-- Standard field/searcher beans used by the generic-module entity XMLs
+         (moved from app extra-beans into the framework defaults so every app/testbed
+         gets them). Apps that declare their own keep overriding these. -->
+    <bean id="id-invisible" class="jpaoletti.jpm2.core.model.Field">
+        <property name="id" value="id" />
+        <property name="configs">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                    <property name="operations" value="none" />
+                    <property name="converter" ref="jpm-converter-show" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <bean id="default-id-field" class="jpaoletti.jpm2.core.model.Field">
+        <property name="id" value="id" />
+        <property name="configs" ref="default-id-field-config" />
+        <property name="searcher" ref="jpm-searcher-long-jpa" />
+        <property name="width" value="55px" />
+    </bean>
+    <bean id="default-enabled-field" class="jpaoletti.jpm2.core.model.Field">
+        <property name="id" value="enabled" />
+        <property name="searcher" ref="jpm-searcher-bool-jpa" />
+        <property name="width" value="55px" />
+        <property name="align" value="center" />
+        <property name="configs" ref="inline-bool-config" />
+    </bean>
+    <bean id="enumJPASearcher" class="jpaoletti.jpm2.web.search.EnumJPASearcher" />
+    <util:list id="enum-config-nn" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show" />
+            <property name="converter" ref="jpm-converter-show" />
+        </bean>
+    </util:list>
+    <util:list id="read-only-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show" />
+            <property name="converter" ref="jpm-converter-show" />
+        </bean>
+    </util:list>
+    <util:list id="ro-full-datetime-config" value-type="jpaoletti.jpm2.core.model.FieldConfig">
+        <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+            <property name="operations" value="list show" />
+            <property name="converter" ref="jpm-converter-show-datetime" />
+        </bean>
+    </util:list>
     <import resource="jpm-default-beans-operations.xml" />
 </beans>

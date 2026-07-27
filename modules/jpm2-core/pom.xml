@@ -120,6 +120,14 @@
         </dependency>
         <!-- /Mail support -->
 
+        <!-- Cache support (CacheAdmin module, Redis backend) -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.2.0</version>
+        </dependency>
+        <!-- /Cache support -->
+
         <!-- Excel support -->
         <dependency>
             <groupId>org.apache.poi</groupId>
