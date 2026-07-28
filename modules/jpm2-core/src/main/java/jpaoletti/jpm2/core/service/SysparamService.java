@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.service;
 
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.cache.GeneralCache;
+import jpaoletti.jpm2.core.log.DebugLog;
 import jpaoletti.jpm2.core.crypto.SysparamCipher;
 import jpaoletti.jpm2.core.dao.DefaultJPADAO;
 import jpaoletti.jpm2.core.dao.JPADAOListConfiguration;
@@ -41,6 +42,16 @@ public class SysparamService extends JPMServiceBase {
 
     public static final String CACHE_REGION = "sysparam";
 
+    /**
+     * Sysparam key that drives the global {@link DebugLog} level (INTEGER 0-3): declaring a
+     * param with this key turns the sysparam admin into the live control surface for runtime
+     * debug logging. Keys of the form {@code debug.<channel>} drive per-channel levels.
+     * The value is pushed to DebugLog on every write and re-seeded on boot, so changing it
+     * from the setValue screen takes effect immediately without a restart.
+     */
+    public static final String DEBUG_KEY = "debug";
+    private static final String DEBUG_CHANNEL_PREFIX = "debug.";
+
     @Autowired
     private SysparamCatalog catalog;
 
@@ -75,6 +86,51 @@ public class SysparamService extends JPMServiceBase {
         }
         seedMissingDefaults();
         seedMissingGroups();
+        seedDebugLog();
+    }
+
+    /**
+     * Pushes the persisted {@code debug} / {@code debug.<channel>} levels into {@link DebugLog}
+     * at boot so a level left on before a restart is restored. Best-effort: a failure here must
+     * never block startup.
+     */
+    private void seedDebugLog() {
+        try {
+            final Session session = sessionFactory.openSession();
+            try {
+                final List<Sysparam> rows = session.createQuery("from Sysparam", Sysparam.class).list();
+                for (final Sysparam row : rows) {
+                    applyDebugLevel(row.getKey(), row.getValue());
+                }
+            } finally {
+                session.close();
+            }
+        } catch (final Exception e) {
+            JPMUtils.getLogger().warn("No se pudo inicializar DebugLog desde sysparam", e);
+        }
+    }
+
+    /**
+     * Routes a {@code debug} / {@code debug.<channel>} value to {@link DebugLog}. No-op for any
+     * other key, so it is safe to call on every write.
+     */
+    private void applyDebugLevel(String key, String rawValue) {
+        if (DEBUG_KEY.equals(key)) {
+            DebugLog.setGlobalLevel(parseLevel(rawValue));
+        } else if (key != null && key.startsWith(DEBUG_CHANNEL_PREFIX)) {
+            DebugLog.setChannelLevel(key.substring(DEBUG_CHANNEL_PREFIX.length()), parseLevel(rawValue));
+        }
+    }
+
+    private static int parseLevel(String rawValue) {
+        if (rawValue == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(rawValue.trim());
+        } catch (final NumberFormatException e) {
+            return 0;
+        }
     }
 
     private void seedMissingDefaults() {
@@ -340,6 +396,8 @@ public class SysparamService extends JPMServiceBase {
         // Change history is recorded by the standard JPM audit (detailed audit on the
         // sysparam entity), so no separate history row is written here.
         region().del(key);
+        // Debug logging control surface: a write to debug/debug.<channel> takes effect live.
+        applyDebugLevel(key, rawValue);
     }
 
     /** Resets a managed parameter to its catalog default (persisting the default value). */

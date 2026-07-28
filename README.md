@@ -570,6 +570,153 @@ Important points:
 
 In real applications, you add your own domain annotated classes to the `sessionFactory`, in addition to the internal framework entities.
 
+## Configuration parameters (Sysparam)
+
+`Sysparam` is the schema-first typed configuration module. The **code is the source of truth**
+for each parameter's type, default, group and secrecy; the database only holds the current
+values. Administrators edit those values through a normal JPM entity, and application code
+reads them in a type-safe way.
+
+### Declaring parameters
+
+Declare a `@Component` that implements `SysparamModule` and returns the list of definitions.
+Group the definitions in holder classes so the catalog stays readable:
+
+```java
+public final class MailKeys {
+    public static final SysparamDef<String>  MAIL_SENDER =
+            SysparamDef.string("mail-sender-code").def("default").group("mail").build();
+    public static final SysparamDef<Integer> RETRIES =
+            SysparamDef.integer("mail-retries").def(3).group("mail").range(0, 10).build();
+    public static final SysparamDef<String>  API_KEY =
+            SysparamDef.secret("mail-api-key").group("mail").build();   // encrypted
+
+    public static List<SysparamDef<?>> defs() {
+        return List.of(MAIL_SENDER, RETRIES, API_KEY);
+    }
+}
+
+@Component
+public class MySysparamModule implements SysparamModule {
+    @Override public List<SysparamDef<?>> params() { return MailKeys.defs(); }
+}
+```
+
+`SysparamDef` factories: `string`, `integer`, `longParam`, `decimal`, `doubleParam`, `bool`,
+`date`, `datetime`, `duration`, `list`, `json`, `url`, `path`, `enumOf(key, allowed...)`,
+`secret`. Builder options: `.def(value)`, `.group(name)`, `.cached(boolean)`, `.required()`,
+`.regex(...)`, `.range(min, max)`, `.description(i18nKey)`, then `.build()`.
+
+`SECRET` is a **type**, not a flag: those values are encrypted at rest (AES/GCM via
+`SysparamCipher`) and masked in listings and audit. Encryption requires the `sysparam.secret.key`
+property; without it, secret parameters cannot be stored or read (fail-closed).
+
+### Reading a value in code
+
+Inject `SysparamService` and read the typed value straight from the definition:
+
+```java
+@Autowired private SysparamService sysparamService;
+
+String  sender  = sysparamService.get(MailKeys.MAIL_SENDER);   // typed (String)
+int     retries = sysparamService.get(MailKeys.RETRIES);       // typed (Integer)
+String  raw     = sysparamService.getRaw("mail-sender-code");  // raw string, by key
+```
+
+Resolution order is **cache → DB override → catalog default**. Non-secret values are cached in
+the `sysparam` cache region.
+
+### Editing values (admin)
+
+Import the entity definitions in your `spring-jpm.xml` and register the annotated classes:
+
+```xml
+<import resource="classpath:entities/sysparam.xml" />
+<import resource="classpath:entities/sysparamGroup.xml" />
+```
+
+`sysparam` exposes `list`, `show`, `setValue` (a typed editor — radios for booleans, dropdown for
+`enumOf`, number/textarea by type, masked input for secrets), `clearCache` / `clearAllCache`,
+`sysparamHealth` (missing-required, plaintext-secret, orphan, validation checks…), `sysparamTree`
+(group → parameter tree) and `import` / `export`. Writes go through `SysparamService.set(...)`,
+which validates, encrypts secrets, evicts the cache and records the change via the standard
+detailed audit. `sysparamGroup` holds the purely aesthetic group metadata (label, icon, `style`,
+collapsed, order) used by the tree; groups are auto-seeded and are not created or deleted by hand.
+
+Missing parameters (and groups) are auto-seeded from the catalog on boot, so a freshly declared
+definition appears with its default without any DDL. A compatibility bridge
+(`SysparamConfigBridge`) routes declared keys to Sysparam and leaves undeclared keys on the legacy
+store, which lets an application migrate its configuration key by key.
+
+Register the entities on the `sessionFactory` (`spring-hibernate.xml`):
+
+```
+jpaoletti.jpm2.core.model.persistent.Sysparam
+jpaoletti.jpm2.core.model.persistent.SysparamGroup
+```
+
+Tables: `jpm_sysparam` and `jpm_sysparam_group`.
+
+## Debug logging (DebugLog)
+
+`DebugLog` is a lightweight, runtime-controllable debug logging facility. It replaces the old
+pattern of gating `logger.info(...)` calls behind a boolean configuration flag. State is pure
+in-memory operational state (a debug switch is diagnostic, not application config), so it lives
+in the logging layer and never touches the database on the hot path.
+
+Instead of a single on/off flag it uses a numeric **level** per **channel**:
+
+- `0` = OFF, `1` = BASIC (milestones/decisions), `2` = DETAILED (payloads, intermediate
+  values), `3` = TRACE (per-iteration, raw dumps).
+- A **global** level applies to every channel; a **per-channel** override focuses one area
+  (e.g. global `0` but channel `prisma=3`) without flooding the rest.
+- A call at level `L` on a channel logs only when that channel's effective level is `>= L`.
+  Everything defaults to `0` (off).
+
+### From application code
+
+Use the facade on `PresentationManager` (`getJpm()` is available almost everywhere):
+
+```java
+getJpm().debug("processed order " + id);                 // default channel, level 1
+getJpm().debug(2, "gateway payload: " + data);           // default channel, level 2
+getJpm().debug("prisma", 3, "raw response: " + xml);     // channel "prisma", level 3
+getJpm().debug(3, () -> expensiveDump());                // lazy: supplier runs only if it logs
+
+if (getJpm().isDebug("prisma", 2)) { /* guard a costly block */ }
+```
+
+Output flows through log4j2 loggers named `jpm.debug` (no channel) or `jpm.debug.<channel>`, so
+it can be routed or filtered by normal appender configuration. **The numeric level is the gate;
+messages are currently emitted at log4j `INFO`** (the level does not change the log4j severity —
+levels 1/2/3 all come out as `INFO` on the corresponding logger).
+
+### Controlling it at runtime via Sysparam
+
+Declaring an `INTEGER` Sysparam named `debug` turns the sysparam admin into the live control
+surface: `SysparamService` pushes any write to `debug` (or `debug.<channel>`) into `DebugLog`
+immediately, and re-seeds the levels from the database on boot (so a level left on survives a
+restart).
+
+```java
+public static final SysparamDef<Integer> DEBUG =
+        SysparamDef.integer(SysparamService.DEBUG_KEY).def(0).group("debug").build();
+```
+
+Setting `debug = 2` from the `setValue` screen takes effect at once — no restart. Per-channel
+keys (`debug.prisma = 3`) drive individual channels.
+
+### Programmatic control
+
+```java
+DebugLog.setGlobalLevel(2);                 // or setGlobalLevel(2, 1800) with a TTL in seconds
+DebugLog.setChannelLevel("prisma", 3);      // TTL-capable overload as well
+DebugLog.reset();                           // everything off
+Map<String,Integer> active = DebugLog.channels();
+```
+
+TTL-based enables let a channel turned on in production switch itself off again after N seconds.
+
 ## Build and execution
 
 Build the whole framework:

@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import jpaoletti.jpm2.core.exception.EntityNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.log.DebugLog;
 import jpaoletti.jpm2.core.model.AsynchronicOperationExecutor;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
@@ -414,6 +416,49 @@ public class PresentationManager implements Observer, Serializable {
 
     public void setApiSessionExpiration(Integer apiSessionExpiration) {
         this.apiSessionExpiration = apiSessionExpiration;
+    }
+
+    // ---- debug logging (replaces the legacy ConfigService.debug mini-module) ----
+    // Runtime-controllable, level+channel based, in-memory (no config store). See DebugLog.
+
+    /** Logs at BASIC level (1) on the default channel; the drop-in for {@code configService.debug(x)}. */
+    public void debug(Object message) {
+        DebugLog.debug(1, message);
+    }
+
+    /** Logs at the given level (1=BASIC, 2=DETAILED, 3=TRACE) on the default channel. */
+    public void debug(int level, Object message) {
+        DebugLog.debug(level, message);
+    }
+
+    /** Logs at the given level on a specific channel (e.g. {@code "prisma"}). */
+    public void debug(String channel, int level, Object message) {
+        DebugLog.debug(channel, level, message);
+    }
+
+    /** Lazy variant: the supplier runs only if the default channel logs at {@code level}. */
+    public void debug(int level, Supplier<?> message) {
+        DebugLog.debug(level, message);
+    }
+
+    /** Lazy variant on a specific channel. */
+    public void debug(String channel, int level, Supplier<?> message) {
+        DebugLog.debug(channel, level, message);
+    }
+
+    /** Whether debug is on (default channel, level 1); the drop-in for {@code configService.isDebug()}. */
+    public boolean isDebug() {
+        return DebugLog.level() >= 1;
+    }
+
+    /** Whether the default channel logs at (or above) {@code level}. */
+    public boolean isDebug(int level) {
+        return DebugLog.level() >= level;
+    }
+
+    /** Whether the given channel logs at (or above) {@code level}. */
+    public boolean isDebug(String channel, int level) {
+        return DebugLog.enabled(channel, level);
     }
 
 }
