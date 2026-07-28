@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean id="dao-sysparamGroup" class="jpaoletti.jpm2.core.dao.DefaultJPADAO">
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.SysparamGroup" />
+    </bean>
+    <bean id="sysparamGroup" class="jpaoletti.jpm2.core.model.Entity">
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.SysparamGroup" />
+        <property name="dao" ref="dao-sysparamGroup" />
+        <property name="pageSize" value="50" />
+        <property name="defaultSortField" value="sortOrder" />
+        <property name="operations">
+            <list>
+                <ref bean="compact-list-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-edit-operation" />
+                <ref bean="default-itemAudit-operation" />
+            </list>
+        </property>
+        <property name="fields">
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="name" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <!-- Read-only everywhere: the name maps to the param group and is auto-seeded, never added/renamed by hand. -->
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show edit" />
+                                <property name="converter" ref="jpm-converter-editable" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="label" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="icon" />
+                    <property name="width" value="160px" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="style" />
+                    <property name="width" value="200px" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="collapsed" />
+                    <property name="width" value="80px" />
+                    <property name="align" value="center" />
+                    <property name="searcher" ref="jpm-searcher-bool-jpa" />
+                    <property name="configs" ref="inline-bool-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="sortOrder" />
+                    <property name="width" value="90px" />
+                    <property name="align" value="center" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="" />
+                                <property name="title" value="" />
+                                <property name="blocks" value="6" />
+                                <property name="fields" value="id name label icon style collapsed sortOrder" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
