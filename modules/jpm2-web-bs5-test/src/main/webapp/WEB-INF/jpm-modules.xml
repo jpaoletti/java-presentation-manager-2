@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <!-- ============================================================
+         Testbed wiring for the generic modules migrated into JPM2:
+         MailSender, Syslog, Batch, ThreadRunner, Customization,
+         CacheAdmin and Sysparam. Lets jpm2-web-bs5-test exercise them.
+         ============================================================ -->
+
+    <!-- Standard field/searcher beans (id-invisible, default-id-field, default-enabled-field,
+         enumJPASearcher, enum-config-nn, read-only-config, ro-full-datetime-config) now come
+         from the framework defaults (jpm-default-beans.xml). -->
+
+    <!-- Services (classes live in jpm2-core; wired directly, no generics dependency). -->
+    <bean id="mailSenderService" class="jpaoletti.jpm2.core.service.MailSenderService" init-method="init" depends-on="dao-mailSender,sessionFactory,transactionManager" />
+    <bean id="cacheService" class="jpaoletti.jpm2.core.service.CacheService" init-method="init" depends-on="dao-cacheAdmin,sessionFactory,transactionManager" />
+    <bean id="batchService" class="jpaoletti.jpm2.core.service.BatchService" init-method="scheduleAll" depends-on="dao-batch,sessionFactory,transactionManager" />
+    <bean id="threadRunnerService" class="jpaoletti.jpm2.core.service.ThreadRunnerService" depends-on="dao-threadRunner,sessionFactory,transactionManager" />
+
+    <!-- Sysparam -->
+    <bean id="sysparamCatalog" class="jpaoletti.jpm2.core.sysparam.SysparamCatalog" />
+    <bean id="sysparamCipher" class="jpaoletti.jpm2.core.crypto.AesSysparamCipher">
+        <constructor-arg value="${sysparam.secret.key}" />
+    </bean>
+    <bean id="sysparamService" class="jpaoletti.jpm2.core.service.SysparamService" init-method="init" depends-on="dao-sysparam,cacheService,sysparamCatalog,sysparamCipher,sessionFactory,transactionManager" />
+    <bean id="testSysparamModule" class="jpaoletti.jpm2.web.sysparam.TestSysparamModule" />
+
+    <!-- Entity definitions (from jpm2-core resources). -->
+    <import resource="classpath:entities/mailSender.xml" />
+    <import resource="classpath:entities/mailSenderParameter.xml" />
+    <import resource="classpath:entities/syslog.xml" />
+    <import resource="classpath:entities/batch.xml" />
+    <import resource="classpath:entities/batchParameter.xml" />
+    <import resource="classpath:entities/threadRunner.xml" />
+    <import resource="classpath:entities/threadRunnerParameter.xml" />
+    <import resource="classpath:entities/customization.xml" />
+    <import resource="classpath:entities/cacheAdmin.xml" />
+    <import resource="classpath:entities/cacheAdminParameter.xml" />
+    <import resource="classpath:entities/sysparam.xml" />
+    <import resource="classpath:entities/sysparamGroup.xml" />
+</beans>

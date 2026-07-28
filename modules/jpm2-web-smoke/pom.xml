@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.jpaoletti</groupId>
+    <artifactId>jpm2-web-smoke</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <!--
+        Smoke crawler for the JPM2 front-end (validates screens of a running instance,
+        e.g. the jpm2-web-bs5 testbed). STANDALONE module: it is NOT listed in the parent
+        reactor <modules>, so the normal build does not touch it.
+
+        How to run (against an already-running instance; does NOT build/deploy the app):
+          mvn -f modules/jpm2-web-smoke/pom.xml compile exec:java \
+              -Dsmoke.baseUrl=http://localhost:8084/jpm2-web-bs5 \
+              -Dsmoke.user=admin -Dsmoke.pass=admin -Dsmoke.verbose=true
+
+        Optional flags:
+          -Dsmoke.only=sysparam,cacheAdmin   (CSV to focus on some entities)
+          -Dsmoke.maxEntities=0              (0 = no limit)
+          -Dsmoke.filters / -Dsmoke.columns / -Dsmoke.operations / -Dsmoke.i18n  (default true)
+    -->
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <mainClass>jpaoletti.jpm2.smoke.WebSmokeCrawler</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

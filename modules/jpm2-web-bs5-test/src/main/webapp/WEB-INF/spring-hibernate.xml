@@ -16,6 +16,7 @@
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
                 <prop key="hibernate.show_sql">true</prop>
                 <prop key="hibernate.id.new_generator_mappings">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
             </props>
         </property>
  
@@ -23,6 +24,7 @@
             <list>
                 <value>jpaoletti.jpm2.core.model.AuditRecord</value>
                 <value>jpaoletti.jpm2.core.model.UserFavorite</value>
+                <value>jpaoletti.jpm2.core.model.UserVisibleColumn</value>
                 
                 <value>jpaoletti.jpm2.core.model.reports.EntityReportUserSave</value>
 
@@ -36,7 +38,21 @@
                 
                 <value>jpaoletti.jpm2.core.test.JPMTest</value>
                 <value>jpaoletti.jpm2.core.test.JPMTestWeak</value>
-                
+
+                <!-- Migrated generic modules -->
+                <value>jpaoletti.jpm2.core.model.persistent.MailSender</value>
+                <value>jpaoletti.jpm2.core.model.persistent.MailSenderParameter</value>
+                <value>jpaoletti.jpm2.core.model.persistent.Syslog</value>
+                <value>jpaoletti.jpm2.core.model.persistent.Batch</value>
+                <value>jpaoletti.jpm2.core.model.persistent.BatchParameter</value>
+                <value>jpaoletti.jpm2.core.model.persistent.ThreadRunner</value>
+                <value>jpaoletti.jpm2.core.model.persistent.ThreadRunnerParameter</value>
+                <value>jpaoletti.jpm2.core.model.persistent.Customization</value>
+                <value>jpaoletti.jpm2.core.model.persistent.CacheAdmin</value>
+                <value>jpaoletti.jpm2.core.model.persistent.CacheAdminParameter</value>
+                <value>jpaoletti.jpm2.core.model.persistent.Sysparam</value>
+                <value>jpaoletti.jpm2.core.model.persistent.SysparamGroup</value>
+
             </list>
         </property>
     </bean>

@@ -93,6 +93,10 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+                <directory>src/main/filtered</directory>
+                <filtering>true</filtering>
+            </resource>
         </resources>
         <plugins>
             <plugin>
