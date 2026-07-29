@@ -25,13 +25,14 @@
     </bean>
     <bean id="securityService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
     <import resource="spring-locale.xml" />
-    <!-- Override the single-basename messageSource: jpm2-core provides the core keys, and a
-         testbed-local bundle adds the migrated-module keys (which live in jpm2-web-core but
-         are not the one 'classpath:messages' loads). Multiple basenames merge per key. -->
+    <!-- Framework i18n now lives in uniquely-named bundles (jpm2-web-core -> jpm-web-messages,
+         jpm2-core -> jpm-core-messages) so both resolve unambiguously; the testbed-local bundle
+         stays as a fallback. Multiple basenames merge per key. -->
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basenames">
             <list>
-                <value>classpath:messages</value>
+                <value>classpath:jpm-web-messages</value>
+                <value>classpath:jpm-core-messages</value>
                 <value>classpath:jpm-modules-messages</value>
             </list>
         </property>

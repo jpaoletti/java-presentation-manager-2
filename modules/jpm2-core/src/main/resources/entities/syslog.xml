@@ -22,7 +22,9 @@
                     <property name="id" value="debugControl" />
                     <property name="scope" value="GENERAL" />
                     <property name="display" value="list" />
-                    <property name="follows" value="list" />
+                    <!-- follows itself: after applying, re-render the debug screen (works even if the
+                         syslog list is not shown/accessible), instead of redirecting to the list. -->
+                    <property name="follows" value="debugControl" />
                     <property name="useFields" value="false" />
                     <property name="executor">
                         <bean class="jpaoletti.jpm2.core.service.executors.DebugControlExec" />
