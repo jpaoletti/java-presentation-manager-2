@@ -28,6 +28,7 @@
     </bean>
     <bean id="sysparamService" class="jpaoletti.jpm2.core.service.SysparamService" init-method="init" depends-on="dao-sysparam,cacheService,sysparamCatalog,sysparamCipher,sessionFactory,transactionManager" />
     <bean id="testSysparamModule" class="jpaoletti.jpm2.web.sysparam.TestSysparamModule" />
+    <bean id="dbSync" class="jpaoletti.jpm2.core.service.DdlMigrationService" init-method="sync" depends-on="sessionFactory,transactionManager" />
 
     <!-- Entity definitions (from jpm2-core resources). -->
     <import resource="classpath:entities/mailSender.xml" />
@@ -42,4 +43,5 @@
     <import resource="classpath:entities/cacheAdminParameter.xml" />
     <import resource="classpath:entities/sysparam.xml" />
     <import resource="classpath:entities/sysparamGroup.xml" />
+    <import resource="classpath:entities/ddlMigration.xml" />
 </beans>

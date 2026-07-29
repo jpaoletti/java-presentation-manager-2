@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <bean id="dao-ddlMigration" class="jpaoletti.jpm2.core.dao.DefaultJPADAO">
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.DdlMigration" />
+    </bean>
+
+    <!-- Read-only history of applied database.sql revisions (see DdlMigrationService). -->
+    <bean id="ddlMigration" class="jpaoletti.jpm2.core.model.Entity">
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.DdlMigration" />
+        <property name="dao" ref="dao-ddlMigration" />
+        <property name="defaultSortField" value="revision" />
+        <property name="defaultSortDirection" value="DESC" />
+        <property name="pageSize" value="50" />
+        <property name="operations">
+            <list>
+                <ref bean="default-list-operation" />
+                <ref bean="default-show-operation" />
+            </list>
+        </property>
+        <property name="fields">
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="revision" />
+                    <property name="width" value="90px" />
+                    <property name="align" value="center" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="success" />
+                    <property name="width" value="80px" />
+                    <property name="align" value="center" />
+                    <property name="searcher" ref="jpm-searcher-bool-jpa" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="appliedAt" />
+                    <property name="width" value="160px" />
+                    <property name="configs" ref="ro-full-datetime-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="durationMs" />
+                    <property name="width" value="90px" />
+                    <property name="align" value="right" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="error" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <!-- Full SQL: only rendered in the show view (default-bigstring-config has no list config). -->
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="statement" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

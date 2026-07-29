@@ -52,6 +52,7 @@
                 <value>jpaoletti.jpm2.core.model.persistent.CacheAdminParameter</value>
                 <value>jpaoletti.jpm2.core.model.persistent.Sysparam</value>
                 <value>jpaoletti.jpm2.core.model.persistent.SysparamGroup</value>
+                <value>jpaoletti.jpm2.core.model.persistent.DdlMigration</value>
 
             </list>
         </property>
