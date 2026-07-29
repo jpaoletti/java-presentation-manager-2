@@ -93,7 +93,22 @@ public final class DebugLog {
         return level >= 1 && level(channel) >= level;
     }
 
+    /** Whether debug is on (default channel, level 1); drop-in for the legacy {@code configService.isDebug()}. */
+    public static boolean isDebug() {
+        return level() >= 1;
+    }
+
+    /** Whether the default channel logs at (or above) {@code level}. */
+    public static boolean isDebug(int level) {
+        return level() >= level;
+    }
+
     // ---- logging ----------------------------------------------------------
+
+    /** Logs at BASIC level (1) on the default channel; drop-in for the legacy {@code configService.debug(x)}. */
+    public static void debug(Object message) {
+        debug(null, 1, message);
+    }
 
     public static void debug(int level, Object message) {
         debug(null, level, message);
