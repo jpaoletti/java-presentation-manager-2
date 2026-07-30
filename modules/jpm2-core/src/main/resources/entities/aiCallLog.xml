@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean id="dao-aiCallLog" class="jpaoletti.jpm2.core.dao.DefaultJPADAO">
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.AICallLog" />
+    </bean>
+
+    <bean id="aiCallLog" class="jpaoletti.jpm2.core.model.Entity">
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.AICallLog" />
+        <property name="dao" ref="dao-aiCallLog" />
+        <property name="pageSize" value="30" />
+        <property name="defaultSortField" value="id" />
+        <property name="defaultSortDirection" value="DESC" />
+        <property name="operations">
+            <list>
+                <ref bean="default-list-operation" />
+                <ref bean="default-show-operation" />
+                <ref bean="default-delete-operation" />
+            </list>
+        </property>
+        <property name="fields">
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="eventDate" />
+                    <property name="width" value="150px" />
+                    <property name="searcher" ref="jpm-searcher-date-jpa" />
+                    <property name="configs" ref="default-date-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="connectorCode" />
+                    <property name="width" value="130px" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="purpose" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="model" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="status" />
+                    <property name="width" value="90px" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="default-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="promptTokens" />
+                    <property name="width" value="90px" />
+                    <property name="searcher" ref="jpm-searcher-int-jpa" />
+                    <property name="configs" ref="default-int-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="completionTokens" />
+                    <property name="width" value="90px" />
+                    <property name="searcher" ref="jpm-searcher-int-jpa" />
+                    <property name="configs" ref="default-int-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="latencyMs" />
+                    <property name="width" value="90px" />
+                    <property name="searcher" ref="jpm-searcher-long-jpa" />
+                    <property name="configs" ref="default-long-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="responseSummary" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="errorMessage" />
+                    <property name="configs" ref="default-bigstring-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="" />
+                                <property name="title" value="" />
+                                <property name="blocks" value="12" />
+                                <property name="fields" value="id eventDate connectorCode purpose model status promptTokens completionTokens latencyMs responseSummary errorMessage" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>

@@ -717,6 +717,109 @@ Map<String,Integer> active = DebugLog.channels();
 
 TTL-based enables let a channel turned on in production switch itself off again after N seconds.
 
+## AI connectors (AIService)
+
+`AIService` is a provider-neutral facade for large-language-model completions. Application code
+talks to a single neutral API; **which** provider actually runs (Claude, OpenAI, Gemini, ...) and
+which model, credentials and endpoint are used are decided by an administrable **connector**, not by
+the caller. Every call is recorded for cost/audit purposes.
+
+### Architecture
+
+- **`AIProviderImplementation`** — the pluggable contract (same idea as a gateway/converter
+  implementation): `complete(AIConnectorConfig, AIRequest)`, plus `code()` and
+  `supports(capability)`. Built-in implementations cover Claude (Anthropic Messages API), OpenAI
+  (Chat Completions) and Gemini (Generative Language API); each talks raw HTTP through the JDK
+  client, so no extra dependency is added to the core.
+- **`AIProviderType`** — catalog enum (`CLAUDE`, `OPENAI`, `GEMINI`, with room for more) whose
+  `code` selects the implementation.
+- **Neutral DTOs** — `AIRequest` (messages, model, `maxTokens`, `temperature`, system prompt, an
+  optional `jsonSchema` for structured output, and an `extras` map for provider-specific
+  passthrough), `AICompletion` (text, `structuredJson`, model, `AIUsage` token counts,
+  `finishReason`, a `refusal` flag and the raw payload), `AIMessage`/`AIRole`, and
+  `AIConnectorConfig` (the resolved, decrypted runtime configuration handed to a provider).
+- **Entities** — `AIConnector` (one configured connection), `AIConnectorParameter` (name/value
+  children, with an `encrypted` flag for secrets) and `AICallLog` (per-call ledger: model, token
+  usage, latency, status, truncated request/response).
+
+Keep provider implementations thin: model chat and structured output, and let uncommon
+provider-specific knobs travel through `AIRequest.extras` rather than growing the neutral DTO for
+every feature.
+
+### Enabling the module
+
+The three entity definitions are self-contained; `aiConnector.xml` also declares the provider beans
+and the `aiService` bean, so importing them is all the wiring needed:
+
+```xml
+<import resource="classpath:entities/aiConnector.xml" />
+<import resource="classpath:entities/aiConnectorParameter.xml" />
+<import resource="classpath:entities/aiCallLog.xml" />
+```
+
+Then register the entity classes with the session factory (`AIConnector`, `AIConnectorParameter`,
+`AICallLog`) and add the three tables to the application DDL. A `SysparamCipher` bean is optional
+(see below).
+
+### Configuring a connector (admin)
+
+A connector has: `code`, `type` (provider), `defaultModel`, `fallbackModels` (CSV, tried in order),
+`baseUrl` (optional; each provider defaults to its public endpoint), `timeoutMs`, `active`, and a
+logical `purpose`. Credentials and extra settings are child **parameters**; the API key is stored in
+a parameter named `api-key` with `encrypted = true`. When the application declares a
+`SysparamCipher` bean, that value is decrypted transparently; otherwise it is read as plaintext (the
+cipher contract is a plaintext passthrough either way).
+
+### Calling it from code
+
+Resolve a connector by its logical `purpose` (so callers never hardcode a provider) or by `code`:
+
+```java
+@Autowired
+private AIService aiService;
+
+final AIRequest request = AIRequest.builder()
+        .system("You are a helpful assistant. Answer as strict JSON matching the schema.")
+        .user(userText)
+        .jsonSchema(schemaJson)   // optional: request structured output
+        .build();
+
+final AICompletion completion = aiService.completeForPurpose("my-purpose", request);
+// or: aiService.complete("my-connector-code", request);
+
+if (completion.isRefusal()) { /* safety-policy decline: no exception, refusal flag is set */ }
+final String out = (completion.getStructuredJson() != null)
+        ? completion.getStructuredJson()
+        : completion.getText();
+```
+
+`AIService` decrypts the credentials, dispatches to the implementation matching the connector
+`type`, tries the model fallback chain in order, and writes an `AICallLog` row for every attempt. A
+transport failure or non-2xx response throws `AIException`; a provider safety decline comes back as
+a normal `AICompletion` with `refusal == true` (not an exception).
+
+### Structured output
+
+Set `jsonSchema` on the request with a standard JSON Schema (object types, `enum`, arrays, nested
+objects, `required`, `additionalProperties`). Each provider maps it to its own structured-output
+mechanism, and `AICompletion.getStructuredJson()` returns the constrained JSON. The first call with
+a new schema can be noticeably slower (one-time schema compilation on the provider side); repeated
+calls with the same schema are fast.
+
+### Adding a provider
+
+Implement `AIProviderImplementation` (map the neutral `AIRequest` to the provider's wire format and
+its response back to `AICompletion`), register it as a bean in the provider list in
+`aiConnector.xml`, and add a value to `AIProviderType`. Connectors of that type then become
+selectable in the admin and are resolved automatically — no change to calling code.
+
+### Debugging
+
+The module logs richly on the DebugLog channel **`ai-connector`**: connector resolution, model
+attempts, HTTP status, token usage and latency at level `1`; endpoint and config metadata at level
+`2`; and full request/response dumps at level `3`. API keys are never logged. Enable it like any
+other channel (see *Debug logging* above), e.g. set `debug.ai-connector = 3`.
+
 ## Build and execution
 
 Build the whole framework:
