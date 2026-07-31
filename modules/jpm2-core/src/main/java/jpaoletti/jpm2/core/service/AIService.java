@@ -7,9 +7,14 @@ import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.ai.AICompletion;
 import jpaoletti.jpm2.core.ai.AIConnectorConfig;
+import jpaoletti.jpm2.core.ai.AIContextProvider;
+import jpaoletti.jpm2.core.ai.AIContextRequest;
+import jpaoletti.jpm2.core.ai.AIEntitlementResolver;
 import jpaoletti.jpm2.core.ai.AIException;
+import jpaoletti.jpm2.core.ai.AIMessage;
 import jpaoletti.jpm2.core.ai.AIProviderImplementation;
 import jpaoletti.jpm2.core.ai.AIRequest;
+import jpaoletti.jpm2.core.ai.AIRole;
 import jpaoletti.jpm2.core.crypto.SysparamCipher;
 import jpaoletti.jpm2.core.dao.DefaultJPADAO;
 import jpaoletti.jpm2.core.log.DebugLog;
@@ -46,6 +51,14 @@ public class AIService {
 
     @Autowired(required = false)
     private SysparamCipher cipher;
+
+    /** Context providers contributed by modules; auto-collected. Null/empty when none are registered. */
+    @Autowired(required = false)
+    private List<AIContextProvider> contextProviders;
+
+    /** Entitlement resolvers contributed by modules/tenants; auto-collected. Null/empty when none. */
+    @Autowired(required = false)
+    private List<AIEntitlementResolver> entitlementResolvers;
 
     private final Map<String, AIProviderImplementation> providers = new LinkedHashMap<>();
 
@@ -108,12 +121,13 @@ public class AIService {
                 + " systemLen=" + (request.getSystem() == null ? 0 : request.getSystem().length())
                 + " maxTokens=" + request.getMaxTokens() + " temperature=" + request.getTemperature()
                 + " hasSchema=" + (request.getJsonSchema() != null && !request.getJsonSchema().isBlank()));
-        final List<String> models = resolveModels(connector, request);
+        final AIRequest effective = applyContext(connector.getPurpose(), request);
+        final List<String> models = resolveModels(connector, effective);
         DebugLog.debug(DEBUG_CHANNEL, 1, () -> "models to try: " + models);
         AIException last = null;
         for (String model : models) {
             DebugLog.debug(DEBUG_CHANNEL, 1, () -> "attempt model=" + model);
-            final AIRequest attempt = withModel(request, model);
+            final AIRequest attempt = withModel(effective, model);
             final long start = System.currentTimeMillis();
             try {
                 final AICompletion completion = provider.complete(config, attempt);
@@ -135,6 +149,35 @@ public class AIService {
         }
         DebugLog.debug(DEBUG_CHANNEL, 1, () -> "all models exhausted; no completion");
         throw (last != null) ? last : new AIException("No model produced a completion");
+    }
+
+    /**
+     * Whether AI is enabled for {@code purpose}: an active connector exists for it and every registered
+     * {@link AIEntitlementResolver} allows it. Fails closed on a resolver error. Use it to gate
+     * AI-powered features (see {@link AIEnabledCondition}).
+     */
+    public boolean isEnabled(String purpose) {
+        if (purpose == null || findByPurpose(purpose) == null) {
+            DebugLog.debug(DEBUG_CHANNEL, 2, () -> "isEnabled('" + purpose + "') -> false (no active connector)");
+            return false;
+        }
+        if (entitlementResolvers != null) {
+            for (AIEntitlementResolver resolver : entitlementResolvers) {
+                try {
+                    if (!resolver.isEnabled(purpose)) {
+                        DebugLog.debug(DEBUG_CHANNEL, 2, () -> "isEnabled('" + purpose + "') -> false ("
+                                + resolver.getClass().getSimpleName() + " denied)");
+                        return false;
+                    }
+                } catch (Exception e) {
+                    JPMUtils.getLogger().warn("AIEntitlementResolver " + resolver.getClass().getSimpleName()
+                            + " failed for purpose '" + purpose + "'; denying", e);
+                    return false;
+                }
+            }
+        }
+        DebugLog.debug(DEBUG_CHANNEL, 2, () -> "isEnabled('" + purpose + "') -> true");
+        return true;
     }
 
     private List<String> resolveModels(AIConnector connector, AIRequest request) {
@@ -169,7 +212,77 @@ public class AIService {
         for (Map.Entry<String, Object> entry : source.getExtras().entrySet()) {
             builder.extra(entry.getKey(), entry.getValue());
         }
+        for (Map.Entry<String, Object> entry : source.getAttributes().entrySet()) {
+            builder.attribute(entry.getKey(), entry.getValue());
+        }
         return builder.build();
+    }
+
+    /**
+     * Asks every registered {@link AIContextProvider} that supports {@code purpose} for context snippets and,
+     * if any are produced, returns a copy of {@code request} with them appended to the system prompt. Provider
+     * failures are logged and skipped. Returns the original request unchanged when there is nothing to inject.
+     */
+    private AIRequest applyContext(String purpose, AIRequest request) {
+        if (contextProviders == null || contextProviders.isEmpty() || purpose == null) {
+            return request;
+        }
+        final AIContextRequest contextRequest = new AIContextRequest(purpose, collectUserText(request), request.getAttributes());
+        final List<String> snippets = new ArrayList<>();
+        for (AIContextProvider provider : contextProviders) {
+            try {
+                if (provider.supports(purpose)) {
+                    final List<String> contributed = provider.contribute(contextRequest);
+                    if (contributed != null) {
+                        for (String snippet : contributed) {
+                            if (snippet != null && !snippet.isBlank()) {
+                                snippets.add(snippet);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                JPMUtils.getLogger().warn("AIContextProvider " + provider.getClass().getSimpleName()
+                        + " failed for purpose '" + purpose + "'", e);
+            }
+        }
+        if (snippets.isEmpty()) {
+            DebugLog.debug(DEBUG_CHANNEL, 2, () -> "no context contributed for purpose '" + purpose + "'");
+            return request;
+        }
+        DebugLog.debug(DEBUG_CHANNEL, 1, () -> "context: " + snippets.size() + " snippet(s) injected for purpose '" + purpose + "'");
+        DebugLog.debug(DEBUG_CHANNEL, 3, () -> "context snippets: " + snippets);
+        final String base = (request.getSystem() == null) ? "" : request.getSystem();
+        final String mergedSystem = base.isBlank()
+                ? String.join("\n\n", snippets)
+                : base + "\n\n[Context]\n" + String.join("\n\n", snippets);
+        final AIRequest.Builder builder = AIRequest.builder()
+                .messages(request.getMessages())
+                .model(request.getModel())
+                .maxTokens(request.getMaxTokens())
+                .temperature(request.getTemperature())
+                .system(mergedSystem)
+                .jsonSchema(request.getJsonSchema());
+        for (Map.Entry<String, Object> entry : request.getExtras().entrySet()) {
+            builder.extra(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Object> entry : request.getAttributes().entrySet()) {
+            builder.attribute(entry.getKey(), entry.getValue());
+        }
+        return builder.build();
+    }
+
+    private String collectUserText(AIRequest request) {
+        final StringBuilder text = new StringBuilder();
+        for (AIMessage message : request.getMessages()) {
+            if (message.getRole() == AIRole.USER && message.getContent() != null) {
+                if (text.length() > 0) {
+                    text.append("\n");
+                }
+                text.append(message.getContent());
+            }
+        }
+        return text.toString();
     }
 
     private AIConnector findByCode(String code) {

@@ -813,6 +813,61 @@ its response back to `AICompletion`), register it as a bean in the provider list
 `aiConnector.xml`, and add a value to `AIProviderType`. Connectors of that type then become
 selectable in the admin and are resolved automatically — no change to calling code.
 
+### Injecting context (`AIContextProvider`)
+
+Modules can enrich prompts without the caller assembling the context by hand. Implement
+`AIContextProvider` as a bean:
+
+```java
+@Component
+public class MyContext implements AIContextProvider {
+    public boolean supports(String purpose) { return "my-purpose".equals(purpose); }
+    public List<String> contribute(AIContextRequest req) {
+        // req.getPurpose(), req.getInput() (user text), req.getAttribute("...")
+        return List.of("Relevant catalog/tenant/retrieved context ...");
+    }
+}
+```
+
+`AIService` auto-discovers every `AIContextProvider` bean. Before dispatching a completion it asks the
+ones that `supports(purpose)` (the connector's `purpose`) for snippets and appends them to the system
+prompt under a `[Context]` section. A provider that throws is logged and skipped — it never fails the
+completion. Domain data a provider needs travels in the request's `attributes` bag (read by context
+providers, never sent to the model — that is what `extras` is for):
+
+```java
+AIRequest.builder().user(text).attribute("order", order).build();
+```
+
+The core ships no provider: retrieval/context is always a module concern, keeping the domain out of the
+core. Snippet injection is logged on the `ai-connector` channel (count at level 1, full snippets at 3).
+
+### Entitlements (`AIEntitlementResolver`)
+
+`AIService.isEnabled(purpose)` answers whether AI is available for a purpose: an active connector
+exists for it **and** every registered `AIEntitlementResolver` allows it (it fails closed on a
+resolver error). With no resolver, entitlement reduces to "a connector for the purpose is active" —
+the hook for "a client acquired an AI service, so its modules light up". A multi-tenant application
+registers a resolver bean that reads the current session/tenant:
+
+```java
+@Component
+public class MyEntitlement implements AIEntitlementResolver {
+    public boolean isEnabled(String purpose) { return currentTenantHasAI(purpose); }
+}
+```
+
+Gate an operation on it with the ready-made `AIEnabledCondition` (one bean per purpose), referenced
+as the operation's `condition`:
+
+```xml
+<bean id="aiEnabled-myPurpose" class="jpaoletti.jpm2.core.service.AIEnabledCondition">
+    <property name="purpose" value="my-purpose" />
+</bean>
+```
+
+The operation (and its menu entry) then shows only when AI is enabled for that purpose.
+
 ### Debugging
 
 The module logs richly on the DebugLog channel **`ai-connector`**: connector resolution, model

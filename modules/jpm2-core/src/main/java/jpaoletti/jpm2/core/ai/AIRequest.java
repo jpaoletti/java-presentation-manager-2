@@ -23,6 +23,7 @@ public class AIRequest {
     private final String system;
     private final String jsonSchema;
     private final Map<String, Object> extras;
+    private final Map<String, Object> attributes;
 
     private AIRequest(Builder builder) {
         this.messages = Collections.unmodifiableList(new ArrayList<>(builder.messages));
@@ -32,6 +33,7 @@ public class AIRequest {
         this.system = builder.system;
         this.jsonSchema = builder.jsonSchema;
         this.extras = Collections.unmodifiableMap(new LinkedHashMap<>(builder.extras));
+        this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(builder.attributes));
     }
 
     public List<AIMessage> getMessages() {
@@ -62,6 +64,11 @@ public class AIRequest {
         return extras;
     }
 
+    /** Caller-supplied payload for {@link AIContextProvider}s (domain object, ids, ...). Not sent to the provider. */
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -75,6 +82,7 @@ public class AIRequest {
         private String system;
         private String jsonSchema;
         private final Map<String, Object> extras = new LinkedHashMap<>();
+        private final Map<String, Object> attributes = new LinkedHashMap<>();
 
         public Builder message(AIMessage message) {
             this.messages.add(message);
@@ -125,6 +133,12 @@ public class AIRequest {
 
         public Builder extra(String key, Object value) {
             this.extras.put(key, value);
+            return this;
+        }
+
+        /** Attaches a payload for {@link AIContextProvider}s (not sent to the provider). */
+        public Builder attribute(String key, Object value) {
+            this.attributes.put(key, value);
             return this;
         }
 
