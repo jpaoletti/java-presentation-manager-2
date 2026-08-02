@@ -15,6 +15,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
+import jpaoletti.jpm2.core.entityparam.EntityParameterModule;
+import jpaoletti.jpm2.core.entityparam.EntityParameterResolver;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
 import org.json.JSONArray;
@@ -27,7 +31,7 @@ import org.json.JSONObject;
  */
 @Entity
 @Table(name = "batchs")
-public class Batch extends JPMPersistentObject implements Exportable {
+public class Batch extends JPMPersistentObject implements Exportable, ParameterizedEntity<BatchParameter>, EntityParameterModule {
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -69,12 +73,7 @@ public class Batch extends JPMPersistentObject implements Exportable {
     }
 
     public String getParameter(String name, String def) {
-        final BatchParameter config = getParameter(name);
-        if (config == null) {
-            return def;
-        } else {
-            return config.getValue();
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public BatchParameter getParameter(String name) {
@@ -90,36 +89,40 @@ public class Batch extends JPMPersistentObject implements Exportable {
     }
 
     public Integer getParameter(String name, Integer def) {
-        try {
-            return Integer.parseInt(getParameter(name, (def == null) ? null : def.toString()));
-        } catch (Exception exception) {
-            return def;
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public Long getParameter(String name, Long def) {
-        return Long.parseLong(getParameter(name, (def == null) ? null : def.toString()));
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public boolean getParameter(String name, boolean def) {
-        return Boolean.parseBoolean(getParameter(name, Boolean.toString(def)));
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public List<String> getParameter(String name, List<String> def) {
-        final BatchParameter config = getParameter(name);
-        if (config == null || StringUtils.isEmpty(config.getValue())) {
-            return def;
-        } else {
-            return Arrays.asList(config.getValue().split("[,]"));
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public Map<String, String> getParameterMap() {
-        final Map<String, String> result = new HashMap<>();
-        getParameters().stream().forEach(param -> {
-            result.put(param.getName(), getParameter(param.getName()).getValue());
-        });
-        return result;
+        return EntityParameterResolver.map(this);
+    }
+
+    @Override
+    public String getParameterKind() {
+        return BatchParamCatalog.KIND;
+    }
+
+    /** General batch params (the ones proper to a task are declared by its task bean, composed here). */
+    @Override
+    public List<EntityParameterDef<?>> params() {
+        return BatchParamCatalog.general();
+    }
+
+    /** Effective catalog of this batch: general + those of its {@code task} bean. */
+    @Override
+    public List<EntityParameterDef<?>> parameterCatalog() {
+        return BatchParamCatalog.effective(getTask());
     }
 
     public String getName() {
@@ -180,7 +183,10 @@ public class Batch extends JPMPersistentObject implements Exportable {
             for (BatchParameter parameter : getParameters()) {
                 JSONObject exportedParameter = new JSONObject();
                 exportedParameter.put("name", parameter.getName());
-                exportedParameter.put("value", parameter.getValue());
+                // Never export secret values (they are re-entered per environment).
+                final boolean secret = EntityParameterResolver.isSecret(this, parameter.getName());
+                exportedParameter.put("value",
+                        (secret || parameter.getValue() == null) ? JSONObject.NULL : parameter.getValue());
                 exportedParameters.put(exportedParameter);
             }
         }

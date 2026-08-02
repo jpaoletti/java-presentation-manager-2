@@ -25,6 +25,18 @@
                 <ref bean="default-generalAudit-operation" />
                 <ref bean="default-show-operation" />
                 <ref bean="default-edit-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="setEntityParameterValue" />
+                    <property name="display" value="list show" />
+                    <property name="executor">
+                        <bean class="jpaoletti.jpm2.core.service.executors.SetEntityParameterValueExec">
+                            <property name="kind" value="batch" />
+                            <property name="entityName" value="batchParameter" />
+                        </bean>
+                    </property>
+                    <property name="color" value="btn-warning" />
+                    <property name="icon" value="fas fa-key" />
+                </bean>
                 <ref bean="default-itemAudit-operation" />
                 <ref bean="default-delete-operation" />
             </list>
@@ -40,7 +52,30 @@
                 <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="value" />
                     <property name="searcher" ref="jpm-searcher-string-jpa" />
-                    <property name="configs" ref="editable-string-config" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EntityParameterValueConverter">
+                                        <property name="kind" value="batch"/>
+                                    </bean>
+                                </property>
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EntityParameterValueConverter">
+                                        <property name="kind" value="batch"/>
+                                        <property name="reveal" value="true"/>
+                                    </bean>
+                                </property>
+                            </bean>
+                            <!-- No add/edit converter: the value is set only through the setEntityParameterValue
+                                 operation, which validates and encrypts secrets (bs5 UI, as with sysparam).
+                                 Standard-form editing (which would store the value in plaintext) is disabled. -->
+                        </list>
+                    </property>
                 </bean>
             </list>
         </property>

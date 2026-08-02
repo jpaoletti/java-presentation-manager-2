@@ -123,11 +123,11 @@
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
                                 <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EntityParamsTreeConverter">
                                         <property name="entity" ref="batchParameter" />
+                                        <property name="reveal" value="true" />
                                         <property name="btnText" value="jpm.field.batch.parameters" />
-                                        <property name="btnIcon" value="fas fa-cog" />
-                                        <property name="showOperations" value="true" />
+                                        <property name="btnIcon" value="fas fa-th-list" />
                                     </bean>
                                 </property>
                             </bean>
