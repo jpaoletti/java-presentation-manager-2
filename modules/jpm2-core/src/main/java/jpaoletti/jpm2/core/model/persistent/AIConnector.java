@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.model.persistent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.ai.AIConnectorConfig;
 import jpaoletti.jpm2.core.ai.AIProviderType;
 import jpaoletti.jpm2.core.crypto.SysparamCipher;
+import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 
@@ -31,7 +34,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "ai_connectors")
-public class AIConnector extends JPMPersistentObject {
+public class AIConnector extends JPMPersistentObject implements ParameterizedEntity<AIConnectorParameter> {
 
     /** Name of the parameter that holds the (encrypted) API key. */
     public static final String API_KEY_PARAM = "api-key";
@@ -188,6 +191,26 @@ public class AIConnector extends JPMPersistentObject {
 
     public void setParameters(List<AIConnectorParameter> parameters) {
         this.parameters = parameters;
+    }
+
+    @Override
+    public String getParameterKind() {
+        return AIProviderType.KIND;
+    }
+
+    /** Parameters of the selected provider ({@link AIProviderType}); {@code api-key} is secret. */
+    @Override
+    public List<EntityParameterDef<?>> parameterCatalog() {
+        return type != null ? type.parameterDefs() : Collections.emptyList();
+    }
+
+    @Override
+    public AIConnectorParameter newParameter(String name, String value) {
+        final AIConnectorParameter parameter = new AIConnectorParameter();
+        parameter.setName(name);
+        parameter.setValue(value);
+        parameter.setConnector(this);
+        return parameter;
     }
 
     @Override

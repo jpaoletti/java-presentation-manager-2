@@ -18,6 +18,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
+import jpaoletti.jpm2.core.entityparam.EntityParameterResolver;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.json.JSONArray;
@@ -30,7 +33,7 @@ import org.json.JSONObject;
  */
 @Entity
 @Table(name = "mail_senders")
-public class MailSender extends JPMPersistentObject implements Duplicable, Exportable {
+public class MailSender extends JPMPersistentObject implements Duplicable, Exportable, ParameterizedEntity<MailSenderParameter> {
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -76,12 +79,7 @@ public class MailSender extends JPMPersistentObject implements Duplicable, Expor
     }
 
     public String getParameter(String name, String def) {
-        final MailSenderParameter config = getParameter(name);
-        if (config == null) {
-            return def;
-        } else {
-            return config.getValue();
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public MailSenderParameter getParameter(String name) {
@@ -97,27 +95,39 @@ public class MailSender extends JPMPersistentObject implements Duplicable, Expor
     }
 
     public Integer getParameter(String name, Integer def) {
-        try {
-            return Integer.parseInt(getParameter(name, (def == null) ? null : def.toString()));
-        } catch (Exception exception) {
-            return def;
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public Long getParameter(String name, Long def) {
-        return Long.parseLong(getParameter(name, (def == null) ? null : def.toString()));
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public boolean getParameter(String name, boolean def) {
-        return Boolean.parseBoolean(getParameter(name, Boolean.toString(def)));
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public Map<String, String> getParameterMap() {
-        final Map<String, String> result = new HashMap<>();
-        getParameters().stream().forEach(param -> {
-            result.put(param.getName(), getParameter(param.getName()).getValue());
-        });
-        return result;
+        return EntityParameterResolver.map(this);
+    }
+
+    @Override
+    public String getParameterKind() {
+        return MailSenderParamCatalog.KIND;
+    }
+
+    /** Fixed catalog of SMTP connection/message parameters; {@code password} is secret. */
+    @Override
+    public List<EntityParameterDef<?>> parameterCatalog() {
+        return MailSenderParamCatalog.general();
+    }
+
+    @Override
+    public MailSenderParameter newParameter(String name, String value) {
+        final MailSenderParameter parameter = new MailSenderParameter();
+        parameter.setName(name);
+        parameter.setValue(value);
+        parameter.setSender(this);
+        return parameter;
     }
 
     public String getName() {
@@ -178,7 +188,10 @@ public class MailSender extends JPMPersistentObject implements Duplicable, Expor
             for (MailSenderParameter parameter : getParameters()) {
                 JSONObject exportedParameter = new JSONObject();
                 exportedParameter.put("name", parameter.getName());
-                exportedParameter.put("value", parameter.getValue());
+                // Never export secret values (they are re-entered per environment).
+                final boolean secret = EntityParameterResolver.isSecret(this, parameter.getName());
+                exportedParameter.put("value",
+                        (secret || parameter.getValue() == null) ? JSONObject.NULL : parameter.getValue());
                 exportedParameters.put(exportedParameter);
             }
         }

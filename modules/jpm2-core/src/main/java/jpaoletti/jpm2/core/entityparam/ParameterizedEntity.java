@@ -40,4 +40,17 @@ public interface ParameterizedEntity<P extends EntityParameter> {
     default List<EntityParameterDef<?>> parameterCatalog() {
         return Collections.emptyList();
     }
+
+    /**
+     * Factory for a new child parameter (name + value, with the {@code @ManyToOne} back-reference to this
+     * owner already set). Used by {@link EntityParameterSeeder} to auto-populate the catalog parameters on
+     * add. Defaults to throwing — override only in entities that opt into seeding.
+     *
+     * @param name the parameter name
+     * @param value the initial value (typically the catalog default; null for secrets)
+     * @return the new, unsaved child parameter
+     */
+    default P newParameter(String name, String value) {
+        throw new UnsupportedOperationException(getClass().getName() + " does not support parameter seeding");
+    }
 }

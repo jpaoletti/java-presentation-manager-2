@@ -26,6 +26,18 @@
                 <ref bean="default-generalAudit-operation" />
                 <ref bean="default-show-operation" />
                 <ref bean="default-edit-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="setEntityParameterValue" />
+                    <property name="display" value="list show" />
+                    <property name="executor">
+                        <bean class="jpaoletti.jpm2.core.service.executors.SetEntityParameterValueExec">
+                            <property name="kind" value="cache-admin" />
+                            <property name="entityName" value="cacheAdminParameter" />
+                        </bean>
+                    </property>
+                    <property name="color" value="btn-warning" />
+                    <property name="icon" value="fas fa-key" />
+                </bean>
                 <ref bean="default-delete-operation" />
                 <ref bean="default-itemAudit-operation" />
             </list>
@@ -45,13 +57,24 @@
                     <property name="configs">
                         <list>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="list show"/>
-                                <property name="converter" ref="jpm-converter-editable"/>
+                                <property name="operations" value="list"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EntityParameterValueConverter">
+                                        <property name="kind" value="cache-admin"/>
+                                    </bean>
+                                </property>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
-                                <property name="operations" value="add edit"/>
-                                <property name="converter" ref="jpm-converter-edit-bigstring"/>
+                                <property name="operations" value="show"/>
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EntityParameterValueConverter">
+                                        <property name="kind" value="cache-admin"/>
+                                        <property name="reveal" value="true"/>
+                                    </bean>
+                                </property>
                             </bean>
+                            <!-- No add/edit converter: the value is set only through the setEntityParameterValue
+                                 operation, which validates and encrypts secrets (bs5 UI, as with sysparam). -->
                         </list>
                     </property>
                 </bean>

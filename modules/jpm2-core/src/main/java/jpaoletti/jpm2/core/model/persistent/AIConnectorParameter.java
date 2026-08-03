@@ -7,6 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import jpaoletti.jpm2.core.entityparam.EntityParameter;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
+import jpaoletti.jpm2.core.sysparam.SysparamType;
 import org.hibernate.annotations.Type;
 
 /**
@@ -17,7 +20,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "ai_connector_parameters")
-public class AIConnectorParameter extends JPMPersistentObject {
+public class AIConnectorParameter extends JPMPersistentObject implements EntityParameter {
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -72,6 +75,17 @@ public class AIConnectorParameter extends JPMPersistentObject {
 
     public void setConnector(AIConnector connector) {
         this.connector = connector;
+    }
+
+    @Override
+    public ParameterizedEntity<?> getOwnerEntity() {
+        return connector;
+    }
+
+    /** No stored type hint: typing/secrecy comes from the catalog (kind "ai-connector"). */
+    @Override
+    public SysparamType getType() {
+        return null;
     }
 
     @Override

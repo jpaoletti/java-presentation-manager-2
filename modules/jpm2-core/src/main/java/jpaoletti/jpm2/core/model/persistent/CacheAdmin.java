@@ -1,9 +1,13 @@
 package jpaoletti.jpm2.core.model.persistent;
 
 import jpaoletti.jpm2.core.cache.CacheType;
+import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
+import jpaoletti.jpm2.core.entityparam.EntityParameterResolver;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import jpaoletti.jpm2.core.model.Duplicable;
 import jpaoletti.jpm2.core.model.Exportable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +37,10 @@ import org.json.JSONObject;
  */
 @Entity
 @Table(name = "cache_admins")
-public class CacheAdmin extends JPMPersistentObject implements Duplicable, Exportable {
+public class CacheAdmin extends JPMPersistentObject implements Duplicable, Exportable, ParameterizedEntity<CacheAdminParameter> {
+
+    /** Entity-parameter catalog scope for cache admins. */
+    public static final String KIND = "cache-admin";
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -101,10 +108,31 @@ public class CacheAdmin extends JPMPersistentObject implements Duplicable, Expor
     }
 
     public Map<String, String> getParameterMap() {
-        return getParameters().stream().collect(
-                Collectors.toMap(CacheAdminParameter::getName,
-                        item -> Optional.ofNullable(item.getValue()).orElse(""),
-                        (existingValue, newValue) -> existingValue));
+        // Decrypt secrets on read; keep the legacy null -> "" coercion so callers' getOrDefault(...) still
+        // fall back to their default instead of surfacing a null value.
+        final Map<String, String> map = EntityParameterResolver.map(this);
+        map.replaceAll((k, v) -> v == null ? "" : v);
+        return map;
+    }
+
+    @Override
+    public String getParameterKind() {
+        return KIND;
+    }
+
+    /**
+     * Parameters of the selected backend: each {@link CacheType} declares its own catalog (via its
+     * {@link jpaoletti.jpm2.core.cache.GeneralCache} implementation), so the tree shows exactly the params
+     * that backend reads. Empty until a {@code cacheType} is chosen.
+     */
+    @Override
+    public List<EntityParameterDef<?>> parameterCatalog() {
+        return cacheType != null ? cacheType.parameterDefs() : Collections.emptyList();
+    }
+
+    @Override
+    public CacheAdminParameter newParameter(String name, String value) {
+        return new CacheAdminParameter(name, value, this);
     }
 
     @Override
@@ -141,7 +169,9 @@ public class CacheAdmin extends JPMPersistentObject implements Duplicable, Expor
             for (CacheAdminParameter p : getParameters()) {
                 JSONObject paramJson = new JSONObject();
                 paramJson.put("name", p.getName());
-                paramJson.put("value", p.getValue() != null ? p.getValue() : JSONObject.NULL);
+                // Never export secret values (they are re-entered per environment).
+                final boolean secret = EntityParameterResolver.isSecret(this, p.getName());
+                paramJson.put("value", (secret || p.getValue() == null) ? JSONObject.NULL : p.getValue());
                 exportedParams.put(paramJson);
             }
         }

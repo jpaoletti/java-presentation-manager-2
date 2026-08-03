@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -26,6 +29,28 @@ public final class GeneralCacheRedis extends GeneralCache {
     private static final int DEFAULT_TIMEOUT = 5000;
     private static final int DEFAULT_MAX_TOTAL = 32;
     private static final int DEFAULT_MAX_WAIT_MILLIS = 3000;
+
+    /**
+     * Parameters this backend reads from its
+     * {@link jpaoletti.jpm2.core.model.persistent.CacheAdmin} (catalog kind
+     * {@code "cache-admin"}), co-located with the code that consumes them.
+     * {@code password} is secret (encrypted at rest, masked); defaults match
+     * the {@code getOrDefault(...)} calls below. Surfaced to the owner through
+     * {@link CacheType#parameterDefs()} so no backend instance (Jedis pool) is
+     * created just to read the catalog. Types deduced; adjust as needed.
+     */
+    public static final List<EntityParameterDef<?>> PARAMETER_DEFS = Arrays.<EntityParameterDef<?>>asList(
+            EntityParameterDef.secret("cache-admin", "password").group("credentials").build(),
+            EntityParameterDef.string("cache-admin", "host").group("redis").defRaw("localhost").build(),
+            EntityParameterDef.integer("cache-admin", "port").group("redis").defRaw("6379").build(),
+            EntityParameterDef.string("cache-admin", "username").group("redis").build(),
+            EntityParameterDef.string("cache-admin", "prefix").group("redis").build(),
+            EntityParameterDef.integer("cache-admin", "timeout").group("redis").defRaw("5000").build(),
+            EntityParameterDef.integer("cache-admin", "max-total").group("pool").defRaw("32").build(),
+            EntityParameterDef.integer("cache-admin", "max-idle").group("pool").defRaw("32").build(),
+            EntityParameterDef.integer("cache-admin", "min-idle").group("pool").defRaw("0").build(),
+            EntityParameterDef.integer("cache-admin", "max-wait-millis").group("pool").defRaw("3000").build()
+    );
 
     private final JedisPool pool;
     private final String prefix;
@@ -56,9 +81,9 @@ public final class GeneralCacheRedis extends GeneralCache {
     }
 
     /**
-     * Reads an optional integer parameter, falling back to {@code defaultValue} when it is
-     * absent, blank or not a number. A typo in the cache administration screen must not
-     * leave the region unusable.
+     * Reads an optional integer parameter, falling back to {@code defaultValue}
+     * when it is absent, blank or not a number. A typo in the cache
+     * administration screen must not leave the region unusable.
      */
     private static int intParam(Map<String, String> params, String name, int defaultValue) {
         final String value = params.get(name);
@@ -75,18 +100,22 @@ public final class GeneralCacheRedis extends GeneralCache {
 
     /**
      * Pool configuration, overridable per region with the {@code max-total},
-     * {@code max-idle}, {@code min-idle}, {@code max-wait-millis} and {@code timeout}
-     * cache administration parameters.
+     * {@code max-idle}, {@code min-idle}, {@code max-wait-millis} and
+     * {@code timeout} cache administration parameters.
      *
-     * <p>CORE-1113: the defaults of {@link JedisPoolConfig} are deliberately not used: they allow only
-     * 8 connections and wait forever for one to become available. With that combination any
-     * connection leak or unresponsive Redis instance parks every caller indefinitely, which
-     * is exactly how a whole application ends up with all of its request threads stuck in
+     * <p>
+     * CORE-1113: the defaults of {@link JedisPoolConfig} are deliberately not
+     * used: they allow only 8 connections and wait forever for one to become
+     * available. With that combination any connection leak or unresponsive
+     * Redis instance parks every caller indefinitely, which is exactly how a
+     * whole application ends up with all of its request threads stuck in
      * {@code JedisPool.getResource()} and no error logged anywhere. A finite
-     * {@code maxWait} turns that permanent freeze into a plain exception per call.
+     * {@code maxWait} turns that permanent freeze into a plain exception per
+     * call.
      *
-     * <p>Note that callers therefore have to expect a {@code JedisException} when the pool
-     * is exhausted, where before they simply blocked.
+     * <p>
+     * Note that callers therefore have to expect a {@code JedisException} when
+     * the pool is exhausted, where before they simply blocked.
      */
     private static JedisPoolConfig buildPoolConfig(Map<String, String> params) {
         final JedisPoolConfig config = new JedisPoolConfig();
@@ -155,12 +184,16 @@ public final class GeneralCacheRedis extends GeneralCache {
     /**
      * Every key of this region, as stored in Redis (prefix included).
      *
-     * <p>Uses SCAN instead of KEYS: KEYS walks the whole keyspace in a single blocking
-     * call, which on a shared production instance stalls every other client.
+     * <p>
+     * Uses SCAN instead of KEYS: KEYS walks the whole keyspace in a single
+     * blocking call, which on a shared production instance stalls every other
+     * client.
      *
-     * <p>Beware that the match pattern is {@code <prefix>-*}, so a region whose code is a
-     * prefix of another region's code also sees the sibling's keys. For example region
-     * {@code token-auth} matches the keys of {@code token-auth-transfer-out}.
+     * <p>
+     * Beware that the match pattern is {@code <prefix>-*}, so a region whose
+     * code is a prefix of another region's code also sees the sibling's keys.
+     * For example region {@code token-auth} matches the keys of
+     * {@code token-auth-transfer-out}.
      */
     private Set<String> scanKeys(Jedis jedis) {
         final Set<String> res = new LinkedHashSet<>();
@@ -177,8 +210,9 @@ public final class GeneralCacheRedis extends GeneralCache {
     /**
      * Removes every key of this region.
      *
-     * <p>WARNING: see {@link #scanKeys(Jedis)}. Clearing a region whose code is a prefix of
-     * another region's code also wipes the sibling region.
+     * <p>
+     * WARNING: see {@link #scanKeys(Jedis)}. Clearing a region whose code is a
+     * prefix of another region's code also wipes the sibling region.
      */
     @Override
     public void clear() {
@@ -201,9 +235,10 @@ public final class GeneralCacheRedis extends GeneralCache {
      * Every entry of this region, keyed by logical key (no prefix), same as
      * {@link GeneralCacheMap#getAll()}.
      *
-     * <p>SCAN returns the full key, so the value has to be read with the raw key: going
-     * through {@link #get(String)} would prefix it a second time and yield null for
-     * every entry.
+     * <p>
+     * SCAN returns the full key, so the value has to be read with the raw key:
+     * going through {@link #get(String)} would prefix it a second time and
+     * yield null for every entry.
      */
     @Override
     public Map<String, String> getAll() {

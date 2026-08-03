@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import jpaoletti.jpm2.core.entityparam.EntityParameterModule;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
@@ -17,7 +18,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author jpaoletti
  */
-public class ThreadRunnerInstance extends Thread {
+public class ThreadRunnerInstance extends Thread implements EntityParameterModule {
 
     public static final String PARAM_DO_WORK = "do-work";
     public static final String PARAM_OPEN_TX = "open-tx";

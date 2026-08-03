@@ -1,6 +1,9 @@
 package jpaoletti.jpm2.core.model.persistent;
 
+import jpaoletti.jpm2.core.entityparam.EntityParameter;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import jpaoletti.jpm2.core.model.Duplicable;
+import jpaoletti.jpm2.core.sysparam.SysparamType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,7 +20,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cache_admins_parameters")
-public class CacheAdminParameter extends JPMPersistentObject implements Duplicable {
+public class CacheAdminParameter extends JPMPersistentObject implements Duplicable, EntityParameter {
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,6 +57,17 @@ public class CacheAdminParameter extends JPMPersistentObject implements Duplicab
 
     public void setCacheAdmin(CacheAdmin cacheAdmin) {
         this.cacheAdmin = cacheAdmin;
+    }
+
+    @Override
+    public ParameterizedEntity<?> getOwnerEntity() {
+        return cacheAdmin;
+    }
+
+    /** No stored type hint: typing/secrecy comes from the catalog (kind "cache-admin"). */
+    @Override
+    public SysparamType getType() {
+        return null;
     }
 
     public String getName() {

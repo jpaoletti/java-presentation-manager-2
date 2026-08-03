@@ -15,7 +15,18 @@
         <property name="operations">
             <list>
                 <ref bean="compact-list-operation"/>
-                <ref bean="repeatable-add-operation"/>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="repeatable" value="true" />
+                    <property name="display" value="all" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="icon" value="fa fa-plus" />
+                    <property name="color" value="btn-warning" />
+                    <!-- On add, auto-populate the catalog parameters (of the chosen cacheType) with their defaults. -->
+                    <property name="context">
+                        <bean class="jpaoletti.jpm2.core.entityparam.SeedEntityParametersOnAddContext" />
+                    </property>
+                </bean>
                 <ref bean="default-generalAudit-operation"/>
                 <ref bean="default-show-operation"/>
                 <ref bean="default-edit-operation"/>
@@ -144,11 +155,11 @@
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
                                 <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.WeakConverter">
+                                    <bean class="jpaoletti.jpm2.web.converter.EntityParamsTreeConverter">
                                         <property name="entity" ref="cacheAdminParameter" />
+                                        <property name="reveal" value="true" />
                                         <property name="btnText" value="jpm.field.cacheAdmin.parameters" />
-                                        <property name="btnIcon" value="fas fa-cog" />
-                                        <property name="showOperations" value="true" />
+                                        <property name="btnIcon" value="fas fa-th-list" />
                                     </bean>
                                 </property>
                             </bean>

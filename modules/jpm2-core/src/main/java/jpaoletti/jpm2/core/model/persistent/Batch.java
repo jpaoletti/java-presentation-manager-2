@@ -125,6 +125,15 @@ public class Batch extends JPMPersistentObject implements Exportable, Parameteri
         return BatchParamCatalog.effective(getTask());
     }
 
+    @Override
+    public BatchParameter newParameter(String name, String value) {
+        final BatchParameter parameter = new BatchParameter();
+        parameter.setName(name);
+        parameter.setValue(value);
+        parameter.setBatch(this);
+        return parameter;
+    }
+
     public String getName() {
         return name;
     }

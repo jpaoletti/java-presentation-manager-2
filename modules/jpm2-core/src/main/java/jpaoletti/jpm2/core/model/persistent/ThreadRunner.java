@@ -15,6 +15,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
+import jpaoletti.jpm2.core.entityparam.EntityParameterModule;
+import jpaoletti.jpm2.core.entityparam.EntityParameterResolver;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -29,7 +33,7 @@ import org.json.JSONObject;
  */
 @Entity
 @Table(name = "threads_runners")
-public class ThreadRunner extends JPMPersistentObject implements Exportable {
+public class ThreadRunner extends JPMPersistentObject implements Exportable, ParameterizedEntity<ThreadRunnerParameter>, EntityParameterModule {
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -83,12 +87,7 @@ public class ThreadRunner extends JPMPersistentObject implements Exportable {
     }
 
     public String getParameter(String name, String def) {
-        final ThreadRunnerParameter config = getParameter(name);
-        if (config == null) {
-            return def;
-        } else {
-            return config.getValue();
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public ThreadRunnerParameter getParameter(String name) {
@@ -104,37 +103,52 @@ public class ThreadRunner extends JPMPersistentObject implements Exportable {
     }
 
     public Integer getParameter(String name, Integer def) {
-        try {
-            return Integer.valueOf(getParameter(name, (def == null) ? null : def.toString()));
-        } catch (Exception exception) {
-            return def;
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public Long getParameter(String name, Long def) {
-        return Long.valueOf(getParameter(name, (def == null) ? null : def.toString()));
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public boolean getParameter(String name, boolean def) {
-        return Boolean.parseBoolean(getParameter(name, Boolean.toString(def)));
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public List<String> getParameter(String name, List<String> def) {
-        final ThreadRunnerParameter config = getParameter(name);
-        if (config == null || StringUtils.isEmpty(config.getValue())) {
-            return def;
-        } else {
-            return Arrays.asList(config.getValue().split("[,]"));
-        }
+        return EntityParameterResolver.get(this, name, def);
     }
 
     public Map<String, String> getParameterMap() {
-        final Map<String, String> result = new HashMap<>();
-        getParameters().stream().forEach(param -> {
-            result.put(param.getName(), getParameter(param.getName()).getValue());
-        });
+        final Map<String, String> result = EntityParameterResolver.map(this);
+        // Preserve the legacy injection of the entity's debug field as a parameter.
         result.put("debug", Boolean.toString(isDebug()));
         return result;
+    }
+
+    @Override
+    public String getParameterKind() {
+        return ThreadRunnerParamCatalog.KIND;
+    }
+
+    /** General params (base loop); the ones proper to a runner are declared by its instance class. */
+    @Override
+    public List<EntityParameterDef<?>> params() {
+        return ThreadRunnerParamCatalog.general();
+    }
+
+    /** Effective catalog: general + those of the runner's {@code clazz} ({@code ThreadRunnerInstance}). */
+    @Override
+    public List<EntityParameterDef<?>> parameterCatalog() {
+        return ThreadRunnerParamCatalog.effective(getClazz());
+    }
+
+    @Override
+    public ThreadRunnerParameter newParameter(String name, String value) {
+        final ThreadRunnerParameter parameter = new ThreadRunnerParameter();
+        parameter.setName(name);
+        parameter.setValue(value);
+        parameter.setThreadRunner(this);
+        return parameter;
     }
 
     public String getName() {
@@ -196,7 +210,10 @@ public class ThreadRunner extends JPMPersistentObject implements Exportable {
             for (ThreadRunnerParameter parameter : getParameters()) {
                 JSONObject exportedParameter = new JSONObject();
                 exportedParameter.put("name", parameter.getName());
-                exportedParameter.put("value", parameter.getValue());
+                // Never export secret values (they are re-entered per environment).
+                final boolean secret = EntityParameterResolver.isSecret(this, parameter.getName());
+                exportedParameter.put("value",
+                        (secret || parameter.getValue() == null) ? JSONObject.NULL : parameter.getValue());
                 exportedParameters.put(exportedParameter);
             }
         }

@@ -1,6 +1,9 @@
 package jpaoletti.jpm2.core.model.persistent;
 
+import jpaoletti.jpm2.core.entityparam.EntityParameter;
+import jpaoletti.jpm2.core.entityparam.ParameterizedEntity;
 import jpaoletti.jpm2.core.model.Duplicable;
+import jpaoletti.jpm2.core.sysparam.SysparamType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,7 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "mail_senders_parameteres")
-public class MailSenderParameter extends JPMPersistentObject implements Duplicable {
+public class MailSenderParameter extends JPMPersistentObject implements Duplicable, EntityParameter {
 
     @Id()
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,6 +47,17 @@ public class MailSenderParameter extends JPMPersistentObject implements Duplicab
 
     public void setSender(MailSender sender) {
         this.sender = sender;
+    }
+
+    @Override
+    public ParameterizedEntity<?> getOwnerEntity() {
+        return sender;
+    }
+
+    /** No stored type hint: typing/secrecy comes from the catalog (kind "mail-sender"). */
+    @Override
+    public SysparamType getType() {
+        return null;
     }
 
     public String getName() {
