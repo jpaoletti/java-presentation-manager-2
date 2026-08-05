@@ -15,7 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Renders an {@link EntityParameter} value for list/show: plain for non-secret, masked ({@code ••••••}) for
+ * Renders an {@link EntityParameter} value for list/show: plain for non-secret, masked ({@code ******}) for
  * secret (secrecy resolved from the {@link EntityParameterCatalog} for the converter's {@code kind}). When
  * {@code reveal} is enabled (show scope) and the user holds {@link #REVEAL_AUTHORITY}, it adds an in-place eye
  * toggle showing the decrypted value. Mirror of {@code SysparamValueConverter}.
@@ -26,7 +26,7 @@ public class EntityParameterValueConverter extends Converter {
 
     /** Reuses the sysparam reveal authority so a single grant governs all secret reveals. */
     public static final String REVEAL_AUTHORITY = "jpm.sysparam.auth.revealSecret";
-    private static final String MASK = "&bull;&bull;&bull;&bull;&bull;&bull;";
+    private static final String MASK = "******";
     private static final String EMPTY = "-";
 
     private String kind;

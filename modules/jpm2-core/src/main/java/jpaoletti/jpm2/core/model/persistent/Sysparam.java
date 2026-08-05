@@ -165,7 +165,7 @@ public class Sysparam extends JPMPersistentObject implements Exportable, AuditMa
     @Transient
     public String getDisplayValue() {
         if (isSecret()) {
-            return (value == null) ? "" : "••••••";
+            return (value == null) ? "" : "******";
         }
         return value;
     }

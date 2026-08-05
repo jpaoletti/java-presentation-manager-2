@@ -39,7 +39,7 @@
         var field = '${field}';
         var childEntity = '${param.childEntity}';
         var root = ${empty epTreeJson ? '[]' : epTreeJson};
-        var mask = '••••••';
+        var mask = '******';
         var current = null;
 
         // Widen the field cell (drop the label column, like the weak converter).

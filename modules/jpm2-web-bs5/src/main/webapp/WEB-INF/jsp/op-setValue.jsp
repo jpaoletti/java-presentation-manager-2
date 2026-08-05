@@ -21,7 +21,7 @@
                                 <c:choose>
                                     <%-- Secret: masked password, never prefilled --%>
                                     <c:when test="${secret}">
-                                        <input type="password" name="value" id="sysparamValue" class="form-control" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;" />
+                                        <input type="password" name="value" id="sysparamValue" class="form-control" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" placeholder="******" />
                                         <small class="text-muted"><spring:message code="jpm.sysparam.secretHint" text="Leave blank to keep the current secret; type a new value to replace it." /></small>
                                     </c:when>
                                     <%-- Boolean: two radio options --%>

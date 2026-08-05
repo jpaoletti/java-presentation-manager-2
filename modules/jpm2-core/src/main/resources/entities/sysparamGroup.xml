@@ -63,7 +63,8 @@
                     <property name="id" value="sortOrder" />
                     <property name="width" value="90px" />
                     <property name="align" value="center" />
-                    <property name="configs" ref="editable-string-config" />
+                    <!-- Integer: con editable-string-config el WebEditString castea a String y rompe el edit. -->
+                    <property name="configs" ref="default-int-config" />
                 </bean>
             </list>
         </property>

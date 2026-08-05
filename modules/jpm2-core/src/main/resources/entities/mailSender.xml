@@ -159,13 +159,13 @@
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="" />
                                 <property name="title" value="" />
-                                <property name="blocks" value="6" />
+                                <property name="blocks" value="4" />
                                 <property name="fields" value="id name description senderType enabled"/>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.Panel">
                                 <property name="icon" value="" />
                                 <property name="title" value="" />
-                                <property name="blocks" value="6" />
+                                <property name="blocks" value="8" />
                                 <property name="fields" value="parameters"/>
                             </bean>
                         </list>

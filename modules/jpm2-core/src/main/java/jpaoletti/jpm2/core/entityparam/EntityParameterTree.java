@@ -19,7 +19,7 @@ import org.json.JSONObject;
  */
 public final class EntityParameterTree {
 
-    private static final String MASK = "••••••";
+    private static final String MASK = "******";
 
     private EntityParameterTree() {
     }

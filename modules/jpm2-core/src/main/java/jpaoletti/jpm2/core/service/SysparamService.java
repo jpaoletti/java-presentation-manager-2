@@ -553,12 +553,35 @@ public class SysparamService extends JPMServiceBase {
             params.sort(java.util.Comparator.comparing(p -> p.getKey() == null ? "" : p.getKey()));
             final org.json.JSONArray children = new org.json.JSONArray();
             for (Sysparam p : params) {
+                // Enrich each leaf with the metadata the inline editor needs (type/secret/allowed/
+                // default/current), mirroring EntityParameterTree so the tree edits in place instead
+                // of navigating to setValue. The catalog is the source of truth; fall back to the row.
+                final SysparamDef<?> def = catalog.defFor(p.getKey());
+                final boolean secret = catalog.isSecret(p.getKey()) || p.isSecret();
+                final String type = (def != null) ? def.getType().name()
+                        : (p.getType() != null ? p.getType().name() : SysparamType.STRING.name());
+                final org.json.JSONArray allowed = new org.json.JSONArray();
+                if (def != null) {
+                    for (String v : def.getAllowedValues()) {
+                        allowed.put(v);
+                    }
+                }
+                final org.json.JSONObject data = new org.json.JSONObject();
+                data.put("pid", p.getId());
+                data.put("name", p.getKey());
+                data.put("secret", secret);
+                data.put("type", type);
+                data.put("allowed", allowed);
+                data.put("def", def != null ? def.getDefaultRaw() : org.json.JSONObject.NULL);
+                // Never expose a secret's current value; show the plain value otherwise.
+                data.put("cur", secret ? "" : (p.getValue() == null ? "" : p.getValue()));
+
                 final org.json.JSONObject leaf = new org.json.JSONObject();
                 leaf.put("id", "p:" + p.getId());
                 leaf.put("text", escapeHtml(p.getKey())
                         + " <span class=\"text-muted\">= " + escapeHtml(truncate(p.getDisplayValue(), 60)) + "</span>");
-                leaf.put("icon", "fas fa-tag");
-                leaf.put("data", new org.json.JSONObject().put("pid", p.getId()));
+                leaf.put("icon", secret ? "fas fa-key" : "fas fa-tag");
+                leaf.put("data", data);
                 children.put(leaf);
             }
             final SysparamGroup sg = styles.get(g);

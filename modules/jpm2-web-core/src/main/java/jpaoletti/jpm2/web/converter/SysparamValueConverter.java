@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Renders a {@link Sysparam} value for list/show: plain for non-secret, masked
- * ({@code ••••••}) for secret. When {@code reveal} is enabled (show scope) and the current
+ * ({@code ******}) for secret. When {@code reveal} is enabled (show scope) and the current
  * user holds {@value #REVEAL_AUTHORITY}, it adds an in-place "eye" toggle that reveals the
  * decrypted value. This keeps everything inside the standard {@code show} operation — no
  * separate "effective value" operation needed.
@@ -24,7 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SysparamValueConverter extends Converter {
 
     public static final String REVEAL_AUTHORITY = "jpm.sysparam.auth.revealSecret";
-    private static final String MASK = "&bull;&bull;&bull;&bull;&bull;&bull;";
+    private static final String MASK = "******";
     /** Placeholder for an unset value: keeps the field non-empty so it still renders in show. */
     private static final String EMPTY = "-";
 

@@ -412,7 +412,7 @@ public class JPMUtils implements ApplicationContextAware {
      * nothing changed.
      */
     public static String buildAuditDiff(Entity entity, Object object, Map<String, Object> originalValues) {
-        final String mask = "••••••";
+        final String mask = "******";
         final boolean maskable = object instanceof jpaoletti.jpm2.core.model.AuditMaskable;
         final StringBuilder sb = new StringBuilder();
         for (Field field : entity.getAllFields(null)) {
