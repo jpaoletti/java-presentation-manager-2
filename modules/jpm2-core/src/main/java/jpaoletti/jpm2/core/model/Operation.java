@@ -48,6 +48,17 @@ public class Operation extends PMCoreObject {
     private String follows;
     //Conditional to show on others
     private OperationCondition condition;
+    /**
+     * i18n key of the message shown instead of the generic access denied one
+     * when the condition is not met. The condition itself may override it
+     * throwing a ConditionNotMetException with its own key.
+     */
+    private String deniedMessageKey;
+    /**
+     * Id of another operation of the same entity, linked from the denial page
+     * when the condition is not met, so the user has somewhere to go back to.
+     */
+    private String deniedGoToOperation;
     private boolean available;
     //Display a compact visual representation, usually an icon without text
     private boolean compact; //Default: false
@@ -115,6 +126,22 @@ public class Operation extends PMCoreObject {
 
     public void setCondition(OperationCondition condition) {
         this.condition = condition;
+    }
+
+    public String getDeniedMessageKey() {
+        return deniedMessageKey;
+    }
+
+    public void setDeniedMessageKey(String deniedMessageKey) {
+        this.deniedMessageKey = deniedMessageKey;
+    }
+
+    public String getDeniedGoToOperation() {
+        return deniedGoToOperation;
+    }
+
+    public void setDeniedGoToOperation(String deniedGoToOperation) {
+        this.deniedGoToOperation = deniedGoToOperation;
     }
 
     public String getFollows() {

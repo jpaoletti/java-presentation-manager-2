@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.exception.ConditionNotMetException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.message.Message;
@@ -210,8 +211,16 @@ public class BaseController {
         getContext().getContextualEntity().checkAuthorization();
         operation.checkAuthorization();
         if (operation.getCondition() != null) {
-            if (!operation.getCondition().check(instance, operation, null)) {
-                throw new NotAuthorizedException();
+            try {
+                //A condition may also throw a ConditionNotMetException with its own message
+                if (!operation.getCondition().check(instance, operation, null)) {
+                    throw new ConditionNotMetException(operation.getDeniedMessageKey());
+                }
+            } catch (ConditionNotMetException e) {
+                if (e.getGoToOperation() == null) {
+                    e.goTo(operation.getDeniedGoToOperation());
+                }
+                throw e;
             }
         }
     }
