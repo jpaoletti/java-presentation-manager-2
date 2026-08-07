@@ -348,8 +348,10 @@ public class ExecutorsController extends BaseController implements Observer {
     @MessageMapping("/asynchronicOperationExecutorProgress")
     public void asynchronicOperationExecutorProgress(MsgId message) throws Exception {
         final String id = message.toString();
-        if (getJpm().getAsynchronicOperationExecutor(id) != null) {
-            getJpm().getAsynchronicOperationExecutor(id).addObserver(this);
+        final AsynchronicOperationExecutor executor = getJpm().getAsynchronicOperationExecutor(id);
+        if (executor != null) {
+            executor.addObserver(this);
+            template.convertAndSend("/asynchronicOperationExecutor/progress/" + id, executor.getProgress());
         }
     }
 

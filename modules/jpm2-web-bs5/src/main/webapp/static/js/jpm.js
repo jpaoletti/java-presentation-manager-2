@@ -1128,7 +1128,7 @@ function asynchronicOperationProgress(id) {
                     $(".asynchronic").addClass('disabled');
                     var id = "#asynchronicProgress";
                     var r = JSON.parse(s.body);
-                    $(id).show();
+                    $(id).removeClass('d-none').show();
                     $(id + " > .progress-bar").css("width", (Math.round(r.percent * 100) / 100) + "%");
                     $(id + "_status").text((Math.round(r.percent * 100) / 100) + "% (" + r.status + ")");
                 });
@@ -1156,7 +1156,7 @@ function asynchronicOperationProgress(id) {
                             }, 2000);
                         }
                     }
-                    $("#asynchronicProgress").hide();
+                    $("#asynchronicProgress").addClass('d-none').hide();
                     $(".asynchronic").removeClass('disabled');
                 });
                 stompClient.send("/jpm/asynchronicOperationExecutorProgress", {}, JSON.stringify({'id': id}));
