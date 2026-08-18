@@ -40,10 +40,11 @@ public class MailSenderService extends JPMServiceBase {
         final Session session = getSessionFactory().openSession();
         TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
         try {
-            final List list = mailSenderDAO.list(null);
-            list.stream().forEach(o -> {
-                reload((MailSender) o);
-            });
+            final List<?> list = mailSenderDAO.list(null);
+            list.stream()
+                    .map(MailSender.class::cast)
+                    .filter(MailSender::isEnabled)
+                    .forEach(this::reload);
         } catch (Exception e) {
             JPMUtils.getLogger().warn("No se pudieron cargar los enviadores de mails. "
                     + "El servicio queda sin enviadores hasta ejecutar la migracion y recargar.", e);
@@ -89,6 +90,11 @@ public class MailSenderService extends JPMServiceBase {
     }
 
     public void reload(MailSender mailSender) {
+        if (!mailSender.isEnabled()) {
+            senders.remove(mailSender.getName());
+            JPMUtils.getLogger().info("Deshabilitando enviador de mail '" + mailSender.getDescription() + "'");
+            return;
+        }
         senders.put(mailSender.getName(), mailSender.getSenderType().build(mailSender.getParameterMap()));
         JPMUtils.getLogger().info("Iniciando enviador de mail '" + mailSender.getDescription() + "'");
     }

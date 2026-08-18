@@ -15,6 +15,12 @@ public enum MailSenderType {
         public GeneralMailSender build(Map<String, String> parameters) {
             return new SMTPMailSender(parameters);
         }
+    },
+    DUMMY {
+        @Override
+        public GeneralMailSender build(Map<String, String> parameters) {
+            return new DummyMailSender(parameters);
+        }
     };
 
     public abstract GeneralMailSender build(Map<String, String> parameters);

@@ -7,10 +7,9 @@ import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
 
 /**
  * Fixed parameter catalog (kind {@code "mail-sender"}) for {@link MailSender}: the SMTP connection and message
- * settings the sender reads (see {@code SMTPMailSender#getMailConfig}). It is FLAT — there is a single mail
- * backend (SMTP) and its parameters do not vary by type — so there is no per-type composition. The
- * {@code password} is a secret (encrypted at rest, masked); the rest are plain, with the defaults the sender
- * uses in code. Types deduced; adjust as needed.
+ * settings read by {@code SMTPMailSender}. The {@code DUMMY} sender ignores these parameters. The
+ * {@code password} is a secret (encrypted at rest, masked); the rest are plain, with the defaults the SMTP
+ * sender uses in code.
  *
  * @author jpaoletti
  */
