@@ -3,6 +3,12 @@
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <c:set var="epJsonKey" value="epTreeJson_${field}" />
 <c:set var="epTreeJson" value="${requestScope[epJsonKey]}" />
+<%-- Whether the current user may actually set a value; if not, the editor stays read-only
+     (the tree still lets them browse values). Mirrors the setEntityParameterValue op auth key. --%>
+<c:set var="epCanEdit" value="false" />
+<security:authorize access="hasAnyAuthority('jpm.auth.operation.${param.childEntity}.setEntityParameterValue')">
+    <c:set var="epCanEdit" value="true" />
+</security:authorize>
 <security:authorize access="hasAnyAuthority('${param.weakAuth}')">
     <div class="mb-2">
         <a class="btn btn-info btn-sm text-light" href="${cp}jpm/${contextualEntity}/${param.ownerId}/${param.childEntity}${param.context}/list">
@@ -40,6 +46,7 @@
         var childEntity = '${param.childEntity}';
         var root = ${empty epTreeJson ? '[]' : epTreeJson};
         var mask = '******';
+        var canEdit = ${epCanEdit};
         var current = null;
 
         // Widen the field cell (drop the label column, like the weak converter).
@@ -88,12 +95,22 @@
             return $('#epvalue-' + field).val();
         }
 
+        // Read-only rendering when the user lacks the setEntityParameterValue authority: show the
+        // current value (masked for secrets) and a note, with no editable input.
+        function buildReadonly(d) {
+            var v = d.secret ? mask : (d.cur == null || d.cur === '' ? '&mdash;' : esc(d.cur));
+            return '<div class="form-control-plaintext">' + v + '</div>'
+                + '<small class="text-muted"><i class="fas fa-lock"></i> '
+                + '<spring:message code="jpm.entityparam.tree.readonly" text="You do not have permission to modify this value." /></small>';
+        }
+
         function openEditor(d) {
             current = d;
-            $('#epmsg-' + field).text('');
+            $('#epmsg-' + field).removeClass('text-success text-danger').text('');
             $('#eptitle-' + field).text(d.name);
-            $('#epinput-' + field).html(buildInput(d));
-            $('#epdefault-' + field).toggle(d.def != null && d.def !== '');
+            $('#epinput-' + field).html(canEdit ? buildInput(d) : buildReadonly(d));
+            $('#epsave-' + field).toggle(canEdit);
+            $('#epdefault-' + field).toggle(canEdit && d.def != null && d.def !== '');
             $('#epempty-' + field).hide();
             $('#epeditor-' + field).show();
         }
@@ -129,7 +146,7 @@
         });
 
         $('#epsave-' + field).on('click', function () {
-            if (current == null) { return; }
+            if (current == null || !canEdit) { return; }
             var val = readValue(current);
             var d = current;
             var url = '${cp}jpm/' + childEntity + '/' + d.pid + '/setEntityParameterValue.exec';

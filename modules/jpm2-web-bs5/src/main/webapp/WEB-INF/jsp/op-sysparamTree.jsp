@@ -6,6 +6,11 @@
     </head>
     <jpm:jpm-body>
         <jpm:jpm-item-operation>
+            <%-- Whether the user may set a value; otherwise the editor stays read-only (browse only). --%>
+            <c:set var="spCanEdit" value="false" />
+            <security:authorize access="hasAnyAuthority('jpm.auth.operation.sysparam.setValue')">
+                <c:set var="spCanEdit" value="true" />
+            </security:authorize>
             <div class="row">
                 <div class="col-lg-6 col-md-6">
                     <input type="text" id="sysparamTreeSearch" class="form-control form-control-sm mb-2"
@@ -40,6 +45,7 @@
             $('<link href="${cp}static/node_modules/jstree/dist/themes/default/style.min.css" rel="stylesheet">').appendTo("head");
             var root = ${treeJson};
             var mask = '******';
+            var canEdit = ${spCanEdit};
             var current = null;
 
             function esc(s) {
@@ -84,12 +90,22 @@
                 return $('#spValue').val();
             }
 
+            // Read-only rendering when the user lacks the setValue authority: show the current
+            // value (masked for secrets) and a note, with no editable input.
+            function buildReadonly(d) {
+                var v = d.secret ? mask : (d.cur == null || d.cur === '' ? '&mdash;' : esc(d.cur));
+                return '<div class="form-control-plaintext">' + v + '</div>'
+                    + '<small class="text-muted"><i class="fas fa-lock"></i> '
+                    + '<spring:message code="jpm.entityparam.tree.readonly" text="You do not have permission to modify this value." /></small>';
+            }
+
             function openEditor(d) {
                 current = d;
                 $('#spMsg').removeClass('text-success text-danger').text('');
                 $('#spTitle').text(d.name);
-                $('#spInput').html(buildInput(d));
-                $('#spDefault').toggle(d.def != null && d.def !== '');
+                $('#spInput').html(canEdit ? buildInput(d) : buildReadonly(d));
+                $('#spSave').toggle(canEdit);
+                $('#spDefault').toggle(canEdit && d.def != null && d.def !== '');
                 $('#spEmpty').hide();
                 $('#spEditor').show();
             }
@@ -125,7 +141,7 @@
             });
 
             $('#spSave').on('click', function () {
-                if (current == null) { return; }
+                if (current == null || !canEdit) { return; }
                 var val = readValue(current);
                 var d = current;
                 // Route through the sysparam setValue executor so validation, encryption (secrets),
