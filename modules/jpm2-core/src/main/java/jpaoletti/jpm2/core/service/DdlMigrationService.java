@@ -66,7 +66,23 @@ public class DdlMigrationService {
     private static final String BASELINE_STATEMENT = "(baseline from legacy database-revision)";
     private static final int MAX_DIAGNOSTIC_SAMPLES = 10;
 
-    public void sync() throws Exception {
+    /**
+     * Best-effort boot hook: migration problems are reported but never prevent the application
+     * context from starting. Ambiguous histories still stop SQL execution for safety.
+     */
+    public void sync() {
+        try {
+            doSync();
+        } catch (IllegalStateException e) {
+            JPMUtils.getLogger().warn("DDL migration: se omite la sincronizacion y el arranque continua: "
+                    + e.getMessage());
+        } catch (Exception e) {
+            JPMUtils.getLogger().warn(
+                    "DDL migration: fallo inesperado; se omite la sincronizacion y el arranque continua", e);
+        }
+    }
+
+    void doSync() throws Exception {
         final InputStream is = getClass().getClassLoader().getResourceAsStream(RESOURCE);
         if (is == null) {
             JPMUtils.getLogger().warn("DDL migration: no se encontro '" + RESOURCE + "' en el classpath; nada que aplicar");
@@ -210,7 +226,7 @@ public class DdlMigrationService {
         try {
             migrations = readMigrations();
         } catch (java.io.IOException e) {
-            JPMUtils.getLogger().error("DDL migration: error leyendo " + RESOURCE, e);
+            JPMUtils.getLogger().warn("DDL migration: error leyendo " + RESOURCE + "; no se aplicaran migraciones", e);
             return;
         }
         final int effectiveCurrent = reconcileLegacyRevisionNumbers(conn, current, migrations);
@@ -266,8 +282,8 @@ public class DdlMigrationService {
 
     /**
      * Recovers the effective revision for histories written by the old {@code rev++} algorithm.
-     * Matching is exact and O(script blocks + history rows); ambiguous or unknown rows fail closed
-     * before any pending SQL is executed.
+     * Matching is exact and O(script blocks + history rows); ambiguous or unknown rows stop pending
+     * SQL execution, while {@link #sync()} converts that condition to a warning so boot continues.
      */
     int reconcileLegacyRevisionNumbers(Connection conn, int current, List<MigrationBlock> migrations) throws SQLException {
         final long startedAt = System.currentTimeMillis();
@@ -507,7 +523,7 @@ public class DdlMigrationService {
             ps.setLong(6, durationMs);
             ps.executeUpdate();
         } catch (SQLException e) {
-            JPMUtils.getLogger().error(String.format("DDL migration: no se pudo registrar la revision %d en el historial", revision), e);
+            JPMUtils.getLogger().warn(String.format("DDL migration: no se pudo registrar la revision %d en el historial", revision), e);
         }
     }
 

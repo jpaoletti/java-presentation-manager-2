@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,14 +20,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DdlMigrationServiceTest {
+
+    @Test
+    public void ambiguousHistoryNeverBlocksApplicationStartup() throws Exception {
+        final DdlMigrationService service = spy(new DdlMigrationService());
+        doThrow(new IllegalStateException("ambiguous history")).when(service).doSync();
+
+        assertDoesNotThrow(service::sync);
+    }
+
+    @Test
+    public void unexpectedMigrationFailureNeverBlocksApplicationStartup() throws Exception {
+        final DdlMigrationService service = spy(new DdlMigrationService());
+        doThrow(new SQLException("database unavailable")).when(service).doSync();
+
+        assertDoesNotThrow(service::sync);
+    }
 
     @Test
     public void runTemporarilyDisablesAndRestoresAutoCommit() throws Exception {
