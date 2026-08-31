@@ -7,12 +7,16 @@ import javax.transaction.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.Exportable;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
+import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.model.OperationValidator;
 import jpaoletti.jpm2.core.model.Progress;
+import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.core.service.executors.OperationExecutorSimple;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -25,6 +29,11 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
  * Generic import executor: reads a JSON array (from an uploaded {@code .json} file
  * or a pasted textarea in {@code op-import.jsp}) and creates one entity per item by
  * calling {@link Exportable#importData(String)}, saving and auditing each one.
+ * <p>
+ * When the import operation declares a {@code validator}, every imported item is
+ * checked with it before being saved, so an item coming from a file is subject to
+ * the very same consistency rules as one typed in the add form. A rejected item
+ * aborts the whole import (the executor is transactional).
  *
  * @author jpaoletti
  */
@@ -69,6 +78,7 @@ public class ImportExec extends OperationExecutorSimple {
             Exportable exportable = createExportable();
             exportable.importData(object.toString());
             applyOwner(ctx, parameters, exportable);
+            validate(ctx, exportable, i + 1);
             ctx.getEntity().getDao().save(exportable);
             final String newId = ctx.getEntity().getDao().getId(exportable).toString();
             getJpm().audit(ctx.getEntity(), ctx.getOperation(), new IdentifiedObject(newId, exportable));
@@ -77,6 +87,33 @@ public class ImportExec extends OperationExecutorSimple {
 
         ctx.setGlobalMessage(MessageFactory.success("export.import.success", Integer.toString(imported)));
         return null;
+    }
+
+    /**
+     * Applies the operation validator, if any, to an item about to be imported.
+     *
+     * @param ctx current context
+     * @param exportable the item already populated from the JSON
+     * @param itemNumber 1 based position of the item inside the array, for the error message
+     * @throws PMException when the validator rejects the item
+     */
+    private void validate(JPMContext ctx, Exportable exportable, int itemNumber) throws PMException {
+        final Operation operation = ctx.getOperation();
+        final OperationValidator validator = (operation != null) ? operation.getValidator() : null;
+        if (validator == null) {
+            return;
+        }
+        try {
+            validator.validate(exportable);
+        } catch (ValidationException exception) {
+            final Message msg = exception.getMsg();
+            if (msg == null) {
+                throw new PMException(MessageFactory.error("export.import.itemRejected",
+                        Integer.toString(itemNumber)), exception);
+            }
+            throw new PMException(MessageFactory.error("export.import.invalidItemValidation",
+                    Integer.toString(itemNumber), msg.getText()), exception);
+        }
     }
 
     private String resolveJson(Map parameters) throws PMException {
