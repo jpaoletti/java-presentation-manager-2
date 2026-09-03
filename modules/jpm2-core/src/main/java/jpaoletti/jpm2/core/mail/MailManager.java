@@ -10,6 +10,7 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Part;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.AddressException;
@@ -17,6 +18,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -77,39 +79,7 @@ public class MailManager {
         final String user = getConfig().getUser();
         final Boolean auth = getConfig().isAuth();
         final Session session = getNewSession(user, auth);
-        final MimeMessage msg = initBasicMessage(session, mail.getReplyTo(), mail.getTo(), mail.getSubject());
-        if (mail.getCc() != null) {
-            msg.setRecipients(Message.RecipientType.CC, getAddress(mail.getCc()));
-        }
-        if (mail.getCco() != null) {
-            msg.setRecipients(Message.RecipientType.BCC, getAddress(mail.getCco()));
-        }
-        if (mail.getAttachs() != null || mail.getTextbody() != null) {
-            final Multipart multipart = new MimeMultipart("alternative");
-            // HTML version
-            final MimeBodyPart htmlPart = new MimeBodyPart();
-            htmlPart.setContent(mail.getBody(), "text/html; charset=UTF-8");
-
-            if (mail.getTextbody() != null) {
-                // Unformatted text version
-                final MimeBodyPart textPart = new MimeBodyPart();
-                textPart.setContent(mail.getTextbody(), "text/plain; charset=UTF-8");
-                multipart.addBodyPart(textPart);
-            }
-            if (mail.getAttachs() != null) {
-                for (File file : mail.getAttachs()) {
-                    final MimeBodyPart part = new MimeBodyPart();
-                    final DataSource source = new FileDataSource(file);
-                    part.setDataHandler(new DataHandler(source));
-                    part.setFileName(file.getName());
-                    multipart.addBodyPart(part);
-                }
-            }
-            multipart.addBodyPart(htmlPart);
-            msg.setContent(multipart);
-        } else {
-            msg.setContent(mail.getBody(), "text/html; charset=UTF-8");
-        }
+        final MimeMessage msg = buildMessage(session, mail);
 
         // Signing
         /*if (mail.getDkimSignTemplate() != null) {
@@ -138,39 +108,104 @@ public class MailManager {
     }
 
     /**
+     * Builds a message without sending it, keeping MIME composition testable
+     * without requiring an SMTP server.
+     *
+     * @param session mail session
+     * @param mail message data
+     * @return the composed MIME message
+     * @throws MessagingException if the message cannot be composed
+     */
+    protected MimeMessage buildMessage(Session session, Mail mail) throws MessagingException {
+        final MimeMessage msg = initBasicMessage(
+                session, mail.getReplyTo(), mail.getTo(), mail.getSubject());
+        if (mail.getCc() != null) {
+            msg.setRecipients(Message.RecipientType.CC, getAddress(mail.getCc()));
+        }
+        if (mail.getCco() != null) {
+            msg.setRecipients(Message.RecipientType.BCC, getAddress(mail.getCco()));
+        }
+
+        final boolean hasTextBody = mail.getTextbody() != null;
+        final boolean hasAttachments = mail.getAttachs() != null && mail.getAttachs().length > 0;
+        final boolean hasInlineAttachments = !mail.getInlineAttachments().isEmpty();
+        if (!hasTextBody && !hasAttachments && !hasInlineAttachments) {
+            msg.setContent(mail.getBody(), "text/html; charset=UTF-8");
+            return msg;
+        }
+
+        final MimeBodyPart htmlPart = new MimeBodyPart();
+        htmlPart.setContent(mail.getBody(), "text/html; charset=UTF-8");
+        MimeBodyPart htmlRepresentation = htmlPart;
+        MimeMultipart related = null;
+        if (hasInlineAttachments) {
+            related = new MimeMultipart("related");
+            related.addBodyPart(htmlPart);
+            for (InlineAttachment attachment : mail.getInlineAttachments()) {
+                related.addBodyPart(buildInlineAttachment(attachment));
+            }
+            htmlRepresentation = wrap(related);
+        }
+
+        MimeMultipart alternative = null;
+        MimeBodyPart bodyRepresentation = htmlRepresentation;
+        if (hasTextBody) {
+            alternative = new MimeMultipart("alternative");
+            final MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setContent(mail.getTextbody(), "text/plain; charset=UTF-8");
+            alternative.addBodyPart(textPart);
+            alternative.addBodyPart(htmlRepresentation);
+            bodyRepresentation = wrap(alternative);
+        }
+
+        if (hasAttachments) {
+            final MimeMultipart mixed = new MimeMultipart("mixed");
+            mixed.addBodyPart(bodyRepresentation);
+            for (File file : mail.getAttachs()) {
+                mixed.addBodyPart(buildFileAttachment(file));
+            }
+            msg.setContent(mixed);
+        } else if (alternative != null) {
+            msg.setContent(alternative);
+        } else {
+            msg.setContent(related);
+        }
+        return msg;
+    }
+
+    private MimeBodyPart buildInlineAttachment(InlineAttachment attachment) throws MessagingException {
+        final MimeBodyPart part = new MimeBodyPart();
+        final DataSource source = new ByteArrayDataSource(
+                attachment.getContent(), attachment.getContentType());
+        part.setDataHandler(new DataHandler(source));
+        part.setFileName(attachment.getFilename());
+        part.setDisposition(Part.INLINE);
+        part.setHeader("Content-ID", "<" + attachment.getContentId() + ">");
+        return part;
+    }
+
+    private MimeBodyPart buildFileAttachment(File file) throws MessagingException {
+        final MimeBodyPart part = new MimeBodyPart();
+        final DataSource source = new FileDataSource(file);
+        part.setDataHandler(new DataHandler(source));
+        part.setFileName(file.getName());
+        part.setDisposition(Part.ATTACHMENT);
+        return part;
+    }
+
+    private MimeBodyPart wrap(Multipart multipart) throws MessagingException {
+        final MimeBodyPart part = new MimeBodyPart();
+        part.setContent(multipart);
+        return part;
+    }
+
+    /**
      * Sends a mail with a single attached file.
      */
     public void send(String subject, String body, File attach, String... to) throws MessagingException {
-        final String user = getConfig().getUser();
-        final Boolean auth = getConfig().isAuth();
-        final Session session = getNewSession(user, auth);
-
-        // create a message
-        final MimeMessage msg = new MimeMessage(session);
-        try {
-            msg.setFrom(new InternetAddress(getConfig().getFrom(), getConfig().getFromName()));
-        } catch (UnsupportedEncodingException ex) {
-            msg.setFrom(new InternetAddress(getConfig().getFrom()));
-        }
-        msg.setRecipients(Message.RecipientType.TO, getAddress(to));
-        if (getAppname() != null) {
-            msg.setSubject("[" + getAppname() + "] " + subject);
-        } else {
-            msg.setSubject(subject);
-        }
-        msg.setSentDate(new Date());
-
-        MimeBodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent(body, "text/html");
-        final Multipart multipart = new MimeMultipart();
-        multipart.addBodyPart(messageBodyPart);
-        messageBodyPart = new MimeBodyPart();
-        final DataSource source = new FileDataSource(attach);
-        messageBodyPart.setDataHandler(new DataHandler(source));
-        messageBodyPart.setFileName(attach.getName());
-        multipart.addBodyPart(messageBodyPart);
-        msg.setContent(multipart);
-        sendMsg(session, getConfig(), msg);
+        final Mail mail = new Mail(subject, body, to);
+        mail.setAttachs(attach);
+        send(mail);
     }
 
     public void send(String subject, String body, String... to) throws MessagingException {

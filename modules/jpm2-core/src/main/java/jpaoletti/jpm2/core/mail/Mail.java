@@ -1,6 +1,10 @@
 package jpaoletti.jpm2.core.mail;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Value object describing a single email to be sent.
@@ -18,6 +22,7 @@ public class Mail {
     private String[] cc;
     private String[] cco;
     private File[] attachs;
+    private final List<InlineAttachment> inlineAttachments = new ArrayList<>();
 
     public Mail(String subject, String body, String... to) {
         this.subject = subject;
@@ -87,6 +92,24 @@ public class Mail {
 
     public void setAttachs(File... attachs) {
         this.attachs = attachs;
+    }
+
+    public List<InlineAttachment> getInlineAttachments() {
+        return Collections.unmodifiableList(inlineAttachments);
+    }
+
+    public void addInlineAttachment(String contentId, String filename, String contentType, byte[] content) {
+        addInlineAttachment(new InlineAttachment(contentId, filename, contentType, content));
+    }
+
+    public void addInlineAttachment(InlineAttachment attachment) {
+        Objects.requireNonNull(attachment, "attachment");
+        if (inlineAttachments.stream().anyMatch(existing
+                -> existing.getContentId().equalsIgnoreCase(attachment.getContentId()))) {
+            throw new IllegalArgumentException("Duplicated inline attachment contentId: "
+                    + attachment.getContentId());
+        }
+        inlineAttachments.add(attachment);
     }
 
     public String getReplyTo() {
