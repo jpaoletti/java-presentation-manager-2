@@ -15,7 +15,6 @@ import org.mockito.InOrder;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.contains;
@@ -189,13 +188,14 @@ public class DdlMigrationServiceTest {
     }
 
     @Test
-    public void revisionSequenceRejectsDuplicatesAndDescendingMarkers() {
+    public void revisionSequenceWarnsButKeepsDuplicatesAndDescendingMarkers() throws Exception {
         final DdlMigrationService service = new DdlMigrationService();
 
-        assertThrows(IllegalStateException.class, () -> service.readMigrations(
-                reader("-- @@ 10\nSELECT 1\n-- @@ 10\nSELECT 2")));
-        assertThrows(IllegalStateException.class, () -> service.readMigrations(
-                reader("-- @@ 20\nSELECT 1\n-- @@ 10\nSELECT 2")));
+        final List<DdlMigrationService.MigrationBlock> migrations = service.readMigrations(
+                reader("-- @@ 10\nSELECT 1\n-- @@ 10\nSELECT 2\n-- @@ 5\nSELECT 3"));
+
+        assertEquals(List.of(10, 10, 5), migrations.stream()
+                .map(DdlMigrationService.MigrationBlock::revision).toList());
     }
 
     @Test
@@ -212,26 +212,95 @@ public class DdlMigrationServiceTest {
     }
 
     @Test
-    public void reconciliationFailsClosedForUnknownHistoricalSql() throws Exception {
+    public void reconciliationWarnsAndKeepsNumericRevisionForUnknownHistoricalSql() throws Exception {
         final DdlMigrationService service = new DdlMigrationService();
         final List<DdlMigrationService.MigrationBlock> migrations = service.readMigrations(reader(
                 "-- @@ 10\nSELECT 10\n-- @@ 20\nSELECT 20"));
         final Connection conn = historyConnection(
                 new int[] {10, 11}, new String[] {"SELECT 10", "SELECT changed"});
 
-        assertThrows(IllegalStateException.class,
-                () -> service.reconcileLegacyRevisionNumbers(conn, 11, migrations));
+        assertEquals(11, service.reconcileLegacyRevisionNumbers(conn, 11, migrations));
     }
 
     @Test
-    public void reconciliationFailsClosedForAmbiguousRepeatedSql() throws Exception {
+    public void reconciliationWarnsAndKeepsNumericRevisionForAmbiguousRepeatedSql() throws Exception {
         final DdlMigrationService service = new DdlMigrationService();
         final List<DdlMigrationService.MigrationBlock> migrations = service.readMigrations(reader(
                 "-- @@ 10\nSELECT 1\n-- @@ 20\nSELECT 1"));
         final Connection conn = historyConnection(new int[] {11}, new String[] {"SELECT 1"});
 
-        assertThrows(IllegalStateException.class,
-                () -> service.reconcileLegacyRevisionNumbers(conn, 11, migrations));
+        assertEquals(11, service.reconcileLegacyRevisionNumbers(conn, 11, migrations));
+    }
+
+    @Test
+    public void ambiguousRevision1495DoesNotPreventRevision1496FromRunning() throws Exception {
+        final DdlMigrationService service = new DdlMigrationService();
+        final List<DdlMigrationService.MigrationBlock> migrations = service.readMigrations(reader(
+                "-- @@ 1495\nUPDATE expected_sql SET value = 1\n"
+                + "-- @@ 1496\nINSERT INTO example(value) VALUES (1496)"));
+        final Connection conn = mock(Connection.class);
+        final Statement historyQuery = mock(Statement.class);
+        final Statement revision1496 = mock(Statement.class);
+        final ResultSet history = mock(ResultSet.class);
+        final PreparedStatement historyInsert = mock(PreparedStatement.class);
+        when(conn.createStatement()).thenReturn(historyQuery, revision1496);
+        when(historyQuery.executeQuery("SELECT revision, statement FROM jpm_ddl_migration ORDER BY id"))
+                .thenReturn(history);
+        when(history.next()).thenReturn(true, false);
+        when(history.getInt(1)).thenReturn(1495);
+        when(history.getString(2)).thenReturn(
+                "UPDATE jpm_sysparam SET param_value = 'historical SQL not present in script'");
+        when(conn.prepareStatement(contains("INSERT INTO jpm_ddl_migration")))
+                .thenReturn(historyInsert);
+
+        service.applyMigrations(conn, 1495, migrations);
+
+        verify(revision1496).execute("INSERT INTO example(value) VALUES (1496)");
+        verify(historyInsert).setInt(1, 1496);
+        verify(conn).commit();
+    }
+
+    @Test
+    public void failedRevision1495DoesNotPreventRevision1496FromRunning() throws Exception {
+        final DdlMigrationService service = new DdlMigrationService();
+        final List<DdlMigrationService.MigrationBlock> migrations = service.readMigrations(reader(
+                "-- @@ 1495\nUPDATE broken_table SET value = 1\n"
+                + "-- @@ 1496\nINSERT INTO example(value) VALUES (1496)"));
+        final Connection conn = mock(Connection.class);
+        final Statement historyQuery = mock(Statement.class);
+        final Statement revision1495 = mock(Statement.class);
+        final Statement revision1496 = mock(Statement.class);
+        final ResultSet emptyHistory = mock(ResultSet.class);
+        final PreparedStatement historyInsert = mock(PreparedStatement.class);
+        when(conn.createStatement()).thenReturn(historyQuery, revision1495, revision1496);
+        when(historyQuery.executeQuery("SELECT revision, statement FROM jpm_ddl_migration ORDER BY id"))
+                .thenReturn(emptyHistory);
+        when(emptyHistory.next()).thenReturn(false);
+        when(revision1495.execute("UPDATE broken_table SET value = 1"))
+                .thenThrow(new SQLException("expected failure"));
+        when(conn.prepareStatement(contains("INSERT INTO jpm_ddl_migration")))
+                .thenReturn(historyInsert);
+
+        service.applyMigrations(conn, 1494, migrations);
+
+        verify(revision1495).execute("UPDATE broken_table SET value = 1");
+        verify(revision1496).execute("INSERT INTO example(value) VALUES (1496)");
+        verify(conn).rollback();
+        verify(historyInsert, times(2)).executeUpdate();
+        verify(conn, times(2)).commit();
+    }
+
+    @Test
+    public void malformedMarkerSkipsOnlyItsBlockAndKeepsFollowingRevisions() throws Exception {
+        final List<DdlMigrationService.MigrationBlock> migrations =
+                new DdlMigrationService().readMigrations(reader(
+                        "-- @@ 1495\nSELECT 1495\n"
+                        + "-- @@ invalid\nBROKEN SQL\n"
+                        + "-- @@ 1496\nSELECT 1496"));
+
+        assertEquals(List.of(1495, 1496), migrations.stream()
+                .map(DdlMigrationService.MigrationBlock::revision).toList());
+        assertEquals("SELECT 1496", migrations.get(1).statement());
     }
 
     @Test

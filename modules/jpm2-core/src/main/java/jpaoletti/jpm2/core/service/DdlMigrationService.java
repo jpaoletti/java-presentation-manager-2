@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  *   <li>is cluster-safe via a MySQL advisory lock so two instances booting at once do not
  *       apply migrations concurrently;</li>
  *   <li>reconciles histories written by the legacy sequential-number bug by exact SQL match,
- *       failing closed when a historical row cannot be mapped unambiguously.</li>
+ *       warning and continuing when a historical row cannot be mapped unambiguously.</li>
  * </ul>
  *
  * <p>Everything runs on a single JDBC connection (via {@link Session#doWork}) so the advisory
@@ -59,7 +59,7 @@ public class DdlMigrationService {
     private SessionFactory sessionFactory;
 
     /** Marker prefix; a revision line looks like {@code -- @@ 1234}. */
-    private static final String SYNC_DB_START_TOKEN = "-- @";
+    private static final String SYNC_DB_START_TOKEN = "-- @@";
     private static final String RESOURCE = "database.sql";
     private static final String LOCK_NAME = "jpm_ddl_migration";
     private static final int LOCK_TIMEOUT_SECONDS = 60;
@@ -68,7 +68,7 @@ public class DdlMigrationService {
 
     /**
      * Best-effort boot hook: migration problems are reported but never prevent the application
-     * context from starting. Ambiguous histories still stop SQL execution for safety.
+     * context from starting. Ambiguous history rows are ignored so later revisions can run.
      */
     public void sync() {
         try {
@@ -229,10 +229,30 @@ public class DdlMigrationService {
             JPMUtils.getLogger().warn("DDL migration: error leyendo " + RESOURCE + "; no se aplicaran migraciones", e);
             return;
         }
-        final int effectiveCurrent = reconcileLegacyRevisionNumbers(conn, current, migrations);
+        applyMigrations(conn, current, migrations);
+    }
+
+    /** Applies every block newer than the best revision that can be inferred from history. */
+    void applyMigrations(Connection conn, int current, List<MigrationBlock> migrations) {
+        int effectiveCurrent = current;
+        try {
+            effectiveCurrent = reconcileLegacyRevisionNumbers(conn, current, migrations);
+        } catch (Exception e) {
+            JPMUtils.getLogger().warn(String.format(
+                    "DDL migration: no se pudo reconciliar el historial; se continuara desde "
+                    + "la revision %d", current), e);
+            rollbackQuietly(conn);
+        }
         for (MigrationBlock migration : migrations) {
             if (migration.revision() > effectiveCurrent) {
-                executeOne(conn, migration.revision(), migration.statement());
+                try {
+                    executeOne(conn, migration.revision(), migration.statement());
+                } catch (Exception e) {
+                    JPMUtils.getLogger().warn(String.format(
+                            "DDL migration: revision %d no pudo completarse; se continua con "
+                            + "la siguiente", migration.revision()), e);
+                    rollbackQuietly(conn);
+                }
             }
         }
     }
@@ -258,10 +278,18 @@ public class DdlMigrationService {
         while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (line.startsWith(SYNC_DB_START_TOKEN)) {
-                final int nextRevision = revisionOf(line);
+                final Integer nextRevision = revisionOfOrNull(line);
+                if (nextRevision == null) {
+                    if (revision != null) {
+                        migrations.add(new MigrationBlock(revision, sql.toString().trim()));
+                    }
+                    revision = null;
+                    sql = new StringBuilder();
+                    continue;
+                }
                 if (previous != null && nextRevision <= previous) {
-                    throw new IllegalStateException(String.format(
-                            "DDL migration: revisiones fuera de orden: %d seguida de %d",
+                    JPMUtils.getLogger().warn(String.format(
+                            "DDL migration: revisiones fuera de orden: %d seguida de %d; se continua",
                             previous, nextRevision));
                 }
                 if (revision != null) {
@@ -282,8 +310,8 @@ public class DdlMigrationService {
 
     /**
      * Recovers the effective revision for histories written by the old {@code rev++} algorithm.
-     * Matching is exact and O(script blocks + history rows); ambiguous or unknown rows stop pending
-     * SQL execution, while {@link #sync()} converts that condition to a warning so boot continues.
+     * Matching is exact and O(script blocks + history rows). Ambiguous or unknown rows are warned
+     * and ignored so later revisions can still run.
      */
     int reconcileLegacyRevisionNumbers(Connection conn, int current, List<MigrationBlock> migrations) throws SQLException {
         final long startedAt = System.currentTimeMillis();
@@ -345,10 +373,11 @@ public class DdlMigrationService {
 
         final long durationMs = System.currentTimeMillis() - startedAt;
         if (uncertain > 0) {
-            throw new IllegalStateException(String.format(
+            JPMUtils.getLogger().warn(String.format(
                     "DDL migration: historial incompatible o ambiguo (%d de %d filas, %d ms); "
-                    + "no se ejecutara SQL. Casos: %s",
-                    uncertain, historyRows, durationMs, String.join(" | ", uncertainSamples)));
+                    + "se continuara desde la revision efectiva %d. Casos: %s",
+                    uncertain, historyRows, durationMs, effectiveCurrent,
+                    String.join(" | ", uncertainSamples)));
         }
         if (recovered > 0) {
             JPMUtils.getLogger().warn(String.format(
@@ -529,7 +558,17 @@ public class DdlMigrationService {
 
     /** Parses the revision number from a marker line such as {@code -- @@ 1234}. */
     private int revisionOf(String markerLine) {
-        return Integer.parseInt(markerLine.substring(SYNC_DB_START_TOKEN.length() + 1).trim());
+        return Integer.parseInt(markerLine.substring(SYNC_DB_START_TOKEN.length()).trim());
+    }
+
+    private Integer revisionOfOrNull(String markerLine) {
+        try {
+            return revisionOf(markerLine);
+        } catch (NumberFormatException e) {
+            JPMUtils.getLogger().warn("DDL migration: marcador invalido; se omite su bloque: "
+                    + markerLine);
+            return null;
+        }
     }
 
     record MigrationBlock(int revision, String statement) {
