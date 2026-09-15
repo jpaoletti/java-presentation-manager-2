@@ -3,6 +3,7 @@ package jpaoletti.jpm2.core.log;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,12 @@ import org.apache.logging.log4j.Logger;
  *       (e.g. global {@code 0} but channel {@code prisma=3}) without flooding the rest.</li>
  *   <li>A call at level {@code L} on a channel logs only when the effective level of that
  *       channel is {@code >= L}. Everything defaults to {@code 0} (off).</li>
+ *   <li>On top of that, a <b>scope</b> ({@link #pushScope(int, String)}) raises the effective
+ *       level for the current thread only, during one unit of work. It lets a caller that knows
+ *       something is worth tracing (a transaction of a product flagged for debugging, a single
+ *       request) light up every existing debug call of that thread without turning debugging on
+ *       for the whole system, and without touching a single call site. A scope only raises the
+ *       level, it never lowers what the global/channel configuration already enables.</li>
  * </ul>
  *
  * <p>Output flows through log4j2 loggers named {@code jpm.debug} (no channel) or
@@ -54,17 +61,42 @@ public final class DebugLog {
     private static final Entry GLOBAL = new Entry(0, 0L);
     private static final Map<String, Entry> CHANNELS = new ConcurrentHashMap<>();
 
+    /** A thread-local level elevation, with an optional label prefixed to the messages it enables. */
+    private static final class Scope {
+
+        final int level;
+        final String label;
+        final Scope parent;
+
+        Scope(int level, String label, Scope parent) {
+            this.level = level;
+            this.label = label;
+            this.parent = parent;
+        }
+    }
+
+    private static final ThreadLocal<Scope> SCOPE = new ThreadLocal<>();
+
+    /**
+     * Number of scopes open across all threads. It is the guard that keeps scopes free when nobody
+     * is debugging: while it is zero no thread-local lookup happens at all, so the cost of the
+     * feature on the normal path is a single volatile read.
+     */
+    private static final AtomicInteger ACTIVE_SCOPES = new AtomicInteger();
+
     private DebugLog() {
     }
 
     // ---- level resolution -------------------------------------------------
 
-    /** Effective global level (expiring it first if its TTL elapsed). */
+    /** Effective global level (expiring it first if its TTL elapsed), raised by the thread scope. */
     public static int level() {
-        return current(GLOBAL);
+        final int base = current(GLOBAL);
+        final int scoped = scopeLevel();
+        return scoped > base ? scoped : base;
     }
 
-    /** Effective level for a channel: its override if set, otherwise the global level. */
+    /** Effective level for a channel: its override if set, otherwise the global level; raised by the thread scope. */
     public static int level(String channel) {
         if (channel == null || channel.isEmpty()) {
             return level();
@@ -73,7 +105,8 @@ public final class DebugLog {
         if (e != null) {
             final int l = current(e);
             if (l > 0) {
-                return l;
+                final int scoped = scopeLevel();
+                return scoped > l ? scoped : l;
             }
             CHANNELS.remove(channel);
         }
@@ -86,6 +119,65 @@ public final class DebugLog {
             e.expiry = 0L;
         }
         return e.level;
+    }
+
+    // ---- thread scope -----------------------------------------------------
+
+    /**
+     * Raises the effective level for the current thread until the matching {@link #popScope()}.
+     * Scopes nest, so every call <b>must</b> be paired in a {@code finally} block:
+     *
+     * <pre>
+     * DebugLog.pushScope(level, "P:" + product.getId());
+     * try {
+     *     ...
+     * } finally {
+     *     DebugLog.popScope();
+     * }
+     * </pre>
+     *
+     * @param level level to guarantee within the scope, clamped to {@code [0, MAX_LEVEL]}
+     * @param label optional tag prefixed to every message the scope enables, to tell the trace of
+     * one unit of work apart from the rest of the log ({@code null} for none)
+     */
+    public static void pushScope(int level, String label) {
+        SCOPE.set(new Scope(clamp(level), label, SCOPE.get()));
+        ACTIVE_SCOPES.incrementAndGet();
+    }
+
+    /** Closes the innermost scope of the current thread, restoring the enclosing one. Null-safe. */
+    public static void popScope() {
+        final Scope scope = SCOPE.get();
+        if (scope == null) {
+            return;
+        }
+        if (scope.parent == null) {
+            SCOPE.remove();
+        } else {
+            SCOPE.set(scope.parent);
+        }
+        //Never below zero: if a thread-local were wiped from the outside (container thread cleanup)
+        //the counter would be the only thing left holding the fast path open.
+        ACTIVE_SCOPES.updateAndGet(open -> open > 0 ? open - 1 : 0);
+    }
+
+    /**
+     * Level of the innermost scope of the current thread, or {@code 0} when there is none. Callers
+     * that hand work over to another thread capture it here and re-open the scope on the other side.
+     */
+    public static int scopeLevel() {
+        final Scope scope = currentScope();
+        return scope == null ? 0 : scope.level;
+    }
+
+    /** Label of the innermost scope of the current thread, or {@code null} when there is none. */
+    public static String scopeLabel() {
+        final Scope scope = currentScope();
+        return scope == null ? null : scope.label;
+    }
+
+    private static Scope currentScope() {
+        return ACTIVE_SCOPES.get() == 0 ? null : SCOPE.get();
     }
 
     /** Whether the given channel would log at (or above) {@code level}. Useful to guard expensive blocks. */
@@ -116,7 +208,7 @@ public final class DebugLog {
 
     public static void debug(String channel, int level, Object message) {
         if (level >= 1 && level(channel) >= level) {
-            logger(channel).info(message);
+            emit(channel, message);
         }
     }
 
@@ -127,7 +219,17 @@ public final class DebugLog {
     /** Lazy variant: the supplier runs only when the channel actually logs. */
     public static void debug(String channel, int level, Supplier<?> message) {
         if (level >= 1 && level(channel) >= level) {
-            logger(channel).info(message == null ? null : message.get());
+            emit(channel, message == null ? null : message.get());
+        }
+    }
+
+    /** Writes the message, prefixed with the scope label when one is open. */
+    private static void emit(String channel, Object message) {
+        final Scope scope = currentScope();
+        if (scope != null && scope.label != null && !scope.label.isEmpty()) {
+            logger(channel).info("[{}] {}", scope.label, message);
+        } else {
+            logger(channel).info(message);
         }
     }
 
