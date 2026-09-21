@@ -24,6 +24,13 @@
             <list>
                 <ref bean="id-invisible" />
                 <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="tag" />
+                    <property name="width" value="100px" />
+                    <property name="align" value="center" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="read-only-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
                     <property name="id" value="revision" />
                     <property name="width" value="90px" />
                     <property name="align" value="center" />

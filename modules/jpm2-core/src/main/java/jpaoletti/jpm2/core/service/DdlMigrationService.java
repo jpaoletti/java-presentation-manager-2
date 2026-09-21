@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,9 +14,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -24,8 +29,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Applies the DDL of a classpath {@code database.sql} at boot, keeping the historical
- * {@code -- @@ N} marker format and semantics of the legacy {@code DBSyncService} (one statement
- * per marker, executed in file order, continue-on-error), but:
+ * {@code -- @@ N} marker format and semantics of the legacy {@code DBSyncService}, adding optional
+ * independent tagged sequences with {@code -- @@ TAG N} (one statement per marker, executed in
+ * file order, continue-on-error), but:
  *
  * <ul>
  *   <li>tracks the applied revision in its own {@code jpm_ddl_migration} history table
@@ -46,9 +52,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * If a block contains multiple top-level semicolon-delimited statements, only the first is
  * executed and the ignored remainder is reported as a warning.
  *
- * <p>First run after cutover: if the history table is empty, the starting revision is bridged
- * once from the legacy {@code configs.database-revision} row (read with raw SQL, tolerant to its
- * absence), so databases already migrated by the old runner are not replayed.
+ * <p>First run after cutover: if the history has no untagged sequence, its starting revision is
+ * bridged once from the legacy {@code configs.database-revision} row (read with raw SQL, tolerant
+ * to its absence), so databases already migrated by the old runner are not replayed.
  *
  * @author jpaoletti
  */
@@ -60,6 +66,9 @@ public class DdlMigrationService {
 
     /** Marker prefix; a revision line looks like {@code -- @@ 1234}. */
     private static final String SYNC_DB_START_TOKEN = "-- @@";
+    private static final String DEFAULT_TAG = "";
+    private static final int MAX_TAG_LENGTH = 64;
+    private static final Pattern TAG_PATTERN = Pattern.compile("[A-Za-z0-9_-]{1," + MAX_TAG_LENGTH + "}");
     private static final String RESOURCE = "database.sql";
     private static final String LOCK_NAME = "jpm_ddl_migration";
     private static final int LOCK_TIMEOUT_SECONDS = 60;
@@ -115,7 +124,7 @@ public class DdlMigrationService {
 
             ensureTable(conn);
             conn.commit();
-            final int current = getCurrentRevision(conn);
+            final Map<String, Integer> current = getCurrentRevisions(conn);
             conn.commit();
             applyPending(conn, current);
         } finally {
@@ -168,10 +177,11 @@ public class DdlMigrationService {
 
     // --- table + current revision -------------------------------------------
 
-    private void ensureTable(Connection conn) throws SQLException {
+    void ensureTable(Connection conn) throws SQLException {
         try (Statement st = conn.createStatement()) {
             st.execute("CREATE TABLE IF NOT EXISTS jpm_ddl_migration ("
                     + "id BIGINT NOT NULL AUTO_INCREMENT,"
+                    + "tag VARCHAR(64) NOT NULL DEFAULT '',"
                     + "revision INT NOT NULL,"
                     + "statement LONGTEXT,"
                     + "success CHAR(1) DEFAULT 'Y',"
@@ -179,29 +189,108 @@ public class DdlMigrationService {
                     + "applied_at DATETIME,"
                     + "duration_ms BIGINT,"
                     + "PRIMARY KEY (id),"
-                    + "UNIQUE KEY jpm_ddl_migration_revision_uq (revision)"
+                    + "UNIQUE KEY jpm_ddl_migration_tag_revision_uq (tag, revision)"
                     + ") ENGINE=InnoDB");
         }
+        upgradeHistoryTable(conn);
     }
 
-    /**
-     * Current revision = {@code MAX(revision)} of the history table. On an empty table, bridge
-     * once from the legacy {@code configs.database-revision} value (0 if absent) and record it as
-     * a baseline row so already-migrated databases are not replayed.
-     */
-    private int getCurrentRevision(Connection conn) throws SQLException {
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery("SELECT MAX(revision) FROM jpm_ddl_migration")) {
-            if (rs.next()) {
-                final int max = rs.getInt(1);
-                if (!rs.wasNull()) {
-                    return max;
+    /** Upgrades tables created by earlier versions without requiring an application DDL block. */
+    private void upgradeHistoryTable(Connection conn) throws SQLException {
+        final DatabaseMetaData metadata = conn.getMetaData();
+        final boolean hasTag = hasColumn(metadata, conn.getCatalog(), "tag");
+        final Map<String, List<String>> uniqueIndexes = uniqueIndexes(metadata, conn.getCatalog());
+        final List<String> legacyIndexes = new ArrayList<>();
+        boolean hasCompositeIndex = false;
+        for (Map.Entry<String, List<String>> index : uniqueIndexes.entrySet()) {
+            if (index.getValue().equals(List.of("revision"))) {
+                legacyIndexes.add(index.getKey());
+            } else if (index.getValue().equals(List.of("tag", "revision"))) {
+                hasCompositeIndex = true;
+            }
+        }
+        if (hasTag && legacyIndexes.isEmpty() && hasCompositeIndex) {
+            return;
+        }
+
+        final List<String> changes = new ArrayList<>();
+        if (!hasTag) {
+            changes.add("ADD COLUMN tag VARCHAR(64) NOT NULL DEFAULT '' AFTER id");
+        }
+        for (String index : legacyIndexes) {
+            changes.add("DROP INDEX " + quoteIdentifier(index));
+        }
+        if (!hasCompositeIndex) {
+            changes.add("ADD UNIQUE KEY jpm_ddl_migration_tag_revision_uq (tag, revision)");
+        }
+        try (Statement st = conn.createStatement()) {
+            st.execute("ALTER TABLE jpm_ddl_migration " + String.join(", ", changes));
+        }
+        JPMUtils.getLogger().info("DDL migration: historial actualizado para soportar secuencias por tag");
+    }
+
+    private boolean hasColumn(DatabaseMetaData metadata, String catalog, String column) throws SQLException {
+        for (String table : List.of("jpm_ddl_migration", "JPM_DDL_MIGRATION")) {
+            try (ResultSet rs = metadata.getColumns(catalog, null, table, null)) {
+                while (rs.next()) {
+                    if (column.equalsIgnoreCase(rs.getString("COLUMN_NAME"))) {
+                        return true;
+                    }
                 }
             }
         }
-        final int baseline = readLegacyRevision(conn);
-        record(conn, baseline, BASELINE_STATEMENT, true, null, 0L);
-        JPMUtils.getLogger().info(String.format("DDL migration: historial vacio, baseline en revision %d (legacy database-revision)", baseline));
-        return baseline;
+        return false;
+    }
+
+    private Map<String, List<String>> uniqueIndexes(DatabaseMetaData metadata, String catalog)
+            throws SQLException {
+        final Map<String, TreeMap<Short, String>> columnsByIndex = new LinkedHashMap<>();
+        for (String table : List.of("jpm_ddl_migration", "JPM_DDL_MIGRATION")) {
+            try (ResultSet rs = metadata.getIndexInfo(catalog, null, table, true, false)) {
+                while (rs.next()) {
+                    final String index = rs.getString("INDEX_NAME");
+                    final String column = rs.getString("COLUMN_NAME");
+                    if (index != null && column != null) {
+                        columnsByIndex.computeIfAbsent(index, ignored -> new TreeMap<>())
+                                .put(rs.getShort("ORDINAL_POSITION"), column.toLowerCase(Locale.ROOT));
+                    }
+                }
+            }
+            if (!columnsByIndex.isEmpty()) {
+                break;
+            }
+        }
+        final Map<String, List<String>> result = new LinkedHashMap<>();
+        columnsByIndex.forEach((name, columns) -> result.put(name, new ArrayList<>(columns.values())));
+        return result;
+    }
+
+    private String quoteIdentifier(String identifier) {
+        return "`" + identifier.replace("`", "``") + "`";
+    }
+
+    /**
+     * Current revision per tag. The empty tag alone is bridged once from the legacy
+     * {@code configs.database-revision} value so already-migrated databases are not replayed.
+     */
+    private Map<String, Integer> getCurrentRevisions(Connection conn) throws SQLException {
+        final Map<String, Integer> current = new HashMap<>();
+        try (Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT tag, MAX(revision) FROM jpm_ddl_migration GROUP BY tag")) {
+            while (rs.next()) {
+                current.merge(normalizeTag(rs.getString(1)), rs.getInt(2), Math::max);
+            }
+        }
+        if (!current.containsKey(DEFAULT_TAG)) {
+            final int baseline = readLegacyRevision(conn);
+            record(conn, DEFAULT_TAG, baseline, BASELINE_STATEMENT, true, null, 0L);
+            current.put(DEFAULT_TAG, baseline);
+            JPMUtils.getLogger().info(String.format(
+                    "DDL migration: secuencia sin tag inicializada en revision %d "
+                    + "(legacy database-revision)", baseline));
+        }
+        return current;
     }
 
     /** Reads the legacy {@code configs.database-revision}; returns 0 if the table/row is absent. */
@@ -221,7 +310,7 @@ public class DdlMigrationService {
 
     // --- apply -------------------------------------------------------------
 
-    private void applyPending(Connection conn, int current) throws SQLException {
+    private void applyPending(Connection conn, Map<String, Integer> current) throws SQLException {
         final List<MigrationBlock> migrations;
         try {
             migrations = readMigrations();
@@ -233,24 +322,25 @@ public class DdlMigrationService {
     }
 
     /** Applies every block newer than the best revision that can be inferred from history. */
-    void applyMigrations(Connection conn, int current, List<MigrationBlock> migrations) {
-        int effectiveCurrent = current;
+    void applyMigrations(Connection conn, Map<String, Integer> current, List<MigrationBlock> migrations) {
+        Map<String, Integer> effectiveCurrent = new HashMap<>(current);
         try {
             effectiveCurrent = reconcileLegacyRevisionNumbers(conn, current, migrations);
         } catch (Exception e) {
             JPMUtils.getLogger().warn(String.format(
                     "DDL migration: no se pudo reconciliar el historial; se continuara desde "
-                    + "la revision %d", current), e);
+                    + "las revisiones conocidas %s", current), e);
             rollbackQuietly(conn);
         }
         for (MigrationBlock migration : migrations) {
-            if (migration.revision() > effectiveCurrent) {
+            if (migration.revision() > effectiveCurrent.getOrDefault(migration.tag(), 0)) {
                 try {
-                    executeOne(conn, migration.revision(), migration.statement());
+                    executeOne(conn, migration.tag(), migration.revision(), migration.statement());
                 } catch (Exception e) {
                     JPMUtils.getLogger().warn(String.format(
-                            "DDL migration: revision %d no pudo completarse; se continua con "
-                            + "la siguiente", migration.revision()), e);
+                            "DDL migration: secuencia %s revision %d no pudo completarse; "
+                            + "se continua con la siguiente", sequenceLabel(migration.tag()),
+                            migration.revision()), e);
                     rollbackQuietly(conn);
                 }
             }
@@ -271,39 +361,45 @@ public class DdlMigrationService {
 
     List<MigrationBlock> readMigrations(BufferedReader reader) throws java.io.IOException {
         final List<MigrationBlock> migrations = new ArrayList<>();
-        Integer previous = null;
-        Integer revision = null;
+        final Map<String, Integer> previousByTag = new HashMap<>();
+        final Set<MigrationIdentity> seen = new HashSet<>();
+        MigrationMarker marker = null;
         StringBuilder sql = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (line.startsWith(SYNC_DB_START_TOKEN)) {
-                final Integer nextRevision = revisionOfOrNull(line);
-                if (nextRevision == null) {
-                    if (revision != null) {
-                        migrations.add(new MigrationBlock(revision, sql.toString().trim()));
-                    }
-                    revision = null;
-                    sql = new StringBuilder();
+                final MigrationMarker next = markerOfOrNull(line);
+                if (marker != null) {
+                    migrations.add(new MigrationBlock(marker.tag(), marker.revision(), sql.toString().trim()));
+                }
+                marker = null;
+                sql = new StringBuilder();
+                if (next == null) {
                     continue;
                 }
-                if (previous != null && nextRevision <= previous) {
+                final MigrationIdentity identity = new MigrationIdentity(next.tag(), next.revision());
+                if (!seen.add(identity)) {
                     JPMUtils.getLogger().warn(String.format(
-                            "DDL migration: revisiones fuera de orden: %d seguida de %d; se continua",
-                            previous, nextRevision));
+                            "DDL migration: marcador duplicado para secuencia %s revision %d; "
+                            + "se omite su bloque", sequenceLabel(next.tag()), next.revision()));
+                    continue;
                 }
-                if (revision != null) {
-                    migrations.add(new MigrationBlock(revision, sql.toString().trim()));
+                final Integer previous = previousByTag.get(next.tag());
+                if (previous != null && next.revision() <= previous) {
+                    JPMUtils.getLogger().warn(String.format(
+                            "DDL migration: revisiones fuera de orden en secuencia %s: %d seguida "
+                            + "de %d; se continua", sequenceLabel(next.tag()), previous,
+                            next.revision()));
                 }
-                previous = nextRevision;
-                revision = nextRevision;
-                sql = new StringBuilder();
-            } else if (revision != null && !line.startsWith("--")) {
+                previousByTag.put(next.tag(), next.revision());
+                marker = next;
+            } else if (marker != null && !line.startsWith("--")) {
                 sql.append(line).append('\n');
             }
         }
-        if (revision != null) {
-            migrations.add(new MigrationBlock(revision, sql.toString().trim()));
+        if (marker != null) {
+            migrations.add(new MigrationBlock(marker.tag(), marker.revision(), sql.toString().trim()));
         }
         return migrations;
     }
@@ -313,27 +409,31 @@ public class DdlMigrationService {
      * Matching is exact and O(script blocks + history rows). Ambiguous or unknown rows are warned
      * and ignored so later revisions can still run.
      */
-    int reconcileLegacyRevisionNumbers(Connection conn, int current, List<MigrationBlock> migrations) throws SQLException {
+    Map<String, Integer> reconcileLegacyRevisionNumbers(Connection conn,
+            Map<String, Integer> current, List<MigrationBlock> migrations) throws SQLException {
         final long startedAt = System.currentTimeMillis();
-        final Map<String, Integer> uniqueRevisionByStatement = new HashMap<>();
-        final Set<String> ambiguousStatements = new HashSet<>();
-        final Map<Integer, String> statementByRevision = new HashMap<>();
+        final Map<TaggedStatement, Integer> uniqueRevisionByStatement = new HashMap<>();
+        final Set<TaggedStatement> ambiguousStatements = new HashSet<>();
+        final Map<MigrationIdentity, String> statementByRevision = new HashMap<>();
         for (MigrationBlock migration : migrations) {
-            if (migration.statement().isEmpty()) {
+            if (!migration.tag().isEmpty() || migration.statement().isEmpty()) {
                 continue;
             }
-            statementByRevision.put(migration.revision(), migration.statement());
-            if (!ambiguousStatements.contains(migration.statement())) {
+            final MigrationIdentity identity = new MigrationIdentity(migration.tag(), migration.revision());
+            final TaggedStatement taggedStatement = new TaggedStatement(
+                    migration.tag(), migration.statement());
+            statementByRevision.put(identity, migration.statement());
+            if (!ambiguousStatements.contains(taggedStatement)) {
                 final Integer previous = uniqueRevisionByStatement.putIfAbsent(
-                        migration.statement(), migration.revision());
+                        taggedStatement, migration.revision());
                 if (previous != null) {
-                    uniqueRevisionByStatement.remove(migration.statement());
-                    ambiguousStatements.add(migration.statement());
+                    uniqueRevisionByStatement.remove(taggedStatement);
+                    ambiguousStatements.add(taggedStatement);
                 }
             }
         }
 
-        int effectiveCurrent = current;
+        final Map<String, Integer> effectiveCurrent = new HashMap<>(current);
         int historyRows = 0;
         int recovered = 0;
         int uncertain = 0;
@@ -341,7 +441,8 @@ public class DdlMigrationService {
         final List<String> uncertainSamples = new ArrayList<>();
         try (Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(
-                        "SELECT revision, statement FROM jpm_ddl_migration ORDER BY id")) {
+                        "SELECT revision, statement FROM jpm_ddl_migration "
+                        + "WHERE tag = '' ORDER BY id")) {
             while (rs.next()) {
                 historyRows++;
                 final int recordedRevision = rs.getInt(1);
@@ -350,19 +451,22 @@ public class DdlMigrationService {
                     continue;
                 }
 
-                final Integer declaredRevision = uniqueRevisionByStatement.get(statement);
+                final TaggedStatement taggedStatement = new TaggedStatement(DEFAULT_TAG, statement);
+                final Integer declaredRevision = uniqueRevisionByStatement.get(taggedStatement);
                 if (declaredRevision != null) {
                     if (declaredRevision != recordedRevision) {
-                        effectiveCurrent = Math.max(effectiveCurrent, declaredRevision);
+                        effectiveCurrent.merge(DEFAULT_TAG, declaredRevision, Math::max);
                         recovered++;
                         addDiagnostic(recoveredSamples, String.format(
-                                "registrada=%d, declarada=%d", recordedRevision, declaredRevision));
+                                "registrada=%d, declarada=%d", recordedRevision,
+                                declaredRevision));
                     }
                     continue;
                 }
 
-                if (ambiguousStatements.contains(statement)
-                        && statement.equals(statementByRevision.get(recordedRevision))) {
+                if (ambiguousStatements.contains(taggedStatement)
+                        && statement.equals(statementByRevision.get(
+                                new MigrationIdentity(DEFAULT_TAG, recordedRevision)))) {
                     continue;
                 }
                 uncertain++;
@@ -375,7 +479,7 @@ public class DdlMigrationService {
         if (uncertain > 0) {
             JPMUtils.getLogger().warn(String.format(
                     "DDL migration: historial incompatible o ambiguo (%d de %d filas, %d ms); "
-                    + "se continuara desde la revision efectiva %d. Casos: %s",
+                    + "se continuara desde las revisiones efectivas %s. Casos: %s",
                     uncertain, historyRows, durationMs, effectiveCurrent,
                     String.join(" | ", uncertainSamples)));
         }
@@ -386,7 +490,7 @@ public class DdlMigrationService {
         }
         JPMUtils.getLogger().info(String.format(
                 "DDL migration: preflight %d bloques, %d filas historicas, %d reconciliadas, "
-                + "revision efectiva %d, %d ms",
+                + "revisiones efectivas %s, %d ms",
                 migrations.size(), historyRows, recovered, effectiveCurrent, durationMs));
         return effectiveCurrent;
     }
@@ -406,28 +510,32 @@ public class DdlMigrationService {
      * Executes one parsed block and records its outcome. Mirrors the legacy runner: one statement
      * per marker, continue-on-error.
      */
-    void executeOne(Connection conn, int revision, String stmt) throws SQLException {
+    void executeOne(Connection conn, String tag, int revision, String stmt) throws SQLException {
         if (!stmt.isEmpty()) {
             final SqlSelection selection = selectFirstStatement(stmt);
             if (selection.hasIgnoredSql()) {
                 JPMUtils.getLogger().warn(String.format(
-                        "DDL migration: revision %d contiene multiples sentencias; se ejecutara "
-                        + "solo la primera y se ignorara el resto: %s",
-                        revision, sqlPreview(selection.ignoredSql())));
+                        "DDL migration: secuencia %s revision %d contiene multiples sentencias; "
+                        + "se ejecutara solo la primera y se ignorara el resto: %s",
+                        sequenceLabel(tag), revision, sqlPreview(selection.ignoredSql())));
             }
             final long t0 = System.currentTimeMillis();
             boolean ok = true;
             String error = null;
             try (Statement st = conn.createStatement()) {
-                JPMUtils.getLogger().info(String.format("DDL migration: aplicando revision %d", revision));
+                JPMUtils.getLogger().info(String.format(
+                        "DDL migration: aplicando secuencia %s revision %d",
+                        sequenceLabel(tag), revision));
                 st.execute(selection.firstStatement());
             } catch (SQLException e) {
                 ok = false;
                 error = e.getMessage();
-                JPMUtils.getLogger().warn(String.format("DDL migration: revision %d FALLIDA: %s", revision, stmt), e);
+                JPMUtils.getLogger().warn(String.format(
+                        "DDL migration: secuencia %s revision %d FALLIDA: %s",
+                        sequenceLabel(tag), revision, stmt), e);
                 conn.rollback();
             }
-            record(conn, revision, stmt, ok, error, System.currentTimeMillis() - t0);
+            record(conn, tag, revision, stmt, ok, error, System.currentTimeMillis() - t0);
             conn.commit();
         }
     }
@@ -541,37 +649,67 @@ public class DdlMigrationService {
     }
 
     /** Inserts one history row. Best-effort: a failure here must not abort the migration run. */
-    private void record(Connection conn, int revision, String statement, boolean success, String error, long durationMs) {
+    private void record(Connection conn, String tag, int revision, String statement,
+            boolean success, String error, long durationMs) {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO jpm_ddl_migration (revision, statement, success, error, applied_at, duration_ms) VALUES (?, ?, ?, ?, ?, ?)")) {
-            ps.setInt(1, revision);
-            ps.setString(2, statement);
-            ps.setString(3, success ? "Y" : "N");
-            ps.setString(4, error);
-            ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-            ps.setLong(6, durationMs);
+                "INSERT INTO jpm_ddl_migration (tag, revision, statement, success, error, "
+                + "applied_at, duration_ms) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+            ps.setString(1, normalizeTag(tag));
+            ps.setInt(2, revision);
+            ps.setString(3, statement);
+            ps.setString(4, success ? "Y" : "N");
+            ps.setString(5, error);
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            ps.setLong(7, durationMs);
             ps.executeUpdate();
         } catch (SQLException e) {
-            JPMUtils.getLogger().warn(String.format("DDL migration: no se pudo registrar la revision %d en el historial", revision), e);
+            JPMUtils.getLogger().warn(String.format(
+                    "DDL migration: no se pudo registrar secuencia %s revision %d en el historial",
+                    sequenceLabel(tag), revision), e);
         }
     }
 
-    /** Parses the revision number from a marker line such as {@code -- @@ 1234}. */
-    private int revisionOf(String markerLine) {
-        return Integer.parseInt(markerLine.substring(SYNC_DB_START_TOKEN.length()).trim());
+    /** Parses {@code -- @@ N} and {@code -- @@ TAG N}; tags are normalized to upper case. */
+    private MigrationMarker markerOf(String markerLine) {
+        final String marker = markerLine.substring(SYNC_DB_START_TOKEN.length()).trim();
+        final String[] parts = marker.split("\\s+");
+        if (parts.length == 1) {
+            return new MigrationMarker(DEFAULT_TAG, Integer.parseInt(parts[0]));
+        }
+        if (parts.length != 2 || !TAG_PATTERN.matcher(parts[0]).matches()) {
+            throw new IllegalArgumentException("invalid marker");
+        }
+        return new MigrationMarker(normalizeTag(parts[0]), Integer.parseInt(parts[1]));
     }
 
-    private Integer revisionOfOrNull(String markerLine) {
+    private MigrationMarker markerOfOrNull(String markerLine) {
         try {
-            return revisionOf(markerLine);
-        } catch (NumberFormatException e) {
+            return markerOf(markerLine);
+        } catch (IllegalArgumentException e) {
             JPMUtils.getLogger().warn("DDL migration: marcador invalido; se omite su bloque: "
                     + markerLine);
             return null;
         }
     }
 
-    record MigrationBlock(int revision, String statement) {
+    private String normalizeTag(String tag) {
+        return tag == null ? DEFAULT_TAG : tag.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private String sequenceLabel(String tag) {
+        return tag == null || tag.isEmpty() ? "<sin tag>" : tag;
+    }
+
+    record MigrationMarker(String tag, int revision) {
+    }
+
+    record MigrationBlock(String tag, int revision, String statement) {
+    }
+
+    private record MigrationIdentity(String tag, int revision) {
+    }
+
+    private record TaggedStatement(String tag, String statement) {
     }
 
     record SqlSelection(String firstStatement, String ignoredSql) {

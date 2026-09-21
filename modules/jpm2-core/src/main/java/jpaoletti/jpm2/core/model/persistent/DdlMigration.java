@@ -12,14 +12,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 
 /**
  * History of DDL migration blocks applied at boot by {@code DdlMigrationService}: one row per
- * {@code database.sql} revision ({@code -- @@ N} marker) that was executed, with its outcome.
+ * {@code database.sql} tagged revision ({@code -- @@ N} or {@code -- @@ TAG N} marker) that was
+ * executed, with its outcome.
  * Replaces the silent WARNING logging and the single {@code database-revision} config counter of
- * the legacy runner: the current revision is {@code MAX(revision)} of this table.
+ * the legacy runner: the current revision is {@code MAX(revision)} for each tag in this table.
  *
  * <p>The table is created by the service itself ({@code CREATE TABLE IF NOT EXISTS}), so it does
  * not depend on {@code hbm2ddl}; this mapping is used for the read-only admin grid.
@@ -27,13 +28,20 @@ import org.hibernate.annotations.Type;
  * @author jpaoletti
  */
 @Entity
-@Table(name = "jpm_ddl_migration", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"revision"})})
+@Table(name = "jpm_ddl_migration")
 public class DdlMigration implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    /**
+     * Normalized sequence tag; the empty string is the historical untagged sequence.
+     * Formula keeps schema ownership in {@code DdlMigrationService}: Hibernate can build or
+     * validate the SessionFactory before the service adds the column to a legacy table.
+     */
+    @Formula("tag")
+    private String tag = "";
 
     /** The {@code -- @@ N} marker number of the applied block. */
     @Column(name = "revision")
@@ -65,6 +73,14 @@ public class DdlMigration implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public Integer getRevision() {
@@ -136,6 +152,7 @@ public class DdlMigration implements Serializable {
 
     @Override
     public String toString() {
-        return getId() == null ? "..." : ("#" + revision + " " + (success ? "OK" : "FAIL"));
+        final String sequence = tag == null || tag.isEmpty() ? "" : tag + " ";
+        return getId() == null ? "..." : ("#" + sequence + revision + " " + (success ? "OK" : "FAIL"));
     }
 }
