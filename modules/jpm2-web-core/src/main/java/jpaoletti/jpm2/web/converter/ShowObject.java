@@ -49,7 +49,7 @@ public class ShowObject extends Converter {
             request.setAttribute(SHOW_OBJECT_FIELD_VALUE, new LinkedHashMap<String, String>());
         }
         final Map<String, String> values = (Map<String, String>) request.getAttribute(SHOW_OBJECT_FIELD_VALUE);
-        final Serializable realInstanceID = getContext().getEntity().getDao(getContext().getEntityContext()).getId(object);
+        final Serializable realInstanceID = contextualEntity.getDao().getId(object);
 
         final String res = "@page:show-object-converter.jsp"
                 + "?entityId=" + getEntity().getId()
