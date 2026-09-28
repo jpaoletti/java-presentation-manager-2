@@ -1,8 +1,9 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <select name="field_${field}" id="field_${field}" class="objectConverterInput form-select" data-entity="${param.entityId}" data-textField="${param.textField}" data-related="${param.related}">
     <c:if test="${not empty param.value}">
-        <option value="${param.value}">${param.valueText}</option>
+        <option value="${fn:escapeXml(param.value)}">${fn:escapeXml(param.valueText)}</option>
     </c:if>
 </select>
 <c:if test="${not empty param.textFieldDetails}">
@@ -15,7 +16,7 @@
                 $.getJSON("${cp}jpm/${param.entityId}/" + id + "/show.json?fields=${param.textFieldDetails}", function (data) {
                     var content = "<div><div class='table-responsive'><table class='table table-bordered table-sm w-auto'><tbody>";
                     $.each(data, function (i, v) {
-                        content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
+                        content = content + "<tr><th>" + jpmEscape(i) + "</th><td>" + v + "</td></tr>";
                     });
                     content = content + "</tbody></table>";
                     //<c:if test="${not empty param.textFieldDetailsOperation}">

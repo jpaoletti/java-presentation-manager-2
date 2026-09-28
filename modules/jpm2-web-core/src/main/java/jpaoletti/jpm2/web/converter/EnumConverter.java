@@ -31,9 +31,8 @@ public class EnumConverter extends WebToString {
                 options.add(((Enum) option).name() + "@" + String.valueOf(option));
             }
             final StringBuilder sb = new StringBuilder("@page:enum-converter.jsp?options=" + URLEncoder.encode(StringUtils.join(options, ","), "UTF-8"));
-            if (value != null) {
-                sb.append("&value=").append(((Enum) value).name());
-            }
+            // Always pass value, otherwise the included jsp takes it from the request query string
+            sb.append("&value=").append(value == null ? "" : ((Enum) value).name());
             return sb.toString();
         } catch (UnsupportedEncodingException ignoreme) {
             return "";

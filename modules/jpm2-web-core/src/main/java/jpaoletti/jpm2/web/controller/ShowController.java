@@ -15,6 +15,7 @@ import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,7 +87,7 @@ public final class ShowController extends BaseController {
                     try {
                         final Object convertedValue = converter.visualize(getContext().getContextualEntity(), field, object, instanceId);
                         if (convertedValue.toString().startsWith("@page:")) {
-                            values.put(field.getTitle(getContext().getEntity()), String.valueOf(Converter.getValue(object, field)));
+                            values.put(field.getTitle(getContext().getEntity()), StringEscapeUtils.escapeHtml4(String.valueOf(Converter.getValue(object, field))));
                         } else {
                             values.put(field.getTitle(getContext().getEntity()), convertedValue);
                         }

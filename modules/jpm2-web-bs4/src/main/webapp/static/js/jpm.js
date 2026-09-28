@@ -216,8 +216,8 @@ var initPage = function () {
                 $.getJSON(getContextPath() + "jpm/favorites", function (data) {
                     var isFav = false;
                     $.each(data, function (i, item) {
-                        var html = '<a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
-                        html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a>';
+                        var html = '<a class="dropdown-item" href="' + jpmEscape(item.link) + '" data-id="fav' + jpmEscape(item.id) + '">';
+                        html += '<div class="content"><div class="notification-detail">' + jpmEscape(item.title) + '</div></div></div></a>';
                         if (item.link === document.location.href) {
                             isFav = true;
                         } else {
@@ -306,7 +306,11 @@ var initPage = function () {
                 var _recentArray = $.cookie(name);
                 var recentArray = new Array();
                 if (typeof _recentArray !== "undefined" && _recentArray !== "") {
-                    recentArray = JSON.parse(_recentArray);
+                    try {
+                        recentArray = JSON.parse(_recentArray);
+                    } catch (e) {
+                        recentArray = new Array();
+                    }
                 }
                 var array = Array.prototype.slice.call(recentArray);
                 if (array.length >= 10) {
@@ -318,9 +322,9 @@ var initPage = function () {
                 var finalArray = uniqBy(array, JSON.stringify);
                 $.cookie(name, JSON.stringify(finalArray), {path: '/'});
                 $.each(finalArray, function (i, item) {
-                    var html = '<a class="dropdown-item" href="' + item.url + '">';
+                    var html = '<a class="dropdown-item" href="' + jpmEscape(item.url) + '">';
                     html += '<div class="notification-content">';
-                    html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a>';
+                    html += '<div class="content"><div class="notification-detail">' + jpmEscape(item.title) + '</div></div></div></a>';
                     $("#userNavRecent").find(".dropdown-menu").append(html);
                 });
             }
@@ -562,11 +566,26 @@ function buildAjaxJpmForm(formId, callback, beforeSubmit) {
     });
 }
 
+/**
+ * Escapes a value to be concatenated into html (content or quoted attribute).
+ */
+function jpmEscape(value) {
+    if (value === null || typeof value === "undefined") {
+        return "";
+    }
+    return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+}
+
 function setEntityVal(select, id, callback) {
     $.getJSON(getContextPath() + "jpm/" + select.attr('data-entity') + "/" + id + ".json", {
         textField: ((!!select.attr('data-textField')) ? select.attr('data-textField') : "")
     }, function (data) {
-        select.append("<option value=" + id + ">" + data.text + "</option>");
+        select.append($("<option>").val(id).text(data.text));
         select.val(id).trigger("change");
         if (callback) {
             callback(select, data);

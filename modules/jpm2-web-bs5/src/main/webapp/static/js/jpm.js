@@ -64,11 +64,28 @@ function getLocalStorage() {
     return window['localStorage'];
 }
 
+/**
+ * Escapes a value to be concatenated into html (content or quoted attribute).
+ */
+function jpmEscape(value) {
+    if (value === null || typeof value === "undefined") {
+        return "";
+    }
+    return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+}
+
 var wrapToString = function () {
     $(".inline-edit,.showObjectConverter").addClass("form-control");
     $(".to-string").each(function () {
-        var v = $(this).html();
-        $(this).html("<input disabled class='form-control' type='text' value='" + v + "' style='text-align:" + $(this).attr("data-align") + "' />");
+        var $input = $("<input disabled class='form-control' type='text' />")
+                .val($(this).text())
+                .css("text-align", $(this).attr("data-align"));
+        $(this).empty().append($input);
     });
 };
 
@@ -328,7 +345,11 @@ function refreshRecentMenu() {
     var _recentArray = $.cookie(name);
     var recentArray = new Array();
     if (typeof _recentArray !== "undefined" && _recentArray !== "") {
-        recentArray = JSON.parse(_recentArray);
+        try {
+            recentArray = JSON.parse(_recentArray);
+        } catch (e) {
+            recentArray = new Array();
+        }
     }
     var array = Array.prototype.slice.call(recentArray);
     if (array.length >= 10) {
@@ -340,9 +361,9 @@ function refreshRecentMenu() {
     var finalArray = uniqBy(array, JSON.stringify);
     $.cookie(name, JSON.stringify(finalArray), {path: '/'});
     $.each(finalArray, function (i, item) {
-        var html = '<li><a class="dropdown-item" href="' + item.url + '">';
+        var html = '<li><a class="dropdown-item" href="' + jpmEscape(item.url) + '">';
         html += '<div class="notification-content">';
-        html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
+        html += '<div class="content"><div class="notification-detail">' + jpmEscape(item.title) + '</div></div></div></a></li>';
         $recentMenu.append(html);
     });
 }
@@ -360,8 +381,8 @@ function refreshFavoriteMenu() {
         var isFav = false;
         var currentHref = stripCacheBuster(document.location.href);
         $.each(data, function (i, item) {
-            var html = '<li><a class="dropdown-item" href="' + item.link + '" data-id="fav' + item.id + '">';
-            html += '<div class="content"><div class="notification-detail">' + item.title + '</div></div></div></a></li>';
+            var html = '<li><a class="dropdown-item" href="' + jpmEscape(item.link) + '" data-id="fav' + jpmEscape(item.id) + '">';
+            html += '<div class="content"><div class="notification-detail">' + jpmEscape(item.title) + '</div></div></div></a></li>';
             if (stripCacheBuster(item.link) === currentHref) {
                 isFav = true;
             } else {
@@ -1108,7 +1129,7 @@ function setEntityVal(select, id, callback) {
     $.getJSON(getContextPath() + "jpm/" + select.attr('data-entity') + "/" + id + ".json", {
         textField: ((!!select.attr('data-textField')) ? select.attr('data-textField') : "")
     }, function (data) {
-        select.append("<option value=" + id + ">" + data.text + "</option>");
+        select.append($("<option>").val(id).text(data.text));
         select.val(id).trigger("change");
         if (callback) {
             callback(select, data);

@@ -23,10 +23,10 @@
                 ownerId: "${not empty owner?ownerId:''}"
             },
             success: function (data) {
-                var ids = "${param.value}".split(",");
+                var ids = "<spring:escapeBody javaScriptEscape="true">${param.value}</spring:escapeBody>".split(",");
                 $.each(data.results, function (i, item) {
                     var checked = ($.inArray(item.id, ids) >= 0) ? 'checked' : '';
-                    $("#${param.field}objectSearcher").append("<label><input type='checkbox' " + checked + " value='" + item.id + "' name='value' />&nbsp;" + item.text + "</label>");
+                    $("#${param.field}objectSearcher").append("<label><input type='checkbox' " + checked + " value='" + jpmEscape(item.id) + "' name='value' />&nbsp;" + jpmEscape(item.text) + "</label>");
                 });
                 if (data.results.length > 0) {
                     $("#${param.field}objectSearcher").attr("style","grid-template-rows: repeat(" + Math.ceil(data.results.length / 2) + ", 1fr)");

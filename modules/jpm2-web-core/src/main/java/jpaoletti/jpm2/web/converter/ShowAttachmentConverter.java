@@ -1,5 +1,7 @@
 package jpaoletti.jpm2.web.converter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,12 +63,20 @@ public class ShowAttachmentConverter extends Converter {
             return "@page:show-attachment-converter.jsp"
                     + "?len=" + len
                     + "&downloadable=" + note.isDownloadable()
-                    + "&contentType=" + note.getContentType()
-                    + "&attachmentName=" + (showName ? note.getAttachmentName() : "")
+                    + "&contentType=" + encode(note.getContentType())
+                    + "&attachmentName=" + (showName ? encode(note.getAttachmentName()) : "")
                     + "&noteId=" + instanceId
                     + "&entity=" + contextualEntity.getEntity().getId();
         } else {
             return "@page:show-attachment-converter.jsp?";
+        }
+    }
+
+    private static String encode(String value) {
+        try {
+            return value == null ? "" : URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return "";
         }
     }
 

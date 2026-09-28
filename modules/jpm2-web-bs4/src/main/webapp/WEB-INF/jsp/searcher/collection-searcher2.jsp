@@ -14,7 +14,7 @@
             },
             success: function (data) {
                 $.each(data.results, function (i, item) {
-                    $("#${param.field}CollectionSearcherContainer").append("<label><input type='checkbox' value='" + item.id + "' name='value' />&nbsp;" + item.text + "</label><br/>");
+                    $("#${param.field}CollectionSearcherContainer").append("<label><input type='checkbox' value='" + jpmEscape(item.id) + "' name='value' />&nbsp;" + jpmEscape(item.text) + "</label><br/>");
                 });
             }
         });

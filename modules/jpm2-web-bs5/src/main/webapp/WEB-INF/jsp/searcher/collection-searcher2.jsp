@@ -22,7 +22,7 @@
             },
             success: function (data) {
                 $.each(data.results, function (i, item) {
-                    $("#${param.field}CollectionSearcherContainer").append("<label><input type='checkbox' value='" + item.id + "' name='value' />&nbsp;" + item.text + "</label>");
+                    $("#${param.field}CollectionSearcherContainer").append("<label><input type='checkbox' value='" + jpmEscape(item.id) + "' name='value' />&nbsp;" + jpmEscape(item.text) + "</label>");
                 });
                 if (data.results.length > 0) {
                     $("#${param.field}CollectionSearcherContainer").attr("style","grid-template-rows: repeat(" + Math.ceil(data.results.length / 2) + ", 1fr)");

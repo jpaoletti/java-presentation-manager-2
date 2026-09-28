@@ -25,9 +25,8 @@ public class EditAuthoritiesConverter extends Converter {
         final List<String> value = (List<String>) ((object == null) ? null : getValue(object, field));
         final StringBuilder sb = new StringBuilder("@page:editAuthorities-converter.jsp?readonly=" + isReadonly());
         sb.append("&group=").append(instanceId);
-        if (value != null && !value.isEmpty()) {
-            sb.append("&value=").append(StringUtils.join(value, ","));
-        }
+        // Always pass value, otherwise the included jsp takes it from the request query string
+        sb.append("&value=").append(value == null ? "" : StringUtils.join(value, ","));
         return sb.toString();
     }
 

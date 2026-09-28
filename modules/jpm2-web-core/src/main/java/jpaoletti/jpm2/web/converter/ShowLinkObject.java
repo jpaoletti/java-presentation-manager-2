@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.web.converter;
 
+import org.apache.taglibs.standard.tag.common.core.Util;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
@@ -33,7 +34,7 @@ public class ShowLinkObject extends ShowObject {
                 final String finalValue = getFinalValue(value);
                 final Operation op = getEntity().getOperation(getOperation());
                 return res
-                        + "&value=" + finalValue
+                        + "&value=" + Util.URLEncode(finalValue, "UTF-8")
                         + "&operationId=" + op.getPathId();
             } catch (ConfigurationException | NotAuthorizedException ex) {
                 throw new ConverterException(ex.getMessage());

@@ -1,3 +1,4 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <%@include file="inc/default-taglibs.jsp" %>
 <html lang="${locale.language}">
@@ -19,7 +20,7 @@
                                         <spring:message code="jpm.security.generatedpassword" text="Generated Passowrd"/>
                                     </label>
                                     <div class="col-lg-8">
-                                        <input type="text" class="form-control" value="${param.newPassword}" disabled/>
+                                        <input type="text" class="form-control" value="${fn:escapeXml(param.newPassword)}" disabled/>
                                     </div>
                                 </div>
                             </div>

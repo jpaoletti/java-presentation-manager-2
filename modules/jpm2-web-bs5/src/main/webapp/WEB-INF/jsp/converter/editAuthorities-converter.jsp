@@ -24,7 +24,7 @@
     }
     jpmLoad(function () {
         var readonly = ${param.readonly};
-        var ids = "${param.value}".split(",");
+        var ids = "<spring:escapeBody javaScriptEscape="true">${param.value}</spring:escapeBody>".split(",");
         var root = [];
         var special = {'id': '-1', text: sec_i18n('jpm.security.authority.title'), children: [], state: {'opened': true}};
         var auths = {'id': '-2', text: sec_i18n('jpm.security.authority.jpmauth.title'), children: [], state: {'opened': true}};
@@ -39,7 +39,7 @@
                     if (!readonly || ($.inArray(item.id, ids) >= 0)) {
                         special.children.push({
                             'id': item.id,
-                            'text': sec_i18n('jpm.security.authority.' + item.id) + "<span class='authKey'> [" + item.id + "]</span>",
+                            'text': sec_i18n('jpm.security.authority.' + item.id) + "<span class='authKey'> [" + jpmEscape(item.id) + "]</span>",
                             'icon': "fas fa-chevron-right",
                             'state': {selected: !readonly && $.inArray(item.id, ids) >= 0}
                         });

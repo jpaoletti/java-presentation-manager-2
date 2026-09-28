@@ -5,6 +5,7 @@ import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  *
@@ -13,15 +14,46 @@ import jpaoletti.jpm2.core.model.Field;
 public class WebToString extends ToStringConverter {
 
     private boolean useTitle = true;
+    /**
+     * When true the value is rendered as html (not escaped). Use it only for
+     * fields that store trusted html on purpose.
+     */
+    private boolean html = false;
 
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
-        return wrap(field, process(value), value);
+        return wrap(field, escape(process(value)), value);
     }
 
+    /**
+     * Wraps an already rendered (and escaped when needed) content. The title
+     * is always escaped.
+     */
     public String wrap(Field field, String process, Object value) {
         final String originalValue = (value == null) ? getNullValue() : getFinalValue(value, getProperties());
-        return "<span class='to-string' title='" + (isUseTitle() ? originalValue : "") + "' data-align='" + field.getAlign() + "'>" + process + "</span>";
+        return "<span class='to-string' title='" + (isUseTitle() ? escapeAttribute(originalValue) : "") + "' data-align='" + field.getAlign() + "'>" + process + "</span>";
+    }
+
+    /**
+     * Escapes a value for html content, unless html is true.
+     */
+    protected String escape(String value) {
+        return (isHtml() || value == null) ? value : StringEscapeUtils.escapeHtml4(value);
+    }
+
+    /**
+     * Escapes a value for an html attribute (single or double quoted).
+     */
+    public static String escapeAttribute(String value) {
+        return value == null ? null : StringEscapeUtils.escapeHtml4(value).replace("'", "&#39;");
+    }
+
+    public boolean isHtml() {
+        return html;
+    }
+
+    public void setHtml(boolean html) {
+        this.html = html;
     }
 
     public boolean isUseTitle() {

@@ -1,7 +1,8 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <select name="field_${field}" id="field_${field}" class="objectConverterInput form-control" data-entity="${param.entityId}" data-textField="${param.textField}">
     <c:if test="${not empty param.value}">
-        <option value="${param.value}">${param.valueText}</option>
+        <option value="${fn:escapeXml(param.value)}">${fn:escapeXml(param.valueText)}</option>
     </c:if>
 </select>
 <script type="text/javascript" charset="UTF-8" src="${cp}static/js/select2.min.js?v=${jpm.appversion}"></script>

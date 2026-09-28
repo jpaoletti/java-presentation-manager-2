@@ -1,5 +1,6 @@
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <div id="field_${field}" class="input-group">
-    <input type="text" name="field_${field}" class="form-control" value="${param.value}" />
+    <input type="text" name="field_${field}" class="form-control" value="${fn:escapeXml(param.value)}" />
     <span class="input-group-addon add-on"><i class="glyphicon glyphicon-calendar"></i></span>
 </div>
 <script type="text/javascript" src="${cp}static/js/moment.min.js?v=${jpm.appversion}" charset="UTF-8"></script>

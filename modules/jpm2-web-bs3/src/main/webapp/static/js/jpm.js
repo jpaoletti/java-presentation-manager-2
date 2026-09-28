@@ -176,9 +176,9 @@ var initPage = function () {
                     if (item.link === document.location.href) {
                         $("#addFavoriteLi").hide();
                         $("#removeFavoriteLi").show();
-                        $("#userNavFavorite").find(".dropdown-menu").append("<li class='active'><a title='' href='" + item.link + "' data-id='fav" + item.id + "'>" + item.title + "</a></li>");
+                        $("#userNavFavorite").find(".dropdown-menu").append("<li class='active'><a title='' href='" + jpmEscape(item.link) + "' data-id='fav" + jpmEscape(item.id) + "'>" + jpmEscape(item.title) + "</a></li>");
                     } else {
-                        $("#userNavFavorite").find(".dropdown-menu").append("<li><a title='' href='" + item.link + "' data-id='fav" + item.id + "'>" + item.title + "</a></li>");
+                        $("#userNavFavorite").find(".dropdown-menu").append("<li><a title='' href='" + jpmEscape(item.link) + "' data-id='fav" + jpmEscape(item.id) + "'>" + jpmEscape(item.title) + "</a></li>");
                     }
                 });
             });
@@ -242,7 +242,11 @@ var initPage = function () {
                 var _recentArray = $.cookie(name);
                 var recentArray = new Array();
                 if (typeof _recentArray !== "undefined" && _recentArray !== "") {
-                    recentArray = JSON.parse(_recentArray);
+                    try {
+                        recentArray = JSON.parse(_recentArray);
+                    } catch (e) {
+                        recentArray = new Array();
+                    }
                 }
                 var array = Array.prototype.slice.call(recentArray);
                 if (array.length >= 10) {
@@ -254,7 +258,7 @@ var initPage = function () {
                 var finalArray = uniqBy(array, JSON.stringify);
                 $.cookie(name, JSON.stringify(finalArray), {path: '/'});
                 $.each(finalArray, function (i, item) {
-                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + item.url + "'>" + item.title + "</a></li>");
+                    $("#userNavRecent").find(".dropdown-menu").append("<li><a title='' href='" + jpmEscape(item.url) + "'>" + jpmEscape(item.title) + "</a></li>");
                 });
             }
         }
@@ -489,11 +493,26 @@ function buildAjaxJpmForm(formId, callback, beforeSubmit) {
     });
 }
 
+/**
+ * Escapes a value to be concatenated into html (content or quoted attribute).
+ */
+function jpmEscape(value) {
+    if (value === null || typeof value === "undefined") {
+        return "";
+    }
+    return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+}
+
 function setEntityVal(select, id, callback) {
     $.getJSON(getContextPath() + "jpm/" + select.attr('data-entity') + "/" + id + ".json", {
         textField: ((!!select.attr('data-textField')) ? select.attr('data-textField') : "")
     }, function (data) {
-        select.append("<option value=" + id + ">" + data.text + "</option>");
+        select.append($("<option>").val(id).text(data.text));
         select.val(id).trigger("change");
         if (callback) {
             callback(select, data);

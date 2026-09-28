@@ -33,7 +33,8 @@ public class WebEditCollection2 extends WebEditObject {
                 + "&addable=" + isAddable()
                 + "&minSearch=" + getMinSearch();
         if (value == null || value.isEmpty()) {
-            return res;
+            // Always pass value, otherwise the included jsp takes it from the request query string
+            return res + "&value=";
         } else {
             final StringBuilder sb = new StringBuilder();
             for (Object o : value) {
