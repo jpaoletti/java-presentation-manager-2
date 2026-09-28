@@ -19,6 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
+ * DAO based on the legacy Hibernate Criteria API (removed in Hibernate 6; use
+ * the JPA DAOs for new code).
+ *
+ * Known limitation: when the configuration has an alias to a collection (for
+ * example a CollectionSearcher filter), count() counts join rows instead of
+ * entities and paginated lists may return short pages or repeat rows, because
+ * duplicates are removed in memory after paging. The JPA DAOs don't have this
+ * problem.
  *
  * @author jpaoletti
  * @param <T>

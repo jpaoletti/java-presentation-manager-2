@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import jpaoletti.jpm2.core.PMCoreObject;
 import jpaoletti.jpm2.core.PMException;
@@ -44,7 +45,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private List<Entity> weaks = new ArrayList<>();
     private List<PanelRow> panels = new ArrayList<>();
     private List<Operation> operations = new ArrayList<>();
-    private Map<String, Map<String, Field>> fieldsbyid = new LinkedHashMap<>();
+    private final Map<String, Map<String, Field>> fieldsbyid = new ConcurrentHashMap<>();
     private List<SearchDefinition> defaultSearchs = new ArrayList<>();
     private String defaultSortField;
     private ListSort.SortDirection defaultSortDirection;
@@ -63,7 +64,6 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public Entity() {
         super();
-        this.fieldsbyid = null;
         this.paginable = true;
         this.countable = true;
         this.auditable = true;
@@ -128,17 +128,30 @@ public class Entity extends PMCoreObject implements BeanNameAware {
      *
      */
     private Map<String, Field> getFieldsbyid(String context) {
-        if (fieldsbyid == null) {
-            fieldsbyid = new HashMap<>();
+        // A context that doesn't exist (neither here nor in a parent) has the same
+        // fields as no context: don't let arbitrary url contexts grow the cache
+        final String effectiveContext = hasContext(context) ? context : null;
+        final String key = effectiveContext != null ? effectiveContext : "_ALL_";
+        // Built completely before being published, so concurrent readers never see it half filled
+        return fieldsbyid.computeIfAbsent(key, k -> {
+            final Map<String, Field> map = new LinkedHashMap<>();
+            for (Field f : getAllFields(effectiveContext)) {
+                map.put(f.getId(), f);
+            }
+            return Collections.unmodifiableMap(map);
+        });
+    }
+
+    private boolean hasContext(String context) {
+        if (context == null) {
+            return false;
         }
-        final String key = context != null ? context : "_ALL_";
-        if (!fieldsbyid.containsKey(key)) {
-            fieldsbyid.put(key, new LinkedHashMap<>());
-            for (Field f : getAllFields(context)) {
-                fieldsbyid.get(key).put(f.getId(), f);
+        for (Entity e = this; e != null; e = e.getParent()) {
+            if (e.getContext(context) != null) {
+                return true;
             }
         }
-        return fieldsbyid.get(key);
+        return false;
     }
 
     /**

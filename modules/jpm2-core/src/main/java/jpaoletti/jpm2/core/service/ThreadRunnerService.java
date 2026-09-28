@@ -6,6 +6,7 @@ import jpaoletti.jpm2.core.model.persistent.ThreadRunnerParameter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
@@ -27,7 +28,7 @@ public class ThreadRunnerService extends JPMServiceBase implements DisposableBea
     private volatile boolean shuttingDown = false;
     private volatile boolean started = false;
 
-    private final Map<Long, ThreadRunnerInstance> threads = new LinkedHashMap<>();
+    private final Map<Long, ThreadRunnerInstance> threads = new ConcurrentHashMap<>();
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -85,8 +86,14 @@ public class ThreadRunnerService extends JPMServiceBase implements DisposableBea
     }
 
     @SuppressWarnings("unchecked")
-    public void exec(ThreadRunner r) {
+    public synchronized void exec(ThreadRunner r) {
         ThreadRunnerInstance thread = threads.get(r.getId());
+        if (thread != null && !thread.isAlive()) {
+            // A dead thread can't be restarted: discard it and create a new one
+            JPMUtils.getLogger().warn("Thread " + r.getName() + " no estaba vivo, se vuelve a crear");
+            threads.remove(r.getId());
+            thread = null;
+        }
         if (thread == null) {
             try {
                 final Class<?> raw = Class.forName(r.getClazz());

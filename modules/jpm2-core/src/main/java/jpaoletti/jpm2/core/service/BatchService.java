@@ -17,6 +17,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author jpaoletti
  */
-public class BatchService extends JPMServiceBase implements ApplicationContextAware {
+public class BatchService extends JPMServiceBase implements ApplicationContextAware, DisposableBean {
 
     public static final int ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -74,7 +75,7 @@ public class BatchService extends JPMServiceBase implements ApplicationContextAw
         scheduleAll();
     }
 
-    public void scheduleAll() {
+    public synchronized void scheduleAll() {
         if (!contextRefreshed) {
             JPMUtils.getLogger().info("Programacion de tareas diferida hasta que el contexto este listo");
             return;
@@ -120,7 +121,8 @@ public class BatchService extends JPMServiceBase implements ApplicationContextAw
 
     protected Timer schedule(Batch batch, String time) {
         try {
-            final Timer timer = new Timer();
+            // Daemon: a pending timer must not keep the JVM (or an undeployed app) alive
+            final Timer timer = new Timer("batch-" + batch.getName(), true);
             final InternalTimerTask task = new InternalTimerTask(
                     batch,
                     (BatchTask) getApplicationContext().getBean(batch.getTask().trim()));
@@ -149,6 +151,21 @@ public class BatchService extends JPMServiceBase implements ApplicationContextAw
         } catch (Exception ex) {
             JPMUtils.getLogger().error("Error al ejecutar tarea " + batch, ex);
         }
+    }
+
+    /**
+     * Cancels every scheduled batch when the context is closed (undeploy,
+     * shutdown), so no task runs against a closed context.
+     */
+    @Override
+    public synchronized void destroy() {
+        tasks.values().forEach(timer -> {
+            if (timer != null) {
+                timer.cancel();
+            }
+        });
+        tasks.clear();
+        JPMUtils.getLogger().info("Programacion de tareas detenida");
     }
 
     public SessionFactory getSessionFactory() {
@@ -182,7 +199,8 @@ public class BatchService extends JPMServiceBase implements ApplicationContextAw
         public void run() {
             try {
                 task.excecute(batch);
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                // An uncaught Throwable would kill the Timer thread and stop every future run
                 JPMUtils.getLogger().error("Error en la tarea programada: " + batch.getName(), e);
             }
         }

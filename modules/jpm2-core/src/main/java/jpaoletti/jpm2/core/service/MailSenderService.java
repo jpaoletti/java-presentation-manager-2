@@ -3,9 +3,9 @@ package jpaoletti.jpm2.core.service;
 import jpaoletti.jpm2.core.mail.GeneralMailSender;
 import jpaoletti.jpm2.core.mail.Mail;
 import jpaoletti.jpm2.core.model.persistent.MailSender;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DefaultJPADAO;
 import jpaoletti.jpm2.util.JPMUtils;
@@ -32,11 +32,12 @@ public class MailSenderService extends JPMServiceBase {
     @Autowired
     private SessionFactory sessionFactory;
 
-    private Map<String, GeneralMailSender> senders;
+    // Replaced as a whole on init (volatile) and updated in place on reload
+    private volatile Map<String, GeneralMailSender> senders = new ConcurrentHashMap<>();
 
     public void init() {
         JPMUtils.getLogger().info("Iniciando servicio de envio de mails");
-        senders = new LinkedHashMap<>();
+        final Map<String, GeneralMailSender> fresh = new ConcurrentHashMap<>();
         final Session session = getSessionFactory().openSession();
         TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
         try {
@@ -44,7 +45,7 @@ public class MailSenderService extends JPMServiceBase {
             list.stream()
                     .map(MailSender.class::cast)
                     .filter(MailSender::isEnabled)
-                    .forEach(this::reload);
+                    .forEach(ms -> load(fresh, ms));
         } catch (Exception e) {
             JPMUtils.getLogger().warn("No se pudieron cargar los enviadores de mails. "
                     + "El servicio queda sin enviadores hasta ejecutar la migracion y recargar.", e);
@@ -52,6 +53,8 @@ public class MailSenderService extends JPMServiceBase {
             TransactionSynchronizationManager.unbindResourceIfPossible(getSessionFactory());// Without this the second invocation fails?
             session.close();
         }
+        // Published complete: readers never see a half loaded map
+        senders = fresh;
     }
 
     /**
@@ -64,10 +67,11 @@ public class MailSenderService extends JPMServiceBase {
      */
     public void send(String code, Mail mail) {
         if (!StringUtils.isEmpty(code)) {
-            if (!senders.containsKey(code)) {
+            final GeneralMailSender sender = senders.get(code);
+            if (sender == null) {
                 JPMUtils.getLogger().warn(String.format("No existe el enviador de mails '%s'", code));
             } else {
-                senders.get(code).send(mail);
+                sender.send(mail);
             }
         }
     }
@@ -90,6 +94,10 @@ public class MailSenderService extends JPMServiceBase {
     }
 
     public void reload(MailSender mailSender) {
+        load(senders, mailSender);
+    }
+
+    private void load(Map<String, GeneralMailSender> senders, MailSender mailSender) {
         if (!mailSender.isEnabled()) {
             senders.remove(mailSender.getName());
             JPMUtils.getLogger().info("Deshabilitando enviador de mail '" + mailSender.getDescription() + "'");

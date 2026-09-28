@@ -6,6 +6,7 @@ import jpaoletti.jpm2.core.model.persistent.CacheAdmin;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import jpaoletti.jpm2.core.dao.DefaultJPADAO;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.Session;
@@ -32,16 +33,17 @@ public class CacheService extends JPMServiceBase {
     @Autowired
     private SessionFactory sessionFactory;
 
-    private Map<String, GeneralCache> caches = new LinkedHashMap<>();
+    // Replaced as a whole on init (volatile) and updated in place on reload
+    private volatile Map<String, GeneralCache> caches = new ConcurrentHashMap<>();
 
     public void init() {
         JPMUtils.getLogger().info("Iniciando servicio de caches");
-        caches = new LinkedHashMap<>();
+        final Map<String, GeneralCache> fresh = new ConcurrentHashMap<>();
         final Session session = getSessionFactory().openSession();
         TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
         try {
             final List list = cacheAdminDAO.list(null);
-            list.stream().forEach(o -> reload((CacheAdmin) o));
+            list.stream().forEach(o -> load(fresh, (CacheAdmin) o));
         } catch (Exception e) {
             JPMUtils.getLogger().warn("No se pudieron cargar las caches. "
                     + "El servicio queda sin caches configuradas hasta ejecutar la migracion y recargar.", e);
@@ -49,6 +51,8 @@ public class CacheService extends JPMServiceBase {
             TransactionSynchronizationManager.unbindResourceIfPossible(getSessionFactory());// Without this the second invocation fails?
             session.close();
         }
+        // Published complete: readers never see a half loaded map
+        caches = fresh;
     }
 
     public GeneralCache getCache(String code) {
@@ -60,7 +64,11 @@ public class CacheService extends JPMServiceBase {
     }
 
     public void reload(CacheAdmin cacheAdmin) {
-        caches.put(cacheAdmin.getCode(), cacheAdmin.getCacheType().build(cacheAdmin.getParameterMap(), cacheAdmin.getCode()));
+        load(caches, cacheAdmin);
+    }
+
+    private void load(Map<String, GeneralCache> target, CacheAdmin cacheAdmin) {
+        target.put(cacheAdmin.getCode(), cacheAdmin.getCacheType().build(cacheAdmin.getParameterMap(), cacheAdmin.getCode()));
         JPMUtils.getLogger().info("Iniciando cache '" + cacheAdmin.getDescription() + "'");
     }
 

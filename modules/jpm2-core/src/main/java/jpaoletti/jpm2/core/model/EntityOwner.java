@@ -51,18 +51,21 @@ public class EntityOwner extends PMCoreObject {
         this.owner = owner;
     }
 
+    /**
+     * The owner of the given (weak) object: the owner instance or, when
+     * onlyId is true, the owner id stored in the local property.
+     */
     public Object getOwnerObject(String context, Object object) throws ConfigurationException {
-        final Object value = JPMUtils.get(object, getLocalProperty());
-        if (isOnlyId()) {
-            return getOwner().getDao(context).getId(object);
-        } else {
-            return value;
-        }
+        return JPMUtils.get(object, getLocalProperty());
     }
 
+    /**
+     * Sets the owner instance into the weak object. When onlyId is true, the
+     * owner id is stored in the local property.
+     */
     public void setOwnerObject(String context, Object object, Object ownerObject) {
         if (isOnlyId()) {
-            JPMUtils.set(object, getLocalProperty(), getOwner().getDao(context).getId(object));
+            JPMUtils.set(object, getLocalProperty(), ownerObject == null ? null : getOwner().getDao().getId(ownerObject));
         } else {
             JPMUtils.set(object, getLocalProperty(), ownerObject);
         }

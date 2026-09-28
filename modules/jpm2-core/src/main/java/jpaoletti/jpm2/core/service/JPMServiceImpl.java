@@ -103,13 +103,12 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
             //configuration.getRestrictions().add(Restrictions.eq(entity.getOwner().getLocalProperty(), ownerObject));
             addOwnerRestriction(entity, configuration, owner, ownerObject);
         }
-        // Apply search criteria
+        // Apply search criteria: generic search results (Hibernate and JPA) and legacy criterions (Hibernate only)
         if (sessionEntityData.getSearchCriteria().hasSearchResults()) {
-            // NEW: Use generic search results (works with both Hibernate and JPA)
             sessionEntityData.getSearchCriteria().applyTo(configuration);
-        } else if (search != null) {
-            // LEGACY: Fallback to old Hibernate Criterion method
-            addSearchCriteria(configuration, search, sessionEntityData.getSearchCriteria().getAliases());
+        }
+        if (search != null) {
+            addSearchCriteria(entity, configuration, search, sessionEntityData.getSearchCriteria().getAliases());
         }
         if (sessionEntityData.getSort().isSorted()) {
             addSort(configuration, sessionEntityData.getSort());
@@ -424,14 +423,15 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
      * @param criterion the Hibernate Criterion to add
      * @param aliases the aliases to add
      */
-    private void addSearchCriteria(IDAOListConfiguration cfg, Criterion criterion, Set<DAOListConfiguration.DAOListConfigurationAlias> aliases) {
+    private void addSearchCriteria(ContextualEntity entity, IDAOListConfiguration cfg, Criterion criterion, Set<DAOListConfiguration.DAOListConfigurationAlias> aliases) {
         if (cfg instanceof DAOListConfiguration) {
             DAOListConfiguration dalCfg = (DAOListConfiguration) cfg;
             dalCfg.getRestrictions().add(criterion);
             dalCfg.getAliases().addAll(aliases);
+        } else {
+            // JPA configurations don't support Hibernate Criterion: the field must use a JPA searcher (ISearcher)
+            LOG.warn("Legacy searcher filter IGNORED on entity {}: its DAO is JPA, configure a JPA searcher (ISearcher) on the field", entity);
         }
-        // Note: JPA configurations don't support Hibernate Criterion directly.
-        // If using JPA DAOs, search criteria needs to be converted to predicates at the Entity/Field level.
     }
 
     /**
