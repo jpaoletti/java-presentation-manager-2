@@ -9,12 +9,16 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.MessageFactory;
-import jpaoletti.jpm2.core.model.Entity;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.FieldConfig;
+import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.UserFavorite;
 import jpaoletti.jpm2.core.service.FavoriteService;
 import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.converter.ShowImageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -89,17 +93,70 @@ public class JPMController extends BaseController {
         return favoriteService.getFavorites(getUserDetails().getUsername());
     }
 
+    /**
+     * Serves a byte[] field as an image. The url lives under /static (public)
+     * for backward compatibility, so authorization is checked here: the user
+     * must be authenticated and able to see the field in at least one
+     * operation, unless the field's ShowImageConverter has publicAccess=true.
+     * Any failure answers 404 to avoid revealing what exists.
+     */
     @ResponseBody
     @GetMapping(value = "/static/img/{entity}-{field}-{id}.png", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] showImageConverter(@PathVariable String entity, @PathVariable String field, @PathVariable String id, HttpServletResponse response) {
         try {
-            final Entity e = getJpm().getEntity(entity);
-            final Field f = e.getFieldById(field, "");
-            return (byte[]) JPMUtils.get(e.getDao().get(id), f.getProperty());
+            final ContextualEntity ce = getJpm().getContextualEntity(entity);
+            final Field f = ce.getEntity().getFieldById(field, ce.getContext());
+            if (!isPublicImage(f) && !canSeeField(ce, f)) {
+                LOG.debug("showImageConverter DENIED entity={} field={} id={}", entity, field, id);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return null;
+            }
+            final Object object = ce.getDao().get(id);
+            final Object value = object == null ? null : JPMUtils.get(object, f.getProperty());
+            if (!(value instanceof byte[])) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return null;
+            }
+            return (byte[]) value;
         } catch (Exception e) {
             JPMUtils.getLogger().error("Error in entity image", e);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
+    }
+
+    protected boolean isPublicImage(Field field) {
+        for (FieldConfig config : field.getConfigs()) {
+            if (config.getConverter() instanceof ShowImageConverter && ((ShowImageConverter) config.getConverter()).isPublicAccess()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True if there is an authenticated user that can access the entity and at
+     * least one operation where the field is displayed.
+     */
+    protected boolean canSeeField(ContextualEntity ce, Field field) {
+        if (getUserDetails() == null) {
+            return false;
+        }
+        try {
+            ce.checkAuthorization();
+        } catch (NotAuthorizedException ex) {
+            return false;
+        }
+        for (Operation operation : ce.getEntity().getAllOperations()) {
+            if (field.shouldDisplay(operation.getId())) {
+                try {
+                    operation.checkAuthorization(ce.getEntity(), ce.getContext());
+                    return true;
+                } catch (NotAuthorizedException ex) {
+                }
+            }
+        }
+        return false;
     }
 
     public static class UploadFileResult {

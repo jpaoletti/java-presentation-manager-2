@@ -52,6 +52,7 @@ public class Entity extends PMCoreObject implements BeanNameAware {
     private Highlighter highlighter;
     private String auditId; //Optional ID for auditoring
     private boolean detailedAudit = false; //In the update, logs every modified field.
+    private boolean publicAttachment = false; //Allows anonymous access to /static/{entity}/{id}/downloadAttachment
 
     private List<EntityContext> contexts = new ArrayList<>();
 
@@ -707,6 +708,14 @@ public class Entity extends PMCoreObject implements BeanNameAware {
 
     public void setDetailedAudit(boolean detailedAudit) {
         this.detailedAudit = detailedAudit;
+    }
+
+    public boolean isPublicAttachment() {
+        return publicAttachment;
+    }
+
+    public void setPublicAttachment(boolean publicAttachment) {
+        this.publicAttachment = publicAttachment;
     }
 
     public Operation getOperation(String operation) throws OperationNotFoundException, NotAuthorizedException {

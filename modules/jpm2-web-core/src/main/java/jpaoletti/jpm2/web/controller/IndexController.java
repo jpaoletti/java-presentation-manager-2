@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.HibernateCriteriaDAO;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.WithAttachment;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.criterion.Restrictions;
@@ -56,10 +57,27 @@ public class IndexController extends BaseController {
         return res;
     }
 
+    /**
+     * Serves a WithAttachment instance. The url lives under /static (public)
+     * for backward compatibility, so authorization is checked here: the user
+     * must be authenticated and able to access the entity, unless the entity
+     * has publicAttachment=true. Any failure answers 404.
+     */
     @RequestMapping(value = "/static/{entity}/{instanceId}/downloadAttachment")
     @ResponseBody
     public void downloadFileConverter(HttpServletResponse response, @PathVariable String entity, @PathVariable String instanceId, @RequestParam boolean download) throws IOException, PMException {
-        final WithAttachment wa = (WithAttachment) getJpm().getEntity(entity).getDao().get(instanceId);
+        final ContextualEntity ce = getJpm().getContextualEntity(entity);
+        if (!ce.getEntity().isPublicAttachment() && !canAccessEntity(ce)) {
+            LOG.debug("downloadAttachment DENIED entity={} instanceId={}", entity, instanceId);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        final Object object = ce.getDao().get(instanceId);
+        if (!(object instanceof WithAttachment)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        final WithAttachment wa = (WithAttachment) object;
         if (download && !wa.isDownloadable()) {
             throw new PMException("jpm.not.downloadable");
         }
@@ -68,10 +86,9 @@ public class IndexController extends BaseController {
             response.addHeader("Content-Disposition", "attachment;filename=" + wa.getAttachmentName());
         }
         if (wa.isExternalFile()) {
-            final File file = new File(wa.getInternalFileName());
-            final FileInputStream is = new FileInputStream(file);
-            IOUtils.copy(is, response.getOutputStream());
-            IOUtils.closeQuietly(is);
+            try (FileInputStream is = new FileInputStream(new File(wa.getInternalFileName()))) {
+                IOUtils.copy(is, response.getOutputStream());
+            }
         } else {
             response.getOutputStream().write(wa.getAttachment());
         }

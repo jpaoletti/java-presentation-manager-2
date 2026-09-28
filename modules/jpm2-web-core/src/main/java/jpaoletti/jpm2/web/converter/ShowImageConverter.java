@@ -15,6 +15,11 @@ public class ShowImageConverter extends Converter {
     private String contentType = "";
     private String prefix;
     private String sufix;
+    /**
+     * Allows anonymous access to the image url (/static/img/...). Use only for
+     * images that must be reachable without a session (e.g. mails).
+     */
+    private boolean publicAccess = false;
 
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
@@ -27,6 +32,14 @@ public class ShowImageConverter extends Converter {
                 + "&prefix=" + (getPrefix() == null ? contextualEntity.getEntity().getId() : getPrefix())
                 + "&sufix=" + (getSufix() == null ? ".dat" : getSufix());
         return page;
+    }
+
+    public boolean isPublicAccess() {
+        return publicAccess;
+    }
+
+    public void setPublicAccess(boolean publicAccess) {
+        this.publicAccess = publicAccess;
     }
 
     public String getSufix() {

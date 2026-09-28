@@ -17,6 +17,7 @@ import jpaoletti.jpm2.core.exception.ConditionNotMetException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.message.Message;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
@@ -30,6 +31,7 @@ import jpaoletti.jpm2.core.service.JPMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.ModelAndView;
@@ -73,12 +75,39 @@ public class BaseController {
     private List<Message> globalMessages = new ArrayList<>();
 
     public UserDetails getUserDetails() {
-        final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        final Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
             return (UserDetails) principal;
         } else {
             return null;
         }
+    }
+
+    /**
+     * True if there is an authenticated user that can access the entity (and
+     * its context) and at least one of its operations.
+     */
+    protected boolean canAccessEntity(ContextualEntity ce) {
+        if (getUserDetails() == null) {
+            return false;
+        }
+        try {
+            ce.checkAuthorization();
+        } catch (NotAuthorizedException ex) {
+            return false;
+        }
+        for (Operation operation : ce.getEntity().getAllOperations()) {
+            try {
+                operation.checkAuthorization(ce.getEntity(), ce.getContext());
+                return true;
+            } catch (NotAuthorizedException ex) {
+            }
+        }
+        return false;
     }
 
     public Locale getLocale() {
