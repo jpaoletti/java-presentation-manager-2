@@ -47,6 +47,10 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
     public UserDetails resetPassword(Entity entity, String context, Operation operation, String instanceId) throws PMException {
         final String value = UUID.randomUUID().toString().substring(0, 8);
         final User user = (User) entity.getDao(context).get(instanceId);
+        if (user == null) {
+            throw new NotAuthorizedException();
+        }
+        checkInstanceAccess(entity, context, user);
         user.setPassword(BCrypt.hashpw(value, BCrypt.gensalt()));
         user.setNewPassword(value);
         preExecute(operation, user);
@@ -59,6 +63,10 @@ public class SecurityServiceImpl extends JPMServiceBase implements SecurityServi
     @Override
     public void changePassword(Entity entity, String context, Operation operation, String instanceId, String current, String newpass) throws PMException {
         final User user = (User) entity.getDao(context).get(instanceId);
+        if (user == null) {
+            throw new NotAuthorizedException();
+        }
+        checkInstanceAccess(entity, context, user);
         if (!getEncoder().matches(current, user.getPassword())) {
             throw new NotAuthorizedException();
         }

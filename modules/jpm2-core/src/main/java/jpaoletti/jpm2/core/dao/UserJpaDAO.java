@@ -10,19 +10,24 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
 import jpaoletti.jpm2.core.security.Group;
 import jpaoletti.jpm2.core.security.JpmUser;
+import jpaoletti.jpm2.core.security.PrivilegeLevelGuard;
 import jpaoletti.jpm2.core.security.User;
 import jpaoletti.jpm2.util.JPMUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  *
  * @author jpaoletti
  */
-public class UserJpaDAO extends JPADAO<JpmUser, String> {
+public class UserJpaDAO extends JPADAO<JpmUser, String> implements InstanceAccessGuard {
 
     @Override
     public String getId(Object object) {
         return ((JpmUser) object).getUsername();
+    }
+
+    @Override
+    public boolean canAccess(Object instance) {
+        return PrivilegeLevelGuard.canAccess(instance);
     }
 
     @Override
@@ -102,23 +107,25 @@ public class UserJpaDAO extends JPADAO<JpmUser, String> {
     }
 
     protected Predicate buildCurrentUserPredicate(CriteriaBuilder cb, CriteriaQuery<?> cq, Root<JpmUser> root) {
-        try {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof User) {
-                User currentUser = (User) principal;
-                Integer currentUserLevel = currentUser.getMaxPrivilegeLevel();
-                Subquery<String> subquery = cq.subquery(String.class);
-                Root<JpmUser> subRoot = subquery.from(JpmUser.class);
-                Join<JpmUser, Group> groups = subRoot.join("groups");
-                subquery.select(subRoot.get("username"));
-                subquery.where(cb.equal(subRoot.get("username"), root.get("username")));
-                subquery.groupBy(subRoot.get("username"));
-                subquery.having(cb.ge(cb.min(groups.get("level").as(Integer.class)), currentUserLevel));
-                return cb.exists(subquery);
-            }
-        } catch (Exception e) {
-            JPMUtils.getLogger().warn("Error applying user level filter", e);
+        final User currentUser = PrivilegeLevelGuard.getCurrentUser();
+        if (currentUser == null) {
+            // Not authenticated or not a User: system operation, no filter
+            return null;
         }
-        return null;
+        try {
+            Integer currentUserLevel = currentUser.getMaxPrivilegeLevel();
+            Subquery<String> subquery = cq.subquery(String.class);
+            Root<JpmUser> subRoot = subquery.from(JpmUser.class);
+            Join<JpmUser, Group> groups = subRoot.join("groups");
+            subquery.select(subRoot.get("username"));
+            subquery.where(cb.equal(subRoot.get("username"), root.get("username")));
+            subquery.groupBy(subRoot.get("username"));
+            subquery.having(cb.ge(cb.min(groups.get("level").as(Integer.class)), currentUserLevel));
+            return cb.exists(subquery);
+        } catch (Exception e) {
+            // The level of an authenticated user could not be computed: show nothing
+            JPMUtils.getLogger().warn("Error applying user level filter", e);
+            return cb.disjunction();
+        }
     }
 }

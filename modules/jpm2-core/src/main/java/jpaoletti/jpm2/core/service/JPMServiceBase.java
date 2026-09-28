@@ -7,8 +7,11 @@ import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.dao.DAO;
+import jpaoletti.jpm2.core.dao.InstanceAccessGuard;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -157,5 +160,20 @@ public class JPMServiceBase {
 
     public void setAuthorizationService(AuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
+    }
+
+    /**
+     * Checks the InstanceAccessGuard of the entity DAO, if any (for example
+     * users and groups filtered by privilege level).
+     *
+     * @throws NotAuthorizedException when the current user can't access the
+     * instance
+     */
+    protected void checkInstanceAccess(Entity entity, String context, Object object) throws NotAuthorizedException {
+        final DAO dao = entity.getDao(context);
+        if (object != null && dao instanceof InstanceAccessGuard && !((InstanceAccessGuard) dao).canAccess(object)) {
+            JPMUtils.getLogger().debug("checkInstanceAccess DENIED entity={} ctx={} class={}", entity.getId(), context, object.getClass().getSimpleName());
+            throw new NotAuthorizedException();
+        }
     }
 }

@@ -159,6 +159,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                     entity.getId(), context, operation, instanceId, JPMUtils.formatParams(parameters));
         }
         final Object object = entity.getDao(context).get(instanceId);
+        checkInstanceAccess(entity, context, object);
         Map<String, Object> originalValues = null;
         instance.getIobject().setObject(object);
         try {
@@ -166,6 +167,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                 originalValues = JPMUtils.getOriginalValues(entity, object);
             }
             processFields(entity, operation, object, instance, parameters);
+            checkInstanceAccess(entity, context, object);
             preExecute(operation, object);
             entity.getDao(context).update(object);
             final String newId = String.valueOf(entity.getDao(context).getId(object));
@@ -324,6 +326,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     public IdentifiedObject delete(Entity entity, String context, Operation operation, String instanceId) throws PMException {
         LOG.debug("delete IN entity={} ctx={} op={} instanceId={}", entity.getId(), context, operation, instanceId);
         final Object object = entity.getDao(context).get(instanceId); //current object
+        checkInstanceAccess(entity, context, object);
         preExecute(operation, object);
         entity.getDao(context).delete(object);
         postExecute(operation, object);
@@ -338,6 +341,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         //preExecute(operation, null);
         LOG.debug("get IN entity={} ctx={} op={} instanceId={}", entity.getId(), context, operation, instanceId);
         final Object object = entity.getDao(context).get(instanceId); //current object
+        checkInstanceAccess(entity, context, object);
         //postExecute(operation, object);
         LOG.debug("get OUT entity={} instanceId={} found={}", entity.getId(), instanceId, object != null);
         return new IdentifiedObject(instanceId, object);
@@ -345,7 +349,9 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
 
     @Override
     public IdentifiedObject get(Entity entity, String context, String instanceId) throws PMException {
-        return new IdentifiedObject(instanceId, entity.getDao(context).get(instanceId));
+        final Object object = entity.getDao(context).get(instanceId);
+        checkInstanceAccess(entity, context, object);
+        return new IdentifiedObject(instanceId, object);
     }
 
     @Override
@@ -356,6 +362,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         }
         final Object object = JPMUtils.newInstance(entity.getClazz());
         processFields(entity, operation, object, instance, parameters);
+        checkInstanceAccess(entity, context, object);
         preExecute(operation, object);
         entity.getDao(context).save(object);
         postExecute(operation, object);
@@ -377,6 +384,7 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         entity.getOwner(context).setOwnerObject(getContext().getEntityContext(), object, ownerObject);
         entityInstance.setIobject(new IdentifiedObject(null, object), getContext());
         processFields(entity, operation, object, entityInstance, parameters);
+        checkInstanceAccess(entity, context, object);
         preExecute(operation, object);
         entity.getDao(context).save(object);
         postExecute(operation, object);

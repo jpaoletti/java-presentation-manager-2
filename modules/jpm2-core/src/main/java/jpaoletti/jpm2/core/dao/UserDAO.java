@@ -1,21 +1,26 @@
 package jpaoletti.jpm2.core.dao;
 
 import jpaoletti.jpm2.core.security.JpmUser;
+import jpaoletti.jpm2.core.security.PrivilegeLevelGuard;
 import jpaoletti.jpm2.core.security.User;
 import jpaoletti.jpm2.util.JPMUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  *
  * @author jpaoletti
  */
-public class UserDAO extends HibernateCriteriaDAO<JpmUser, String> {
+public class UserDAO extends HibernateCriteriaDAO<JpmUser, String> implements InstanceAccessGuard {
 
     @Override
     public String getId(Object object) {
         return ((JpmUser) object).getUsername();
+    }
+
+    @Override
+    public boolean canAccess(Object instance) {
+        return PrivilegeLevelGuard.canAccess(instance);
     }
 
     /**
@@ -33,13 +38,11 @@ public class UserDAO extends HibernateCriteriaDAO<JpmUser, String> {
     public Criteria getBaseCriteria(IDAOListConfiguration configuration) {
         Criteria criteria = super.getBaseCriteria(configuration);
 
-        try {
-            // Get current authenticated user
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof User) {
-                User currentUser = (User) principal;
-                Integer currentUserLevel = currentUser.getMaxPrivilegeLevel();
-
+        final User currentUser = PrivilegeLevelGuard.getCurrentUser();
+        // If not authenticated or not a User, show all users (system operation)
+        if (currentUser != null) {
+            try {
+                final Integer currentUserLevel = currentUser.getMaxPrivilegeLevel();
                 // Use SQL restriction to filter users whose MIN(group.level) >= currentUserLevel
                 // This subquery calculates the minimum level across all groups for each user
                 criteria.add(Restrictions.sqlRestriction(
@@ -53,11 +56,11 @@ public class UserDAO extends HibernateCriteriaDAO<JpmUser, String> {
                         currentUserLevel,
                         org.hibernate.type.StandardBasicTypes.INTEGER
                 ));
+            } catch (Exception e) {
+                // The level of an authenticated user could not be computed: show nothing
+                JPMUtils.getLogger().warn("Error applying user level filter", e);
+                criteria.add(Restrictions.sqlRestriction("1=0"));
             }
-            // If not authenticated or not a User, show all users (system operation)
-        } catch (Exception e) {
-            // If any error occurs, show all users (fail-open for system operations)
-            JPMUtils.getLogger().warn("Error applying user level filter", e);
         }
 
         return criteria;
