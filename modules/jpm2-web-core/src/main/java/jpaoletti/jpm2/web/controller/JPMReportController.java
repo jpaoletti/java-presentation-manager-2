@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.reports.EntityReport;
 import jpaoletti.jpm2.core.model.reports.EntityReportData;
@@ -38,7 +39,7 @@ public class JPMReportController extends BaseController {
 
     @PostMapping(value = "/jpm/report/{reportId}/save")
     public String saveReport(@PathVariable String reportId, @RequestParam String name, @RequestParam String content) throws PMException {
-        final EntityReport report = getJpm().getReport(reportId);
+        final EntityReport report = getAuthorizedReport(reportId);
         final EntityReportUserSave saveReport = reportService.saveReport(report, reportId, name, getUserDetails().getUsername(), content);
         return "redirect:/jpm/report/" + reportId + "?savedReportId=" + saveReport.getId();
     }
@@ -46,10 +47,7 @@ public class JPMReportController extends BaseController {
     @GetMapping(value = "/jpm/report/{reportId}")
     public ModelAndView report(@PathVariable String reportId, @RequestParam(required = false) Long savedReportId) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-report");
-        final EntityReport report = getJpm().getReport(reportId);
-        if (report == null) {
-            throw new PMException(MessageFactory.error("jpm.reports.report.not.found", reportId));
-        }
+        final EntityReport report = getAuthorizedReport(reportId);
         if (savedReportId != null) {
             final EntityReportUserSave userSave = reportService.getUserSave(savedReportId, getUserDetails().getUsername());
             if (userSave != null) {
@@ -90,10 +88,7 @@ public class JPMReportController extends BaseController {
     @PostMapping(value = "/jpm/report/{reportId}/html")
     public ModelAndView reportHtml(@PathVariable String reportId, @RequestParam String reportData) throws PMException {
         final ModelAndView mav = new ModelAndView("jpm-report.html");
-        final EntityReport report = getJpm().getReport(reportId);
-        if (report == null) {
-            throw new PMException(MessageFactory.error("report.not.found", reportId));
-        }
+        final EntityReport report = getAuthorizedReport(reportId);
         mav.addObject("reportId", reportId);
         mav.addObject("report", report);
         final EntityReportData data = new Gson().fromJson(reportData, EntityReportData.class);
@@ -104,10 +99,7 @@ public class JPMReportController extends BaseController {
 
     @GetMapping(value = {"/jpm/report/{reportId}/xls"})
     public void reportXls(@PathVariable String reportId, @RequestParam String reportData, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        final EntityReport report = getJpm().getReport(reportId);
-        if (report == null) {
-            throw new PMException(MessageFactory.error("report.not.found", reportId));
-        }
+        final EntityReport report = getAuthorizedReport(reportId);
         final EntityReportData data = new Gson().fromJson(reportData, EntityReportData.class);
         final Workbook wb = reportService.getXls(report, data);
         response.setContentType("application/vnd.ms-excel");
@@ -118,9 +110,22 @@ public class JPMReportController extends BaseController {
     @PostMapping(value = "/jpm/report/{reportId}/{savedReportId}/delete")
     @ResponseBody
     public JPMPostResponse deleteReport(@PathVariable String reportId, @PathVariable Long savedReportId) throws PMException {
-        final EntityReport report = getJpm().getReport(reportId);
+        getAuthorizedReport(reportId);
         reportService.deleteUserSave(savedReportId, getUserDetails().getUsername());
         return new JPMPostResponse(true, "redirect:/jpm/report/" + reportId);
     }
 
+    /**
+     * Loads the report checking its own auth (if any) and the authorization
+     * of its entity.
+     */
+    protected EntityReport getAuthorizedReport(String reportId) throws PMException {
+        final EntityReport report = getJpm().getReport(reportId);
+        if (report == null) {
+            throw new PMException(MessageFactory.error("jpm.reports.report.not.found", reportId));
+        }
+        report.checkAuthorization();
+        new ContextualEntity(report.getEntity(), null).checkAuthorization();
+        return report;
+    }
 }

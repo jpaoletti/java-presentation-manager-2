@@ -29,6 +29,7 @@ public class EntityReport extends PMCoreObject {
     private String tabbableFields; //space separated list of field ids that can be used to organize data in tabs
 
     private boolean allowDetail = true;
+    private String auth; //Optional role required to access the report
 
     private EntityReportData fixedData;
 
@@ -79,10 +80,16 @@ public class EntityReport extends PMCoreObject {
     }
 
     public List<String> getTabbableFieldList() {
+        if (getTabbableFields() == null) {
+            return Collections.EMPTY_LIST;
+        }
         return Arrays.asList(StringUtils.split(getTabbableFields(), ' '));
     }
 
     public List<String> getGroupableFieldList() {
+        if (getGroupableFields() == null) {
+            return Collections.EMPTY_LIST;
+        }
         return Arrays.asList(StringUtils.split(getGroupableFields(), ' '));
     }
 
@@ -94,6 +101,9 @@ public class EntityReport extends PMCoreObject {
     }
 
     public List<String> getFilteringFieldList() {
+        if (getFilteringFields() == null) {
+            return Collections.EMPTY_LIST;
+        }
         return Arrays.asList(StringUtils.split(getFilteringFields(), ' '));
     }
 
@@ -114,6 +124,15 @@ public class EntityReport extends PMCoreObject {
 
     public void setTabbableFields(String tabbableFields) {
         this.tabbableFields = tabbableFields;
+    }
+
+    @Override
+    public String getAuth() {
+        return auth;
+    }
+
+    public void setAuth(String auth) {
+        this.auth = auth;
     }
 
     public boolean isAllowDetail() {

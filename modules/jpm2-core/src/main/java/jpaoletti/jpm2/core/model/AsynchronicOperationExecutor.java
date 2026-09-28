@@ -46,6 +46,12 @@ public class AsynchronicOperationExecutor extends Observable implements Runnable
             progress.setError(e.getMessage());
             JPMUtils.getLogger().error("AsynchronicOperationExecutor error", e);
         } finally {
+            TransactionSynchronizationManager.unbindResourceIfPossible(getSessionFactory());
+            try {
+                session.close();
+            } catch (Exception e) {
+                JPMUtils.getLogger().warn("AsynchronicOperationExecutor could not close session", e);
+            }
             setChanged();
             notifyObservers(Boolean.TRUE);
         }

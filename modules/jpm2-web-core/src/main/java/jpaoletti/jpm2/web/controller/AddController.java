@@ -1,10 +1,12 @@
 package jpaoletti.jpm2.web.controller;
 
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.EntityInstanceOwner;
+import jpaoletti.jpm2.core.model.EntityOwner;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
@@ -42,7 +44,7 @@ public class AddController extends BaseController {
             @RequestParam(required = false, defaultValue = "false") boolean close) throws PMException {
         LOG.debug("addPrepare IN entity={} op={} lastId={} close={}", getContext().getEntity(), getContext().getOperation(), lastId, close);
         //If there is a "lastId" , the object values are used as defaults
-        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
+        final Object object = getDefaultsObject(lastId, null);
         final Operation operation = getContext().getOperation();
         if (operation.getContext() != null) {
             operation.getContext().preConversion(object);
@@ -67,10 +69,10 @@ public class AddController extends BaseController {
     @GetMapping(value = "/jpm/{owner}/{ownerId}/{entity}/{operationId:" + OP_ADD + "}")
     public ModelAndView addWeakPrepare(@PathVariable String ownerId, @RequestParam(required = false) String lastId) throws PMException {
         LOG.debug("addWeakPrepare IN entity={} op={} ownerId={} lastId={}", getContext().getEntity(), getContext().getOperation(), ownerId, lastId);
-        final Object object = (lastId == null) ? JPMUtils.newInstance(getContext().getEntity().getClazz()) : getService().get(getContext().getEntity(), getContext().getEntityContext(), lastId).getObject();
+        final Object object = getDefaultsObject(lastId, ownerId);
         IdentifiedObject iobjectOwner = null;
         if (getContext().getEntity().isWeak(getContext().getEntityContext())) {
-            iobjectOwner = getService().get(getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner(), getContext().getEntityContext(), ownerId);
+            iobjectOwner = getOwnerObject(ownerId);
             getContext().getEntity().getOwner().setOwnerObject(getContext().getEntityContext(), object, iobjectOwner.getObject());
         }
         final Operation operation = getContext().getOperation();
@@ -99,7 +101,11 @@ public class AddController extends BaseController {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         LOG.debug("addCommit IN entity={} op={} repeat={}", entity, operation, repeat);
+        if (entity.isWeak(getContext().getEntityContext()) && !entity.getOwner(getContext().getEntityContext()).isOptional()) {
+            throw new NotAuthorizedException();
+        }
         try {
+            checkOperationCondition(operation, new EntityInstance(new IdentifiedObject(null, JPMUtils.newInstance(entity.getClazz())), getContext()));
             final IdentifiedObject newObject = getService().save(entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
@@ -159,7 +165,16 @@ public class AddController extends BaseController {
         final Entity entity = getContext().getEntity();
         final Operation operation = getContext().getOperation();
         LOG.debug("addWeakCommit IN owner={} ownerId={} entity={} op={} repeat={}", owner, ownerId, entity, operation, repeat);
+        if (!entity.isWeak(getContext().getEntityContext()) || !entity.getOwner(getContext().getEntityContext()).getOwner().getId().equals(owner.getId())) {
+            throw new NotAuthorizedException();
+        }
         try {
+            final IdentifiedObject iobjectOwner = getOwnerObject(ownerId);
+            final Object conditionObject = JPMUtils.newInstance(entity.getClazz());
+            entity.getOwner(getContext().getEntityContext()).setOwnerObject(getContext().getEntityContext(), conditionObject, iobjectOwner.getObject());
+            final EntityInstance conditionInstance = new EntityInstance(new IdentifiedObject(null, conditionObject), getContext());
+            conditionInstance.setOwner(new EntityInstanceOwner(entity.getOwner(getContext().getEntityContext()).getOwner(), iobjectOwner));
+            checkOperationCondition(operation, conditionInstance);
             final IdentifiedObject newObject = getService().save(owner, ownerId, entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
@@ -195,5 +210,55 @@ public class AddController extends BaseController {
             }
             return new JPMPostResponse(false, null, getContext().getEntityMessages(), getContext().getFieldMessages());
         }
+    }
+
+    /**
+     * Loads the owner of a weak entity. A missing owner is not authorized.
+     */
+    protected IdentifiedObject getOwnerObject(String ownerId) throws PMException {
+        final Entity ownerEntity = getContext().getEntity().getOwner(getContext().getEntityContext()).getOwner();
+        final IdentifiedObject iobjectOwner = getService().get(ownerEntity, getContext().getEntityContext(), ownerId);
+        if (iobjectOwner.getObject() == null) {
+            throw new NotAuthorizedException();
+        }
+        return iobjectOwner;
+    }
+
+    /**
+     * New instance to prepare the add form. When "lastId" is given (repeated
+     * add) its values are used as defaults, but only if the user can see that
+     * instance (show operation, when defined) and, for weak entities, it
+     * belongs to the same owner. Otherwise it is ignored.
+     */
+    protected Object getDefaultsObject(String lastId, String ownerId) throws PMException {
+        final Entity entity = getContext().getEntity();
+        if (lastId != null) {
+            try {
+                final Operation show = entity.getOperationWithoutAuth(ShowController.OP_SHOW, entity.getContext(getContext().getEntityContext()));
+                if (show != null) {
+                    show.checkAuthorization(entity, getContext().getEntityContext());
+                }
+                final Object last = getService().get(entity, getContext().getEntityContext(), lastId).getObject();
+                if (last != null && (ownerId == null || isOwnedBy(last, ownerId))) {
+                    return last;
+                }
+            } catch (NotAuthorizedException ex) {
+                LOG.debug("getDefaultsObject lastId={} ignored: not authorized", lastId);
+            }
+        }
+        return JPMUtils.newInstance(entity.getClazz());
+    }
+
+    private boolean isOwnedBy(Object object, String ownerId) throws PMException {
+        final EntityOwner entityOwner = getContext().getEntity().getOwner(getContext().getEntityContext());
+        if (entityOwner == null) {
+            return true;
+        }
+        final Object value = JPMUtils.get(object, entityOwner.getLocalProperty());
+        if (value == null) {
+            return false;
+        }
+        final Object id = entityOwner.isOnlyId() ? value : entityOwner.getOwner().getDao(getContext().getEntityContext()).getId(value);
+        return ownerId.equals(String.valueOf(id));
     }
 }

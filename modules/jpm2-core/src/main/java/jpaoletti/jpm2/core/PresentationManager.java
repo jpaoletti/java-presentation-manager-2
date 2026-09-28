@@ -2,7 +2,7 @@ package jpaoletti.jpm2.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -59,7 +59,7 @@ public class PresentationManager implements Observer, Serializable {
     @Autowired(required = false)
     private List<Entity> entityList;
 
-    private final Map<String, AsynchronicOperationExecutor> asynchronicOperationExecutors = new LinkedHashMap<>();
+    private final Map<String, AsynchronicOperationExecutor> asynchronicOperationExecutors = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Autowired
     @Qualifier("sessionFactory")
@@ -270,11 +270,6 @@ public class PresentationManager implements Observer, Serializable {
                 return false;
             }
         }
-        for (EntityInstance instance : instances) {
-            if (asynchronicOperationExecutors.containsKey(getKey(newCtx, instance))) {
-                return false;
-            }
-        }
         switch (ctx.getOperation().getScope()) {
             //All instances in the same 
             case GROUPED: {
@@ -292,7 +287,8 @@ public class PresentationManager implements Observer, Serializable {
             case SELECTED: {
                 for (EntityInstance instance : instances) {
                     final String key = getKey(newCtx, instance);
-                    final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
+                    // Each executor processes only its own instance
+                    final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, Collections.singletonList(instance), parameters, sessionFactory, newCtx);
                     asynchronicOperationExecutor.addObserver(this);
                     asynchronicOperationExecutor.addObserver(observer);
                     asynchronicOperationExecutors.put(key, asynchronicOperationExecutor);
@@ -313,6 +309,10 @@ public class PresentationManager implements Observer, Serializable {
             //only one without instances
             case GENERAL: {
                 final String key = newCtx.getContextualEntity().toString() + "#";
+                if (asynchronicOperationExecutors.containsKey(key)) {
+                    // The same general operation is already running
+                    return false;
+                }
                 final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
                 asynchronicOperationExecutor.addObserver(this);
                 asynchronicOperationExecutor.addObserver(observer);
@@ -363,17 +363,12 @@ public class PresentationManager implements Observer, Serializable {
     @Override
     public synchronized void update(Observable o, Object arg) {
         if (o instanceof AsynchronicOperationExecutor) {
-            final Boolean ended = (Boolean) arg;
-            if (ended) {
+            if (Boolean.TRUE.equals(arg)) {
                 final AsynchronicOperationExecutor t = (AsynchronicOperationExecutor) o;
-                if (t.getId().contains(",")) {
-                    for (String id : t.getId().split(",")) {
-                        asynchronicOperationExecutors.remove(id);
-                    }
-                } else {
-                    asynchronicOperationExecutors.remove(t.getId());
+                // Only remove the entries of this executor
+                for (String id : t.getId().split(",")) {
+                    asynchronicOperationExecutors.remove(id, t);
                 }
-            } else {
             }
         }
     }

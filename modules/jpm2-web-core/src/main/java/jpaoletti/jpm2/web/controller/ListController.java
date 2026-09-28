@@ -672,6 +672,16 @@ public class ListController extends BaseController {
         return declared || StringUtils.isEmpty(sortBy) || !JPMUtils.isSensitive(sortBy);
     }
 
+    /**
+     * A weak entity whose owner is required can only be listed or exported
+     * through its owner (the non-weak route would show every owner rows).
+     */
+    protected void checkNotRequiredWeak(Entity entity) throws NotAuthorizedException {
+        if (entity.isWeak(getContext().getEntityContext()) && !entity.getOwner(getContext().getEntityContext()).isOptional()) {
+            throw new NotAuthorizedException();
+        }
+    }
+
     protected void getObjectDisplay(final ObjectConverterData r, Entity entity, Object object, boolean useToString, String textField) throws ConfigurationException {
         if (!textField.contains("{")) {
             final Field field = entity.getFieldById(textField, getContext().getEntityContext());
@@ -706,6 +716,7 @@ public class ListController extends BaseController {
     @GetMapping(value = {"/jpm/{entity}/{operationId:toExcel}"})
     public void toExcel(HttpServletResponse response) throws Exception {
         final Entity entity = getContext().getEntity();
+        checkNotRequiredWeak(entity);
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), null, null);
         response.setContentType("application/vnd.ms-excel");
         final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", ""); // "papa"
@@ -736,6 +747,7 @@ public class ListController extends BaseController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false, defaultValue = "false") boolean download,
             HttpServletResponse response) throws Exception {
+        checkNotRequiredWeak(getContext().getEntity());
         writePdf(getContext().getEntity(), null, null, fields, orientation, size, title, download, response);
     }
 

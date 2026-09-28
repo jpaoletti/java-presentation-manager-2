@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jpaoletti.jpm2.core.PMException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.Operation;
 import jpaoletti.jpm2.core.model.ValidationException;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -42,9 +44,17 @@ public class EditController extends BaseController {
         }
         final Operation operation = entity.getOperation(OP_EDIT, getContext().getContext());
         getContext().set(entity, operation);
+        getContext().getContextualEntity().checkAuthorization();
         try {
             final EntityInstance instance = new EntityInstance(new IdentifiedObject(instanceId), getContext());
             getContext().setEntityInstance(instance);
+            // Only fields editable in the edit operation can be changed inline.
+            // The operation condition is not checked on purpose: inline editors are
+            // shown regardless of it and applications rely on that.
+            if (!instance.getValues().containsKey(name)) {
+                LOG.debug("ileditCommit DENIED entity={} instanceId={} name={} (not editable)", entity, instanceId, name);
+                throw new NotAuthorizedException();
+            }
             final Map<String, String[]> params = new HashMap<>();
             params.put("field_" + name, (String[]) Arrays.asList(value).toArray(new String[1]));
             final Object tmp = instance.getValues().get(name);
@@ -52,7 +62,8 @@ public class EditController extends BaseController {
             instance.getValues().put(name, tmp);
             getJpm().getService().update(entity, getContext().getEntityContext(), operation, instance, params);
             LOG.debug("ileditCommit OUT entity={} instanceId={} name={} status=200", entity, instanceId, name);
-            return new ResponseEntity<>(value, HttpStatus.OK);
+            // The inline editor renders the response as html
+            return new ResponseEntity<>(StringEscapeUtils.escapeHtml4(value), HttpStatus.OK);
         } catch (ValidationException e) {
             final StringBuilder sb = new StringBuilder();
             for (Map.Entry<String, List<Message>> entry : getContext().getFieldMessages().entrySet()) {
@@ -61,7 +72,7 @@ public class EditController extends BaseController {
                 }
             }
             LOG.debug("ileditCommit OUT entity={} instanceId={} name={} status=400 msg={}", entity, instanceId, name, sb);
-            return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(StringEscapeUtils.escapeHtml4(sb.toString()), HttpStatus.BAD_REQUEST);
         }
     }
 }

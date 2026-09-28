@@ -135,20 +135,34 @@ public class Field extends PMCoreObject {
         } catch (NotAuthorizedException ex) {
             return false;
         }
+        if (configs == null) {
+            // Only the implicit "all" config: the display property decides
+            return isDisplayedAt(operationId);
+        }
+        boolean included = false;
         for (FieldConfig config : getConfigs()) {
             if (config.includes(operationId)) {
+                included = true;
                 try {
                     config.checkAuthorization();
                     return true;
                 } catch (NotAuthorizedException ex) {
+                    // Another config for the same operation may be authorized
                 }
             }
         }
+        if (included) {
+            // Every config for this operation requires an authorization the user lacks
+            return false;
+        }
+        return isDisplayedAt(operationId);
+    }
+
+    private boolean isDisplayedAt(String operationId) {
         if (getDisplay().equalsIgnoreCase("all")) {
             return true;
         }
-        final String[] split = getDisplay().split("[ ]");
-        for (String string : split) {
+        for (String string : getDisplay().split("[ ]")) {
             if (string.equalsIgnoreCase(operationId)) {
                 return true;
             }

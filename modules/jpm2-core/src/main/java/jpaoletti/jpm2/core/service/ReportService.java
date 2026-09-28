@@ -64,6 +64,7 @@ public class ReportService extends JPMServiceBase {
 
     public EntityReportResult getResult(EntityReport report, EntityReportData reportData, boolean converted) throws FieldNotFoundException {
         final DAOListConfiguration cfg = new DAOListConfiguration();
+        sanitize(report, reportData);
 
         if (report.getFixedData() != null) {
             if (!CollectionUtils.isEmpty(report.getFixedData().getFilters())) {
@@ -362,6 +363,34 @@ public class ReportService extends JPMServiceBase {
         final EntityReportUserSave userSave = getUserSave(savedReportId, username);
         if (userSave != null) {
             entityReportUserSaveDAO.delete(userSave);
+        }
+    }
+
+    /**
+     * The report data comes from the client: only fields declared in the report
+     * can be used for each purpose. Anything else is discarded. Must be called
+     * before adding the fixed data.
+     */
+    protected void sanitize(EntityReport report, EntityReportData data) {
+        if (data.getFilters() != null) {
+            data.getFilters().removeIf(f -> !report.getFilteringFieldList().contains(f.getField()));
+        }
+        if (data.getVisibleFields() != null) {
+            data.getVisibleFields().removeIf(f -> !report.getDescriptiveFieldList().contains(f));
+        }
+        if (data.getGroups() != null) {
+            // "" is the "All" group
+            data.getGroups().removeIf(g -> !"".equals(g) && !report.getGroupableFieldList().contains(g) && !report.getTabbableFieldList().contains(g));
+        }
+        if (data.getFormulas() != null) {
+            data.getFormulas().removeIf(f -> !report.getNumericFieldList().contains(f.getField()));
+        }
+        if (!StringUtils.isEmpty(data.getSortField()) && !report.getSortableFieldList().contains(data.getSortField())) {
+            JPMUtils.getLogger().debug("ReportService.sanitize --- sort field discarded: {}", data.getSortField());
+            data.setSortField(null);
+        }
+        if (!StringUtils.isEmpty(data.getTabField()) && !report.getTabbableFieldList().contains(data.getTabField())) {
+            data.setTabField(null);
         }
     }
 }
