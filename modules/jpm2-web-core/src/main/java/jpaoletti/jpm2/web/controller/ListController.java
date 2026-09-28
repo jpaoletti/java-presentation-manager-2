@@ -101,14 +101,26 @@ public class ListController extends BaseController {
             @RequestParam(required = false) String filter,
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "2147483647") Integer pageSize) throws PMException {
+            @RequestParam(required = false, defaultValue = "2147483647") Integer pageSize,
+            HttpServletResponse response) throws PMException {
 
         LOG.debug("listObject IN entity={} textField={} filter={} query={} owner={} ownerId={} page={} pageSize={}",
                 entity, textField, filter, query, owner, ownerId, page, pageSize);
-        final Integer ps = (pageSize == null) ? 20 : pageSize;
+        final Integer ps = (pageSize == null || pageSize < 1) ? 20 : pageSize;
         final ObjectConverterData r = new ObjectConverterData();
         r.setResults(new ArrayList<>());
+        if (page == null || page < 1) {
+            page = 1;
+        }
+        if ((long) (page - 1) * ps > Integer.MAX_VALUE) {
+            return r;
+        }
         try {
+            if (!canReadLookup(entity, textField, filter, sortBy)) {
+                LOG.debug("listObject DENIED entity={} textField={} filter={} sortBy={}", entity, textField, filter, sortBy);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return r;
+            }
             final IDAOListConfiguration cl = entity.getDao(getContext().getEntityContext()).build();
             cl.setFrom((page - 1) * ps);
             cl.setMax(ps);
@@ -633,6 +645,31 @@ public class ListController extends BaseController {
 
     public void setCtx(WebApplicationContext ctx) {
         this.ctx = ctx;
+    }
+
+    /**
+     * Authorization of the autocomplete endpoint. A request matching a lookup
+     * declared in the entities configuration is allowed when the user can see
+     * its source field. Any other request (custom pages) needs read access to
+     * the entity and can't reference sensitive fields. In both cases the
+     * filter must be a list filter bean.
+     */
+    protected boolean canReadLookup(Entity entity, String textField, String filter, String sortBy) {
+        final ContextualEntity ce = new ContextualEntity(entity, getContext().getEntityContext());
+        final boolean declared = isVisibleDeclaredLookup(entity, textField, filter);
+        if (!declared && !canReadEntity(ce)) {
+            return false;
+        }
+        if (StringUtils.isNotEmpty(filter)) {
+            final Class<?> type = ctx.getType(filter);
+            if (type != null && !ListFilter.class.isAssignableFrom(type) && !JPAListFilter.class.isAssignableFrom(type)) {
+                return false;
+            }
+        }
+        if (!canReadFields(ce, getTextFieldIds(textField), declared)) {
+            return false;
+        }
+        return declared || StringUtils.isEmpty(sortBy) || !JPMUtils.isSensitive(sortBy);
     }
 
     protected void getObjectDisplay(final ObjectConverterData r, Entity entity, Object object, boolean useToString, String textField) throws ConfigurationException {

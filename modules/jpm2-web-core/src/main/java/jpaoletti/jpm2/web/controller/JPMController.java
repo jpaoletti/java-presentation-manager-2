@@ -134,31 +134,6 @@ public class JPMController extends BaseController {
         return false;
     }
 
-    /**
-     * True if there is an authenticated user that can access the entity and at
-     * least one operation where the field is displayed.
-     */
-    protected boolean canSeeField(ContextualEntity ce, Field field) {
-        if (getUserDetails() == null) {
-            return false;
-        }
-        try {
-            ce.checkAuthorization();
-        } catch (NotAuthorizedException ex) {
-            return false;
-        }
-        for (Operation operation : ce.getEntity().getAllOperations()) {
-            if (field.shouldDisplay(operation.getId())) {
-                try {
-                    operation.checkAuthorization(ce.getEntity(), ce.getContext());
-                    return true;
-                } catch (NotAuthorizedException ex) {
-                }
-            }
-        }
-        return false;
-    }
-
     public static class UploadFileResult {
 
         private String url;

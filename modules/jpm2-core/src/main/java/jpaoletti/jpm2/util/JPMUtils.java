@@ -229,7 +229,7 @@ public class JPMUtils implements ApplicationContextAware {
         return isSensitive(key) ? "***" : value;
     }
 
-    private static boolean isSensitive(String key) {
+    public static boolean isSensitive(String key) {
         if (key == null) {
             return false;
         }

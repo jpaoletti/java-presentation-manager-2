@@ -3,23 +3,28 @@ package jpaoletti.jpm2.web.controller;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.exception.ConditionNotMetException;
+import jpaoletti.jpm2.core.converter.ToStringConverter;
+import jpaoletti.jpm2.core.exception.FieldNotFoundException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.exception.OperationNotFoundException;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
+import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.core.model.ListSort;
 import jpaoletti.jpm2.core.model.Operation;
@@ -28,6 +33,8 @@ import jpaoletti.jpm2.core.model.SearchDefinition;
 import jpaoletti.jpm2.core.model.SessionEntityData;
 import jpaoletti.jpm2.core.service.AuthorizationService;
 import jpaoletti.jpm2.core.service.JPMService;
+import jpaoletti.jpm2.util.JPMUtils;
+import jpaoletti.jpm2.web.LookupRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -71,6 +78,8 @@ public class BaseController {
     private AuthorizationService authorizationService;
     @Autowired
     private MessageSource messageSource;
+    @Autowired
+    private LookupRegistry lookupRegistry;
     //Messages TO-DO
     private List<Message> globalMessages = new ArrayList<>();
 
@@ -108,6 +117,120 @@ public class BaseController {
             }
         }
         return false;
+    }
+
+    /**
+     * True if there is an authenticated user that can access the entity and at
+     * least one operation where the field is displayed.
+     */
+    protected boolean canSeeField(ContextualEntity ce, Field field) {
+        if (getUserDetails() == null) {
+            return false;
+        }
+        try {
+            ce.checkAuthorization();
+        } catch (NotAuthorizedException ex) {
+            return false;
+        }
+        for (Operation operation : ce.getEntity().getAllOperations()) {
+            if (field.shouldDisplay(operation.getId())) {
+                try {
+                    operation.checkAuthorization(ce.getEntity(), ce.getContext());
+                    return true;
+                } catch (NotAuthorizedException ex) {
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True if the user can see the source field of any declared lookup that
+     * targets the entity with the given text field and filter.
+     */
+    protected boolean isVisibleDeclaredLookup(Entity target, String textField, String filter) {
+        for (LookupRegistry.Lookup lookup : getLookupRegistry().find(target.getId(), textField, filter)) {
+            if (canSeeField(new ContextualEntity(lookup.getSource(), lookup.getSourceContext()), lookup.getSourceField())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Read access for the generic json endpoints: the entity (and context)
+     * authorization must pass, or the entity must be the target of a declared
+     * lookup whose source field the user can see.
+     */
+    protected boolean canReadEntity(ContextualEntity ce) {
+        if (getUserDetails() == null) {
+            return false;
+        }
+        try {
+            ce.checkAuthorization();
+            return true;
+        } catch (NotAuthorizedException ex) {
+        }
+        for (LookupRegistry.Lookup lookup : getLookupRegistry().getLookups(ce.getEntity().getId())) {
+            if (canSeeField(new ContextualEntity(lookup.getSource(), lookup.getSourceContext()), lookup.getSourceField())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks that the fields can be read by the generic json endpoints: the
+     * field authorization must pass and, unless the request matches a
+     * declared lookup, the field can't be a sensitive one (password, token,
+     * etc.).
+     *
+     * @param fieldIds field ids. A field that doesn't exist is ignored here,
+     * so the endpoint fails the same way it did before.
+     */
+    protected boolean canReadFields(ContextualEntity ce, Collection<String> fieldIds, boolean declared) {
+        for (String fieldId : fieldIds) {
+            final Field field;
+            try {
+                field = ce.getEntity().getFieldById(fieldId, ce.getContext());
+            } catch (FieldNotFoundException ex) {
+                continue;
+            }
+            try {
+                field.checkAuthorization();
+            } catch (NotAuthorizedException ex) {
+                return false;
+            }
+            if (!declared && (JPMUtils.isSensitive(field.getId()) || JPMUtils.isSensitive(field.getProperty()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Field ids referenced by a textField: a single field id, or a template
+     * like "{code} - {!name|default}".
+     */
+    protected static List<String> getTextFieldIds(String textField) {
+        final List<String> res = new ArrayList<>();
+        if (textField == null || textField.isEmpty() || "null".equals(textField)) {
+            return res;
+        }
+        if (!textField.contains("{")) {
+            res.add(textField);
+            return res;
+        }
+        final Matcher matcher = ToStringConverter.DISPLAY_PATTERN.matcher(textField);
+        while (matcher.find()) {
+            String id = matcher.group().replaceAll("\\{", "").replaceAll("\\}", "").replace("!", "");
+            final int sep = id.indexOf('|');
+            if (sep >= 0) {
+                id = id.substring(0, sep);
+            }
+            res.add(id);
+        }
+        return res;
     }
 
     public Locale getLocale() {
@@ -218,6 +341,10 @@ public class BaseController {
 
     public void setJpm(PresentationManager jpm) {
         this.jpm = jpm;
+    }
+
+    public LookupRegistry getLookupRegistry() {
+        return lookupRegistry;
     }
 
     public MessageSource getMessageSource() {

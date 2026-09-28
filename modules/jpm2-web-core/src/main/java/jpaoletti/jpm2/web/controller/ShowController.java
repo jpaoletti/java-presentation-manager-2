@@ -7,11 +7,14 @@ import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
+import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.model.IdentifiedObject;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.ObjectConverterData;
+import org.apache.commons.lang3.StringUtils;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +36,18 @@ public final class ShowController extends BaseController {
     public ObjectConverterData.ObjectConverterDataItem listObject(
             @PathVariable Entity entity,
             @PathVariable String instanceId,
-            @RequestParam(required = false) String textField) throws PMException {
+            @RequestParam(required = false) String textField,
+            HttpServletResponse response) throws PMException {
         LOG.debug("listObject(show) IN entity={} instanceId={} textField={}", entity, instanceId, textField);
         try {
             final String entityContext = getContext().getEntityContext();
+            final ContextualEntity ce = new ContextualEntity(entity, entityContext);
+            final boolean declared = getLookupRegistry().isDeclaredTextField(entity.getId(), textField);
+            if (!canReadEntity(ce) || !canReadFields(ce, getTextFieldIds(textField), declared)) {
+                LOG.debug("listObject(show) DENIED entity={} instanceId={} textField={}", entity, instanceId, textField);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return new ObjectConverterDataItem("", "");
+            }
             final IdentifiedObject iobject = getService().get(entity, entityContext, instanceId);
             final Object object = iobject.getObject();
             if (object == null) {
@@ -44,7 +55,8 @@ public final class ShowController extends BaseController {
             }
             return ObjectConverterData.buildDataObject(textField, entity, entityContext, instanceId, object);
         } catch (Exception e) {
-            return new ObjectConverterDataItem("", e.getMessage());
+            LOG.error("listObject(show) error entity=" + entity + " instanceId=" + instanceId, e);
+            return new ObjectConverterDataItem("", "");
         }
     }
 
@@ -54,10 +66,21 @@ public final class ShowController extends BaseController {
         LOG.debug("showJSON IN entity={} instanceId={} fields={}", getContext().getEntity(), instanceId, fields);
         final Map<String, Object> values = new LinkedHashMap<>();
         try {
+            if (StringUtils.isBlank(fields)) {
+                return values;
+            }
             final Object object = getService().get(getContext().getEntity(), getContext().getEntityContext(), getContext().getOperation(), instanceId).getObject();
             final String[] fs = fields.split("[,]");
             for (String fid : fs) {
-                final Field field = getContext().getEntity().getFieldById(fid, getContext().getEntityContext());
+                if (StringUtils.isBlank(fid)) {
+                    continue;
+                }
+                final Field field = getContext().getEntity().getFieldById(fid.trim(), getContext().getEntityContext());
+                try {
+                    field.checkAuthorization();
+                } catch (NotAuthorizedException ex) {
+                    continue;
+                }
                 final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());
                 if (converter != null) {
                     try {
@@ -72,7 +95,8 @@ public final class ShowController extends BaseController {
                 }
             }
         } catch (PMException e) {
-            values.put("ERROR", e.getMessage());
+            LOG.error("showJSON error entity=" + getContext().getEntity() + " instanceId=" + instanceId, e);
+            values.put("ERROR", getMessageSource().getMessage("unexpected.exception", null, "Error", getLocale()));
         }
         LOG.debug("showJSON OUT instanceId={} valuesCount={}", instanceId, values.size());
         return values;
