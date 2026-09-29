@@ -209,10 +209,4 @@
 
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>glassfish-repository</id>
-            <url>http://download.java.net/maven/glassfish</url>
-        </repository>
-    </repositories>
 </project>

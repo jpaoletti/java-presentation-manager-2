@@ -3,7 +3,6 @@ package jpaoletti.jpm2.web.executors;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PMException;
@@ -22,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 

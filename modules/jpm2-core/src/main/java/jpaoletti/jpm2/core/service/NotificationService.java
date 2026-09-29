@@ -3,7 +3,6 @@ package jpaoletti.jpm2.core.service;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import jpaoletti.jpm2.core.dao.DAOOrder;
 import jpaoletti.jpm2.core.dao.JPADAO;
 import jpaoletti.jpm2.core.dao.JPADAOListConfiguration;
@@ -12,6 +11,7 @@ import jpaoletti.jpm2.core.model.persistent.NotificationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
