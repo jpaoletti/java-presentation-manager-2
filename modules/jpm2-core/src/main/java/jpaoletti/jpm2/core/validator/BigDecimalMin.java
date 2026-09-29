@@ -17,7 +17,7 @@ public class BigDecimalMin implements FieldValidator {
     @Override
     public Message validate(Object object, Object convertedValue) {
         final BigDecimal value = (BigDecimal) convertedValue;
-        if (value == null || (getMin() != null && value.compareTo(getMin()) >= 0)) {
+        if (value == null || getMin() == null || value.compareTo(getMin()) >= 0) {
             return null;
         } else {
             return MessageFactory.error(getMessage(), String.valueOf(convertedValue), String.valueOf(getMin()));

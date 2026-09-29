@@ -22,7 +22,7 @@ public class WebToString extends ToStringConverter {
 
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
-        return wrap(field, escape(process(value)), value);
+        return wrap(field, escape(process(value), value), value);
     }
 
     /**
@@ -31,7 +31,7 @@ public class WebToString extends ToStringConverter {
      */
     public String wrap(Field field, String process, Object value) {
         final String originalValue = (value == null) ? getNullValue() : getFinalValue(value, getProperties());
-        return "<span class='to-string' title='" + (isUseTitle() ? escapeAttribute(originalValue) : "") + "' data-align='" + field.getAlign() + "'>" + process + "</span>";
+        return "<span class='to-string' title='" + (isUseTitle() ? escapeAttribute(originalValue, value) : "") + "' data-align='" + field.getAlign() + "'>" + process + "</span>";
     }
 
     /**
@@ -39,6 +39,35 @@ public class WebToString extends ToStringConverter {
      */
     protected String escape(String value) {
         return (isHtml() || value == null) ? value : StringEscapeUtils.escapeHtml4(value);
+    }
+
+    /**
+     * Escapes the rendered text of a value, unless the value is trusted (see
+     * {@link #isTrusted(Object)}).
+     */
+    protected String escape(String text, Object value) {
+        return isTrusted(value) ? text : escape(text);
+    }
+
+    /**
+     * Escapes the rendered text of a value for an html attribute. Trusted
+     * values keep their entities (so they are decoded by the browser) and only
+     * the quotes are escaped.
+     */
+    public static String escapeAttribute(String text, Object value) {
+        if (isTrusted(value)) {
+            return text == null ? null : text.replace("\"", "&quot;").replace("'", "&#39;");
+        }
+        return escapeAttribute(text);
+    }
+
+    /**
+     * Values defined in the code (enums) are trusted: their texts may contain
+     * html entities, like "Restituci&amp;oacute;n", following the same convention
+     * as the jsp pages.
+     */
+    public static boolean isTrusted(Object value) {
+        return value instanceof Enum;
     }
 
     /**

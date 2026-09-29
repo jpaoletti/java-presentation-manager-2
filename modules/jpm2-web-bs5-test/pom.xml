@@ -92,10 +92,16 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.md</exclude> <!-- CLAUDE.md and other notes must not be packaged -->
+                </excludes>
             </resource>
             <resource>
                 <directory>src/main/filtered</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.md</exclude> <!-- CLAUDE.md and other notes must not be packaged -->
+                </excludes>
             </resource>
         </resources>
         <plugins>
@@ -114,7 +120,7 @@
                 <version>3.3.2</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>WEB-INF/classes/**</packagingExcludes>
+                    <packagingExcludes>WEB-INF/classes/**,**/*.md</packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>

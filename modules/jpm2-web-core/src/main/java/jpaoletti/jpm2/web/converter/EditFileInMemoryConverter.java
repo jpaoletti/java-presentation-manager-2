@@ -22,6 +22,13 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
     private HttpSession session;
     private String contentTypeField = null;
     private Long maxSize = null;
+    /**
+     * When the user keeps the current file ("@current:"), the converter returns
+     * CURRENT_FILE by default so a context/service of the application can tell
+     * the file wasn't changed (for files stored outside the entity). Set it to
+     * true when the byte[] property is persisted: the current value is kept.
+     */
+    private boolean keepCurrentValue = false;
 
     @Override
     protected String getPage(ContextualEntity contextualEntity, Field field, Object object, String instanceId) {
@@ -31,6 +38,9 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
     @Override
     public Object build(ContextualEntity contextualEntity, Field field, Object object, Object newValue) throws ConverterException {
         if (newValue != null && newValue.equals("@current:")) {
+            if (isKeepCurrentValue()) {
+                throw new IgnoreConvertionException();
+            }
             return CURRENT_FILE;
         }
         if (newValue == null || newValue.equals("")) {
@@ -95,4 +105,12 @@ public class EditFileInMemoryConverter extends BaseEditFileConverter {
         this.maxSize = maxSize;
     }
 
+
+    public boolean isKeepCurrentValue() {
+        return keepCurrentValue;
+    }
+
+    public void setKeepCurrentValue(boolean keepCurrentValue) {
+        this.keepCurrentValue = keepCurrentValue;
+    }
 }

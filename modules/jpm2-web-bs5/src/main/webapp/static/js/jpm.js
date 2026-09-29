@@ -37,10 +37,6 @@ function isMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-String.prototype.trim = function () {
-    return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
-};
-
 (function ($) {
     $.fn.uniqueId = function () {
         this.each(function () {
@@ -1024,6 +1020,20 @@ var processFormResponse = function (data) {
                 };
             }
             jpmDialog(params);
+        } else {
+            // Success without messages: go on directly (otherwise the page stays blocked).
+            // Deferred so the current navigation finishes and frees jpmNavigator.loading first.
+            if (!data.next || data.next === "" || data.next === "-") {
+                jpmUnBlock();
+            } else if (data.next === "EXECUTOR_RELOAD") {
+                setTimeout(function () {
+                    jpmNavigate(window.location.href, {push: false, replace: true});
+                }, 0);
+            } else {
+                setTimeout(function () {
+                    jpmNavigate(getContextPath() + (data.next.startsWith("/") ? data.next.substr(1) : data.next));
+                }, 0);
+            }
         }
     } else {
         $(".form-control").removeClass("is-invalid");
@@ -1138,51 +1148,108 @@ function setEntityVal(select, id, callback) {
     return select;
 }
 
-function asynchronicOperationProgress(id) {
-    $.getScript(getContextPath() + "static/js/sockjs.min.js", function (data, textStatus, jqxhr) {
-        $.getScript(getContextPath() + "static/js/stomp.min.js", function (data, textStatus, jqxhr) {
-            var socket = new SockJS(getContextPath() + 'jpm-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.debug = null;
-            stompClient.connect({}, function (frame) {
-                stompClient.subscribe('/asynchronicOperationExecutor/progress/' + id, function (s) {
-                    $(".asynchronic").addClass('disabled');
-                    var id = "#asynchronicProgress";
-                    var r = JSON.parse(s.body);
-                    $(id).removeClass('d-none').show();
-                    $(id + " > .progress-bar").css("width", (Math.round(r.percent * 100) / 100) + "%");
-                    $(id + "_status").text((Math.round(r.percent * 100) / 100) + "% (" + r.status + ")");
-                });
-                stompClient.subscribe('/asynchronicOperationExecutor/done/' + id, function (s) {
-                    var res = JSON.parse(s.body);
-                    if (res.error !== null && res.error !== '') {
-                        jpmDialog({
-                            message: res.error,
-                            titleBackground: "bg-danger",
-                            callback: function () {
-                                window.history.back();
-                            }
-                        });
-                    } else {
-                        var status = res.status;
-                        if (status !== '') {
-                            jpmDialogConfirm({
-                                message: status,
-                                callback: function () {
-                                    jpmNavigate(window.location.href, {push: false, replace: true});
-                                }
-                            });
-                            setTimeout(function () {
-                                jpmNavigate(window.location.href, {push: false, replace: true});
-                            }, 2000);
-                        }
-                    }
-                    $("#asynchronicProgress").addClass('d-none').hide();
-                    $(".asynchronic").removeClass('disabled');
-                });
-                stompClient.send("/jpm/asynchronicOperationExecutorProgress", {}, JSON.stringify({'id': id}));
+/**
+ * Single websocket (STOMP over SockJS) client shared by every page: pages are
+ * loaded with partial navigation, so connecting on each page would leave one
+ * open connection (and duplicated subscriptions) per visited page.
+ */
+var jpmAsyncWs = {client: null, connecting: false, queue: [], subscriptions: [], page: 0};
+
+function jpmAsyncWsScripts(callback) {
+    if (window.SockJS && window.Stomp) {
+        callback();
+        return;
+    }
+    $.getScript(getContextPath() + "static/js/sockjs.min.js", function () {
+        $.getScript(getContextPath() + "static/js/stomp.min.js", callback);
+    });
+}
+
+function jpmAsyncWsClient(callback) {
+    if (jpmAsyncWs.client && jpmAsyncWs.client.connected) {
+        callback(jpmAsyncWs.client);
+        return;
+    }
+    jpmAsyncWs.queue.push(callback);
+    if (jpmAsyncWs.connecting) {
+        return;
+    }
+    jpmAsyncWs.connecting = true;
+    jpmAsyncWsScripts(function () {
+        var client = Stomp.over(new SockJS(getContextPath() + 'jpm-websocket'));
+        client.debug = null;
+        client.connect({}, function () {
+            jpmAsyncWs.client = client;
+            jpmAsyncWs.connecting = false;
+            var pending = jpmAsyncWs.queue;
+            jpmAsyncWs.queue = [];
+            $.each(pending, function (i, cb) {
+                cb(client);
             });
+        }, function () {
+            // Connection lost/refused or ERROR frame: close it (if still open) and let the next page connect again
+            try {
+                client.disconnect();
+            } catch (e) {
+            }
+            jpmAsyncWs.client = null;
+            jpmAsyncWs.connecting = false;
+            jpmAsyncWs.queue = [];
+            jpmAsyncWs.subscriptions = [];
         });
+    });
+}
+
+function asynchronicOperationProgress(id) {
+    // A new page: drop the subscriptions of the previous one
+    var page = ++jpmAsyncWs.page;
+    $.each(jpmAsyncWs.subscriptions, function (i, subscription) {
+        try {
+            subscription.unsubscribe();
+        } catch (e) {
+        }
+    });
+    jpmAsyncWs.subscriptions = [];
+    jpmAsyncWsClient(function (stompClient) {
+        if (page !== jpmAsyncWs.page) {
+            return; // the user already left the page that asked for this
+        }
+        jpmAsyncWs.subscriptions.push(stompClient.subscribe('/asynchronicOperationExecutor/progress/' + id, function (s) {
+            $(".asynchronic").addClass('disabled');
+            var id = "#asynchronicProgress";
+            var r = JSON.parse(s.body);
+            $(id).removeClass('d-none').show();
+            $(id + " > .progress-bar").css("width", (Math.round(r.percent * 100) / 100) + "%");
+            $(id + "_status").text((Math.round(r.percent * 100) / 100) + "% (" + r.status + ")");
+        }));
+        jpmAsyncWs.subscriptions.push(stompClient.subscribe('/asynchronicOperationExecutor/done/' + id, function (s) {
+            var res = JSON.parse(s.body);
+            if (res.error !== null && res.error !== '') {
+                jpmDialog({
+                    message: res.error,
+                    titleBackground: "bg-danger",
+                    callback: function () {
+                        window.history.back();
+                    }
+                });
+            } else {
+                var status = res.status;
+                if (status !== '') {
+                    jpmDialogConfirm({
+                        message: status,
+                        callback: function () {
+                            jpmNavigate(window.location.href, {push: false, replace: true});
+                        }
+                    });
+                    setTimeout(function () {
+                        jpmNavigate(window.location.href, {push: false, replace: true});
+                    }, 2000);
+                }
+            }
+            $("#asynchronicProgress").addClass('d-none').hide();
+            $(".asynchronic").removeClass('disabled');
+        }));
+        stompClient.send("/jpm/asynchronicOperationExecutorProgress", {}, JSON.stringify({'id': id}));
     });
 }
 
@@ -1196,7 +1263,7 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
     var html = "";
     if (ct.includes("image")) {
         html = html + "<img id='attachmentImg' src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "'/>";
-    } else if (ct.contains("pdf")) {
+    } else if (ct.includes("pdf")) {
         html = html + "<iframe src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "' style='height:500px;width:100%;'></iframe>";
     } else {
         html = html + "<div class='alert alert-info' >" + messages["jpm.modal.attachment.preview"] + "</div>";

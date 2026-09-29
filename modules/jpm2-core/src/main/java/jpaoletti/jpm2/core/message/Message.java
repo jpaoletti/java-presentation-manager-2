@@ -2,6 +2,7 @@ package jpaoletti.jpm2.core.message;
 
 import java.io.Serializable;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -75,6 +76,23 @@ public class Message implements Serializable {
         } else {
             return "";
         }
+    }
+
+    /**
+     * The arguments escaped for html, to render the message in a page: the
+     * message pattern (which may contain entities like &amp;aacute;) is trusted,
+     * the arguments (usually user input) are not.
+     */
+    public String[] getHtmlEscapedArgs() {
+        final String[] args = getArgs();
+        if (args == null) {
+            return new String[0];
+        }
+        final String[] res = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+            res[i] = args[i] == null ? null : StringEscapeUtils.escapeHtml4(args[i]);
+        }
+        return res;
     }
 
     public final void build() {

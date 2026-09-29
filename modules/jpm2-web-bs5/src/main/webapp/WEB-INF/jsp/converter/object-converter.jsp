@@ -16,7 +16,7 @@
                 $.getJSON("${cp}jpm/${param.entityId}/" + id + "/show.json?fields=${param.textFieldDetails}", function (data) {
                     var content = "<div><div class='table-responsive'><table class='table table-bordered table-sm w-auto'><tbody>";
                     $.each(data, function (i, v) {
-                        content = content + "<tr><th>" + jpmEscape(i) + "</th><td>" + v + "</td></tr>";
+                        content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
                     });
                     content = content + "</tbody></table>";
                     //<c:if test="${not empty param.textFieldDetailsOperation}">

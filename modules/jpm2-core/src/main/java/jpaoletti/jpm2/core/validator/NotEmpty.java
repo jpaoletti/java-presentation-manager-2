@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.core.validator;
 
 import java.util.Collection;
+import java.util.Map;
 import jpaoletti.jpm2.core.message.Message;
 import jpaoletti.jpm2.core.message.MessageFactory;
 import jpaoletti.jpm2.core.model.FieldValidator;
@@ -15,11 +16,19 @@ public class NotEmpty implements FieldValidator {
 
     @Override
     public Message validate(Object object, Object convertedValue) {
-        if (convertedValue != null && !((Collection) convertedValue).isEmpty()) {
-            return null;
+        final boolean empty;
+        if (convertedValue == null) {
+            empty = true;
+        } else if (convertedValue instanceof Collection) {
+            empty = ((Collection) convertedValue).isEmpty();
+        } else if (convertedValue instanceof Map) {
+            empty = ((Map) convertedValue).isEmpty();
+        } else if (convertedValue.getClass().isArray()) {
+            empty = java.lang.reflect.Array.getLength(convertedValue) == 0;
         } else {
-            return MessageFactory.error(getMessage());
+            empty = convertedValue.toString().trim().isEmpty();
         }
+        return empty ? MessageFactory.error(getMessage()) : null;
     }
 
     public String getMessage() {

@@ -13,6 +13,7 @@
         <div class="sidebar-submenu" style="display: none;">
             <ul>
                 <li>
+                    <jpm:menu-item code="jpm-entity-test"  icon="fab fa-java" />
                     <!--<span class="badge bg-pill bg-success">Pro</span>-->
                 </li>
             </ul>

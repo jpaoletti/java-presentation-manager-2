@@ -177,6 +177,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.md</exclude> <!-- CLAUDE.md and other notes must not be packaged -->
+                </excludes>
             </resource>
         </resources>
         <testResources>

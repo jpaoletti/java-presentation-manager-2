@@ -17,6 +17,9 @@ public class MailConfig {
     private String port = "25";
     private String tlsEnabled = "false";
     private String tlsVersion;
+    public static final int DEFAULT_TIMEOUT_MS = 30000;
+    private boolean starttlsRequired = false;
+    private Integer timeoutMs = DEFAULT_TIMEOUT_MS; //connection, read and write timeout
     private String from;
     private String fromName;
 
@@ -114,5 +117,21 @@ public class MailConfig {
 
     public void setTlsVersion(String tlsVersion) {
         this.tlsVersion = tlsVersion;
+    }
+
+    public boolean isStarttlsRequired() {
+        return starttlsRequired;
+    }
+
+    public void setStarttlsRequired(boolean starttlsRequired) {
+        this.starttlsRequired = starttlsRequired;
+    }
+
+    public Integer getTimeoutMs() {
+        return timeoutMs;
+    }
+
+    public void setTimeoutMs(Integer timeoutMs) {
+        this.timeoutMs = timeoutMs;
     }
 }

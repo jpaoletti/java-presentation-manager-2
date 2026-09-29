@@ -16,11 +16,11 @@ public class EditableToString extends WebToString {
 
     @Override
     public Object visualizeValue(ContextualEntity contextualEntity, Field field, Object instance, Object value, String instanceId) throws ConverterException, ConfigurationException {
-        String processed = escape(process(value));
+        String processed = escape(process(value), value);
         if (always || getAuthorizationService().userHasRole("jpm.auth.operation." + contextualEntity + ".edit")) {
             final String originalValue = (value == null) ? "" : value.toString();
             final String finalValue = (value == null) ? getNullValue() : getFinalValue(value, getProperties());
-            return "<a href=\"javascript:;\" class=\"inline-edit\" title=\"" + escapeAttribute(originalValue) + "\" data-name=\"" + field.getId() + "\" data-type=\"text\" data-align=\"" + field.getAlign() + "\">" + escape(finalValue) + "</a>";
+            return "<a href=\"javascript:;\" class=\"inline-edit\" title=\"" + escapeAttribute(originalValue, value) + "\" data-name=\"" + field.getId() + "\" data-type=\"text\" data-align=\"" + field.getAlign() + "\">" + escape(finalValue, value) + "</a>";
         } else {
             return wrap(field, processed, value);
         }

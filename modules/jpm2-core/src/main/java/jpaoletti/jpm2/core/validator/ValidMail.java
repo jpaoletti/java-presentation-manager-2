@@ -19,7 +19,7 @@ public class ValidMail implements FieldValidator {
 
     @Override
     public Message validate(Object object, Object convertedValue) {
-        final String mail = convertedValue.toString();
+        final String mail = convertedValue == null ? null : convertedValue.toString();
         if (StringUtils.isNotEmpty(mail)) {
             if (isUseRegex()) {
                 Pattern pattern = Pattern.compile(regexPattern);

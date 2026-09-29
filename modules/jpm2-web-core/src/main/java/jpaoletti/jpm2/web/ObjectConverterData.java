@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.util.JPMUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  *
@@ -38,7 +39,7 @@ public class ObjectConverterData {
         if (textField != null) {
             if (!textField.contains("{")) {
                 final Field field = entity.getFieldById(textField, entityContext);
-                return new ObjectConverterDataItem(instanceId, String.valueOf(JPMUtils.get(object, field.getProperty())));
+                return new ObjectConverterDataItem(instanceId, toText(JPMUtils.get(object, field.getProperty())));
             } else {
                 result = new ObjectConverterDataItem(instanceId, renderTextField(textField, entity, entityContext, object));
             }
@@ -68,8 +69,18 @@ public class ObjectConverterData {
         if (value == null) {
             return defaultValue == null ? "null" : defaultValue;
         }
-        final String stringValue = String.valueOf(value);
+        final String stringValue = toText(value);
         return "null".equals(stringValue) && defaultValue != null ? defaultValue : stringValue;
+    }
+
+    /**
+     * Plain text of a value for the json responses (the client escapes it).
+     * Enum texts are defined in the code with html entities ("Restituci&amp;oacute;n"),
+     * so they are decoded to plain text.
+     */
+    public static String toText(Object value) {
+        final String text = String.valueOf(value);
+        return value instanceof Enum ? StringEscapeUtils.unescapeHtml4(text) : text;
     }
 
     public static class ObjectConverterDataItem {

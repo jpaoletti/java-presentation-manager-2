@@ -318,9 +318,12 @@ public class MailManager {
         if (config.isAuth()) {
             final String passw = config.getPassword();
             final Transport t = session.getTransport("smtp");
-            t.connect(config.getUser(), passw);
-            t.sendMessage(msg, msg.getAllRecipients());
-            t.close();
+            try {
+                t.connect(config.getUser(), passw);
+                t.sendMessage(msg, msg.getAllRecipients());
+            } finally {
+                t.close();
+            }
         } else {
             Transport.send(msg);
         }
@@ -333,7 +336,19 @@ public class MailManager {
         props.setProperty("mail.smtp.host", getConfig().getHost());
         props.setProperty("mail.smtp.starttls.enable", getConfig().getTlsEnabled());
         props.setProperty("mail.smtp.port", getConfig().getPort());
-        props.setProperty("mail.smtp.user", user);
+        if (user != null) {
+            props.setProperty("mail.smtp.user", user);
+        }
+        if (getConfig().isStarttlsRequired()) {
+            props.setProperty("mail.smtp.starttls.required", "true");
+        }
+        if (getConfig().getTimeoutMs() != null && getConfig().getTimeoutMs() > 0) {
+            // Without timeouts a server that accepts the connection and never answers hangs the thread forever
+            final String timeout = String.valueOf(getConfig().getTimeoutMs());
+            props.setProperty("mail.smtp.connectiontimeout", timeout);
+            props.setProperty("mail.smtp.timeout", timeout);
+            props.setProperty("mail.smtp.writetimeout", timeout);
+        }
         props.setProperty("mail.smtp.auth", auth.toString());
         if (StringUtils.isNotEmpty(getConfig().getTlsVersion())) {
             props.put("mail.smtp.ssl.protocols", getConfig().getTlsVersion());
@@ -379,7 +394,7 @@ public class MailManager {
 
     protected MimeMessage initMessage(final Session session, String replyTo, String[] to, String subject, String body) throws MessagingException {
         final MimeMessage msg = initBasicMessage(session, replyTo, to, subject);
-        msg.setContent(body, "text/html");
+        msg.setContent(body, "text/html; charset=UTF-8");
         return msg;
     }
 
@@ -421,7 +436,7 @@ public class MailManager {
             msg.setFrom(new InternetAddress(getConfig().getFrom()));
         }
         msg.setRecipients(Message.RecipientType.TO, getAddress(to));
-        if (getAppname() != null) {
+        if (StringUtils.isNotEmpty(getAppname())) {
             msg.setSubject("[" + getAppname() + "] " + subject, "UTF-8");
         } else {
             msg.setSubject(subject, "UTF-8");

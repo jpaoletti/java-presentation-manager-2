@@ -18,10 +18,14 @@ public class DateMin implements FieldValidator {
 
     @Override
     public Message validate(Object object, Object convertedValue) {
+        if (!(convertedValue instanceof Date)) {
+            return null;
+        }
         try {
             final Date value = (Date) convertedValue;
-            final Date maxdate = min == null ? new Date() : new SimpleDateFormat().parse(getMin());
-            if (value == null || value.after(maxdate)) {
+            // min is yyyy-MM-dd (see the property); null means now
+            final Date maxdate = min == null ? new Date() : new SimpleDateFormat("yyyy-MM-dd").parse(getMin());
+            if (value.after(maxdate)) {
                 return null;
             } else {
                 return MessageFactory.error(getMessage(), String.valueOf(convertedValue), String.valueOf(getMin()));

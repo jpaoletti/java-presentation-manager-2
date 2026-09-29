@@ -21,10 +21,6 @@ function isMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-String.prototype.trim = function () {
-    return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g, "");
-};
-
 (function ($) {
     $.fn.uniqueId = function () {
         this.each(function () {
@@ -391,7 +387,7 @@ var processFormResponse = function (data) {
         if (data.messages.length > 0) {
             var $message = '<div><ul>';
             $.each(data.messages, function (m, text) {
-                $message = "<li>" + text.text + "</li>";
+                $message += "<li>" + text.text + "</li>";
             });
             $message = $message + "</ul></div>";
             var okbuttons = [];
@@ -415,6 +411,9 @@ var processFormResponse = function (data) {
             setTimeout(function () {
                 document.location = getContextPath() + (data.next.startsWith("/") ? data.next.substr(1) : data.next);
             }, data.messageDelay);
+        } else if (data.messages.length === 0) {
+            // Success without messages nor next: nothing else will unblock the page
+            jpmUnBlock();
         }
     } else {
         $(".form-group").removeClass("has-error");
@@ -565,9 +564,9 @@ $(document).on("click", ".viewAttachmentIco", function (e) {
     var entity = $(this).attr("data-entity");
     var $textAndPic = $('<div id="attachmentPopup"></div>');
     var html = "";
-    if (ct.contains("image")) {
+    if (ct.includes("image")) {
         html = html + "<img id='attachmentImg' src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "'/>";
-    } else if (ct.contains("pdf")) {
+    } else if (ct.includes("pdf")) {
         html = html + "<iframe src='" + getContextPath() + "static/" + entity + "/" + id + "/downloadAttachment?download=false" + "' style='height:500px;width:100%;'></iframe>";
     } else {
         html = html + "<div class='alert alert-info' >" + messages["jpm.modal.attachment.preview"] + "</div>";

@@ -105,6 +105,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.md</exclude> <!-- CLAUDE.md and other notes must not be packaged -->
+                </excludes>
             </resource>
         </resources>
         <plugins>
@@ -123,6 +126,7 @@
                 <version>3.4.0</version>
                 <configuration>
                     <attachClasses>true</attachClasses>
+                    <packagingExcludes>**/*.md</packagingExcludes>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <archive>                   
                         <manifest>

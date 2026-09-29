@@ -3,7 +3,6 @@
 <li class="nav-item dropdown active">
     <a class="nav-link  dropdown-toggle" data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false"><i class="fa fa-cogs"></i><span class="menu-text"> Configuration</span></a>
     <div class="dropdown-menu" aria-labelledby="dLabel">
-        <jpm:menu-item code="jpm-entity-test"  icon="fab fa-java" />
     </div>
 </li>
 <li class="nav-item dropdown">

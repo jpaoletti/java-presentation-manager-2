@@ -16,6 +16,5 @@
     </bean>
     <bean id="securityService" class="jpaoletti.jpm2.core.service.SecurityServiceImpl" />
     <import resource="jpm-default-beans.xml" />
-    <import resource="entities/test.xml" />
     <import resource="entities/jpm-security-entities.xml" />
 </beans>

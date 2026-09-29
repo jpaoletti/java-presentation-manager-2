@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import jpaoletti.jpm2.core.entityparam.EntityParameterDef;
+import jpaoletti.jpm2.core.mail.MailConfig;
 
 /**
  * Fixed parameter catalog (kind {@code "mail-sender"}) for {@link MailSender}: the SMTP connection and message
@@ -35,7 +36,9 @@ public final class MailSenderParamCatalog {
         d.add(EntityParameterDef.bool(KIND, "auth").group("connection").defRaw("true").build());
         d.add(EntityParameterDef.bool(KIND, "ssl").group("connection").defRaw("false").build());
         d.add(EntityParameterDef.bool(KIND, "tls").group("connection").defRaw("true").build());
-        d.add(EntityParameterDef.bool(KIND, "debug").group("connection").defRaw("true").build());
+        d.add(EntityParameterDef.bool(KIND, "debug").group("connection").defRaw("false").build());
+        d.add(EntityParameterDef.bool(KIND, "starttls-required").group("connection").defRaw("false").build());
+        d.add(EntityParameterDef.integer(KIND, "timeout-ms").group("connection").defRaw(String.valueOf(MailConfig.DEFAULT_TIMEOUT_MS)).build());
         d.add(EntityParameterDef.string(KIND, "from").group("message").build());
         d.add(EntityParameterDef.string(KIND, "from-name").group("message").build());
         d.add(EntityParameterDef.string(KIND, "reply-to").group("message").build());

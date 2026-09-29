@@ -10,7 +10,7 @@
                 $.getJSON("${cp}jpm/${param.entityId}/${param.instanceId}/show.json?fields=${param.fields}", function (data) {
                             var content = "<div><div class='table-responsive'><table class='table table-bordered table-sm w-auto'><tbody>";
                             $.each(data, function (i, v) {
-                                content = content + "<tr><th>" + jpmEscape(i) + "</th><td>" + v + "</td></tr>";
+                                content = content + "<tr><th>" + i + "</th><td>" + v + "</td></tr>";
                             });
                             content = content + "</tbody></table></div>";
                             content = content + "<button class='float-end btn-close' type='button' aria-label='Close'></button>";

@@ -68,7 +68,7 @@ public class PaginatedList {
      * @param pageSize
      */
     public void setPageSize(Integer pageSize) {
-        if (pageSize != null) {
+        if (pageSize != null && pageSize > 0) {
             if (!Objects.equals(pageSize, getPageSize())) {
                 this.page = 1;
             }
@@ -105,10 +105,10 @@ public class PaginatedList {
      * @param page
      */
     public void setPage(Integer page) {
-        if (page == null) {
+        if (page == null || page < 1) {
             this.page = 1;
         } else if (getTotal() != null && page > getPages()) { //Out of range page sets to last one
-            this.page = getPages();
+            this.page = Math.max(1, getPages());
         } else {
             this.page = page;
         }
@@ -148,10 +148,11 @@ public class PaginatedList {
     public final void setTotal(Long total) {
         this.total = total;
         if (total != null) {
-            if (total % pageSize == 0) {
-                this.pages = (int) (total / pageSize);
+            final int size = getPageSize();
+            if (total % size == 0) {
+                this.pages = (int) (total / size);
             } else {
-                this.pages = (int) (total / pageSize) + 1;
+                this.pages = (int) (total / size) + 1;
             }
         }
     }
@@ -166,7 +167,8 @@ public class PaginatedList {
      * @return
      */
     public Integer from() {
-        return (this.getPage() != null) ? (((getPage() - 1) * getPageSize())) : 0;
+        final long from = (long) (Math.max(1, getPage()) - 1) * getPageSize();
+        return (int) Math.min(from, Integer.MAX_VALUE);
     }
 
     /**

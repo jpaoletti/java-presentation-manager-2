@@ -31,7 +31,7 @@
                                 <div class="btn-group">
                                     <c:forEach items="${sessionEntityData.searchCriteria.definitions}" var="d" varStatus="st">
                                         <spring:message var="fieldTitle" code="jpm.field.${entity.id}.${d.fieldId}" text="${d.fieldId}" />
-                                        <spring:message var="text" code="${d.description.key}" arguments="${d.description.arguments}" argumentSeparator=";" htmlEscape="true" />
+                                        <spring:message var="text" code="${d.description.key}" arguments="${d.description.htmlEscapedArgs}" />
                                         <c:if test="${empty owner}">
                                             <a type="button" href="${cp}jpm/${contextualEntity}/removeSearch?i=${st.index}" class="btn btn-default removeSearchBtn">
                                                 "${fieldTitle}" ${text}

@@ -35,10 +35,12 @@ public class SMTPMailSender extends GeneralMailSender {
         config.setPassword(getParameter("password", ""));
         config.setHost(getParameter("host", "smtp.gmail.com"));
         config.setPort(getParameter("port", "587"));
-        config.setDebug(getParameter("debug", true));
+        config.setDebug(getParameter("debug", false));
         config.setAuth(getParameter("auth", true));
         config.setSsl(getParameter("ssl", false));
         config.setTlsEnabled(getParameter("tls", "true"));
+        config.setStarttlsRequired(getParameter("starttls-required", false));
+        config.setTimeoutMs(getParameter("timeout-ms", MailConfig.DEFAULT_TIMEOUT_MS));
         return config;
     }
 }
