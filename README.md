@@ -909,6 +909,77 @@ npm install
 npm run build
 ```
 
+## Maven coordinates
+
+The framework is published in Maven Central under `com.github.jpaoletti`:
+
+```xml
+<dependency>
+    <groupId>com.github.jpaoletti</groupId>
+    <artifactId>jpm2-core</artifactId>
+    <version>2.0.0</version>
+</dependency>
+<!-- Bootstrap 5 web overlay and its classes -->
+<dependency>
+    <groupId>com.github.jpaoletti</groupId>
+    <artifactId>jpm2-web-bs5</artifactId>
+    <version>2.0.0</version>
+    <type>war</type>
+</dependency>
+<dependency>
+    <groupId>com.github.jpaoletti</groupId>
+    <artifactId>jpm2-web-bs5</artifactId>
+    <version>2.0.0</version>
+    <classifier>classes</classifier>
+</dependency>
+```
+
+Published modules: `java-presentation-manager-2` (parent), `jpm2-core`, `jpm2-web-core`, `jpm2-web-bs3`, `jpm2-web-bs4` and `jpm2-web-bs5`. The sample application `jpm2-web-bs5-test` is not published.
+
+## Publishing
+
+Releases go to Maven Central through the [Central Publisher Portal](https://central.sonatype.com) with the `release` profile, which adds the `-sources` and `-javadoc` jars (placeholders for the war overlays, which have no java code), signs every file with GPG and uploads the bundle.
+
+One time setup:
+
+1. Log in to https://central.sonatype.com (the legacy OSSRH account of the `com.github.jpaoletti` namespace) and check the namespace is listed and verified.
+2. Generate a user token (*View Account* > *Generate User Token*) and add it to `~/.m2/settings.xml`:
+
+   ```xml
+   <settings>
+     <servers>
+       <server>
+         <id>central</id>
+         <username>TOKEN_USERNAME</username>
+         <password>TOKEN_PASSWORD</password>
+       </server>
+     </servers>
+   </settings>
+   ```
+
+3. Create a GPG key and publish its public part in a key server:
+
+   ```bash
+   gpg --gen-key
+   gpg --keyserver keyserver.ubuntu.com --send-keys <KEY_ID>
+   ```
+
+Release (from the repository root, with a clean working copy and a non `-SNAPSHOT` version):
+
+```bash
+mvn clean deploy -Prelease
+```
+
+The bundle is uploaded and validated but not published (`autoPublish=false`): review it in *Deployments* on central.sonatype.com and press *Publish*. Once published, a version can't be deleted nor replaced.
+
+To build every release artifact (jars, wars, `-sources`, `-javadoc`) without signing nor uploading anything:
+
+```bash
+mvn clean verify -Prelease -Dgpg.skip
+```
+
+`-DskipPublishing=true` skips the Central plugin completely (no bundle is created).
+
 ## Recommended minimal flow for a new application
 
 1. Create a `war` project.
@@ -940,3 +1011,46 @@ Files worth studying:
 - The web base still uses `javax.servlet`, not Spring Boot or a full Jakarta EE stack.
 - `bs5` is the active line; legacy modules are still present in the repository for compatibility.
 - Some frontend pieces are inherited and not fully modernized to a pure Bootstrap 5 ecosystem.
+
+## Known issues (2.0.0)
+
+These were found in the 2.0.0 code review and are intentionally left for 2.1.0 (Spring 6 / Hibernate 6 / Jakarta), to avoid breaking existing applications.
+
+### Security
+
+- **CSRF protection and security headers are disabled** in the default `spring-security.xml` (`<csrf disabled="true"/>`, `<headers disabled="true"/>`) and in the applications that copied it. Some state-changing actions still run on `GET`: `resetPassword` and `.exec` operations with `immediateExecute`. Enabling CSRF needs the token in every AJAX `POST` (`jpm.js`) and in the forms of each application, plus exclusions for token-based APIs.
+- **`SecurityServiceImpl.resetPassword` / `changePassword` have no transaction of their own** (the class `@Transactional` is commented). They are persisted because the audit service commits the session afterwards; an application without `auditService` would not save the new password.
+- **Inline edit (`iledit`) does not check the `edit` operation condition.** It checks the operation permission and that the field is editable in `edit`, but many applications rely on inline editing records whose `edit` is conditioned.
+- **`security/BCrypt.java` is an old copy of jBCrypt** (no constant time comparison, `log_rounds` overflow). Replace it with Spring Security's `BCryptPasswordEncoder`.
+- **Websocket destinations are not authorized per user**: any authenticated user can subscribe to the progress of another user's asynchronous operation.
+- **Autocomplete endpoints (`/jpm/{entity}.json`) have no page size limit** when `pageSize` is not sent: some screens rely on getting every row.
+- The sample Maven profiles contain development database credentials (`desa/desa`).
+
+### Persistence
+
+- **`HibernateCriteriaDAO` with an alias to a collection** (for example a `CollectionSearcher` filter): `count()` counts join rows instead of entities and paginated lists may return short pages or repeated rows, because duplicates are removed in memory after paging. The JPA DAOs don't have this problem. The legacy Criteria API is removed in Hibernate 6.
+- **Legacy searchers (`Searcher`) on entities with a JPA DAO are ignored** (a `WARN` is logged). Use the JPA searchers (`ISearcher`: `StringJPASearcher`, `BoolJPASearcher`, `CollectionSearcher2JPA`, `CollectionJPASearcher`, ...).
+- **DDL migration (`database.sql`) is best effort by design**: a failed revision is recorded with `success='N'`, the next ones still run and it is not retried; when another instance holds the migration lock, the application starts without waiting.
+- **Asynchronous executors run without a transaction** of their own (they persist through `@Transactional` services) and without the `SecurityContext` of the user that launched them.
+
+### Dependencies
+
+Kept on purpose (not exploitable with the current usage, or upgrading could change behavior):
+
+- `commons-beanutils-core` 1.8.3 (CVE-2014-0114: property names always come from configuration or code, never from the request). It also arrives as `commons-beanutils` 1.8.3 through `commons-validator`.
+- `jdom` 1.1 (XXE): not used by the framework nor the known applications.
+- `jstl` / `taglibs:standard` 1.1.2 (CVE-2015-0254): only affects the JSTL XML tags (`x:parse`, `x:transform`), which are not used.
+- `fop` 2.6, `poi` 4.1.2, `moment.js` 2.15.1 and `Select2` 4.0.5: upgrading may change PDF/Excel rendering, date parsing or combos.
+- Some applications still use `javax.transaction.Transactional`, which Spring 6 ignores: replace it with `org.springframework.transaction.annotation.Transactional`.
+
+## Upgrade notes (applications moving to 2.0.0)
+
+- **Output is HTML escaped.** `WebToString` / `EditableToString` escape the value (enum values are trusted and keep their `&oacute;` style entities). Fields whose getter builds HTML on purpose must use `jpm-converter-show-html` (`ShowHtml`), or set `html=true` on the converter.
+- **Public files need an explicit opt-in.** `/static/img/{entity}-{field}-{id}.png` and `/static/{entity}/{id}/downloadAttachment` now require a logged user with access to the entity (404 otherwise). Use `ShowImageConverter.publicAccess=true` or `Entity.publicAttachment=true` for images/attachments fetched without a session (FOP, mails, public pages).
+- **The generic JSON endpoints are authorized.** A request matching a lookup declared in the entities configuration needs access to its source field; any other request needs access to the entity and can't read sensitive fields (password, token, secret...).
+- **Websocket requires a session** (`/jpm-websocket/**`). Applications with public screens using it can keep it public and restrict anonymous connections with `PublicDestinationsChannelInterceptor`.
+- **Users and groups are protected by privilege level** when loaded, updated or deleted through operations (`InstanceAccessGuard`).
+- **Fields declaring `display` without `configs` are only shown in those operations** (before, `display` was ignored in that case).
+- `EditFileInMemoryConverter` has `keepCurrentValue`: set it to `true` when the `byte[]` property is persisted, so editing without uploading a new file keeps the current one.
+- The mail sender `debug` parameter defaults to `false`; new parameters `timeout-ms` (30s) and `starttls-required`.
+- The test entities (`jpaoletti.jpm2.core.test.*`) moved to `jpm2-web-bs5-test`.

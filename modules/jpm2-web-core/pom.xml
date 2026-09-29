@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
 
     <name>jpm2-web-core</name>
-    <url>http://maven.apache.org</url>
+    <description>JPM2 web layer: Spring MVC controllers, web converters, searchers and filters.</description>
     <parent>
         <groupId>com.github.jpaoletti</groupId>
         <artifactId>java-presentation-manager-2</artifactId>

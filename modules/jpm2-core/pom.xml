@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
 
     <name>jpm2-core</name>
-    <url>http://maven.apache.org</url>
+    <description>JPM2 core: entities, fields, operations, DAOs, converters, validators and services.</description>
     <parent>
         <groupId>com.github.jpaoletti</groupId>
         <artifactId>java-presentation-manager-2</artifactId>

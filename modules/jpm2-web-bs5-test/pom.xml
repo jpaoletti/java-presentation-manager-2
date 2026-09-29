@@ -16,6 +16,8 @@
     </scm>
 
     <properties>
+        <!-- Sample application: never published -->
+        <maven.deploy.skip>true</maven.deploy.skip>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jpm.version>2.0.0</jpm.version>

@@ -6,6 +6,7 @@
     <artifactId>jpm2-web-bs3</artifactId>
     <packaging>war</packaging>
     <name>jpm2-web-bs3</name>
+    <description>JPM2 Bootstrap 3 web overlay (legacy): JSP, static resources and Spring configuration.</description>
 
     <parent>
         <groupId>com.github.jpaoletti</groupId>
@@ -20,7 +21,50 @@
     </properties>
     
     <!-- You may want to copy this profiles in your own project -->
+
+    
     <profiles>
+        <!-- Maven Central needs -sources and -javadoc jars: this overlay has no java code, so both are placeholders -->
+        <profile>
+            <id>release</id>
+            <properties>
+                <maven.source.skip>true</maven.source.skip>
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.4.2</version>
+                        <executions>
+                            <execution>
+                                <id>placeholder-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>sources</classifier>
+                                    <classesDirectory>${release.placeholder.dir}</classesDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>placeholder-javadoc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>javadoc</classifier>
+                                    <classesDirectory>${release.placeholder.dir}</classesDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <!-- Development profile -->
             <id>Development</id>
@@ -29,9 +73,9 @@
             </activation>
             <properties>
                 <lessMode>less</lessMode>
-                <connection.url>jdbc:mysql://jpm.mysql.com:3306/jpm_test?autoReconnect=true</connection.url>
-                <connection.username>desa</connection.username>
-                <connection.password>desa</connection.password>
+                <connection.url>jdbc:mysql://localhost:3306/jpm?autoReconnect=true</connection.url>
+                <connection.username>jpm</connection.username>
+                <connection.password></connection.password>
             </properties>
         </profile>
         <profile>
@@ -39,8 +83,8 @@
             <id>Production</id>
             <properties>
                 <lessMode>css</lessMode>
-                <connection.url>jdbc:mysql://jpm.mysql.com:3306/jpm_test?autoReconnect=true</connection.url>
-                <connection.username>root</connection.username>
+                <connection.url>jdbc:mysql://localhost:3306/jpm?autoReconnect=true</connection.url>
+                <connection.username>jpm</connection.username>
                 <connection.password></connection.password>
             </properties>
             <build>

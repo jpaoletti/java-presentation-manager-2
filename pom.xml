@@ -1,11 +1,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         child.project.url.inherit.append.path="false">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jpaoletti</groupId>
     <artifactId>java-presentation-manager-2</artifactId>
     <version>2.0.0</version>
     <packaging>pom</packaging>
     <name>java-presentation-manager-2</name>
+    <description>Java Presentation Manager 2: metadata driven CRUD framework for Java web applications (Spring MVC, Hibernate, JSP).</description>
+    <url>https://github.com/jpaoletti/java-presentation-manager-2</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jpaoletti</id>
+            <name>Jeronimo Paoletti</name>
+            <url>https://github.com/jpaoletti</url>
+        </developer>
+    </developers>
+
+    <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
+        <connection>scm:git:https://github.com/jpaoletti/java-presentation-manager-2.git</connection>
+        <developerConnection>scm:git:git@github.com:jpaoletti/java-presentation-manager-2.git</developerConnection>
+        <url>https://github.com/jpaoletti/java-presentation-manager-2</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <properties>
         <java.version>17</java.version>
         <spring.version>5.3.39</spring.version>
@@ -14,6 +41,8 @@
         <jackson.version>2.20.1</jackson.version>
         <junit.version>5.10.1</junit.version>
         <mockito.version>5.6.0</mockito.version>
+        <!-- Placeholder content for the -sources/-javadoc jars of the war overlays (they have no java code) -->
+        <release.placeholder.dir>${maven.multiModuleProjectDirectory}/src/release/placeholder</release.placeholder.dir>
     </properties>
 
     <dependencyManagement>
@@ -35,12 +64,87 @@
     <modules>
         <module>modules/jpm2-core</module>
         <module>modules/jpm2-web-core</module>
-        <!--<module>modules/jpm2-web-bs3</module>-->
-        <!--<module>modules/jpm2-web-bs4</module>-->
+        <module>modules/jpm2-web-bs3</module>
+        <module>modules/jpm2-web-bs4</module>
         <module>modules/jpm2-web-bs5</module>
         <!--<module>modules/jpm2-web-bs5-th</module>-->
         <!--<module>modules/jpm2-web-bs5-th-test</module>-->
         <!--<module>modules/jpm2-web-bs4-test</module>-->
         <module>modules/jpm2-web-bs5-test</module>
     </modules>
+
+    <profiles>
+        <!--
+            Publication to Maven Central (Central Portal):
+                mvn clean deploy -Prelease
+            Needs the "central" server (Central Portal user token) in ~/.m2/settings.xml
+            and a GPG key to sign. See "Publishing" in README.md.
+        -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.12.0</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <quiet>true</quiet>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <!-- The deployment is uploaded and validated; it is published by hand from central.sonatype.com -->
+                            <autoPublish>false</autoPublish>
+                            <waitUntil>validated</waitUntil>
+                            <excludeArtifacts>
+                                <artifact>jpm2-web-bs5-test</artifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
