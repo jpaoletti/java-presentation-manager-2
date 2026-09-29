@@ -2,14 +2,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-web-core</artifactId>
     <packaging>jar</packaging>
 
     <name>jpm2-web-core</name>
     <description>JPM2 web layer: Spring MVC controllers, web converters, searchers and filters.</description>
     <parent>
-        <groupId>com.github.jpaoletti</groupId>
+        <groupId>ar.com.jpaoletti</groupId>
         <artifactId>java-presentation-manager-2</artifactId>
         <version>2.0.0</version>
         <relativePath>../../pom.xml</relativePath>

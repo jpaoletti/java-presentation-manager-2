@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-web-bs5-test</artifactId>
     <packaging>war</packaging>
     <name>jpm2-web-bs5-test</name>
@@ -53,20 +53,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.jpaoletti</groupId>
+            <groupId>ar.com.jpaoletti</groupId>
             <artifactId>jpm2-web-bs5</artifactId>
             <version>${jpm.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>com.github.jpaoletti</groupId>
+            <groupId>ar.com.jpaoletti</groupId>
             <artifactId>jpm2-web-bs5</artifactId>
             <version>${jpm.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
         </dependency>
         <dependency>
-            <groupId>com.github.jpaoletti</groupId>
+            <groupId>ar.com.jpaoletti</groupId>
             <artifactId>jpm2-core</artifactId>
             <version>${jpm.version}</version>
             <type>jar</type>

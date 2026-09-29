@@ -81,20 +81,20 @@ A consuming application is usually another Maven `war` project that depends on:
 
 ```xml
 <dependency>
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-web-bs5</artifactId>
     <version>${jpm.version}</version>
     <type>war</type>
 </dependency>
 <dependency>
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-web-bs5</artifactId>
     <version>${jpm.version}</version>
     <type>jar</type>
     <classifier>classes</classifier>
 </dependency>
 <dependency>
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-core</artifactId>
     <version>${jpm.version}</version>
 </dependency>
@@ -911,23 +911,23 @@ npm run build
 
 ## Maven coordinates
 
-The framework is published in Maven Central under `com.github.jpaoletti`:
+The framework is published in Maven Central under `ar.com.jpaoletti`:
 
 ```xml
 <dependency>
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-core</artifactId>
     <version>2.0.0</version>
 </dependency>
 <!-- Bootstrap 5 web overlay and its classes -->
 <dependency>
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-web-bs5</artifactId>
     <version>2.0.0</version>
     <type>war</type>
 </dependency>
 <dependency>
-    <groupId>com.github.jpaoletti</groupId>
+    <groupId>ar.com.jpaoletti</groupId>
     <artifactId>jpm2-web-bs5</artifactId>
     <version>2.0.0</version>
     <classifier>classes</classifier>
@@ -942,7 +942,7 @@ Releases go to Maven Central through the [Central Publisher Portal](https://cent
 
 One time setup:
 
-1. Log in to https://central.sonatype.com (the legacy OSSRH account of the `com.github.jpaoletti` namespace) and check the namespace is listed and verified.
+1. In https://central.sonatype.com, register the `ar.com.jpaoletti` namespace (*Namespaces* > *Add Namespace*) and verify it with the DNS `TXT` record the portal gives for `jpaoletti.com.ar`.
 2. Generate a user token (*View Account* > *Generate User Token*) and add it to `~/.m2/settings.xml`:
 
    ```xml
