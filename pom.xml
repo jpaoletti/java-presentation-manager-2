@@ -42,7 +42,8 @@
         <junit.version>5.10.1</junit.version>
         <mockito.version>5.6.0</mockito.version>
         <!-- Placeholder content for the -sources/-javadoc jars of the war overlays (they have no java code) -->
-        <release.placeholder.dir>${maven.multiModuleProjectDirectory}/src/release/placeholder</release.placeholder.dir>
+        <!-- Relative to each overlay module (modules/<module>), so it works from any directory -->
+        <release.placeholder.dir>${project.basedir}/../../src/release/placeholder</release.placeholder.dir>
     </properties>
 
     <dependencyManagement>
@@ -96,6 +97,12 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <excludes>
+                                <!-- CLAUDE.md and other notes must not be published -->
+                                <exclude>**/*.md</exclude>
+                            </excludes>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

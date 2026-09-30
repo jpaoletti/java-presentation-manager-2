@@ -14,7 +14,7 @@
     
 <!--    <beans:bean id="jpmApiEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
         <beans:property name="algorithm" value="PBEWithMD5AndTripleDES" />
-        <beans:property name="password" value="7RWgzGxSdfate6b63SQ3uAK0GDr6werDG" />
+        <beans:property name="password" value="CHANGE_ME" />
     </beans:bean>-->
 
     

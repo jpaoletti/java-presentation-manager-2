@@ -13,6 +13,7 @@ import jpaoletti.jpm2.core.search.ISearchResult;
 import jpaoletti.jpm2.core.search.ISearcher;
 import jpaoletti.jpm2.core.search.JPASearchResult;
 import jpaoletti.jpm2.core.search.jpa.JPASearcherHelper;
+import jpaoletti.jpm2.web.ObjectConverterData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +51,7 @@ public class EnumJPASearcher implements ISearcher {
         final List<Object> values = getValues(entity, field, parameters);
         final String searchProperty = JPASearcherHelper.getSearchProperty(field);
         final JPASearchResult result = new JPASearchResult(
-                MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
+                MessageFactory.info(DESCRIPTION_KEY, ObjectConverterData.toText(values)),
                 (cb, root) -> root.get(searchProperty).in(values));
         return JPASearcherHelper.addAliases(result, field);
     }

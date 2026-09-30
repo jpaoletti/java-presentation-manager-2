@@ -105,7 +105,12 @@ public class AddController extends BaseController {
             throw new NotAuthorizedException();
         }
         try {
-            checkOperationCondition(operation, new EntityInstance(new IdentifiedObject(null, JPMUtils.newInstance(entity.getClazz())), getContext()));
+            // Same instance addPrepare checks the condition with (preConversion included)
+            final Object conditionObject = JPMUtils.newInstance(entity.getClazz());
+            if (operation.getContext() != null) {
+                operation.getContext().preConversion(conditionObject);
+            }
+            checkOperationCondition(operation, new EntityInstance(new IdentifiedObject(null, conditionObject), getContext()));
             final IdentifiedObject newObject = getService().save(entity, getContext().getEntityContext(), operation, new EntityInstance(getContext()), getRequest().getParameterMap());
             getContext().setEntityInstance(new EntityInstance(newObject, getContext()));
             getContext().setGlobalMessage(MessageFactory.success(getSuccessMsg(operation)));
@@ -172,6 +177,10 @@ public class AddController extends BaseController {
             final IdentifiedObject iobjectOwner = getOwnerObject(ownerId);
             final Object conditionObject = JPMUtils.newInstance(entity.getClazz());
             entity.getOwner(getContext().getEntityContext()).setOwnerObject(getContext().getEntityContext(), conditionObject, iobjectOwner.getObject());
+            // Same instance addWeakPrepare checks the condition with (preConversion included)
+            if (operation.getContext() != null) {
+                operation.getContext().preConversion(conditionObject);
+            }
             final EntityInstance conditionInstance = new EntityInstance(new IdentifiedObject(null, conditionObject), getContext());
             conditionInstance.setOwner(new EntityInstanceOwner(entity.getOwner(getContext().getEntityContext()).getOwner(), iobjectOwner));
             checkOperationCondition(operation, conditionInstance);

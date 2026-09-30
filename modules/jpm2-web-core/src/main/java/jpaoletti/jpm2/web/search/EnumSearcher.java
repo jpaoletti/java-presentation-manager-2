@@ -11,6 +11,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.SearcherHelper;
+import jpaoletti.jpm2.web.ObjectConverterData;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class EnumSearcher implements Searcher {
     public DescribedCriterion build(Entity entity, Field field, Map<String, String[]> parameters) {
         final List<Object> values = getValues(entity, field, parameters);
         return new DescribedCriterion(
-                MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
+                MessageFactory.info(DESCRIPTION_KEY, ObjectConverterData.toText(values)),
                 Restrictions.in(SearcherHelper.getSearchProperty(field), values));
     }
 

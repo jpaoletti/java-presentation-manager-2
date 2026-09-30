@@ -8,6 +8,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
 import jpaoletti.jpm2.core.search.ISearchResult;
 import jpaoletti.jpm2.core.search.JPASearchResult;
+import jpaoletti.jpm2.web.ObjectConverterData;
 
 /**
  * JPA Criteria API implementation of {@link NestedEnumSearcher}.
@@ -31,7 +32,7 @@ public class NestedEnumJPASearcher extends EnumJPASearcher {
         final List<Object> values = getValues(entity, field, parameters);
         final String[] path = field.getProperty().split("[.]");
         return new JPASearchResult(
-                MessageFactory.info(DESCRIPTION_KEY, String.valueOf(values)),
+                MessageFactory.info(DESCRIPTION_KEY, ObjectConverterData.toText(values)),
                 (cb, root) -> {
                     Path p = root;
                     for (String part : path) {

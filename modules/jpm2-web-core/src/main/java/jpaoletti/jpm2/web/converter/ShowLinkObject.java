@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.web.converter;
 
-import org.apache.taglibs.standard.tag.common.core.Util;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
@@ -21,24 +22,32 @@ public class ShowLinkObject extends ShowObject {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
-
+        // Every parameter is always passed (even empty): otherwise the included jsp takes it from the request query string
         final String res = "@page:link-object-converter.jsp"
                 + "?extraClass=" + getExtraClass(contextualEntity, field, object, instanceId)
                 + "&entityId=" + getEntity().getId()
-                + ((getCtx() != null) ? "&ctx=" + getCtx() : "")
-                + (object != null ? "&objectId=" + getEntity().getDao(getCtx()).getId(value) : "");
+                + "&ctx=" + ((getCtx() != null) ? getCtx() : "")
+                + "&objectId=" + (value != null ? getEntity().getDao(getCtx()).getId(value) : "");
         if (value == null) {
-            return res;
+            return res + "&value=&operationId=";
         } else {
             try {
                 final String finalValue = getFinalValue(value);
                 final Operation op = getEntity().getOperation(getOperation());
                 return res
-                        + "&value=" + Util.URLEncode(finalValue, "UTF-8")
+                        + "&value=" + encode(finalValue)
                         + "&operationId=" + op.getPathId();
             } catch (ConfigurationException | NotAuthorizedException ex) {
                 throw new ConverterException(ex.getMessage());
             }
+        }
+    }
+
+    private static String encode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return "";
         }
     }
 

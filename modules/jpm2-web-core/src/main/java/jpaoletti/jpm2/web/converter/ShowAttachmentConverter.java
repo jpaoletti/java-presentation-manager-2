@@ -68,7 +68,8 @@ public class ShowAttachmentConverter extends Converter {
                     + "&noteId=" + instanceId
                     + "&entity=" + contextualEntity.getEntity().getId();
         } else {
-            return "@page:show-attachment-converter.jsp?";
+            // Every parameter is always passed (even empty): otherwise the included jsp takes it from the request query string
+            return "@page:show-attachment-converter.jsp?len=&downloadable=&contentType=&attachmentName=&noteId=&entity=";
         }
     }
 

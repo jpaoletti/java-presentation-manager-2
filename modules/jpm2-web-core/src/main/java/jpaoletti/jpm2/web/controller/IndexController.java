@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
 import jpaoletti.jpm2.core.dao.HibernateCriteriaDAO;
+import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.WithAttachment;
 import org.apache.commons.io.IOUtils;
@@ -72,7 +73,14 @@ public class IndexController extends BaseController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        final Object object = ce.getDao().get(instanceId);
+        final Object object;
+        try {
+            // Through the service so the InstanceAccessGuard of the dao (if any) is applied
+            object = getService().get(ce.getEntity(), ce.getContext(), instanceId).getObject();
+        } catch (NotAuthorizedException ex) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
         if (!(object instanceof WithAttachment)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

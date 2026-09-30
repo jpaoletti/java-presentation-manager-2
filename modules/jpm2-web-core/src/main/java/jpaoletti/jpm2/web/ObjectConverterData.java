@@ -1,5 +1,6 @@
 package jpaoletti.jpm2.web;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import static jpaoletti.jpm2.core.converter.ToStringConverter.DISPLAY_PATTERN;
@@ -79,6 +80,17 @@ public class ObjectConverterData {
      * so they are decoded to plain text.
      */
     public static String toText(Object value) {
+        if (value instanceof Collection) {
+            // Same format as String.valueOf(collection): [a, b]
+            final StringBuilder sb = new StringBuilder("[");
+            for (Object item : (Collection<?>) value) {
+                if (sb.length() > 1) {
+                    sb.append(", ");
+                }
+                sb.append(toText(item));
+            }
+            return sb.append("]").toString();
+        }
         final String text = String.valueOf(value);
         return value instanceof Enum ? StringEscapeUtils.unescapeHtml4(text) : text;
     }

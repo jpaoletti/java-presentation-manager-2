@@ -32,7 +32,10 @@
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
                                 <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter" />
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter">
+                                        <!-- Branding: shown in the login page, without session -->
+                                        <property name="publicAccess" value="true" />
+                                    </bean>
                                 </property>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -58,7 +61,10 @@
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
                                 <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter" />
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter">
+                                        <!-- Branding: shown in the login page, without session -->
+                                        <property name="publicAccess" value="true" />
+                                    </bean>
                                 </property>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
@@ -84,7 +90,10 @@
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">
                                 <property name="operations" value="show"/>
                                 <property name="converter">
-                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter" />
+                                    <bean class="jpaoletti.jpm2.web.converter.ShowImageConverter">
+                                        <!-- Branding: shown in the login page, without session -->
+                                        <property name="publicAccess" value="true" />
+                                    </bean>
                                 </property>
                             </bean>
                             <bean class="jpaoletti.jpm2.core.model.FieldConfig">

@@ -15,7 +15,7 @@ This repository contains the framework and a sample WAR application.
 - JSP + JSTL + standard taglibs
 - Bootstrap 5.3.8
 - jQuery 3.5.x
-- MySQL Connector/J 8.0.30
+- MySQL Connector/J 8.4.0
 - Log4j 2.24.1
 - Jackson 2.20.x
 - WebSocket/STOMP for asynchronous operations
@@ -27,6 +27,7 @@ This is not a Spring Boot or Thymeleaf stack. Real integration is still based on
 - `modules/jpm2-core`: base model, DAO layer, security, validators, converters, operations, and core framework services.
 - `modules/jpm2-web-core`: Spring MVC controllers, web rendering, web converters, filters, and shared infrastructure.
 - `modules/jpm2-web-bs3`: legacy Bootstrap 3 variant.
+- `modules/jpm2-web-bs4`: legacy Bootstrap 4 variant.
 - `modules/jpm2-web-bs5`: active web variant based on Bootstrap 5.
 - `modules/jpm2-web-bs5-test`: minimal sample application for the `bs5` line.
 
@@ -1022,6 +1023,8 @@ These were found in the 2.0.0 code review and are intentionally left for 2.1.0 (
 - **`SecurityServiceImpl.resetPassword` / `changePassword` have no transaction of their own** (the class `@Transactional` is commented). They are persisted because the audit service commits the session afterwards; an application without `auditService` would not save the new password.
 - **Inline edit (`iledit`) does not check the `edit` operation condition.** It checks the operation permission and that the field is editable in `edit`, but many applications rely on inline editing records whose `edit` is conditioned.
 - **`security/BCrypt.java` is an old copy of jBCrypt** (no constant time comparison, `log_rounds` overflow). Replace it with Spring Security's `BCryptPasswordEncoder`.
+- **Read access through the generic JSON endpoints is broad**: `/jpm/{entity}.json` and `/jpm/{entity}/{id}.json` need a logged user and the entity `auth` (when declared, and very few entities declare it) or a declared lookup to the entity (`show.json` also needs the `show` operation). Only fields whose name looks sensitive (password, pass, secret, token, csrf) or with an `auth` the user lacks are refused, so a logged user can read other fields of entities with no `auth`.
+- **`collection-converter.jsp` / `collection-searcher3.jsp` render the related entity text without escaping** (select2 `escapeMarkup` is disabled and the selected `<option>` is not escaped).
 - **Websocket destinations are not authorized per user**: any authenticated user can subscribe to the progress of another user's asynchronous operation.
 - **Autocomplete endpoints (`/jpm/{entity}.json`) have no page size limit** when `pageSize` is not sent: some screens rely on getting every row.
 - The sample Maven profiles contain development database credentials (`desa/desa`).
@@ -1049,7 +1052,7 @@ Kept on purpose (not exploitable with the current usage, or upgrading could chan
 - **Public files need an explicit opt-in.** `/static/img/{entity}-{field}-{id}.png` and `/static/{entity}/{id}/downloadAttachment` now require a logged user with access to the entity (404 otherwise). Use `ShowImageConverter.publicAccess=true` or `Entity.publicAttachment=true` for images/attachments fetched without a session (FOP, mails, public pages).
 - **The generic JSON endpoints are authorized.** A request matching a lookup declared in the entities configuration needs access to its source field; any other request needs access to the entity and can't read sensitive fields (password, token, secret...).
 - **Websocket requires a session** (`/jpm-websocket/**`). Applications with public screens using it can keep it public and restrict anonymous connections with `PublicDestinationsChannelInterceptor`.
-- **Users and groups are protected by privilege level** when loaded, updated or deleted through operations (`InstanceAccessGuard`).
+- **Users and groups are protected by privilege level** when loaded, updated or deleted through operations (`InstanceAccessGuard`). Applications with their own user DAO (not `UserDAO` / `UserJpaDAO`) must implement `InstanceAccessGuard` in it (`return PrivilegeLevelGuard.canAccess(instance);`).
 - **Fields declaring `display` without `configs` are only shown in those operations** (before, `display` was ignored in that case).
 - `EditFileInMemoryConverter` has `keepCurrentValue`: set it to `true` when the `byte[]` property is persisted, so editing without uploading a new file keeps the current one.
 - The mail sender `debug` parameter defaults to `false`; new parameters `timeout-ms` (30s) and `starttls-required`.

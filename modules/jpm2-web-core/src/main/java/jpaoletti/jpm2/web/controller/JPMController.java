@@ -111,7 +111,8 @@ public class JPMController extends BaseController {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return null;
             }
-            final Object object = ce.getDao().get(id);
+            // Through the service so the InstanceAccessGuard of the dao (if any) is applied
+            final Object object = getService().get(ce.getEntity(), ce.getContext(), id).getObject();
             final Object value = object == null ? null : JPMUtils.get(object, f.getProperty());
             if (!(value instanceof byte[])) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);

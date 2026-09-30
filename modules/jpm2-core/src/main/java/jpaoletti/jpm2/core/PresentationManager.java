@@ -308,11 +308,9 @@ public class PresentationManager implements Observer, Serializable {
             }
             //only one without instances
             case GENERAL: {
+                // The key has no operation id, so different general operations of the same
+                // entity may run at the same time (they share the progress channel)
                 final String key = newCtx.getContextualEntity().toString() + "#";
-                if (asynchronicOperationExecutors.containsKey(key)) {
-                    // The same general operation is already running
-                    return false;
-                }
                 final AsynchronicOperationExecutor asynchronicOperationExecutor = new AsynchronicOperationExecutor(key, executor, instances, parameters, sessionFactory, newCtx);
                 asynchronicOperationExecutor.addObserver(this);
                 asynchronicOperationExecutor.addObserver(observer);

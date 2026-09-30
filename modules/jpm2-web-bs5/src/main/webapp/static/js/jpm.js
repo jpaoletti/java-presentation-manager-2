@@ -1160,9 +1160,14 @@ function jpmAsyncWsScripts(callback) {
         callback();
         return;
     }
+    var failed = function () {
+        // The scripts could not be loaded: let a later page try again
+        jpmAsyncWs.connecting = false;
+        jpmAsyncWs.queue = [];
+    };
     $.getScript(getContextPath() + "static/js/sockjs.min.js", function () {
-        $.getScript(getContextPath() + "static/js/stomp.min.js", callback);
-    });
+        $.getScript(getContextPath() + "static/js/stomp.min.js", callback).fail(failed);
+    }).fail(failed);
 }
 
 function jpmAsyncWsClient(callback) {

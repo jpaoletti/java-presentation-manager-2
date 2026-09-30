@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.converter.Converter;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
-import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Field;
@@ -77,9 +76,8 @@ public final class ShowController extends BaseController {
                     continue;
                 }
                 final Field field = getContext().getEntity().getFieldById(fid.trim(), getContext().getEntityContext());
-                try {
-                    field.checkAuthorization();
-                } catch (NotAuthorizedException ex) {
+                // Only fields shown in the operation (includes the field authorization)
+                if (!field.shouldDisplay(getContext().getOperation().getId())) {
                     continue;
                 }
                 final Converter converter = field.getConverter(getContext().getEntityInstance(), getContext().getOperation());

@@ -18,6 +18,25 @@ class FieldShouldDisplayTest {
     }
 
     @Test
+    void displayStillDecidesAfterTheImplicitConfigIsCreated() {
+        // EntityInstanceList, LookupRegistry, etc. call getConfigs()/getConverter() first
+        final Field field = new Field("error");
+        field.setDisplay("show");
+        assertTrue(field.getConfigs().size() == 1);
+        assertTrue(field.hasImplicitConfigs());
+        assertFalse(field.shouldDisplay("list"));
+        assertTrue(field.shouldDisplay("show"));
+        assertFalse(field.hasConfigFor("list"));
+    }
+
+    @Test
+    void explicitConfigsAreNotImplicit() {
+        final Field field = new Field("name");
+        field.setConfigs(Arrays.asList(config(null, null, "ROLE_OTHER")));
+        assertFalse(field.hasImplicitConfigs());
+    }
+
+    @Test
     void withoutConfigsAndDisplayAllIsShownEverywhere() {
         final Field field = new Field("name");
         assertTrue(field.shouldDisplay("list"));

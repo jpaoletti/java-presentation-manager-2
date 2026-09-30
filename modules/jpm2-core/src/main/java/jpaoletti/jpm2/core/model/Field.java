@@ -96,10 +96,31 @@ public class Field extends PMCoreObject {
 
     public List<FieldConfig> getConfigs() {
         if (configs == null) {
-            configs = new ArrayList<>();
-            configs.add(new FieldConfig(FieldConfig.ALL, null, getDefaultConverter()));
+            final List<FieldConfig> implicit = new ArrayList<>();
+            implicit.add(new ImplicitFieldConfig(getDefaultConverter()));
+            configs = implicit;
         }
         return configs;
+    }
+
+    /**
+     * True when the field has no configs of its own (only the implicit "all"
+     * config with the default converter). Then the display property decides
+     * where the field is shown.
+     */
+    public boolean hasImplicitConfigs() {
+        final List<FieldConfig> c = configs;
+        return c == null || (c.size() == 1 && c.get(0) instanceof ImplicitFieldConfig);
+    }
+
+    /**
+     * Marker for the config created when a field declares no configs.
+     */
+    private static final class ImplicitFieldConfig extends FieldConfig {
+
+        ImplicitFieldConfig(Converter converter) {
+            super(FieldConfig.ALL, null, converter);
+        }
     }
 
     public void setConfigs(List<FieldConfig> configs) {
@@ -135,7 +156,7 @@ public class Field extends PMCoreObject {
         } catch (NotAuthorizedException ex) {
             return false;
         }
-        if (configs == null) {
+        if (hasImplicitConfigs()) {
             // Only the implicit "all" config: the display property decides
             return isDisplayedAt(operationId);
         }
@@ -182,7 +203,7 @@ public class Field extends PMCoreObject {
      * @return true if some config explicitly declares the operation
      */
     public boolean hasConfigFor(String operationId) {
-        if (operationId == null || configs == null) {
+        if (operationId == null || hasImplicitConfigs()) {
             return false;
         }
         for (FieldConfig config : configs) {

@@ -142,13 +142,12 @@ public class ShowObject extends Converter {
         if (getTextField() != null) {
             if (!getTextField().contains("{")) {
                 final Field field = getEntity().getFieldById(getTextField(), getContext().getEntityContext());
-                return String.valueOf(JPMUtils.get(value, field.getProperty()));
+                return ObjectConverterData.toText(JPMUtils.get(value, field.getProperty()));
             } else {
                 finalValue = ObjectConverterData.renderTextField(getTextField(), getEntity(), getContext().getEntityContext(), value);
             }
         } else {
-            finalValue = String.valueOf(value);
-
+            finalValue = ObjectConverterData.toText(value);
         }
         if (getCutOff() != null && finalValue.length() > getCutOff()) {
             finalValue = finalValue.substring(0, getCutOff()) + "...";
