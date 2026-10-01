@@ -7,6 +7,7 @@ import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.NotAuthorizedException;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.Operation;
 
 /**
@@ -22,18 +23,19 @@ public class ShowLinkObject extends ShowObject {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
+        final Entity targetEntity = resolveEntity(value);
         // Every parameter is always passed (even empty): otherwise the included jsp takes it from the request query string
         final String res = "@page:link-object-converter.jsp"
                 + "?extraClass=" + getExtraClass(contextualEntity, field, object, instanceId)
-                + "&entityId=" + getEntity().getId()
+                + "&entityId=" + targetEntity.getId()
                 + "&ctx=" + ((getCtx() != null) ? getCtx() : "")
-                + "&objectId=" + (value != null ? getEntity().getDao(getCtx()).getId(value) : "");
+                + "&objectId=" + (value != null ? targetEntity.getDao(getCtx()).getId(value) : "");
         if (value == null) {
             return res + "&value=&operationId=";
         } else {
             try {
-                final String finalValue = getFinalValue(value);
-                final Operation op = getEntity().getOperation(getOperation());
+                final String finalValue = getFinalValue(value, targetEntity);
+                final Operation op = targetEntity.getOperation(getOperation());
                 return res
                         + "&value=" + encode(finalValue)
                         + "&operationId=" + op.getPathId();

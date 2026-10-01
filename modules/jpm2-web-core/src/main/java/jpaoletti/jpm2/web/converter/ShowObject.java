@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.ObjectEntityResolver;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.FieldNotFoundException;
@@ -30,6 +31,7 @@ import org.springframework.web.util.HtmlUtils;
 public class ShowObject extends Converter {
 
     private Entity entity;
+    private ObjectEntityResolver entityResolver;
     private String entityContext;
     private String fields;
     private String operation;
@@ -45,6 +47,7 @@ public class ShowObject extends Converter {
     @Override
     public Object visualize(ContextualEntity contextualEntity, Field field, Object object, String instanceId) throws ConverterException, ConfigurationException {
         final Object value = getValue(object, field);
+        final Entity targetEntity = resolveEntity(value);
         if (request.getAttribute(SHOW_OBJECT_FIELD_VALUE) == null) {
             request.setAttribute(SHOW_OBJECT_FIELD_VALUE, new LinkedHashMap<String, String>());
         }
@@ -52,23 +55,23 @@ public class ShowObject extends Converter {
         final Serializable realInstanceID = contextualEntity.getDao().getId(object);
 
         final String res = "@page:show-object-converter.jsp"
-                + "?entityId=" + getEntity().getId()
+                + "?entityId=" + targetEntity.getId()
                 + "&fields=" + getFields()
                 + (object != null ? "&objectId=" + realInstanceID : "");
         if (value == null) {
             return res;
         } else {
             try {
-                final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
+                final Serializable localId = targetEntity.getDao(getContext().getEntityContext()).getId(value);
                 String operationLink = "";
                 String operationTitle = "";
                 String operationIcon = "";
                 if (getOperation() != null && (getOperationAuth() == null || getAuthorizationService().userHasRole(getOperationAuth()))) {
                     try {
-                        final Operation op = getEntity().getOperation(getOperation(), getContext().getContext());
-                        operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
+                        final Operation op = targetEntity.getOperation(getOperation(), getContext().getContext());
+                        operationTitle = getMessage(op.getTitle(), getMessage(targetEntity.getTitle()));
                         operationIcon = op.getIcon();
-                        final String entityId = getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
+                        final String entityId = targetEntity.getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                         switch (op.getScope()) {
                             case ITEM:
                                 operationLink = "jpm/" + entityId + "/" + localId + "/" + op.getPathId();
@@ -81,7 +84,7 @@ public class ShowObject extends Converter {
                         //We don't care for now
                     }
                 }
-                final String finalValue = HtmlUtils.htmlEscape(getFinalValue(value));
+                final String finalValue = HtmlUtils.htmlEscape(getFinalValue(value, targetEntity));
                 values.put(field.getId() + realInstanceID, finalValue);
                 return res
                         // + "&value=" + finalValue
@@ -96,6 +99,22 @@ public class ShowObject extends Converter {
         }
     }
     protected static final String SHOW_OBJECT_FIELD_VALUE = "show_object_field_value";
+
+    public ObjectEntityResolver getEntityResolver() {
+        return entityResolver;
+    }
+
+    public void setEntityResolver(ObjectEntityResolver entityResolver) {
+        this.entityResolver = entityResolver;
+    }
+
+    protected Entity resolveEntity(Object value) {
+        if (value == null || getEntityResolver() == null) {
+            return getEntity();
+        }
+        final Entity resolved = getEntityResolver().resolve(value, getEntity());
+        return resolved == null ? getEntity() : resolved;
+    }
 
     public Entity getEntity() {
         return entity;
@@ -138,13 +157,21 @@ public class ShowObject extends Converter {
     }
 
     protected String getFinalValue(Object value) throws FieldNotFoundException, ConfigurationException {
+        return renderFinalValue(value, getEntity());
+    }
+
+    protected String getFinalValue(Object value, Entity targetEntity) throws FieldNotFoundException, ConfigurationException {
+        return targetEntity == getEntity() ? getFinalValue(value) : renderFinalValue(value, targetEntity);
+    }
+
+    private String renderFinalValue(Object value, Entity targetEntity) throws FieldNotFoundException, ConfigurationException {
         String finalValue;
         if (getTextField() != null) {
             if (!getTextField().contains("{")) {
-                final Field field = getEntity().getFieldById(getTextField(), getContext().getEntityContext());
+                final Field field = targetEntity.getFieldById(getTextField(), getContext().getEntityContext());
                 return ObjectConverterData.toText(JPMUtils.get(value, field.getProperty()));
             } else {
-                finalValue = ObjectConverterData.renderTextField(getTextField(), getEntity(), getContext().getEntityContext(), value);
+                finalValue = ObjectConverterData.renderTextField(getTextField(), targetEntity, getContext().getEntityContext(), value);
             }
         } else {
             finalValue = ObjectConverterData.toText(value);

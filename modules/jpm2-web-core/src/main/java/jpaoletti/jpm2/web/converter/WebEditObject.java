@@ -4,6 +4,7 @@ import java.io.Serializable;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PresentationManager;
 import jpaoletti.jpm2.core.converter.Converter;
+import jpaoletti.jpm2.core.converter.ObjectEntityResolver;
 import jpaoletti.jpm2.core.exception.ConfigurationException;
 import jpaoletti.jpm2.core.exception.ConverterException;
 import jpaoletti.jpm2.core.exception.IgnoreConvertionException;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WebEditObject extends Converter {
 
     private Entity entity;
+    private ObjectEntityResolver entityResolver;
     private IdentifiableListFilter filter;
     private String textField;
     private String textFieldDetails;
@@ -79,15 +81,16 @@ public class WebEditObject extends Converter {
             String operationLink = "";
             String operationTitle = "";
             String operationIcon = "";
-            if (StringUtils.isNotEmpty(textFieldDetailsOperation) || getAuthorizationService().userHasRole(textFieldDetailsOperation)) {
+            if (value != null && StringUtils.isNotEmpty(textFieldDetailsOperation)) {
                 try {
-                    final Serializable localId = getEntity().getDao(getContext().getEntityContext()).getId(value);
-                    final Operation op = getEntity().getOperation(textFieldDetailsOperation, getContext().getContext());
-                    operationTitle = getMessage(op.getTitle(), getMessage(getEntity().getTitle()));
+                    final Entity targetEntity = resolveEntity(value);
+                    final Serializable localId = targetEntity.getDao(getContext().getEntityContext()).getId(value);
+                    final Operation op = targetEntity.getOperation(textFieldDetailsOperation, getContext().getContext());
+                    operationTitle = getMessage(op.getTitle(), getMessage(targetEntity.getTitle()));
                     operationIcon = op.getIcon();
                     final String entityId
                             = StringUtils.isNotEmpty(textFieldDetailsEntity) ? textFieldDetailsEntity
-                            : getEntity().getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
+                            : targetEntity.getId() + ((getEntityContext() == null) ? "" : (PresentationManager.CONTEXT_SEPARATOR + getEntityContext()));
                     switch (op.getScope()) {
                         case ITEM:
                             operationLink = "jpm/" + entityId + "/" + localId + "/" + op.getPathId();
@@ -119,6 +122,22 @@ public class WebEditObject extends Converter {
         } else {
             return getEntity().getDao().get((String) newValue);
         }
+    }
+
+    public ObjectEntityResolver getEntityResolver() {
+        return entityResolver;
+    }
+
+    public void setEntityResolver(ObjectEntityResolver entityResolver) {
+        this.entityResolver = entityResolver;
+    }
+
+    protected Entity resolveEntity(Object value) {
+        if (value == null || getEntityResolver() == null) {
+            return getEntity();
+        }
+        final Entity resolved = getEntityResolver().resolve(value, getEntity());
+        return resolved == null ? getEntity() : resolved;
     }
 
     public Entity getEntity() {
