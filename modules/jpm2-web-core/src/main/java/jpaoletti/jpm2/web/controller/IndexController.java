@@ -3,6 +3,7 @@ package jpaoletti.jpm2.web.controller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.PMException;
 import jpaoletti.jpm2.core.dao.DAOListConfiguration;
@@ -14,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.http.ContentDisposition;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,9 +92,12 @@ public class IndexController extends BaseController {
             throw new PMException("jpm.not.downloadable");
         }
         response.setContentType(wa.getContentType());
-        if (download) {
-            response.addHeader("Content-Disposition", "attachment;filename=" + wa.getAttachmentName());
-        }
+        // Also name inline previews: mobile viewers may otherwise reuse the
+        // shared URL filename "downloadAttachment" for different documents.
+        response.setHeader("Content-Disposition", ContentDisposition.builder(download ? "attachment" : "inline")
+                .filename(wa.getAttachmentName(), StandardCharsets.UTF_8)
+                .build().toString());
+        response.setHeader("Cache-Control", "private, no-store");
         if (wa.isExternalFile()) {
             try (FileInputStream is = new FileInputStream(new File(wa.getInternalFileName()))) {
                 IOUtils.copy(is, response.getOutputStream());
