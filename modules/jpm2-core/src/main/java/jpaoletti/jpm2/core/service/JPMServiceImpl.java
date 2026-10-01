@@ -182,6 +182,15 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         }
     }
 
+    /**
+     * Primera fila de datos de cada hoja de toExcel (antes van el titulo y el encabezado).
+     */
+    private static final int XLS_FIRST_DATA_ROW = 3;
+    /**
+     * Filas de datos por hoja de toExcel (el formato .xls admite 65536 filas por hoja).
+     */
+    private static final int XLS_MAX_ROWS_PER_SHEET = 65530;
+
     @Override
     public Workbook toExcel(Entity entity, SessionEntityData sed, ContextualEntity owner, String ownerId) throws PMException {
         final Workbook wb = new HSSFWorkbook();
@@ -194,28 +203,35 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (list == null || list.isEmpty()) {
             throw new PMException("jpm.toExcel.noData");
         }
-        if (list.size() > 65530) {
-            throw new PMException("jpm.toExcel.tooMuchData");
-        }
-        final Sheet sheet = xlsNewPage(wb, new XlsFormatTitle(
-                getMessage("jpm.toExcel.pageName", null, LocaleContextHolder.getLocale()),
-                getMessage("jpm.toExcel.pageTitle", entity.getPluralTitle().toUpperCase(), LocaleContextHolder.getLocale())
-        ));
-        sheet.createFreezePane(0, 3);
         final CellStyle bold = xlsBoldStyle(wb);
         final CellStyle xlsDateStyle = xlsDateStyle(wb);
         final CellStyle xlsAmountStyle = xlsAmountStyle(wb);
-        final Row headerRow = sheet.createRow(2);
-        int i = 0;
-        for (Field field : paginatedList.getFields()) {
-            final Cell cell = headerRow.createCell(i++);
-            cell.setCellStyle(bold);
-            cell.setCellValue(replaceHtmlCodeAccents(field.getTitle(entity)));
-        }
-        int r = 3;
+        final String pageTitle = getMessage("jpm.toExcel.pageTitle", entity.getPluralTitle().toUpperCase(), LocaleContextHolder.getLocale());
+        Sheet sheet = null;
+        int r = 0;
+        int pageNumber = 0;
         for (EntityInstance entityInstance : list) {
+            if (sheet == null || r >= XLS_FIRST_DATA_ROW + XLS_MAX_ROWS_PER_SHEET) {
+                // .xls admite 65536 filas por hoja: al llegar al limite se sigue en una hoja nueva
+                pageNumber++;
+                sheet = xlsNewPage(wb, new XlsFormatTitle(
+                        pageNumber == 1
+                                ? getMessage("jpm.toExcel.pageName", null, LocaleContextHolder.getLocale())
+                                : getMessage("jpm.toExcel.pageNameN", String.valueOf(pageNumber)),
+                        pageTitle
+                ));
+                sheet.createFreezePane(0, XLS_FIRST_DATA_ROW);
+                final Row headerRow = sheet.createRow(XLS_FIRST_DATA_ROW - 1);
+                int i = 0;
+                for (Field field : paginatedList.getFields()) {
+                    final Cell cell = headerRow.createCell(i++);
+                    cell.setCellStyle(bold);
+                    cell.setCellValue(replaceHtmlCodeAccents(field.getTitle(entity)));
+                }
+                r = XLS_FIRST_DATA_ROW;
+            }
             final Row row = sheet.createRow(r++);
-            i = 0;
+            int i = 0;
             for (Map.Entry<String, Object> v : entityInstance.getValues().entrySet()) {
                 final Object convertedValue = v.getValue();
                 if (convertedValue == null) {

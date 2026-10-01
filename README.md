@@ -1036,6 +1036,10 @@ These were found in the 2.0.0 code review and are intentionally left for 2.1.0 (
 - **DDL migration (`database.sql`) is best effort by design**: a failed revision is recorded with `success='N'`, the next ones still run and it is not retried; when another instance holds the migration lock, the application starts without waiting.
 - **Asynchronous executors run without a transaction** of their own (they persist through `@Transactional` services) and without the `SecurityContext` of the user that launched them.
 
+### Exports
+
+- **`toExcel` still generates `.xls` (`HSSFWorkbook`)**: each sheet holds up to 65530 data rows and the export continues on a new sheet (`jpm.toExcel.pageNameN`). The whole list is loaded in memory before building the file, so very large exports are slow and memory hungry. Planned for 2.1.0: move to `.xlsx` with streaming (`SXSSFWorkbook`, up to 1048576 rows per sheet), paging the query, and update the MIME type (`XlsUtils.MIME_XLS`) and the `.xls` file extension in `ListController`.
+
 ### Dependencies
 
 Kept on purpose (not exploitable with the current usage, or upgrading could change behavior):
