@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -23,6 +24,10 @@ import jpaoletti.jpm2.core.model.OperationExecutor;
 import static jpaoletti.jpm2.core.model.OperationExecutor.OWNER_ENTITY;
 import static jpaoletti.jpm2.core.model.OperationExecutor.OWNER_ID;
 import jpaoletti.jpm2.core.model.Progress;
+import jpaoletti.jpm2.core.model.Operation;
+import jpaoletti.jpm2.core.model.OperationScope;
+import jpaoletti.jpm2.core.model.Field;
+import jpaoletti.jpm2.core.service.MiscEntityService;
 import jpaoletti.jpm2.core.model.ValidationException;
 import jpaoletti.jpm2.util.JPMUtils;
 import jpaoletti.jpm2.web.JPMAskConfirmationException;
@@ -53,6 +58,9 @@ public class ExecutorsController extends BaseController implements Observer {
 
     @Autowired
     private SimpMessagingTemplate template;
+
+    @Autowired
+    private MiscEntityService miscEntityService;
 
     /**
      * True when the request is a JPM partial (AJAX) navigation. Such requests
@@ -226,6 +234,9 @@ public class ExecutorsController extends BaseController implements Observer {
      */
     @GetMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec")
     public ModelAndView executorsPrepare(HttpServletRequest request, HttpServletResponse httpResponse, @PathVariable List<String> instanceIds) throws PMException {
+        if ("true".equals(request.getParameter("selectionReview"))) {
+            return selectionReview(instanceIds);
+        }
         final List<EntityInstance> instances = new ArrayList<>();
         for (String instanceId : instanceIds) {
             initItemControllerOperation(instanceId);
@@ -272,6 +283,55 @@ public class ExecutorsController extends BaseController implements Observer {
             );
             return mav;
         }
+    }
+
+    /** Reviews a selection without calling prepare or executing the operation. */
+    protected ModelAndView selectionReview(List<String> instanceIds) throws PMException {
+        final Operation operation = getContext().getOperation();
+        if (operation.getScope() != OperationScope.SELECTED
+                || !"persistent".equals(operation.getProperty("selectionMode", "page"))) {
+            throw new PMException("jpm.selection.unsupported");
+        }
+        final Operation listOperation = getContext().getEntity().getOperation("list", getContext().getEntityContext());
+        final List<String> visibleColumns = miscEntityService.getVisibleColumns(
+                getAuthorizationService().getCurrentUsername(), getContext().getContextualEntity());
+        final List<Map<String, Object>> rows = new ArrayList<>();
+        final Map<String, Field> fields = new LinkedHashMap<>();
+        for (String id : new LinkedHashSet<>(instanceIds)) {
+            final Map<String, Object> row = new LinkedHashMap<>();
+            row.put("id", id);
+            try {
+                // Load and check access/conditions using the actual target operation.
+                final IdentifiedObject object = getJpm().getService().get(
+                        getContext().getEntity(), getContext().getEntityContext(), operation, id);
+                if (object == null || object.getObject() == null) {
+                    throw new PMException("jpm.selection.unavailable");
+                }
+                if (operation.getContext() != null) {
+                    operation.getContext().preConversion(object.getObject());
+                }
+                getContext().setEntityInstance(new EntityInstance(object, getContext()));
+                checkOperationCondition(operation, getContext().getEntityInstance());
+                // Render with the same converters and columns as the list.
+                getContext().setOperation(listOperation);
+                final EntityInstance item = new EntityInstance(object, getContext());
+                row.put("values", item.getValues());
+                for (Field field : item.getFields()) {
+                    if (visibleColumns.contains(field.getId())) {
+                        fields.putIfAbsent(field.getId(), field);
+                    }
+                }
+            } catch (PMException e) {
+                // A deleted or no longer accessible item can still be removed.
+                row.put("unavailable", true);
+            } finally {
+                getContext().setOperation(operation);
+            }
+            rows.add(row);
+        }
+        return new ModelAndView("jpm-selection-review")
+                .addObject("selectionRows", rows)
+                .addObject("selectionFields", new ArrayList<>(fields.values()));
     }
 
     @PostMapping(value = "/jpm/{entity}/{instanceIds}/{operationId}.exec")

@@ -86,7 +86,10 @@
                 <hr class="mb-3 mt-3"/>
                 <!-- CONTENT DATA -->
                 <div class="table-responsive list-operation-table-container">
-                    <table class="table table-bordered table-sm jpm-list-table w-auto">
+                    <table class="table table-bordered table-sm jpm-list-table w-auto"
+                           data-selection-entity="${fn:escapeXml(contextualEntity)}"
+                           data-selection-owner="${fn:escapeXml(owner.id)}"
+                           data-selection-owner-id="${fn:escapeXml(ownerId)}">
                         <thead class="table-secondary">
                             <tr>
                                 <!-- GENERAL Operations -->
@@ -159,6 +162,12 @@
                             <tbody>
                                 <tr>
                                     <td colspan="100">
+                                        <div class="jpm-selection-toolbar mb-2" hidden>
+                                            <span class="badge bg-secondary"><span class="jpm-selection-count">0</span> <spring:message code="jpm.selection.selected" /></span>
+                                            <span class="small text-muted"><spring:message code="jpm.selection.includesOtherPages" /></span>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary jpm-selection-review"><spring:message code="jpm.selection.review" /></button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary jpm-selection-clear"><spring:message code="jpm.selection.clear" /></button>
+                                        </div>
                                         <img src="${cp}static/img/arrow_ltr.png" alt="selected" class="float-start" />
                                         <c:forEach var="o" items="${selectedOperations}">
                                             <jpm:operation-link operation="${o}" clazz="btn btn-sm ${not empty o.color?o.color:'btn-warning'} selected-operation" contextualEntity="${contextualEntity}" instanceId="@@" entityName="${entityName}" title="true" />
@@ -286,9 +295,9 @@
                 });
                 $("#select_unselect_all").on("click", function () {
                     if ($(this).is(":checked")) {
-                        $(".selectable").prop("checked", true);
+                        $(this).closest("table").find(".selectable").prop("checked", true).trigger("change");
                     } else {
-                        $(".selectable").prop("checked", false);
+                        $(this).closest("table").find(".selectable").prop("checked", false).trigger("change");
                     }
                 });
                 $("#help-btn").popover({

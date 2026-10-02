@@ -9,6 +9,7 @@
 <%@attribute name = "title"             required="false" type="java.lang.Boolean" description="Show title " %>
 <%@attribute name = "textClass"         required="false" type="java.lang.String" %>
 <a
+    data-selection-mode="${operation.getProperty('selectionMode', 'page')}"
     id="operation-${operation.id}"
     class="${clazz} operation-${operation.id}-${contextualEntity} confirm-${operation.confirm} ${operation.synchronic?'synchronic':'asynchronic'}" 
     title="<spring:message code="${operation.title}" text="${operation.title}" arguments="${entityName}" />"

@@ -681,6 +681,7 @@ function jpmNavigate(url, options) {
                 if (html && html.ok && html.next && html.next !== "-" && html.next !== "EXECUTOR_RELOAD" && !html.confirmation) {
                     jpmNavigator.handoff = true;
                 }
+                jpmSelectionSucceeded(html, url);
                 processFormResponse(html);
                 return;
             }
@@ -750,9 +751,186 @@ function jpmSubmitNavigationForm($form) {
     });
 }
 
+// IDs only; sessionStorage keeps selections isolated by tab, user and list context.
+var jpmSelectionMemory = Object.create(null);
+function jpmSelectionRead(key) {
+    if (Object.prototype.hasOwnProperty.call(jpmSelectionMemory, key)) {
+        return jpmSelectionMemory[key].slice();
+    }
+    try {
+        var ids = JSON.parse(sessionStorage.getItem(key) || '[]');
+        return Array.isArray(ids) ? Array.from(new Set(ids.filter(function (id) {
+            return typeof id === 'string' && id.length > 0;
+        }))) : [];
+    } catch (e) {
+        return jpmSelectionMemory[key] || [];
+    }
+}
+function jpmSelectionWrite(key, ids) {
+    jpmSelectionMemory[key] = ids.slice();
+    try {
+        // Keep an empty snapshot so browser Back cannot resurrect an old review.
+        sessionStorage.setItem(key, JSON.stringify(ids));
+    } catch (e) {
+        // Keep selection working for partial navigation if storage is disabled.
+    }
+}
+function jpmSelectionKey(table) {
+    return 'jpm.selection:' + JSON.stringify([getContextPath(), currentUser,
+        table.attr('data-selection-entity'), table.attr('data-selection-owner') || '',
+        table.attr('data-selection-owner-id') || '']);
+}
+function jpmSelectionSucceeded(data, url) {
+    if (!data || !data.ok) {
+        return;
+    }
+    var source = new URL(url, window.location.href);
+    var current = new URL(window.location.href);
+    var key = source.searchParams.get('_jpmSelectionKey');
+    if (!key && source.pathname === current.pathname) {
+        key = current.searchParams.get('_jpmSelectionKey');
+    }
+    if (key && key.startsWith('jpm.selection:')) {
+        jpmSelectionWrite(key, []);
+    }
+}
+function jpmSelectionReviewLink(button, table) {
+    var key = jpmSelectionKey(table);
+    var ids = jpmSelectionRead(key);
+    if (!ids.length) {
+        return;
+    }
+    var url = new URL(button.attr('href').replace('@@', ids.map(encodeURIComponent).join(',')), window.location.href);
+    url.searchParams.set('selectionReview', 'true');
+    url.searchParams.set('_jpmSelectionKey', key);
+    url.searchParams.set('_jpmSelectionReturn', window.location.href);
+    jpmNavigate(url.href);
+}
+function initPersistentSelection() {
+    $('.jpm-list-table[data-selection-entity]').each(function () {
+        var table = $(this);
+        var button = table.find('.selected-operation[data-selection-mode="persistent"]').first();
+        if (!button.length) {
+            return;
+        }
+        var key = jpmSelectionKey(table);
+        function refresh() {
+            var ids = jpmSelectionRead(key);
+            table.find('.selectable').each(function () {
+                $(this).prop('checked', ids.includes($(this).attr('data-id')));
+            });
+            var checks = table.find('.selectable');
+            var checked = checks.filter(':checked').length;
+            table.find('#select_unselect_all').prop('checked', checks.length > 0 && checked === checks.length)
+                    .prop('indeterminate', checked > 0 && checked < checks.length);
+            table.find('.jpm-selection-count').text(ids.length);
+        }
+        table.find('.jpm-selection-toolbar').prop('hidden', false);
+        table.find('.selectable').off('change.jpmSelection').on('change.jpmSelection', function () {
+            var ids = jpmSelectionRead(key);
+            var id = $(this).attr('data-id');
+            if (this.checked && !ids.includes(id)) {
+                ids.push(id);
+            } else if (!this.checked) {
+                ids = ids.filter(function (selected) { return selected !== id; });
+            }
+            jpmSelectionWrite(key, ids);
+            // Don't restore other checkboxes while select-all is updating them.
+            table.find('.jpm-selection-count').text(ids.length);
+            var checks = table.find('.selectable');
+            var checked = checks.filter(':checked').length;
+            table.find('#select_unselect_all').prop('checked', checks.length > 0 && checked === checks.length)
+                    .prop('indeterminate', checked > 0 && checked < checks.length);
+        });
+        table.find('.jpm-selection-clear').off('click.jpmSelection').on('click.jpmSelection', function () {
+            jpmSelectionWrite(key, []);
+            refresh();
+        });
+        table.find('.jpm-selection-review').off('click.jpmSelection').on('click.jpmSelection', function () {
+            jpmSelectionReviewLink(button, table);
+        });
+        refresh();
+    });
+    var review = $('#jpm-selection-review');
+    if (!review.length) {
+        return;
+    }
+    var params = new URL(window.location.href).searchParams;
+    var key = params.get('_jpmSelectionKey');
+    // Direct links also work, but never mutate an unrelated stored selection.
+    var validKey = key && key.startsWith('jpm.selection:');
+    var hasSnapshot = validKey && Object.prototype.hasOwnProperty.call(jpmSelectionMemory, key);
+    try {
+        hasSnapshot = hasSnapshot || (validKey && sessionStorage.getItem(key) !== null);
+    } catch (e) {
+        // A direct link still works when browser storage is disabled.
+    }
+    if (hasSnapshot) {
+        var snapshot = jpmSelectionRead(key);
+        review.find('tr[data-selection-id]').each(function () {
+            if (!snapshot.includes($(this).attr('data-selection-id'))) {
+                $(this).remove();
+            }
+        });
+    }
+    function remainingIds() {
+        return review.find('tr[data-selection-id]').map(function () {
+            return $(this).attr('data-selection-id');
+        }).get();
+    }
+    function updateReview() {
+        var ids = remainingIds();
+        if (validKey) {
+            jpmSelectionWrite(key, ids);
+        }
+        review.find('.jpm-selection-count').text(ids.length);
+        review.find('.jpm-selection-continue').prop('disabled', !ids.length || review.find('[data-unavailable="true"]').length > 0);
+    }
+    review.find('.jpm-selection-remove').off('click.jpmSelection').on('click.jpmSelection', function () {
+        $(this).closest('tr').remove();
+        updateReview();
+    });
+    review.find('.jpm-selection-cancel').off('click.jpmSelection').on('click.jpmSelection', function () {
+        var returnUrl = params.get('_jpmSelectionReturn');
+        if (returnUrl && new URL(returnUrl, window.location.href).origin === window.location.origin) {
+            jpmNavigate(returnUrl);
+        } else {
+            window.history.back();
+        }
+    });
+    review.find('.jpm-selection-continue').off('click.jpmSelection').on('click.jpmSelection', function () {
+        var ids = remainingIds();
+        if (!ids.length || review.find('[data-unavailable="true"]').length) {
+            return;
+        }
+        var url = new URL(window.location.href);
+        var parts = url.pathname.split('/');
+        parts[parts.length - 2] = ids.map(encodeURIComponent).join(',');
+        url.pathname = parts.join('/');
+        url.searchParams.delete('selectionReview');
+        url.searchParams.delete('_jpmSelectionReturn');
+        if (review.attr('data-confirm') === 'true') {
+            // The review itself is the confirmation for direct POST operations.
+            var form = $('<form id="jpmForm" method="POST" style="display:none"></form>').attr('action', url.href);
+            $('#jpmForm').remove();
+            $('body').append(form);
+            buildAjaxJpmFormObject(form, function (data) {
+                if (data.ok) {
+                    form.remove();
+                }
+                processFormResponse(data);
+            }).submit();
+        } else {
+            jpmNavigate(url.href);
+        }
+    });
+    updateReview();
+}
+
 var initPage = function () {
     try {
         initShell();
+        initPersistentSelection();
         //Clean empty help-blocks
         $(".help-block:empty").remove();
         $(".card-body:not(:has(*))").parent(".card").parent().remove();
@@ -851,7 +1029,12 @@ var initPage = function () {
 
         $(".selected-operation").off("click.jpmSelectedOperation").on("click.jpmSelectedOperation", function (e) {
             e.preventDefault();
-            var instanceIds = $.map($('.selectable:checked'), function (n, i) {
+            var table = $(this).closest('.jpm-list-table');
+            if ($(this).attr('data-selection-mode') === 'persistent') {
+                jpmSelectionReviewLink($(this), table);
+                return;
+            }
+            var instanceIds = $.map(table.find('.selectable:checked'), function (n, i) {
                 return $(n).attr("data-id");
             }).join(',');
             if (instanceIds !== "") {
@@ -1112,6 +1295,7 @@ function buildAjaxJpmFormObject(form, callback, beforeSubmit, beforeSerialize) {
             jpmBlock();
         },
         success: function (data) {
+            jpmSelectionSucceeded(data, form.attr('action') || window.location.href);
             if (callback) {
                 try {
                     callback(data);
