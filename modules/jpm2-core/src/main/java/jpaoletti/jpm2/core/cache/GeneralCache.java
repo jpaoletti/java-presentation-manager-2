@@ -62,4 +62,20 @@ public abstract class GeneralCache {
      * @return true if the value was set (key did not exist), false if it already existed
      */
     public abstract boolean setIfAbsent(String key, String value, long expirationMillis);
+
+    /**
+     * Same as {@link #setIfAbsent(String, String, long)}, but tells apart a key
+     * that already exists from a backend failure. {@code setIfAbsent} answers
+     * false in both cases, which is the safe answer for a lock but blocks every
+     * caller when used as a duplicate guard while the backend is down.
+     *
+     * @param key key
+     * @param value value
+     * @param expirationMillis expiration time in milliseconds
+     * @return true if the value was set, false if the key already existed, null
+     * if the backend could not be reached
+     */
+    public Boolean trySetIfAbsent(String key, String value, long expirationMillis) {
+        return setIfAbsent(key, value, expirationMillis);
+    }
 }

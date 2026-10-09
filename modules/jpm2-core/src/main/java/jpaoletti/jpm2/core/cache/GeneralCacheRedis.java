@@ -254,13 +254,18 @@ public final class GeneralCacheRedis extends GeneralCache {
 
     @Override
     public boolean setIfAbsent(String key, String value, long expirationMillis) {
+        return Boolean.TRUE.equals(trySetIfAbsent(key, value, expirationMillis));
+    }
+
+    @Override
+    public Boolean trySetIfAbsent(String key, String value, long expirationMillis) {
         try (Jedis jedis = pool.getResource()) {
             SetParams params = SetParams.setParams().nx().px(expirationMillis);
             String result = jedis.set(getWithPrefix(key), value != null ? value : "", params);
             return "OK".equals(result);
         } catch (Exception ex) {
             JPMUtils.getLogger().error("error en redis setIfAbsent", ex);
-            return false;
+            return null;
         }
     }
 }
