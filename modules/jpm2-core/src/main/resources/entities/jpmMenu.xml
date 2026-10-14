@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <!-- Dynamic menu module. To enable it the app imports this file, registers
+         jpaoletti.jpm2.core.model.persistent.JpmMenu in the sessionFactory, creates the
+         jpm_menu table (sql/jpm_menu.mysql.sql) and turns on the jpm.menu.dynamic sysparam.
+         Needs the sysparam module (sysparamService). -->
+
+    <bean id="jpmMenuService" class="jpaoletti.jpm2.core.menu.JpmMenuService" />
+    <bean id="jpmMenuSysparamModule" class="jpaoletti.jpm2.core.menu.JpmMenuSysparamModule" />
+    <bean id="jpmMenuGroupFilter" class="jpaoletti.jpm2.core.menu.JpmMenuGroupFilter" />
+    <bean id="jpmMenuValidator" class="jpaoletti.jpm2.core.menu.JpmMenuValidator" />
+
+    <bean id="dao-jpmMenu" class="jpaoletti.jpm2.core.menu.JpmMenuDAO">
+        <property name="transformer" ref="transformer-strToLong" />
+        <property name="className" value="jpaoletti.jpm2.core.model.persistent.JpmMenu" />
+        <property name="menuService" ref="jpmMenuService" />
+    </bean>
+
+    <bean id="jpmMenu" class="jpaoletti.jpm2.core.model.Entity">
+        <property name="clazz" value="jpaoletti.jpm2.core.model.persistent.JpmMenu" />
+        <property name="dao" ref="dao-jpmMenu" />
+        <property name="pageSize" value="100" />
+        <property name="defaultSortField" value="sortOrder" />
+        <property name="operations">
+            <list>
+                <ref bean="compact-list-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="add" />
+                    <property name="repeatable" value="true" />
+                    <property name="display" value="all" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="validator" ref="jpmMenuValidator" />
+                    <property name="icon" value="fa fa-plus" />
+                    <property name="color" value="btn-warning" />
+                </bean>
+                <ref bean="default-show-operation" />
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="edit" />
+                    <property name="display" value="show list" />
+                    <property name="repeatable" value="true" />
+                    <property name="executor" ref="operationExecutorEdit" />
+                    <property name="validator" ref="jpmMenuValidator" />
+                    <property name="icon" value="fas fa-edit" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="menuPreview" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="list" />
+                    <property name="follows" value="list" />
+                    <property name="executor">
+                        <bean class="jpaoletti.jpm2.core.menu.JpmMenuPreviewExec" />
+                    </property>
+                    <property name="color" value="btn-secondary" />
+                    <property name="icon" value="fas fa-sitemap" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Operation">
+                    <property name="id" value="menuGenerate" />
+                    <property name="scope" value="GENERAL" />
+                    <property name="display" value="list" />
+                    <property name="confirm" value="true" />
+                    <property name="executor">
+                        <bean class="jpaoletti.jpm2.core.menu.JpmMenuGenerateExec" />
+                    </property>
+                    <property name="color" value="btn-success" />
+                    <property name="icon" value="fas fa-magic" />
+                </bean>
+                <ref bean="default-generalAudit-operation" />
+                <ref bean="default-itemAudit-operation" />
+                <ref bean="default-delete-operation" />
+            </list>
+        </property>
+        <property name="fields">
+            <list>
+                <ref bean="id-invisible" />
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="parent" />
+                    <property name="width" value="180px" />
+                    <property name="configs">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="list show" />
+                                <property name="converter" ref="jpm-converter-show" />
+                            </bean>
+                            <bean class="jpaoletti.jpm2.core.model.FieldConfig">
+                                <property name="operations" value="add edit" />
+                                <property name="converter">
+                                    <bean class="jpaoletti.jpm2.web.converter.WebEditObject">
+                                        <property name="entity" ref="jpmMenu" />
+                                        <property name="textField" value="label" />
+                                        <property name="filter" ref="jpmMenuGroupFilter" />
+                                    </bean>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="type" />
+                    <property name="width" value="110px" />
+                    <property name="searcher" ref="enumJPASearcher" />
+                    <property name="configs" ref="default-enum-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="label" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="icon" />
+                    <property name="width" value="180px" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="entity" />
+                    <property name="width" value="150px" />
+                    <property name="searcher" ref="jpm-searcher-string-jpa" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="operation" />
+                    <property name="width" value="110px" />
+                    <property name="configs" ref="editable-string-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="url" />
+                    <property name="configs" ref="editable-string-config-nolist" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="authorities" />
+                    <property name="configs" ref="editable-string-config-nolist" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="userCondition" />
+                    <property name="width" value="150px" />
+                    <property name="configs" ref="editable-string-config-nolist" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="sortOrder" />
+                    <property name="width" value="90px" />
+                    <property name="align" value="center" />
+                    <!-- Integer: con editable-string-config el WebEditString castea a String y rompe el edit. -->
+                    <property name="configs" ref="default-int-config" />
+                </bean>
+                <bean class="jpaoletti.jpm2.core.model.Field">
+                    <property name="id" value="active" />
+                    <property name="width" value="80px" />
+                    <property name="align" value="center" />
+                    <property name="searcher" ref="jpm-searcher-bool-jpa" />
+                    <property name="configs" ref="inline-bool-config" />
+                </bean>
+            </list>
+        </property>
+        <property name="panels">
+            <list>
+                <bean class="jpaoletti.jpm2.core.model.PanelRow">
+                    <property name="panels">
+                        <list>
+                            <bean class="jpaoletti.jpm2.core.model.Panel">
+                                <property name="icon" value="" />
+                                <property name="title" value="" />
+                                <property name="blocks" value="6" />
+                                <property name="fields" value="id parent type label icon entity operation url authorities userCondition sortOrder active" />
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
+

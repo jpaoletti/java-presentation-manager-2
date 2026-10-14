@@ -17,6 +17,7 @@
         <jpm:menu-item code="batch"           icon="fas fa-tasks" />
         <jpm:menu-item code="threadRunner"    icon="fas fa-microchip" />
         <jpm:menu-item code="customization"   icon="fas fa-paint-brush" />
+        <jpm:menu-item code="jpmMenu"         icon="fas fa-bars" />
     </ul>
 </li>
 <li class="nav-item dropdown">

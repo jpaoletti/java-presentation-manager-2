@@ -298,6 +298,24 @@ CREATE TABLE IF NOT EXISTS `jpm_sysparam_group` (
   UNIQUE KEY `jpm_sysparam_group_name_uq` (`name`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `jpm_menu` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `parent` bigint DEFAULT NULL,
+  `type` varchar(20) NOT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `icon` varchar(100) DEFAULT NULL,
+  `entity` varchar(100) DEFAULT NULL,
+  `operation` varchar(100) DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `authorities` varchar(1000) DEFAULT NULL,
+  `user_condition` varchar(255) DEFAULT NULL,
+  `sort_order` int DEFAULT NULL,
+  `active` char(1) NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id`),
+  KEY `jpm_menu_parent_FK` (`parent`),
+  CONSTRAINT `jpm_menu_parent_FK` FOREIGN KEY (`parent`) REFERENCES `jpm_menu` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- ---------------------------------------------------------------------------
 -- Grant the migrated-module operations to the Administrators group (id=1)
 -- ---------------------------------------------------------------------------
@@ -314,6 +332,7 @@ INSERT IGNORE INTO `group_authorities` (`group_id`,`authority`) VALUES
  (1,'jpm.auth.operation.batchParameter.list'),(1,'jpm.auth.operation.batchParameter.add'),(1,'jpm.auth.operation.batchParameter.show'),(1,'jpm.auth.operation.batchParameter.edit'),(1,'jpm.auth.operation.batchParameter.delete'),(1,'jpm.auth.operation.batchParameter.itemAudit'),(1,'jpm.auth.operation.batchParameter.generalAudit'),
  (1,'jpm.auth.operation.threadRunner.list'),(1,'jpm.auth.operation.threadRunner.add'),(1,'jpm.auth.operation.threadRunner.show'),(1,'jpm.auth.operation.threadRunner.edit'),(1,'jpm.auth.operation.threadRunner.delete'),(1,'jpm.auth.operation.threadRunner.itemAudit'),(1,'jpm.auth.operation.threadRunner.generalAudit'),
  (1,'jpm.auth.operation.threadRunnerParameter.list'),(1,'jpm.auth.operation.threadRunnerParameter.add'),(1,'jpm.auth.operation.threadRunnerParameter.show'),(1,'jpm.auth.operation.threadRunnerParameter.edit'),(1,'jpm.auth.operation.threadRunnerParameter.delete'),(1,'jpm.auth.operation.threadRunnerParameter.itemAudit'),(1,'jpm.auth.operation.threadRunnerParameter.generalAudit'),
- (1,'jpm.auth.operation.customization.list'),(1,'jpm.auth.operation.customization.add'),(1,'jpm.auth.operation.customization.show'),(1,'jpm.auth.operation.customization.edit'),(1,'jpm.auth.operation.customization.delete'),(1,'jpm.auth.operation.customization.itemAudit'),(1,'jpm.auth.operation.customization.generalAudit');
+ (1,'jpm.auth.operation.customization.list'),(1,'jpm.auth.operation.customization.add'),(1,'jpm.auth.operation.customization.show'),(1,'jpm.auth.operation.customization.edit'),(1,'jpm.auth.operation.customization.delete'),(1,'jpm.auth.operation.customization.itemAudit'),(1,'jpm.auth.operation.customization.generalAudit'),
+ (1,'jpm.auth.operation.jpmMenu.list'),(1,'jpm.auth.operation.jpmMenu.add'),(1,'jpm.auth.operation.jpmMenu.show'),(1,'jpm.auth.operation.jpmMenu.edit'),(1,'jpm.auth.operation.jpmMenu.delete'),(1,'jpm.auth.operation.jpmMenu.itemAudit'),(1,'jpm.auth.operation.jpmMenu.generalAudit'),(1,'jpm.auth.operation.jpmMenu.menuPreview'),(1,'jpm.auth.operation.jpmMenu.menuGenerate');
 
 SET foreign_key_checks = 1;

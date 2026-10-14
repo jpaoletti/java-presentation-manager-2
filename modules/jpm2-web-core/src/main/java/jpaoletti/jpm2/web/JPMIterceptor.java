@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jpaoletti.jpm2.core.JPMContext;
 import jpaoletti.jpm2.core.PresentationManager;
+import jpaoletti.jpm2.core.menu.JpmMenuService;
 import jpaoletti.jpm2.core.model.ContextualEntity;
 import jpaoletti.jpm2.core.model.Entity;
 import jpaoletti.jpm2.core.model.EntityInstance;
@@ -30,6 +31,8 @@ public class JPMIterceptor implements HandlerInterceptor {
     private JPMContext context;
     @Autowired
     private PresentationManager jpm;
+    @Autowired(required = false)
+    private JpmMenuService menuService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse hsr1, Object o) throws Exception {
@@ -58,12 +61,30 @@ public class JPMIterceptor implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * Adds "dynamicMenu" when the dynamic menu module is imported and its
+     * sysparam is on. Without it, jpm-body.tag renders topmenu.jsp.
+     */
+    private void addDynamicMenu(ModelAndView mav) {
+        if (menuService == null || mav == null || (mav.getViewName() != null && mav.getViewName().startsWith("redirect:"))) {
+            return;
+        }
+        try {
+            if (menuService.isEnabled()) {
+                mav.addObject("dynamicMenu", menuService.getVisibleMenu());
+            }
+        } catch (Exception e) {
+            LOG.error("Dynamic menu could not be built", e);
+        }
+    }
+
     @Override
     public void postHandle(HttpServletRequest hsr, HttpServletResponse hsr1, Object o, ModelAndView mav) throws Exception {
         try {
             mav.addObject("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         } catch (Exception e) {
         }
+        addDynamicMenu(mav);
         final JPMContext ctx = getContext();
         if (ctx != null) {
             final Entity entity = ctx.getEntity();

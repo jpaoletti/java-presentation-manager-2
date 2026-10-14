@@ -122,7 +122,7 @@
                 <version>3.3.2</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>WEB-INF/classes/**,**/*.md</packagingExcludes>
+                    <packagingExcludes>**/*.md</packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>

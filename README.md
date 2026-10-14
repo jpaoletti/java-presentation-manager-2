@@ -658,6 +658,57 @@ jpaoletti.jpm2.core.model.persistent.SysparamGroup
 
 Tables: `jpm_sysparam` and `jpm_sysparam_group`.
 
+## Dynamic menu (jpm_menu)
+
+By default the top menu is the `WEB-INF/jsp/inc/menu/topmenu.jsp` of each application. The
+optional dynamic menu stores it in the `jpm_menu` table instead, so it can be changed from the
+`jpmMenu` screen without touching the application. Only the top menu (`menuMode=top`) of the bs5
+module is supported.
+
+Enabling it (it needs the Sysparam module):
+
+1. Import `classpath:entities/jpmMenu.xml`.
+2. Register `jpaoletti.jpm2.core.model.persistent.JpmMenu` on the `sessionFactory`.
+3. Create the table (`jpm2-core/src/main/resources/sql/jpm_menu.mysql.sql`) and grant the
+   `jpm.auth.operation.jpmMenu.*` authorities (`list`, `add`, `show`, `edit`, `delete`,
+   `itemAudit`, `generalAudit`, `menuPreview`, `menuGenerate`).
+4. Load the menu (the `menuGenerate` operation adds a group with every entity that has a `list`
+   operation and is not in the menu yet) and check it with `menuPreview`.
+5. Turn on the `jpm.menu.dynamic` sysparam.
+
+While the sysparam is off, or the table is empty, `topmenu.jsp` is used, so the menu screen is
+always reachable.
+
+Items form a tree of up to 3 levels (`parent`, ordered by `sortOrder`):
+
+| Type | Renders |
+|---|---|
+| `GROUP` | Dropdown on the top level, `&raquo;` submenu below it |
+| `ENTITY` | Link to `jpm/<entity>/<operation>` (`list` by default; `entity!context` is accepted) |
+| `URL` | Link relative to the context path, or absolute (`http:`, `https:`, `mailto:`). `{user.<property>}` placeholders are replaced with the logged user properties (`jpm/reseller/{user.reseller.id}/currentAccount.exec`); the item is hidden when a placeholder has no value |
+| `HEADER` / `SEPARATOR` | Title / divider inside a group |
+
+The label is a `messages.properties` key or literal text (escaped). An `ENTITY` item without label
+uses `top.menu.<entity>` or the entity plural title.
+
+Visibility, computed for each request:
+
+- An `ENTITY` item needs access to the entity and the operation, the same check the operation does
+  (`jpm.auth.operation.<entity>.<operation>`, `ROLE_SPECIAL`, `auth`).
+- `authorities` (comma separated, optional) adds a requirement: the user needs any of them. Use it
+  for `URL` items and groups (for example `MONITOR`).
+- `userCondition` (optional, any item type) checks the logged user: `user.<property>` shows the item
+  only when the property has a value, `!user.<property>` only when it is empty (for example
+  `user.patient`, `!user.institution`).
+- A group without visible items is hidden; empty headers and extra separators are removed.
+- Inactive items, and items whose entity or operation doesn't exist, are hidden with their children
+  (the preview marks them).
+
+The items are cached for 60 seconds (`JpmMenuService.cacheSeconds`); saving or deleting an item
+clears the cache. The menu keeps the `jpm-menu-item` class and the `menu-<entity>` ids, so the menu
+search and the active item highlight work as with the static menu. Applications that override
+`WEB-INF/tags/jpm-body.tag` must add the same `dynamicMenu` choice around the `topmenu.jsp` include.
+
 ## Debug logging (DebugLog)
 
 `DebugLog` is a lightweight, runtime-controllable debug logging facility. It replaces the old

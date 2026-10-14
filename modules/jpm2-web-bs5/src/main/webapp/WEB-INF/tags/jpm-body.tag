@@ -20,7 +20,15 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                            <%@include file="../jsp/inc/menu/topmenu.jsp" %>
+                            <%-- dynamicMenu: jpm_menu module with the jpm.menu.dynamic sysparam on (JPMIterceptor) --%>
+                            <c:choose>
+                                <c:when test="${dynamicMenu != null}">
+                                    <jpm:dynamic-menu items="${dynamicMenu}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <%@include file="../jsp/inc/menu/topmenu.jsp" %>
+                                </c:otherwise>
+                            </c:choose>
                         </ul>
                         <form class="d-flex">
                             <div class="dropdown" id="searchDropdown">

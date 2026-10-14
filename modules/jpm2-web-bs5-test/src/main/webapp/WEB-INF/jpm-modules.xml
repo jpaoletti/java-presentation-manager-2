@@ -44,4 +44,5 @@
     <import resource="classpath:entities/sysparam.xml" />
     <import resource="classpath:entities/sysparamGroup.xml" />
     <import resource="classpath:entities/ddlMigration.xml" />
+    <import resource="classpath:entities/jpmMenu.xml" />
 </beans>
