@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -185,15 +186,14 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
     /**
      * Primera fila de datos de cada hoja de toExcel (antes van el titulo y el encabezado).
      */
-    private static final int XLS_FIRST_DATA_ROW = 3;
-    /**
-     * Filas de datos por hoja de toExcel (el formato .xls admite 65536 filas por hoja).
-     */
-    private static final int XLS_MAX_ROWS_PER_SHEET = 65530;
+    private static final int EXCEL_FIRST_DATA_ROW = 3;
 
     @Override
     public Workbook toExcel(Entity entity, SessionEntityData sed, ContextualEntity owner, String ownerId) throws PMException {
-        final Workbook wb = new HSSFWorkbook();
+        final String format = getContext().getOperation().getConfig("format", "xlsx").trim();
+        if (!"xls".equalsIgnoreCase(format) && !"xlsx".equalsIgnoreCase(format)) {
+            throw new IllegalArgumentException("Unsupported toExcel format: " + format + ". Expected xls or xlsx.");
+        }
         final Integer page = sed.getPage();
         final Integer pageSize = sed.getPageSize();
         final PaginatedList paginatedList = getJpm().getService().getPaginatedList(getContext().getContextualEntity(), getContext().getOperation(), sed, 1, Integer.MAX_VALUE, owner, ownerId);
@@ -203,6 +203,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (list == null || list.isEmpty()) {
             throw new PMException("jpm.toExcel.noData");
         }
+        final Workbook wb = "xls".equalsIgnoreCase(format) ? new HSSFWorkbook() : new XSSFWorkbook();
+        final int maxRowsPerSheet = wb.getSpreadsheetVersion().getMaxRows();
         final CellStyle bold = xlsBoldStyle(wb);
         final CellStyle xlsDateStyle = xlsDateStyle(wb);
         final CellStyle xlsAmountStyle = xlsAmountStyle(wb);
@@ -211,8 +213,8 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         int r = 0;
         int pageNumber = 0;
         for (EntityInstance entityInstance : list) {
-            if (sheet == null || r >= XLS_FIRST_DATA_ROW + XLS_MAX_ROWS_PER_SHEET) {
-                // .xls admite 65536 filas por hoja: al llegar al limite se sigue en una hoja nueva
+            if (sheet == null || r >= maxRowsPerSheet) {
+                // Continue on a new sheet when the selected format reaches its row limit.
                 pageNumber++;
                 sheet = xlsNewPage(wb, new XlsFormatTitle(
                         pageNumber == 1
@@ -220,15 +222,15 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                                 : getMessage("jpm.toExcel.pageNameN", String.valueOf(pageNumber)),
                         pageTitle
                 ));
-                sheet.createFreezePane(0, XLS_FIRST_DATA_ROW);
-                final Row headerRow = sheet.createRow(XLS_FIRST_DATA_ROW - 1);
+                sheet.createFreezePane(0, EXCEL_FIRST_DATA_ROW);
+                final Row headerRow = sheet.createRow(EXCEL_FIRST_DATA_ROW - 1);
                 int i = 0;
                 for (Field field : paginatedList.getFields()) {
                     final Cell cell = headerRow.createCell(i++);
                     cell.setCellStyle(bold);
                     cell.setCellValue(replaceHtmlCodeAccents(field.getTitle(entity)));
                 }
-                r = XLS_FIRST_DATA_ROW;
+                r = EXCEL_FIRST_DATA_ROW;
             }
             final Row row = sheet.createRow(r++);
             int i = 0;

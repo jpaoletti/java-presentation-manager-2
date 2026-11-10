@@ -75,6 +75,10 @@ public interface JPMService {
     @Transactional
     public IdentifiedObject save(Entity owner, String ownerId, Entity entity, String context, Operation operation, EntityInstance entityInstance, Map<String, String[]> parameters) throws PMException;
 
+    /**
+     * Exports using the current operation's format property (xlsx by default, or xls).
+     * The caller is responsible for closing the returned workbook.
+     */
     public Workbook toExcel(Entity entity, SessionEntityData sed, ContextualEntity owner, String ownerId) throws PMException;
 
     /**

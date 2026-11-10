@@ -1112,3 +1112,21 @@ Kept on purpose (not exploitable with the current usage, or upgrading could chan
 - `EditFileInMemoryConverter` has `keepCurrentValue`: set it to `true` when the `byte[]` property is persisted, so editing without uploading a new file keeps the current one.
 - The mail sender `debug` parameter defaults to `false`; new parameters `timeout-ms` (30s) and `starttls-required`.
 - The test entities (`jpaoletti.jpm2.core.test.*`) moved to `jpm2-web-bs5-test`.
+
+## Excel export (`toExcel`)
+
+The `toExcel` operation exports XLSX by default. Set the operation's `format`
+property to `xls` for legacy Excel files, or explicitly to `xlsx` for modern files:
+
+```xml
+<bean parent="default-toExcel-operation">
+    <property name="properties">
+        <props>
+            <prop key="format">xls</prop>
+        </props>
+    </property>
+</bean>
+```
+
+Values are case insensitive. Other values are rejected. The download extension,
+content type, and row limit per sheet follow the selected format.

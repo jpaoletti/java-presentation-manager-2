@@ -48,6 +48,7 @@ import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import static jpaoletti.jpm2.web.controller.ShowController.OP_SHOW;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
@@ -707,10 +708,7 @@ public class ListController extends BaseController {
         }
         final ContextualEntity cowner = getJpm().getContextualEntity(owner);
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), cowner, ownerId);
-        response.setContentType("application/vnd.ms-excel");
-        final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", ""); // "papa"
-        response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + ".xls");
-        response.getOutputStream().write(xlsTobytes(wb));
+        writeExcelResponse(entity, wb, response);
     }
 
     @GetMapping(value = {"/jpm/{entity}/{operationId:toExcel}"})
@@ -718,10 +716,19 @@ public class ListController extends BaseController {
         final Entity entity = getContext().getEntity();
         checkNotRequiredWeak(entity);
         final Workbook wb = getService().toExcel(entity, getSessionEntityData(entity), null, null);
-        response.setContentType("application/vnd.ms-excel");
-        final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", ""); // "papa"
-        response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + ".xls");
-        response.getOutputStream().write(xlsTobytes(wb));
+        writeExcelResponse(entity, wb, response);
+    }
+
+    protected void writeExcelResponse(Entity entity, Workbook wb, HttpServletResponse response) throws Exception {
+        try (wb) {
+            final boolean xlsx = wb.getSpreadsheetVersion() == SpreadsheetVersion.EXCEL2007;
+            response.setContentType(xlsx
+                    ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    : "application/vnd.ms-excel");
+            final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+            response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + (xlsx ? ".xlsx" : ".xls"));
+            response.getOutputStream().write(xlsTobytes(wb));
+        }
     }
 
     @GetMapping(value = {"/jpm/{owner}/{ownerId}/{entity}/{operationId:toPdf}"})
