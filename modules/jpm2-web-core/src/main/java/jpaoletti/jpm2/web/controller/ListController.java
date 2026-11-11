@@ -1,6 +1,7 @@
 package jpaoletti.jpm2.web.controller;
 
 import java.text.Normalizer;
+import org.springframework.http.ContentDisposition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,7 +43,6 @@ import jpaoletti.jpm2.core.search.Searcher;
 import jpaoletti.jpm2.core.search.Searcher.DescribedCriterion;
 import jpaoletti.jpm2.core.service.MiscEntityService;
 import jpaoletti.jpm2.util.JPMUtils;
-import static jpaoletti.jpm2.util.XlsUtils.xlsTobytes;
 import jpaoletti.jpm2.web.ObjectConverterData;
 import jpaoletti.jpm2.web.ObjectConverterData.ObjectConverterDataItem;
 import static jpaoletti.jpm2.web.controller.ShowController.OP_SHOW;
@@ -50,6 +50,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
@@ -719,6 +720,10 @@ public class ListController extends BaseController {
         writeExcelResponse(entity, wb, response);
     }
 
+    /**
+     * Writes the workbook straight to the response (no in-memory copy) and, for a streaming
+     * xlsx workbook, deletes its temporary files.
+     */
     protected void writeExcelResponse(Entity entity, Workbook wb, HttpServletResponse response) throws Exception {
         try (wb) {
             final boolean xlsx = wb.getSpreadsheetVersion() == SpreadsheetVersion.EXCEL2007;
@@ -726,8 +731,13 @@ public class ListController extends BaseController {
                     ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     : "application/vnd.ms-excel");
             final String cleanFileName = Normalizer.normalize(StringEscapeUtils.unescapeHtml4(entity.getPluralTitle()), Normalizer.Form.NFD).replaceAll("\\p{M}", "");
-            response.addHeader("Content-Disposition", "attachment;filename=" + cleanFileName + (xlsx ? ".xlsx" : ".xls"));
-            response.getOutputStream().write(xlsTobytes(wb));
+            response.setHeader("Content-Disposition", ContentDisposition.builder("attachment")
+                    .filename(cleanFileName + (xlsx ? ".xlsx" : ".xls")).build().toString());
+            wb.write(response.getOutputStream());
+        } finally {
+            if (wb instanceof SXSSFWorkbook) {
+                ((SXSSFWorkbook) wb).dispose();
+            }
         }
     }
 

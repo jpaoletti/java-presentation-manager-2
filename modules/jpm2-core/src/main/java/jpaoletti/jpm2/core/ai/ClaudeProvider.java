@@ -16,7 +16,7 @@ import org.json.JSONObject;
 /**
  * Reference {@link AIProviderImplementation} for Anthropic's Claude, over the Messages API
  * ({@code POST /v1/messages}). Uses the JDK HTTP client ({@code java.net.http}) and {@code org.json} — no
- * extra dependency added to jpm2-core. This mirrors how trekker's IA subsystem talks to its provider today,
+ * extra dependency added to jpm2-core. This mirrors how existing applications talk to the provider today,
  * and keeps the core lean for apps on older stacks; it can be re-based on the official {@code anthropic-java}
  * SDK later without changing the {@link AIProviderImplementation} contract.
  *

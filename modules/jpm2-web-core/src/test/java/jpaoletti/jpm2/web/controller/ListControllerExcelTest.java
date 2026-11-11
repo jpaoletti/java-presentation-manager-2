@@ -5,6 +5,7 @@ import jpaoletti.jpm2.core.model.Entity;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -14,7 +15,7 @@ public class ListControllerExcelTest {
 
     @Test
     public void downloadsXlsxWithMatchingHeaders() throws Exception {
-        verifyDownload(new XSSFWorkbook(), "xlsx",
+        verifyDownload(new SXSSFWorkbook(), "xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     }
 
@@ -34,9 +35,9 @@ public class ListControllerExcelTest {
         final MockHttpServletResponse response = new MockHttpServletResponse();
         new ListController().writeExcelResponse(entity, workbook, response);
         assertEquals(contentType, response.getContentType());
-        assertEquals("attachment;filename=Arboles." + extension, response.getHeader("Content-Disposition"));
+        assertEquals("attachment; filename=\"Arboles." + extension + "\"", response.getHeader("Content-Disposition"));
         try (Workbook reopened = WorkbookFactory.create(new ByteArrayInputStream(response.getContentAsByteArray()))) {
-            assertEquals(workbook.getClass(), reopened.getClass());
+            assertEquals(workbook instanceof HSSFWorkbook ? HSSFWorkbook.class : XSSFWorkbook.class, reopened.getClass());
             assertEquals("Test", reopened.getSheetAt(0).getRow(0).getCell(0).getStringCellValue());
         }
     }

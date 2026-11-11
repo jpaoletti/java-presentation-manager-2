@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  *   <li>{@code 0} = OFF, {@code 1} = BASIC (milestones/decisions), {@code 2} = DETAILED
  *       (payloads, intermediate values), {@code 3} = TRACE (per-iteration, raw dumps).</li>
  *   <li>A global level applies to every channel; a per-channel override focuses one area
- *       (e.g. global {@code 0} but channel {@code prisma=3}) without flooding the rest.</li>
+ *       (e.g. global {@code 0} but channel {@code payments=3}) without flooding the rest.</li>
  *   <li>A call at level {@code L} on a channel logs only when the effective level of that
  *       channel is {@code >= L}. Everything defaults to {@code 0} (off).</li>
  *   <li>On top of that, a <b>scope</b> ({@link #pushScope(int, String)}) raises the effective

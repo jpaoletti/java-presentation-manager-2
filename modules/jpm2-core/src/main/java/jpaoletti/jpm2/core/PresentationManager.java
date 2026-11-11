@@ -424,7 +424,7 @@ public class PresentationManager implements Observer, Serializable {
         DebugLog.debug(level, message);
     }
 
-    /** Logs at the given level on a specific channel (e.g. {@code "prisma"}). */
+    /** Logs at the given level on a specific channel (e.g. {@code "payments"}). */
     public void debug(String channel, int level, Object message) {
         DebugLog.debug(channel, level, message);
     }

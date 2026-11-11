@@ -13,7 +13,7 @@ import jpaoletti.jpm2.core.model.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -73,8 +73,9 @@ class JPMServiceExcelTest {
     @ValueSource(strings = {"xlsx", "XLSX", "xls", "XLS"})
     void exportsSelectedFormatAndPreservesCellTypes(String format) throws Exception {
         final boolean legacy = format != null && format.equalsIgnoreCase("xls");
-        try (Workbook workbook = export(format, 1)) {
-            assertTrue(legacy ? workbook instanceof HSSFWorkbook : workbook instanceof XSSFWorkbook);
+        final Workbook workbook = export(format, 1);
+        try (workbook) {
+            assertTrue(legacy ? workbook instanceof HSSFWorkbook : workbook instanceof SXSSFWorkbook);
             final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             workbook.write(bytes);
             try (Workbook reopened = WorkbookFactory.create(new ByteArrayInputStream(bytes.toByteArray()))) {
@@ -85,19 +86,42 @@ class JPMServiceExcelTest {
                 assertEquals("", row.getCell(3).getStringCellValue());
                 assertEquals("Text", reopened.getSheetAt(0).getRow(2).getCell(0).getStringCellValue());
             }
+        } finally {
+            dispose(workbook);
+        }
+    }
+
+    private static void dispose(Workbook workbook) {
+        if (workbook instanceof SXSSFWorkbook) {
+            ((SXSSFWorkbook) workbook).dispose();
+        }
+    }
+
+    @Test
+    void xlsxKeepsOnlyAWindowOfRowsInMemory() throws Exception {
+        final Workbook workbook = export("xlsx", 1000);
+        try (workbook) {
+            // Flushed rows are no longer available in memory
+            assertNull(workbook.getSheetAt(0).getRow(3));
+            assertNotNull(workbook.getSheetAt(0).getRow(1002));
+        } finally {
+            dispose(workbook);
         }
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"xls", "xlsx"})
     void splitsSheetsAccordingToFormatRowLimit(String format) throws Exception {
-        try (Workbook workbook = export(format, 65534)) {
+        final Workbook workbook = export(format, 65534);
+        try (workbook) {
             assertEquals(format.equals("xls") ? 2 : 1, workbook.getNumberOfSheets());
             assertEquals(format.equals("xls") ? 65535 : 65536, workbook.getSheetAt(0).getLastRowNum());
             if (format.equals("xls")) {
                 assertNotNull(workbook.getSheetAt(1).getRow(3));
                 assertNotNull(workbook.getSheetAt(1).getRow(2));
             }
+        } finally {
+            dispose(workbook);
         }
     }
 

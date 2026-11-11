@@ -5,7 +5,7 @@ import jpaoletti.jpm2.core.sysparam.SysparamType;
 /**
  * Contract for a single name/value parameter that belongs to a {@link ParameterizedEntity}. It is a plain
  * interface (not a base class) so it composes with any persistence root — jpm2-core children extend
- * {@code JPMPersistentObject}, hermes children extend {@code CustomModelObject}, etc. A consumer can either
+ * {@code JPMPersistentObject}, other applications extend their own base classes, etc. A consumer can either
  * implement this directly on its existing child entity or extend {@link AbstractEntityParameter} to also
  * inherit the {@code name}/{@code value}/{@code param_type} columns.
  *

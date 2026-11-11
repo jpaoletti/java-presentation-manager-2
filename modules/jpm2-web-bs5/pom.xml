@@ -170,7 +170,7 @@
                 <version>3.4.0</version>
                 <configuration>
                     <attachClasses>true</attachClasses>
-                    <packagingExcludes>**/*.md</packagingExcludes>
+                    <packagingExcludes>**/*.md,**/.idea/**</packagingExcludes>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <archive>                   
                         <manifest>

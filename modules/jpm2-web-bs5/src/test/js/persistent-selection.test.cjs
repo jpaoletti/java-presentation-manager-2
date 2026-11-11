@@ -40,8 +40,8 @@ function setup(storageBlocked = false) {
     let tables = [], review;
     const navigations = [], posts = [];
     const context = {
-        URL, currentUser: 'ana', getContextPath: () => 'http://localhost/trekker/',
-        window: {location: {href: 'http://localhost/trekker/jpm/orden/list?page=1', origin: 'http://localhost'}, history: {back() {}}},
+        URL, currentUser: 'ana', getContextPath: () => 'http://localhost/myapp/',
+        window: {location: {href: 'http://localhost/myapp/jpm/orden/list?page=1', origin: 'http://localhost'}, history: {back() {}}},
         sessionStorage: {
             getItem: k => { if (storageBlocked) throw Error('disabled'); return data.get(k) || null; },
             setItem: (k,v) => { if (storageBlocked) throw Error('disabled'); data.set(k,v); },
@@ -66,7 +66,7 @@ function setup(storageBlocked = false) {
 function page(ids, owner = '') {
     const table = element({'data-selection-entity':'orden', 'data-selection-owner':'cliente', 'data-selection-owner-id':owner});
     const checks = ids.map(id => element({'data-id':id}));
-    const button = element({href:'http://localhost/trekker/jpm/orden/@@/agrupar.exec'});
+    const button = element({href:'http://localhost/myapp/jpm/orden/@@/agrupar.exec'});
     const count = element(), clear = element(), review = element(), header = element(), toolbar = element();
     table.children = {'.selectable':checks, '.selected-operation[data-selection-mode="persistent"]':[button], '.jpm-selection-toolbar':[toolbar], '.jpm-selection-count':[count], '#select_unselect_all':[header], '.jpm-selection-clear':[clear], '.jpm-selection-review':[review]};
     return {table, checks, button, count, clear, review, header};
@@ -132,34 +132,34 @@ test('review removes rows, retains cancellation and opens executor with remainin
     fire(a.review,'click.jpmSelection');
     const url = new URL(env.navigations[0]);
     assert.equal(url.searchParams.get('selectionReview'), 'true');
-    assert.equal(url.pathname, '/trekker/jpm/orden/1,2/agrupar.exec');
+    assert.equal(url.pathname, '/myapp/jpm/orden/1,2/agrupar.exec');
     env.context.window.location.href=url.href;
     const r = reviewPage(['1','2']); env.setTables([]); env.setReview(r.review); env.context.initPersistentSelection();
     fire(r.removes[0],'click.jpmSelection');
     assert.deepEqual(selection(env,a.table), ['2']);
     fire(r.cancel,'click.jpmSelection');
-    assert.equal(env.navigations.at(-1), 'http://localhost/trekker/jpm/orden/list?page=1');
+    assert.equal(env.navigations.at(-1), 'http://localhost/myapp/jpm/orden/list?page=1');
     assert.deepEqual(selection(env,a.table), ['2']);
     fire(r.next,'click.jpmSelection');
     const next = new URL(env.navigations.at(-1));
-    assert.equal(next.pathname, '/trekker/jpm/orden/2/agrupar.exec');
+    assert.equal(next.pathname, '/myapp/jpm/orden/2/agrupar.exec');
     assert.equal(next.searchParams.has('selectionReview'), false);
     assert.ok(next.searchParams.has('_jpmSelectionKey'));
 });
 test('unavailable rows and empty selection block continuation; confirmation uses POST', () => {
-    const env = setup(); env.context.window.location.href='http://localhost/trekker/jpm/orden/1,2/agrupar.exec?selectionReview=true';
+    const env = setup(); env.context.window.location.href='http://localhost/myapp/jpm/orden/1,2/agrupar.exec?selectionReview=true';
     const r = reviewPage(['1','2'], true, ['1']); env.setReview(r.review); env.context.initPersistentSelection();
     assert.equal(r.next.disabled,true); fire(r.next,'click.jpmSelection'); assert.equal(env.posts.length,0);
     fire(r.removes[0],'click.jpmSelection'); assert.equal(r.next.disabled,false);
     fire(r.next,'click.jpmSelection'); assert.equal(env.posts.length,1);
-    assert.equal(new URL(env.posts[0].url).pathname,'/trekker/jpm/orden/2/agrupar.exec');
+    assert.equal(new URL(env.posts[0].url).pathname,'/myapp/jpm/orden/2/agrupar.exec');
     fire(r.removes[1],'click.jpmSelection'); assert.equal(r.next.disabled,true);
 });
 test('only successful execution clears the corresponding selection', () => {
     const env=setup(), a=page(['1']), b=page(['2'],'other');
     env.setTables([a.table,b.table]); env.context.initPersistentSelection();
     fire(a.checks[0],'change.jpmSelection',true); fire(b.checks[0],'change.jpmSelection',true);
-    const url=new URL('http://localhost/trekker/jpm/orden/1/agrupar.exec');
+    const url=new URL('http://localhost/myapp/jpm/orden/1/agrupar.exec');
     url.searchParams.set('_jpmSelectionKey',env.context.jpmSelectionKey(wrap([a.table])));
     env.context.jpmSelectionSucceeded({ok:false},url.href); assert.deepEqual(selection(env,a.table),['1']);
     env.context.jpmSelectionSucceeded({ok:true},url.href); assert.deepEqual(selection(env,a.table),[]);
@@ -171,9 +171,9 @@ test('explicit form actions clear only the current operation, and malformed stor
     env.data.set(key,'broken json'); assert.deepEqual(selection(env,a.table),[]);
     env.data.set(key,JSON.stringify(['1','1',null,42])); assert.deepEqual(selection(env,a.table),['1']);
     env.context.jpmSelectionWrite(key,['1']);
-    const current=new URL('http://localhost/trekker/jpm/orden/1/agrupar.exec');
+    const current=new URL('http://localhost/myapp/jpm/orden/1/agrupar.exec');
     current.searchParams.set('_jpmSelectionKey',key); env.context.window.location.href=current.href;
-    env.context.jpmSelectionSucceeded({ok:true},'http://localhost/trekker/jpm/orden/search');
+    env.context.jpmSelectionSucceeded({ok:true},'http://localhost/myapp/jpm/orden/search');
     assert.deepEqual(selection(env,a.table),['1']);
     env.context.jpmSelectionSucceeded({ok:true},current.origin+current.pathname);
     assert.deepEqual(selection(env,a.table),[]);

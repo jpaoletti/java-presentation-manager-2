@@ -16,7 +16,7 @@ import org.json.JSONObject;
 /**
  * Reference {@link AIProviderImplementation} for OpenAI, over the Chat Completions API
  * ({@code POST /chat/completions}). Uses the JDK HTTP client + {@code org.json} (no extra dependency).
- * This is the generalization of trekker's existing OpenAI integration into the neutral contract.
+ * This is the generalization of an existing application OpenAI integration into the neutral contract.
  *
  * <p>Fase 0 scope: synchronous CHAT + STRUCTURED_OUTPUT (via {@code response_format: json_schema}).
  * The model is taken from the request or the connector's default; there is no hardcoded fallback model.

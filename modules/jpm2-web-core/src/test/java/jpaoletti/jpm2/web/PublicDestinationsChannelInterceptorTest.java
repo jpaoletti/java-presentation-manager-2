@@ -18,12 +18,12 @@ public class PublicDestinationsChannelInterceptorTest {
     @Before
     public void setUp() {
         interceptor = new PublicDestinationsChannelInterceptor();
-        interceptor.setPublicDestinations(Arrays.asList("/siach3WS/waitingRoom*"));
+        interceptor.setPublicDestinations(Arrays.asList("/appWS/waitingRoom*"));
     }
 
     @Test
     public void anonymousCanSubscribeToPublicDestination() {
-        assertNotNull(interceptor.preSend(frame(StompCommand.SUBSCRIBE, "/siach3WS/waitingRoom12", false), null));
+        assertNotNull(interceptor.preSend(frame(StompCommand.SUBSCRIBE, "/appWS/waitingRoom12", false), null));
     }
 
     @Test(expected = MessageDeliveryException.class)
@@ -33,7 +33,7 @@ public class PublicDestinationsChannelInterceptorTest {
 
     @Test(expected = MessageDeliveryException.class)
     public void anonymousCantSend() {
-        interceptor.preSend(frame(StompCommand.SEND, "/siach3WS/waitingRoom12", false), null);
+        interceptor.preSend(frame(StompCommand.SEND, "/appWS/waitingRoom12", false), null);
     }
 
     @Test

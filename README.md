@@ -669,7 +669,7 @@ Enabling it (it needs the Sysparam module):
 
 1. Import `classpath:entities/jpmMenu.xml`.
 2. Register `jpaoletti.jpm2.core.model.persistent.JpmMenu` on the `sessionFactory`.
-3. Create the table (`jpm2-core/src/main/resources/sql/jpm_menu.mysql.sql`) and grant the
+3. Create the table (`sql/jpm_menu.mysql.sql` in the `jpm2-core` jar) and grant the
    `jpm.auth.operation.jpmMenu.*` authorities (`list`, `add`, `show`, `edit`, `delete`,
    `itemAudit`, `generalAudit`, `menuPreview`, `menuGenerate`).
 4. Load the menu (the `menuGenerate` operation adds a group with every entity that has a `list`
@@ -721,7 +721,7 @@ Instead of a single on/off flag it uses a numeric **level** per **channel**:
 - `0` = OFF, `1` = BASIC (milestones/decisions), `2` = DETAILED (payloads, intermediate
   values), `3` = TRACE (per-iteration, raw dumps).
 - A **global** level applies to every channel; a **per-channel** override focuses one area
-  (e.g. global `0` but channel `prisma=3`) without flooding the rest.
+  (e.g. global `0` but channel `payments=3`) without flooding the rest.
 - A call at level `L` on a channel logs only when that channel's effective level is `>= L`.
   Everything defaults to `0` (off).
 
@@ -732,10 +732,10 @@ Use the facade on `PresentationManager` (`getJpm()` is available almost everywhe
 ```java
 getJpm().debug("processed order " + id);                 // default channel, level 1
 getJpm().debug(2, "gateway payload: " + data);           // default channel, level 2
-getJpm().debug("prisma", 3, "raw response: " + xml);     // channel "prisma", level 3
+getJpm().debug("payments", 3, "raw response: " + xml);   // channel "payments", level 3
 getJpm().debug(3, () -> expensiveDump());                // lazy: supplier runs only if it logs
 
-if (getJpm().isDebug("prisma", 2)) { /* guard a costly block */ }
+if (getJpm().isDebug("payments", 2)) { /* guard a costly block */ }
 ```
 
 Output flows through log4j2 loggers named `jpm.debug` (no channel) or `jpm.debug.<channel>`, so
@@ -756,13 +756,13 @@ public static final SysparamDef<Integer> DEBUG =
 ```
 
 Setting `debug = 2` from the `setValue` screen takes effect at once — no restart. Per-channel
-keys (`debug.prisma = 3`) drive individual channels.
+keys (`debug.payments = 3`) drive individual channels.
 
 ### Programmatic control
 
 ```java
 DebugLog.setGlobalLevel(2);                 // or setGlobalLevel(2, 1800) with a TTL in seconds
-DebugLog.setChannelLevel("prisma", 3);      // TTL-capable overload as well
+DebugLog.setChannelLevel("payments", 3);    // TTL-capable overload as well
 DebugLog.reset();                           // everything off
 Map<String,Integer> active = DebugLog.channels();
 ```
@@ -927,6 +927,35 @@ attempts, HTTP status, token usage and latency at level `1`; endpoint and config
 `2`; and full request/response dumps at level `3`. API keys are never logged. Enable it like any
 other channel (see *Debug logging* above), e.g. set `debug.ai-connector = 3`.
 
+## Excel export (`toExcel`)
+
+The `toExcel` operation exports XLSX by default. Set the operation's `format`
+property to `xls` for legacy Excel files, or explicitly to `xlsx` for modern files:
+
+```xml
+<bean parent="default-toExcel-operation">
+    <property name="properties">
+        <props>
+            <prop key="format">xls</prop>
+        </props>
+    </property>
+</bean>
+```
+
+Values are case insensitive. Other values are rejected. The download extension,
+content type, and row limit per sheet follow the selected format.
+
+- **xlsx** is written with a streaming workbook (`SXSSFWorkbook`): only the last 100 rows are kept
+  in memory and the rest go to a compressed temporary file, which is deleted after the download.
+  A sheet holds up to 1,048,573 data rows.
+- **xls** (`HSSFWorkbook`) is built in memory and a sheet holds up to 65,533 data rows.
+- When a sheet is full the export continues on a new one (`jpm.toExcel.pageName` for the first,
+  `jpm.toExcel.pageNameN` for the rest), with the title and the column headers repeated.
+
+`JPMService.toExcel(...)` returns the workbook without writing it. A caller that serves it on its
+own must write it to the output and then call `SXSSFWorkbook.dispose()` to delete the temporary
+file (see `ListController.writeExcelResponse`).
+
 ## Build and execution
 
 Build the whole framework:
@@ -1089,7 +1118,8 @@ These were found in the 2.0.0 code review and are intentionally left for 2.1.0 (
 
 ### Exports
 
-- **`toExcel` still generates `.xls` (`HSSFWorkbook`)**: each sheet holds up to 65530 data rows and the export continues on a new sheet (`jpm.toExcel.pageNameN`). The whole list is loaded in memory before building the file, so very large exports are slow and memory hungry. Planned for 2.1.0: move to `.xlsx` with streaming (`SXSSFWorkbook`, up to 1048576 rows per sheet), paging the query, and update the MIME type (`XlsUtils.MIME_XLS`) and the `.xls` file extension in `ListController`.
+- **`toExcel` loads the whole list before writing it.** The xlsx file is streamed (`SXSSFWorkbook`), but the query and the converted values of every row are still in memory at once, so very large exports are slow and memory hungry. Planned for 2.1.0: page the query while writing.
+- **The generic reports (`JPMReportController` / `ReportService`) still export `.xls` (`HSSFWorkbook`)**, built in memory.
 
 ### Dependencies
 
@@ -1112,21 +1142,8 @@ Kept on purpose (not exploitable with the current usage, or upgrading could chan
 - `EditFileInMemoryConverter` has `keepCurrentValue`: set it to `true` when the `byte[]` property is persisted, so editing without uploading a new file keeps the current one.
 - The mail sender `debug` parameter defaults to `false`; new parameters `timeout-ms` (30s) and `starttls-required`.
 - The test entities (`jpaoletti.jpm2.core.test.*`) moved to `jpm2-web-bs5-test`.
-
-## Excel export (`toExcel`)
-
-The `toExcel` operation exports XLSX by default. Set the operation's `format`
-property to `xls` for legacy Excel files, or explicitly to `xlsx` for modern files:
-
-```xml
-<bean parent="default-toExcel-operation">
-    <property name="properties">
-        <props>
-            <prop key="format">xls</prop>
-        </props>
-    </property>
-</bean>
-```
-
-Values are case insensitive. Other values are rejected. The download extension,
-content type, and row limit per sheet follow the selected format.
+- **`toExcel` exports `.xlsx` by default** (before: `.xls`). The download name, content type and the
+  workbook returned by `JPMService.toExcel(...)` change accordingly; set the operation property
+  `format=xls` to keep the old files (see "Excel export").
+- The table scripts are only in `jpm2-core` (`classpath:sql/*.mysql.sql`); the `jpm2-web-core` copies
+  were removed. `jpm_user_visibles_columns.sql` is now `jpm_user_visibles_columns.mysql.sql`.

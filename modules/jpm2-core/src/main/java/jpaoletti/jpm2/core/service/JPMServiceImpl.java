@@ -37,7 +37,8 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -187,7 +188,18 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
      * Primera fila de datos de cada hoja de toExcel (antes van el titulo y el encabezado).
      */
     private static final int EXCEL_FIRST_DATA_ROW = 3;
+    /**
+     * Filas que un export xlsx mantiene en memoria; las anteriores se escriben a un archivo
+     * temporal (SXSSF).
+     */
+    private static final int EXCEL_ROW_WINDOW = 100;
 
+    /**
+     * Exports the list to a workbook. The default format, xlsx, is a streaming
+     * {@link SXSSFWorkbook}: only the last rows are kept in memory and the rest go to a
+     * temporary file, so the caller must write it and then call
+     * {@link SXSSFWorkbook#dispose()} (see {@code ListController.writeExcelResponse}).
+     */
     @Override
     public Workbook toExcel(Entity entity, SessionEntityData sed, ContextualEntity owner, String ownerId) throws PMException {
         final String format = getContext().getOperation().getConfig("format", "xlsx").trim();
@@ -203,7 +215,15 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
         if (list == null || list.isEmpty()) {
             throw new PMException("jpm.toExcel.noData");
         }
-        final Workbook wb = "xls".equalsIgnoreCase(format) ? new HSSFWorkbook() : new XSSFWorkbook();
+        final Workbook wb;
+        if ("xls".equalsIgnoreCase(format)) {
+            wb = new HSSFWorkbook();
+        } else {
+            final SXSSFWorkbook sxssf = new SXSSFWorkbook(EXCEL_ROW_WINDOW);
+            sxssf.setCompressTempFiles(true);
+            wb = sxssf;
+        }
+        final int columns = paginatedList.getFields().size();
         final int maxRowsPerSheet = wb.getSpreadsheetVersion().getMaxRows();
         final CellStyle bold = xlsBoldStyle(wb);
         final CellStyle xlsDateStyle = xlsDateStyle(wb);
@@ -222,6 +242,10 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                                 : getMessage("jpm.toExcel.pageNameN", String.valueOf(pageNumber)),
                         pageTitle
                 ));
+                if (sheet instanceof SXSSFSheet) {
+                    // Rows are flushed to disk: widths must be measured while they are written
+                    ((SXSSFSheet) sheet).trackAllColumnsForAutoSizing();
+                }
                 sheet.createFreezePane(0, EXCEL_FIRST_DATA_ROW);
                 final Row headerRow = sheet.createRow(EXCEL_FIRST_DATA_ROW - 1);
                 int i = 0;
@@ -251,7 +275,12 @@ public class JPMServiceImpl extends JPMServiceBase implements JPMService {
                 }
             }
         }
-        return xlsStrechColumns(wb);
+        for (int s = 0; s < wb.getNumberOfSheets(); s++) {
+            for (int c = 0; c < columns; c++) {
+                wb.getSheetAt(s).autoSizeColumn(c);
+            }
+        }
+        return wb;
     }
 
     @Override
